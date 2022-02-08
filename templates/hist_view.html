@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SMPL MRP - History</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+    <style>
+        .mytable>tbody>tr>td, .mytable>tbody>tr>th, .mytable>tfoot>tr>td, .mytable>tfoot>tr>th, .mytable>thead>tr>td, .mytable>thead>tr>th {
+    padding: 6px;
+    }
+    input,select {
+    font-family: "Verdana";
+    }
+    hr.style1{
+	        border-top: 15px solid #4d0000;
+            }
+        .oe{
+            font-family: Mathematica6 Bold, Old English Text MT, Engravers Old English BT, Old English, Collins Old English, New Old English, serif;
+            font-size: 50px;
+            color: #4d0000;
+            text-align:center;
+            }
+        .topnav a:hover {
+            color: #4d0000;
+            text-decoration: none;
+        }
+        .nopad {
+                margin: 0;
+                padding: 0;
+                margin-top: 0em;
+                margin-bottom: 0em;
+            }
+
+
+    </style>
+</head>
+<body>
+
+    <div class="topnav" id="myTopnav">
+        <br>
+        <table>
+            <td><img src="/static/logo.jpg"  height="70" width="92" align = "left"></td>
+            <td width="1050px"><div align="center" class="nopad"> <a href="\main_menu"  class="oe">SMPL</a></div></td>
+            <td><div align="left" class="nopad">Hi {{current_user.username}}<br>
+            <a href="\change_password_form">Change Password</a><br>
+            <a href="\logout">Logout</a></div></td>
+        </table>
+    </div>
+
+    <hr class ="style1">
+    <div align="center" class="nopad"><h2>Details for {{incoming.smpl_no}}</h2></div>
+    <h3>Incoming Details Hist</h3>
+    <table class = "table table-sm">
+        <tr>
+            <td>SMPL No: {{incoming.smpl_no}}</td>
+            <td>Customer: {{incoming.customer}}</td>
+        </tr>
+        <tr>
+            <td>Incoming Date: {{incoming.incoming_date}}</td>
+            <td>Unit: {{incoming.unit}}</td>
+        </tr>
+        <tr>
+            <td>Thickness in mm: {{incoming.thickness}}</td>
+            <td>Width in mm: {{incoming.width}}</td>
+        </tr>
+        <tr>
+            <td>Length in mm: {{incoming.length}}</td>
+            <td>Numbers: {{incoming.numbers}}</td>
+        </tr>
+        <tr>
+            <td>Weight in MT: {{incoming.weight}}</td>
+            <td>Grade: {{incoming.grade}}</td>
+        </tr>
+        <tr>
+            <td>Mill: {{incoming.mill}}</td>
+            <td>Mill ID: {{incoming.mill_id}}</td>
+        </tr>
+        <tr>
+            <td>Remarks: {{incoming.remarks}}</td>
+
+        </tr>
+    </table>
+    <!--h3>Uploaded Files</h3>
+    <table class = "table table-sm">
+        <tr>
+
+                {% for file in file_list %}
+
+                    <td><a href="../static/files/{{incoming.smpl_no}}/{{file}}" target="_blank">{{file}} </a></td>
+
+                {% endfor %}
+
+        </tr>
+
+
+
+    </table-->
+
+        <h3>Current Stock</h3>
+    {% if cs_lst %}
+        <table class = "table table-sm">
+            <tr>
+                <td>SMPL No</td>
+                <td>Size</td>
+                <td>Weight</td>
+                <td>Numbers</td>
+                <td>Status</td>
+            </tr>
+            {% for cs in cs_lst %}
+            <tr>
+                <td>{{cs.smpl_no}}</td>
+                <td>{{cs.width}} x {{cs.length}}</td>
+                <td>{{cs.weight}}</td>
+                <td>{{cs.numbers}}</td>
+                <td>{{cs.status}}</td>
+            </tr>
+            {% endfor %}
+        {% else %}
+            <td>Current stock is 0</td>
+        {% endif %}
+
+    </table>
+
+
+     <h3>Processing</h3>
+        {% for processing, processing_id in processing_hdr_lst %}
+             <h4>Operation : {{processing.operation}}</h4>
+            <table class = "table table-sm">
+                <tr>
+
+
+                    <td>Total Processed Wt : {{processing.total_processed_wt}}</td>
+                    <td>No. of Cuts : {{processing.total_cuts}}</td>
+                </tr>
+                <tr>
+                    <td>Processing Date : {{processing.processing_date}}</td>
+                    <td>Start Time : {{processing.start_time}}</td>
+                    <td>End Time : {{processing.end_time}}</td>
+                    <td>Time Taken : {{processing.processing_time}}</td>
+                </tr>
+                {% if processing.operation == "Slitting" or processing.operation == "Mini_Slitting" %}
+                <tr>
+                    <td>Setting Date : {{processing.setting_date}}</td>
+                    <td>Setting Start Time : {{processing.setting_start_time}}</td>
+                    <td>Setting End Time : {{processing.setting_end_time}}</td>
+                    <td>Setting Time Taken : {{processing.setting_time}}</td>
+                </tr>
+                {% endif %}
+                <tr>
+                    <td>No. of QC : {{processing.no_of_qc}}</td>
+                    <td>No. of Helpers : {{processing.no_of_helpers}}</td>
+                    <td>QC : {{processing.names_of_qc}}</td>
+                    <td>Helpers : {{processing.names_of_helpers}}</td>
+                </tr>
+            </table>
+            <hr style="border-top: 3px solid;">
+                {% for _processing_dtl_lst in processing_dtl_lst %}
+
+
+                {% for processing_dtl in _processing_dtl_lst %}
+                    {% if processing_dtl.processing_id == processing_id %}
+                    <table class = "table table-sm">
+                        <tr>
+                            <th>Machine </th>
+                            <th>Processed Wt</th>
+                            <th>Input Size</th>
+                            <th>Output Size</th>
+                            <th>No.s </th>
+                            <th>Packet Name</th>
+                            <th>Remarks </th>
+                         </tr>
+
+                         <tr>
+                             <td>{{processing_dtl.machine}}</td>
+                            <td>{{processing_dtl.processed_wt}}</td>
+                            <td>{{processing_dtl.input_width}} x {{processing_dtl.input_length}}</td>
+                            <td>{{processing_dtl.cut_width}} x {{processing_dtl.cut_length}}</td>
+
+                            <td>{{processing_dtl.processed_numbers}} </td>
+                             <td>{{processing_dtl.packet_name}}</td>
+                             <td>{{processing_dtl.remarks}}</td>
+
+
+                         </tr>
+                     </table>
+                    {% endif %}
+
+                {% endfor %}
+
+                {% endfor %}
+            <hr style="border-top: 3px solid;">
+
+        {% endfor %}
+
+
+
+
+
+
+
+    <h3>Dispatch Details</h3>
+
+        {% for dispatch_hdr, dispatch_id in dispatch_hdr_lst %}
+        <table class = "table table-sm">
+         <tr>
+                <th>Vehicle No.</th>
+                <th>Customer</th>
+                <th>Dispatch Date</th>
+                <th>Dispatch Time</th>
+                <th>Remarks</th>
+        </tr>
+         <tr>
+                <td>{{dispatch_hdr.vehicle_no}}</td>
+                <td>{{dispatch_hdr.customer}}</td>
+                <td>{{dispatch_hdr.dispatch_date}}</td>
+                <td>{{dispatch_hdr.dispatch_time}}</td>
+                <td>{{dispatch_hdr.remarks}}</td>
+
+        </tr>
+    </table>
+
+
+        <table class = "table table-sm">
+            <tr>
+                    <th>SMPL No.</th>
+                    <th>Thickness</th>
+                    <th>Size</th>
+                    <th>Numbers</th>
+                    <th>Weight</th>
+                    <th>No. of Packets</th>
+                    <th>Defectives</th>
+
+            </tr>
+            {% for detail in dispatch_dtl_lst %}
+
+                {% if dispatch_id == detail.dispatch_id %}
+                <tr>
+
+                        <td>{{detail.smpl_no}}</td>
+                        <td>{{detail.thickness}}</td>
+                        <td>{{detail.width}} x {{detail.length}}</td>
+                        <td>{{detail.numbers}}</td>
+                        <td>{{detail.dispatch_wt}}</td>
+                        <td>{{detail.no_of_pkts}}</td>
+                        <td>{{detail.defectives}}</td>
+
+                </tr>
+                {% endif %}
+            {% endfor %}
+            </table>
+        {% endfor %}
+
+
+</body>
+
+
+</html>
+

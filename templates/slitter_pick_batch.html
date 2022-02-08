@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SMPL MRP - Pick Slitter Batch</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+    <style>
+        hr.style1{
+	        border-top: 15px solid #4d0000;
+            }
+        .oe{
+            font-family: Mathematica6 Bold, Old English Text MT, Engravers Old English BT, Old English, Collins Old English, New Old English, serif;
+            font-size: 50px;
+            color: #4d0000;
+            text-align:center;
+            }
+        .topnav a:hover {
+            color: #4d0000;
+            text-decoration: none;
+        }
+        .nopad {
+                margin: 0;
+                padding: 0;
+                margin-top: 0em;
+                margin-bottom: 0em;
+            }
+    </style>
+
+</head>
+<form action="/slitter_grinding_entry">
+    <div class="topnav" id="myTopnav">
+        <br>
+        <table>
+            <td><img src="/static/logo.jpg"  height="70" width="92" align = "left"></td>
+            <td width="1050px"><div align="center" class="nopad"> <a href="\main_menu"  class="oe">SMPL</a></div></td>
+            <td><div align="left" class="nopad">Hi {{current_user.username}}<br>
+            <a href="\change_password_form">Change Password</a><br>
+            <a href="\logout">Logout</a></div></td>
+        </table>
+    </div>
+
+    <hr class ="style1">
+    <!--select name ="select_smpl"-->
+        <table class = "table table-sm">
+            <tr>
+                <th>Slitter Batch</th>
+            </tr>
+        {% for slitter in slitter_lst %}
+            <tr>
+                <td><input type = "radio" name = "select_slitter" value = "{{slitter}}">  {{slitter}}</input></td>
+
+            </tr>
+        {% endfor %}
+    <!--/select-->
+        </table>
+
+
+    <td>
+        <input class="btn btn-default" type="submit" name="submit" value="Enter Grinding Details">
+        <input class="btn btn-default" type="submit" name="submit" value="View Slitter Details">
+    </td>
+</form>
+</html>

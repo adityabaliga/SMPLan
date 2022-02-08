@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SMPL MRP - Slitter Grinding</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+    <style>
+        hr.style1{
+	        border-top: 15px solid #4d0000;
+            }
+        .oe{
+            font-family: Mathematica6 Bold, Old English Text MT, Engravers Old English BT, Old English, Collins Old English, New Old English, serif;
+            font-size: 50px;
+            color: #4d0000;
+            text-align:center;
+            }
+        .topnav a:hover {
+            color: #4d0000;
+            text-decoration: none;
+        }
+        .nopad {
+                margin: 0;
+                padding: 0;
+                margin-top: 0em;
+                margin-bottom: 0em;
+            }
+    </style>
+
+</head>
+<form>
+    <div class="topnav" id="myTopnav">
+        <br>
+        <table>
+            <td><img src="/static/logo.jpg"  height="70" width="92" align = "left"></td>
+            <td width="1050px"><div align="center" class="nopad"> <a href="\main_menu"  class="oe">SMPL</a></div></td>
+            <td><div align="left" class="nopad">Hi {{current_user.username}}<br>
+            <a href="\change_password_form">Change Password</a><br>
+            <a href="\logout">Logout</a></div></td>
+        </table>
+    </div>
+
+    <hr class ="style1">
+
+        <table class = "table table-sm">
+            <tr>
+                <th>Slitter Batch</th>
+                <td><input type = "text" name="slitter_batch" value="{{slitter_batch.slitter_batch}}" readonly></td>
+            </tr>
+            <tr>
+                <th>Slitter Thickness (in mm)</th>
+                <td><input type = "text" name="slitter_thickness" value="{{slitter_batch.cutter_thickness}}" readonly></td>
+            </tr>
+            <tr>
+                <th>No.of Cutters</th>
+                <td><input type = "text" name="no_of_cutters" value="{{slitter_batch.no_of_cutters}}" readonly></td>
+            </tr>
+            <tr>
+                <th>Slitter OD (in mm)</th>
+                <td><input type = "text" name="current_od" id="current_od" value="{{slitter_batch.current_od}}" readonly></td>
+            </tr>
+            <tr>
+                <th>Slitter Length Limit (in metres)</th>
+                <td><input type = "text" name="batch_length_limit" value="{{slitter_batch.batch_length_limit}}" readonly></td>
+            </tr>
+            <tr>
+                <th>Last sent for griding on</th>
+                <td><input type = "date" name="start_date" id="start_date" value="{{slitter_batch.start_date}}" readonly></td>
+            </tr>
+            <tr>
+                <th>No. of metres run by slitter </th>
+            </tr>
+            {% for i in range(0, 6) %}
+            <tr>
+                {% set batch_limit = (slitter_batch.batch_length_limit) | int %}
+
+                <td>
+                {% if (slitter_grinding_lst[(i*5) + 5]) >=  batch_limit %}
+                <b>
+                {% endif %}
+                    Slitter {{(i*5) + 1}}: {{slitter_grinding_lst[(i*5) + 5]}}
+                {% if (slitter_grinding_lst[(i*5) + 5]) >=  batch_limit %}
+                </b>
+                {% endif %}
+                </td>
+
+               <td>
+                {% if (slitter_grinding_lst[(i*5) + 6]) >=  batch_limit %}
+                <b>
+                {% endif %}
+                    Slitter {{(i*5) + 2}}: {{slitter_grinding_lst[(i*5) + 6]}}
+                {% if (slitter_grinding_lst[(i*5) + 6]) >=  batch_limit %}
+                </b>
+                {% endif %}
+                </td>
+
+                <td>
+                {% if (slitter_grinding_lst[(i*5) + 7]) >= batch_limit %}
+                <b>
+                {% endif %}
+                    Slitter {{(i*5) + 3}}: {{slitter_grinding_lst[(i*5) + 7]}}
+                {% if (slitter_grinding_lst[(i*5) + 7]) >= batch_limit %}
+                </b>
+                {% endif %}
+                </td>
+
+                <td>
+                {% if (slitter_grinding_lst[(i*5) + 8]) >=  batch_limit %}
+                <b>
+                {% endif %}
+                    Slitter {{(i*5) + 4}}: {{slitter_grinding_lst[(i*5) + 8]}}
+                {% if (slitter_grinding_lst[(i*5) + 8]) >=  batch_limit %}
+                </b>
+                {% endif %}
+                </td>
+
+                <td>
+                {% if (slitter_grinding_lst[(i*5) + 9]) >=  batch_limit %}
+                <b>
+                {% endif %}
+                    Slitter {{(i*5) + 5}}: {{slitter_grinding_lst[(i*5) + 9]}}
+                {% if (slitter_grinding_lst[(i*5) + 9]) >=  batch_limit %}
+                </b>
+                {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+
+        </table>
+</form>

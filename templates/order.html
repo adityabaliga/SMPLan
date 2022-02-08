@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SMPL MRP - Place Order</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+    <style>
+        .mytable>tbody>tr>td, .mytable>tbody>tr>th, .mytable>tfoot>tr>td, .mytable>tfoot>tr>th, .mytable>thead>tr>td, .mytable>thead>tr>th {
+    padding: 6px;
+    }
+    input,select {
+    font-family: "Verdana";
+    }
+    hr.style1{
+	        border-top: 15px solid #4d0000;
+            }
+        .oe{
+            font-family: Mathematica6 Bold, Old English Text MT, Engravers Old English BT, Old English, Collins Old English, New Old English, serif;
+            font-size: 50px;
+            color: #4d0000;
+            text-align:center;
+            }
+        .topnav a:hover {
+            color: #4d0000;
+            text-decoration: none;
+        }
+        .nopad {
+                margin: 0;
+                padding: 0;
+                margin-top: 0em;
+                margin-bottom: 0em;
+            }
+
+
+    </style>
+</head>
+<body class="order_form">
+<form action="/submit_order" method="post" name="order" id="order" class = "order_form">
+
+
+    <div class="topnav" id="myTopnav">
+        <br>
+        <table>
+            <td><img src="/static/logo.jpg"  height="70" width="92" align = "left"></td>
+            <td width="1050px"><div align="center" class="nopad"> <a href="\main_menu"  class="oe">SMPL</a></div></td>
+            <td><div align="left" class="nopad">Hi {{current_user.username}}<br>
+            <a href="\change_password_form">Change Password</a><br>
+            <a href="\logout">Logout</a></div></td>
+        </table>
+    </div>
+
+    <hr class ="style1">
+    <table class = "table table-sm">
+    <tr>
+        <!--td>SMPL No</td>
+        <td><input type="text" name="smpl_no" value = "{{smpl_no}}" readonly></td>
+
+        <td >Customer</td>
+        <td><input type="text" name="customer" value = "{{customer}}" readonly></td>
+
+        <td>Grade</td>
+        <td><input type="text"  name="grade"  value = "{{grade}}" readonly></td>
+    </tr>
+    <tr>
+        <td>Thickness</td>
+        <td><input type="text"  name="thickness" id = "thickness" value = "{{thickness}}" readonly></td>
+
+        <td>Width</td>
+        <td><input type="text"  name="width" value = "{{width}}" readonly></td>
+
+        <td>Length</td>
+        <td><input type="text"  name="length" value = "{{length}}" readonly></td>
+    </tr>
+    <tr>
+
+        <td>Available Weight in MT</td>
+        <td><input type="text" name="available_wt"  value = "{{weight}}" readonly></td>
+
+        <td>Numbers</td>
+        <td><input type="text" name="available_numbers"  value = "{{numbers}}" readonly></td-->
+
+
+    </tr>
+        <td>SMPL No</td>
+        <td><input type="text" name="smpl_no" class = "smpl_no" value = "{{smpl_no}}" readonly></td>
+
+        <td >Customer</td>
+        <td><input type="text" name="customer" class = "customer" value = "{{customer}}" readonly></td>
+
+        <td>Grade</td>
+        <td>{{grade}}</td>
+        <td><input type ="textarea" name="grade" class="grade" value="{{grade}}" hidden></td>
+    </tr>
+
+    <tr>
+        <td>Thickness</td>
+        <td><input type="text"  name="thickness" class = "thickness" value = "{{thickness}}"  readonly></td>
+
+        <td>Width</td>
+        <td><input type="text"  name="width" class = "width" value = "{{width}}" readonly></td>
+
+        <td>Length</td>
+        <td><input type="text"  name="length" class = "length" id="length" value = "{{length}}" readonly></td>
+    </tr>
+    <tr>
+
+        <td>Available Weight in MT</td>
+        <td><input type="text" name="available_wt" class = "available_wt"  value = "{{weight}}" readonly></td>
+
+        <td>Numbers</td>
+        <td><input type="text" name="available_numbers"  class="available_numbers" value = "{{numbers}}" readonly></td>
+
+        <td>Length of Coil (in metres) </td>
+        <td><input type="text" name="length_of_coil" class = "length_of_coil" id="length_of_coil" readonly></td>
+
+    <tr>
+
+
+
+    </tr>
+    <tr>
+        <td>Coil Processing Weight in MT</td>
+        <td><input type="number"  name="processing_wt"  id="processing_wt" class = "processing_wt" step="0.001" required></td>
+
+        <td>Order Date</td>
+        <td><input type="date"  id = "order_date" class ="order_date" name="order_date" required></td>
+
+        <td>Expected Date</td>
+        <td><input type="date"  id = "expected_date" class ="expected_date" name="expected_date" required></td>
+    </tr>
+
+    </table>
+
+    <tr>
+
+        <td>Special Instructions</td>
+        <td><input type="text"  name="hdr_remarks" style="width:900px;" value="{{remarks}}"></td>
+    </tr>
+
+    <hr>
+
+    <div id="current_op_tbl" class = "current_op">
+    <h3>Operation</h3>
+        <span style = "padding-right:20px;"><b>Operation</b></span>
+        <select class = "current_op_name" disabled>
+                <option selected disabled>Select Operation</option>
+                <option value="CTL">CTL</option>
+                <option value="Slitting">Slitting</option>
+                <option value="Mini_Slitting">Mini Slitting</option>
+                <option value="Narrow_CTL">Narrow CTL</option>
+                <!--option value="Trap CTL">Trap CTL</option-->
+                <option value="Reshearing">Reshearing</option>
+                <option value="Lamination">Lamination</option>
+                <option value="Levelling">Levelling</option>
+        </select>
+        <span style="padding:100px;">
+            <span style = "padding-right:20px;"><b>Stage</b></span>
+            <input type="number" class ="current_op_stage" step="1.0" value="1">
+        </span>
+        <span  style = "padding-right:20px;"><b>Input Material</b></span>
+            <select class="current_op_ip_mtrl">
+                <option selected disabled>Select Input</option>
+            </select>
+        <!--option value="{{width}} x {{length}}">{{width}} x {{length}}</option-->
+        <!--option value="1250 x 0">1250 x 0    22.54 MT</option-->
+        <br><br>
+        <div class="current_op_slitting" hidden>
+            <span class="processing_wt_for_op_hdr" style = "padding-right:20px;">
+                <span><b>Processing Wt</b></span>
+                <input type="number" class ="processing_wt_for_op" value="" step="0.001">
+            </span>
+            <span class="available_width_hdr" style = "padding-right:20px;">
+                <span><b>Available Width</b></span>
+                <input type="number" class ="available_width" value="" readonly>
+            </span>
+            <span class="no_of_parts_hdr" style = "padding-right:20px;">
+                <span><b>No of Parts</b></span>
+                <input type="number" class ="no_of_parts" value=""></span>
+            <span class="iDia_hdr" style = "padding-right:20px;">
+                <b>Internal Dia</b>
+            </span>
+                 <select class="iDia">
+                    <option value = "0" selected="selected"> </option>
+                    <option value = "610">610</option>
+                    <option value = "508">508</option>
+                    <option value = "350">350</option>
+                </select>
+
+
+        </div>
+    <hr>
+    </div>
+    <div class="current_sizes">
+        <div class="id_curr_size" hidden>
+            <span class="id_hdr">ID</span>
+            <input type="number" class="id">
+        </div>
+
+        <div class="fg_wip_curr_size">
+            <span class="fg_wip_hdr" style = "padding-right:20px;"><b>FG/WIP</b></span>
+            <select class="fg_wip">
+                <option value = "FG">FG</option>
+                <option value = "WIP">WIP</option>
+                <option value = "Scrap">Scrap</option>
+            </select>
+        </div>
+        <br>
+
+        <span class="cut_width_curr_size" >
+            <span class="cut_width_hdr" style = "padding-right:20px;"><b>Width</b></span>
+            <input type="number" class="cut_width" step="0.1" style= "width:200px;" value="" readOnly>
+        </span>
+
+        <span class="cut_length_curr_size">
+            <span class="cut_length_hdr" style= "padding-left:110px;padding-right:20px;"><b>Length</b></span>
+            <input type="number" class="cut_length" step="0.1" style= "width:200px;" value="">
+        </span>
+
+
+        <br><br>
+        <span class="tol_curr_size" style="width:200px;">
+            <span class="tol_hdr"><b>Tolerance</b></span>
+            <input type="text" class="tol" value="">
+        </span>
+
+        <span class="lami_hdr_curr_size">
+            <span class="lami_hdr" style= "padding-left:96px;padding-right:20px;"><b>Lamination</b></span>
+            <select class="lami" style="padding-right:50px">
+                <option value = "No Lamination">No Lamination</option>
+                <option value = "Single Side - White">Single Side - White</option>
+                <option value = "Single Side - Blue">Single Side - Blue</option>
+                <option value = "Double Side - White">Double Side - White</option>
+                <option value = "Double Side - Blue">Double Side - Blue</option>
+                <option value = "Double Side - Top Blue Bottom White">Double Side - Top Blue Bottom White</option>
+                <option value = "Double Side - Top White Bottom Blue">Double Side - Top White Bottom Blue</option>
+
+            </select>
+        </span>
+
+
+
+
+
+        <br><br>
+
+        <span class="prc_wt_curr_size">
+            <span class="prc_wt_hdr" ><b>Processing Wt (in MT)</b></span>
+            <input type="number" class="prc_wt" value="" step="0.01">
+        </span>
+
+        <span class="wt_per_pkt_curr_size">
+            <span class="wt_per_pkt_hdr" style="width:100px;"><b>Weight/pkt (in MT)</b></span>
+            <input type="number" class="wt_per_pkt" value="" step="0.01">
+        </span>
+        <br><br>
+
+        <span class="numbers_curr_size">
+            <span class="numbers_hdr" style="width:100px; padding-right:20px"><b>Numbers</b></span>
+            <input type="number" class="numbers" step="1" value="">
+        </span>
+
+        <span class="no_per_pkt_curr_size" >
+            <span class="no_per_pkt_hdr" style="width:100px; padding-right:20px; padding-left: 83px"><b>No.s/pkt</b></span>
+            <input type="number" class="no_per_pkt" step="1" value="">
+        </span>
+
+        <span class="no_of_pkts_curr_size">
+            <span class="no_of_pkts_hdr" style= "padding-right:20px;padding-left: 83px"><b>No. of pkts</b></span>
+            <input type="number" class="no_of_pkts" step="1" value="">
+        </span>
+
+        <br><br>
+        <span class="packing_curr_size">
+            <span class="packing_hdr"><b>Packing Type</b></span>
+            <input type="text" class="packing" value="">
+        </span>
+
+        <span class="remarks_curr_size" style="padding-left:100px">
+            <span class="remarks_hdr"><b>Remarks</b></span>
+
+            <textarea rows="2" cols="30" class="remarks" value=""></textarea>
+        </span>
+    </div>
+
+    <br><br>
+    <div>
+        <span><b>Operation Processing Wt</b></span>
+        <input type="text" class="op_processing_wt" readonly>
+
+
+    </div>
+
+    <input type="button" name="add_size" class = "add_size_btn" id="add_size" value ="Add Size">
+    <input type="button" name="add_op" class = "add_op_btn" id="add_op" value ="Next operation">
+    <br><br><br>
+
+    <div class="sizes_table">
+        <h5>CTL</h5>
+        <table id="CTL_table" class = "table table-sm CTL_table">
+                <tr>
+                    <th hidden>CTL</th>
+                    <th>Stage No</th>
+                    <th>FG/WIP</th>
+                    <th>Input Material</th>
+                    <th hidden>Cut Width</th>
+                    <th>Cut Length</th>
+                    <th>Lamination</th>
+                    <th>Tolerance</th>
+                    <th hidden>I Dia</th>
+                    <th>Processing Weight</th>
+                    <th>Numbers</th>
+                    <th>No.s/pkt</th>
+                    <th>No. of pkts</th>
+                    <th>Packing Type</th>
+                    <th>Remarks</th>
+                </tr>
+
+        </table>
+
+         <h5>Slitting</h5>
+        <table id="Slitting_table" class = "table table-sm Slitting_table">
+                <tr>
+                    <th hidden>Slitting</th>
+                    <th>Stage No</th>
+                    <th>FG/WIP</th>
+                    <th>Input Material</th>
+                    <th>Cut Width</th>
+                    <th hidden>Cut Length</th>
+                    <th hidden>Lamination</th>
+                    <th>Tolerance</th>
+                    <th>I Dia</th>
+                    <th>Processing Weight</th>
+                    <th>No. of Slits</th>
+                    <th>Length/Part</th>
+                    <th>No. of parts</th>
+                    <th>Packing Type</th>
+                    <th>Remarks</th>
+                </tr>
+        </table>
+
+        <h5>Narrow CTL</h5>
+        <table id="Narrow_CTL_table" class = "table table-sm Narrow_CTL_table">
+                <tr>
+                    <th hidden>Narrow CTL</th>
+                    <th>Stage No</th>
+                    <th>FG/WIP</th>
+                    <th>Input Material</th>
+                    <th hidden>Cut Width</th>
+                    <th>Cut Length</th>
+                    <th>Lamination</th>
+                    <th>Tolerance</th>
+                    <th hidden>I Dia</th>
+                    <th>Processing Weight</th>
+                    <th>Numbers</th>
+                    <th>No.s/pkt</th>
+                    <th>No. of pkts</th>
+                    <th>Packing Type</th>
+                    <th>Remarks</th>
+                </tr>
+
+        </table>
+
+        <h5>Mini Slitting</h5>
+        <table id="Mini_Slitting_table" class = "table table-sm Mini_Slitting_table">
+                <tr>
+                    <th hidden>Mini Slitting</th>
+                    <th>Stage No</th>
+                    <th>FG/WIP</th>
+                    <th>Input Material</th>
+                    <th>Cut Width</th>
+                    <th hidden>Cut Length</th>
+                    <th hidden>Lamination</th>
+                    <th>Tolerance</th>
+                    <th>I Dia</th>
+                    <th>Processing Weight</th>
+                    <th>No. of Slits</th>
+                    <th>Length/Part</th>
+                    <th>No. of parts</th>
+                    <th>Packing Type</th>
+                    <th>Remarks</th>
+                </tr>
+        </table>
+
+
+        <h5>Reshearing</h5>
+        <table id="Reshearing_table" name = "Reshearing_table" class = "table table-sm Reshearing_table">
+                <tr>
+                    <th hidden>Reshearing</th>
+                    <th>Stage No</th>
+                    <th>FG/WIP</th>
+                    <th>Input Material</th>
+                    <th>Cut Width</th>
+                    <th>Cut Length</th>
+                    <th hidden>Lamination</th>
+                    <th>Tolerance</th>
+                    <td hidden>I dia</td>
+                    <th>Processing Weight</th>
+                    <th>Numbers</th>
+                    <th>No.s/pkt</th>
+                    <th>No. of pkts</th>
+                    <th>Packing Type</th>
+                    <th>Remarks</th>
+                </tr>
+        </table>
+
+        <h5>Lamination</h5>
+        <table id="Lamination_table" name = "Lamination_table" class = "table table-sm Lamination_table">
+                <tr>
+                    <th hidden>Lamination</th>
+                    <th>Stage No</th>
+                    <th>FG/WIP</th>
+                    <th>Input Material</th>
+                    <th>Cut Width</th>
+                    <th>Cut Length</th>
+                    <th>Lamination</th>
+                    <th>Tolerance</th>
+                    <td hidden>I dia</td>
+                    <th>Processing Weight</th>
+                    <th>Numbers</th>
+                    <th>No.s/pkt</th>
+                    <th>No. of pkts</th>
+                    <th>Packing Type</th>
+                    <th>Remarks</th>
+                </tr>
+        </table>
+
+        <h5>Lamination</h5>
+        <table id="Levelling_table" name = "Levelling_table" class = "table table-sm Levelling_table">
+                <tr>
+                    <th hidden>Levelling</th>
+                    <th>Stage No</th>
+                    <th>FG/WIP</th>
+                    <th>Input Material</th>
+                    <th>Cut Width</th>
+                    <th>Cut Length</th>
+                    <th hidden>Lamination</th>
+                    <th hidden>Tolerance</th>
+                    <td hidden>I dia</td>
+                    <th>Processing Weight</th>
+                    <th>Numbers</th>
+                    <th>No.s/pkt</th>
+                    <th>No. of pkts</th>
+                    <th>Packing Type</th>
+                    <th>Remarks</th>
+                </tr>
+        </table>
+
+    </div>
+    <input type = "text" value="" class="order_string" name="order_string" id="order_string" hidden>
+    <input type="submit" value ="Submit Orders">
+    <script src = "{{ url_for('static', filename='js/order.js') }}"></script>
+    </form>
+</body>
+</html>
+
+
+
+
+
+
+
+<!--DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SMPL MRP - Place Order</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+    <style>
+        .mytable>tbody>tr>td, .mytable>tbody>tr>th, .mytable>tfoot>tr>td, .mytable>tfoot>tr>th, .mytable>thead>tr>td, .mytable>thead>tr>th {
+    padding: 6px;
+    }
+    input,select {
+    font-family: "Verdana";
+    }
+    hr.style1{
+	        border-top: 15px solid #4d0000;
+            }
+        .oe{
+            font-family: Mathematica6 Bold, Old English Text MT, Engravers Old English BT, Old English, Collins Old English, New Old English, serif;
+            font-size: 50px;
+            color: #4d0000;
+            text-align:center;
+            }
+        .topnav a:hover {
+            color: #4d0000;
+            text-decoration: none;
+        }
+        .nopad {
+                margin: 0;
+                padding: 0;
+                margin-top: 0em;
+                margin-bottom: 0em;
+            }
+
+
+    </style>
+</head>
+<body onload="setFocusToTextBox()">
+<form action="/submit_order" method="post" name="order" onsubmit="return validate_form('dataTable')">
+    <div class="topnav" id="myTopnav">
+        <br>
+        <table>
+            <td><img src="/static/logo.jpg"  height="70" width="92" align = "left"></td>
+            <td width="1050px"><div align="center" class="nopad"> <a href="\main_menu"  class="oe">SMPL</a></div></td>
+            <td><div align="left" class="nopad">Hi {{current_user.username}}<br>
+            <a href="\change_password_form">Change Password</a><br>
+            <a href="\logout">Logout</a></div></td>
+        </table>
+    </div>
+
+    <hr class ="style1">
+    <table class = "table table-sm">
+    <tr>
+        <td>SMPL No</td>
+        <td><input type="text" name="smpl_no" value = "{{smpl_no}}" readonly></td>
+
+        <td >Customer</td>
+        <td><input type="text" name="customer" value = "{{customer}}" readonly></td>
+
+        <td>Grade</td>
+        <td><input type="text"  name="grade"  value = "{{grade}}" readonly></td>
+    </tr>
+    <tr>
+        <td>Thickness</td>
+        <td><input type="text"  name="thickness" id = "thickness" value = "{{thickness}}" readonly></td>
+
+        <td>Width</td>
+        <td><input type="text"  name="width" value = "{{width}}" readonly></td>
+
+        <td>Length</td>
+        <td><input type="text"  name="length" value = "{{length}}" readonly></td>
+    </tr>
+    <tr>
+
+        <td>Available Weight in MT</td>
+        <td><input type="text" name="available_wt"  value = "{{weight}}" readonly></td>
+
+        <td>Numbers</td>
+        <td><input type="text" name="available_numbers"  value = "{{numbers}}" readonly></td>
+    </tr>
+    <tr>
+
+
+
+    </tr>
+    <tr>
+        <td>Processing Weight in MT</td>
+        <td><input type="text"  name="processing_wt"  id="processing_wt" required></td>
+
+        <td>Order Date</td>
+        <td><input type="date"  id = "order_date" name="order_date" required></td>
+
+        <td>Expected Date</td>
+        <td><input type="date"  id = "expected_date" name="expected_date" required></td>
+    </tr>
+
+    </table>
+
+    <tr>
+
+        <td>Special Instructions</td>
+        <td><input type="text"  name="hdr_remarks" style="width:900px;" value="{{remarks}}"></td>
+    </tr>
+
+    <hr>
+
+    <div id="current_op_tbl" class = "current_op">
+            <h3>Operation</h3>
+            <table name="current_op_hdr" id="current_op_hdr" class = "table table-sm">
+                <tr>
+                    <td>Operation</td>
+                    <td>
+                        <select name="curr_operation_type" id="operation_type" onchange="on_select_operation(this, 'current_op_hdr')">
+                            <option value="CTL">CTL</option>
+                            <option value="Slitting">Slitting</option>
+                            <option value="Mini Slitting">Mini Slitting</option>
+                            <option value="Narrow CTL">Narrow CTL</option>
+                            <option value="Trap CTL">Trap CTL</option>
+                            <option value="Reshearing">Reshearing</option>
+                            <option value="Lamination">Lamination</option>
+                        </select>
+                    </td>
+
+
+                    <td>Stage No.</td>
+                    <td><input type ="number" name="curr_stage_no" id="stage_no" value ="1" required></td>
+
+                    <td>Input Material</td>
+                    <td>
+                        <select name = "curr_input_material" id = "input_material">
+                                <option value="{{width}} x {{length}}">{{width}} x {{length}}</option>
+                        </select>
+                    </td>
+
+                    <td>Processing Weight (in MT)</td>
+                    <td>
+                        <input type="number" name="curr_proc_wt" id="curr_proc_wt" step="0.001">
+                    </td>
+                </tr>
+
+                <tr>
+
+
+                    <td name="curr_plus_tol" id="curr_plus_tol_lbl">+ Tolerance</td>
+                    <td><input text="number" name="curr_plus_tol" id="curr_plus_tol" step="0.1"></td>
+
+                    <td name="curr_minus_tol" id="curr_minus_tol_lbl">- Tolerance</td>
+                    <td><input text="number" name="curr_minus_tol" id="curr_minus_tol" step="0.1"></td>
+
+                    <td name="curr_parts" id="curr_parts_lbl" hidden="true">No. of parts</td>
+                    <td><input text="number" name="curr_parts" id="curr_parts" hidden="true"></td>
+
+                    <td name="curr_length" id="curr_length_lbl" hidden="true">Length per Part (in m)</td>
+                    <td><input text="number" name="curr_length" id="curr_length" hidden="true"></td>
+                </tr>
+            </table>
+
+            <hr>
+            <h3>Sizes</h3>
+            <table name="current_op_body" id="current_op_body" class = "table table-sm">
+                <tr>
+                    <th>FG/WIP</th>
+                    <th>Cut Width</th>
+                    <th>Cut Length</th>
+                    <th style="width:100px;">Numbers</th>
+
+
+                    <th style="width:100px;">No. of pieces/pkt</th>
+                    <th style="width:100px;">No. of packets</th>
+                    <th>Packing Type</th>
+                    <th>Remarks</th>
+                </tr>
+                <tr>
+                     <td>
+                        <select name = "curr_size_fg" id = "curr_size_fg" onfocusout="fg_or_no_fg(this, 'dataTable')">
+                            <option value = "FG">FG</option>
+                            <option value = "WIP">WIP</option>
+                        </select>
+                    </td>
+
+                    <td>
+
+                        <input text="number" name="curr_cut_width" id="curr_cut_width" style="width:100px;" step="0.1">
+                    </td>
+
+                    <td>
+
+                        <input text="number" name="curr_cut_length" id="curr_cut_length" style="width:100px;" step="0.1">
+                    </td>
+
+                    <td>
+
+                        <input text="number" name="curr_number" id ="curr_number" style="width:100px;">
+                    </td>
+
+
+
+                    <td><input type="number" name="curr_nos_per_pkt" id="nos_per_pkt" style="width:100px;"></td>
+                    <td><input type="number" name ="curr_no_of_pkts" id="no_of_pkts" style="width:100px;"></td>
+                    <td><input type="text" name="curr_pkng_type" id="pkng_type" style="width:300px;"></td>
+                    <td>
+                        <input type ="text" name="curr_size_remarks" id="curr_size_remarks" style="width:300px;">
+                    </td>
+                    <td>
+                        <input type="button" name="add_size" id="add_size" value="Add Size" onclick="addRow('current_op_body')">
+                    </td>
+                </tr>
+
+            </table>
+
+
+
+
+
+
+        </div>
+
+
+    <input type="button" name="add_op" id="add_op" value ="Add operation">
+    <br><br><br>
+    <table id="CTL_table" class = "table table-sm">
+            <tr>
+                <th>Stage No</th>
+                <th>Input Material</th>
+                <th>Processing Weight</th>
+                <th>Tolerance</th>
+                <th>Cut Length</th>
+                <th>Numbers</th>
+                <th>FG/WIP</th>
+                <th>No. of pkts</th>
+                <th>No.s/pkt</th>
+                <th>Packing Type</th>
+                <th>Remarks</th>
+            </tr>
+    </table>
+
+<script src = "{{ url_for('static', filename='js/order.js') }}"></script>
+</form>
+</body>
+</html-->
+

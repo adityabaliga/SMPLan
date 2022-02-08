@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+    <title>SMPL MRP-Main Menu</title>
+    <style>
+        hr.style1{
+	        border-top: 15px solid #4d0000;
+            }
+        .oe{
+            font-family: Mathematica6 Bold, Old English Text MT, Engravers Old English BT, Old English, Collins Old English, New Old English, serif;
+            font-size: 50px;
+            color: #4d0000;
+            text-align:center;
+            }
+        .topnav a:hover {
+            color: #4d0000;
+            text-decoration: none;
+        }
+        .nopad {
+                margin: 0;
+                padding: 0;
+                margin-top: 0em;
+                margin-bottom: 0em;
+            }
+    </style>
+
+</head>
+<body>
+    <div class="topnav" id="myTopnav">
+        <br>
+        <table>
+            <td><img src="/static/logo.jpg"  height="70" width="92" align = "left"></td>
+            <td width="1050px"><div align="center" class="nopad"> <a href="\main_menu"  class="oe">SMPL</a></div></td>
+            <td><div align="left" class="nopad">Hi {{current_user.username}}<br>
+            <a href="\change_password_form">Change Password</a><br>
+            <a href="\logout">Logout</a></div></td>
+        </table>
+    </div>
+
+    <hr class ="style1">
+    <h5>{{message}}</h5>
+    <!--h5>Processing for entered. Click  <a href="/print_label" class="'alert-link'">here</a> </h5-->
+    <table class="table table-striped">
+
+
+        <!--tr>
+            <th><h3>Incoming</h3></th>
+            <th><h3>Order</h3></th>
+            <th><h3>Upload</h3></th>
+        </tr>
+        <tr>
+            <td><a href ="\incoming_input_smpl">SMPL</a>
+                <br>
+            <a href ="\incoming_input_tr">TSPDL</a>
+                <br>
+            <a href ="\rm_onhold">Put RM on hold</a>
+                <br>
+            <a href ="\rm_unhold">Unhold RM</a>
+                <br>
+            <a href ="transfer_material">Transfer Material</a>
+            </td>
+            <td><a href="\smpl_for_order">SMPL - Place Order</a>
+                <br>
+                <a href="\tr_for_order">TSDPL - Place Order</a>
+                <br>
+            <a href ="\smpl_for_modify_order">View/Delete Order</a>
+            </td>
+            <td><a href="\upload_pick_smpl">Upload Documents</a>
+                <br>
+
+            </td>
+        </tr-->
+        <tr>
+            {% if current_user.user_type == "all" or current_user.user_type == "incoming_head" or current_user.user_type == "plan_head" or current_user.user_type == "incoming_unit1" or current_user.user_type == "incoming_unit2" %}
+            <th><h3>Incoming</h3></th>
+            {% endif %}
+            <th><h3>SMPL Processing</h3></th>
+            <th><h3>TR Processing</h3></th>
+        </tr>
+        {% if current_user.user_type == "all" or current_user.user_type == "incoming_head" or current_user.user_type == "plan_head" or current_user.user_type == "incoming_unit1" or current_user.user_type == "incoming_unit2" %}
+            <tr>
+                <td><a href ="\incoming_input_smpl">SMPL</a>
+                    <br>
+                <a href ="\incoming_input_tr">TSPDL</a>
+                    <br>
+                <a href ="\rm_onhold">Put RM on hold</a>
+                    <br>
+                <a href ="\rm_unhold">Unhold RM</a>
+                    <br>
+                <a href ="transfer_material">Transfer Material</a>
+                    <br>
+                <a href ="\fg_to_wip">FG to WIP</a>
+            </td>
+            {% endif %}
+            <td>
+                <a href="\orders_by_machine?select_operation=CTL&type=smpl">CTL</a><br>
+                <a href="\orders_by_machine?select_operation=Slitting&type=smpl">Slitting</a><br>
+                <a href="\orders_by_machine?select_operation=Mini_Slitting&type=smpl">Mini Slitting</a><br>
+                <a href="\orders_by_machine?select_operation=Narrow_CTL&type=smpl">Narrow CTL</a><br>
+                <a href="\orders_by_machine?select_operation=Reshearing&type=smpl">Reshearing</a><br>
+                <a href="\orders_by_machine?select_operation=Levelling&type=smpl">Levelling</a><br>
+                <a href="\orders_by_machine?select_operation=Lamination&type=smpl">Lamination</a><br>
+                <a href="\processing_search">SMPL Search</a><br>
+
+            </td>
+            <td>
+                <a href="\orders_by_machine?select_operation=CTL&type=tr">CTL</a><br>
+                <a href="\orders_by_machine?select_operation=Slitting&type=tr">Slitting</a><br>
+                <a href="\orders_by_machine?select_operation=Mini_Slitting&type=tr">Mini Slitting</a><br>
+                <a href="\orders_by_machine?select_operation=Narrow_CTL&type=tr">Narrow CTL</a><br>
+                <a href="\orders_by_machine?select_operation=Reshearing&type=tr">Reshearing</a><br>
+                <a href="\orders_by_machine?select_operation=Levelling&type=tr">Levelling</a><br>
+                <a href="\orders_by_machine?select_operation=Lamination&type=tr">Lamination</a><br>
+            </td>
+
+        <tr>
+
+            <!--th><h3>Processing</h3></th-->
+            <th><h3>SMPL History</h3></th>
+            <th><h3>Slitter Maintenance</h3></th>
+            <th></th>
+
+
+        </tr>
+        <tr>
+            <!--td>
+                <a href="\orders_by_machine?select_operation=CTL">CTL</a><br>
+                <a href="\orders_by_machine?select_operation=Slitting">Slitting</a><br>
+                <a href="\orders_by_machine?select_operation=Mini_Slitting">Mini Slitting</a><br>
+                <a href="\orders_by_machine?select_operation=Narrow_CTL">Narrow CTL</a><br>
+                <a href="\orders_by_machine?select_operation=Reshearing">Reshearing</a><br>
+                <a href="\orders_by_machine?select_operation=Levelling">Levelling</a><br>
+                <a href="\orders_by_machine?select_operation=Lamination">Lamination</a><br>
+            </td-->
+            <td>
+                <a href="/enter_smpl_no">SMPL History</a><br>
+            </td>
+            <td>
+                <a href="/pick_slitting_batch">Slitting Maintenance</a><br>
+            </td>
+
+
+        </tr>
+
+
+        <tr>
+            {% if current_user.user_type == "all" or current_user.user_type == "incoming_head" or current_user.user_type == "plan_head"  %}
+            <th><h3>Stock</h3></th>
+            {% endif %}
+            {% if current_user.user_type == "all" or current_user.user_type == "incoming_head" or current_user.user_type == "plan_head" or current_user.user_type == "incoming_unit1" or current_user.user_type == "incoming_unit2" %}
+            <th><h3>Dispatch</h3></th>
+            {% endif %}
+            <th><h3>Reports</h3></th>
+        </tr>
+        <tr>
+            {% if current_user.user_type == "all" or current_user.user_type == "incoming_head" or current_user.user_type == "plan_head"  %}
+             <td>
+                <a href="\check_stock">Unit 1</a><br>
+                <a href="\check_stock">Unit 2</a><br>
+                <a href="\check_stock">Consolidated</a><br>
+            </td>
+            {% endif %}
+            {% if current_user.user_type == "all" or current_user.user_type == "incoming_head" or current_user.user_type == "plan_head" or current_user.user_type == "incoming_unit1" or current_user.user_type == "incoming_unit2" %}
+            <td>
+                <a href="/dispatch_pick_customer">Dispatch Entry</a><br>
+                <a href="/display_dispatch_pick_day">Dispatch View</a><br>
+
+            </td>
+            {% endif %}
+            <td>
+                <a href="/daily_report_pick_date">Daily</a><br>
+                <a href="">Monthly</a><br>
+
+            </td>
+        </tr>
+
+    </table>
+
+</body>
+</html>

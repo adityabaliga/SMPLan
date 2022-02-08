@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+    <title>SMPL MRP-Upload Documents</title>
+    <style>
+        hr.style1{
+	        border-top: 15px solid #4d0000;
+            }
+        .oe{
+            font-family: Mathematica6 Bold, Old English Text MT, Engravers Old English BT, Old English, Collins Old English, New Old English, serif;
+            font-size: 50px;
+            color: #4d0000;
+            text-align:center;
+            }
+        .topnav a:hover {
+            color: #4d0000;
+            text-decoration: none;
+        }
+        .nopad {
+                margin: 0;
+                padding: 0;
+                margin-top: 0em;
+                margin-bottom: 0em;
+            }
+    </style>
+
+</head>
+
+<form action="/upload_docs_submit" method = "POST" enctype = "multipart/form-data">
+    <div class="topnav" id="myTopnav">
+        <br>
+        <table>
+            <td><img src="/static/logo.jpg"  height="70" width="92" align = "left"></td>
+            <td width="1050px"><div align="center" class="nopad"> <a href="\main_menu"  class="oe">SMPL</a></div></td>
+            <td><div align="left" class="nopad">Hi {{current_user.username}}<br>
+            <a href="\change_password_form">Change Password</a><br>
+            <a href="\logout">Logout</a></div></td>
+        </table>
+    </div>
+    <hr class ="style1">
+
+     <table class = "table table-sm">
+    <tr>
+        <td>SMPL No</td>
+        <td><input type="text" name="smpl_no" value = "{{incoming.smpl_no}}" readonly></td>
+
+        <td >Customer</td>
+        <td><input type="text" name="customer" value = "{{incoming.customer}}" readonly></td>
+    </tr>
+    <tr>
+        <td>Thickness</td>
+        <td><input type="text"  name="thickness" id = "thickness" value = "{{incoming.thickness}}" readonly></td>
+
+
+        <td>Weight in MT</td>
+        <td><input type="text"  name="weight" value="{{incoming.weight}}" readonly></td>
+    </tr>
+     <tr>
+        <td>Incoming Width</td>
+        <td><input type="text"  name="width" id = "width" value = "{{incoming.width}}" readonly></td>
+
+
+        <td>Incoming Length</td>
+        <td><input type="text"  name="length" value="{{incoming.length}}" readonly></td>
+    </tr>
+    <tr>
+        <td>Numbers</td>
+        <td><input type="text" name="numbers"  value = "{{incoming.numbers}}" readonly></td>
+
+        <td>Grade</td>
+        <td><input type="text"  name="grade"  value = "{{incoming.grade}}" readonly></td>
+
+
+    </tr>
+     </table>
+
+    <p> <h4>Customer Order File</h4><p><input type="file" name="cust_order_files[]" multiple="" accept=".pdf, .png, .jpg, .jpeg, .gif">
+    <p> <h4>SMPL Order File</h4><p><input type="file" name="smpl_order_files[]" multiple="" accept=".pdf, .png, .jpg, .jpeg, .gif">
+    <p> <h4>SMPL Production Report</h4><p><input type="file" name="prod_rprt_files[]" multiple="" accept=".pdf, .png, .jpg, .jpeg, .gif">
+
+    <br><br><br><input type=submit value=Upload>
+
+</form>
+</html>

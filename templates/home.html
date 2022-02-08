@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+    <title>SMPL MRP</title>
+    <style>
+        .center_div{
+            margin: 0 auto;
+            width:50% /* value of your choice which suits your alignment */
+        }
+        form {
+            width: 300px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+    <form action="/login" method="post">
+
+            <img src="/static/logo.jpg"  height="400" width="400" align = "middle">
+            <h3>Welcome to SMPL MRP</h3>
+            <table>
+            <tr><div class = "container center_div">
+                <td>Username</td>
+                <td><input type="text" name="username"   placeholder="username" required></td>
+            </div></tr>
+            <tr><div class = "container center_div">
+                <td>Password </td>
+                <td><input type="password" name="password"  placeholder="password" required></td>
+            </div></tr>
+            <h3>{{message}}</h3>
+            <tr><div class = "container center_div">
+                <td><input type="submit" class="btn btn-info" value="Submit"></td>
+            </div></tr>
+            </table>
+    </form>
+</html>

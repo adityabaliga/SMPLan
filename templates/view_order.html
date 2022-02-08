@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{smpl_no}} - Order</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+    <style>
+        hr.style1{
+	        border-top: 15px solid #4d0000;
+            }
+        .oe{
+            font-family: Mathematica6 Bold, Old English Text MT, Engravers Old English BT, Old English, Collins Old English, New Old English, serif;
+            font-size: 50px;
+            color: #4d0000;
+            text-align:center;
+            }
+        .topnav a:hover {
+            color: #4d0000;
+            text-decoration: none;
+        }
+        .nopad {
+                margin: 0;
+                padding: 0;
+                margin-top: 0em;
+                margin-bottom: 0em;
+            }
+        table.table-bordered{
+            border:1px solid black;
+            margin-top:20px;
+        }
+        table.table-bordered > thead > tr > th{
+            border:1px solid black;
+        }
+        table.table-bordered > tbody > tr > td{
+            border:1px solid black;
+}
+    </style>
+
+</head>
+<body>
+
+
+    <h2 align="center">Mother Coil Details</h2>
+    <table class = "table table-bordered">
+    <thead>
+        <tr>
+            <th>SMPL No</th>
+            <th>{{smpl_no}}</th>
+            <th>Customer</th>
+            <th>{{customer}}</th>
+        </tr>
+        <tr>
+            <th>Thickness</th>
+            <th>{{thickness}}</th>
+            <th>Grade</th>
+            <th>{{grade}}</th>
+        </tr>
+
+    </thead>
+    </table>
+    <hr style="border-top: 5px solid #4d0000;">
+    {% for order_dtl_lst,operation, ms, proc_wt, stage_no in order_detail_lst %}
+    <h2 align="center">{{operation}} - Stage No. {{stage_no}}</h2>
+
+
+    <table class = "table table-bordered">
+        <thead>
+        <tr>
+            <th>Raw Material</th>
+            <th>{{ms}}</th>
+            <th>Processing Wt</th>
+            <th>{{proc_wt}}</th>
+        </tr>
+        </thead>
+    </table>
+
+    <h2 align="center">Order Details</h2>
+    <table class = "table table-bordered">
+    {% if operation == "CTL" or operation == "Lamination" %}
+    <thead>
+        <tr>
+            <th>Output Size</th>
+            <th>Numbers x packets</th>
+            <th>Lamination</th>
+            <th>Tolerance</th>
+            <th>Packing</th>
+            <th>Remarks</th>
+        </tr>
+    </thead>
+    <tbody>
+
+        {% for order_detail in order_dtl_lst %}
+
+
+        <tr>
+
+            <td>{{order_detail.cut_width}} x {{order_detail.cut_length}}</td>
+            <td>{{order_detail.no_per_packet}} x {{order_detail.no_of_packets}}</td>
+            <td>{{order_detail.lamination}}</td>
+            <td>{{order_detail.tolerance}}</td>
+            <td>{{order_detail.packing}}</td>
+            <td>{{order_detail.remarks}}</td>
+
+        </tr>
+
+        {% endfor %}
+        </tbody>
+
+
+    {% endif %}
+
+    {% if operation == "Narrow_CTL" or operation == "Reshearing"  or operation == "Levelling" %}
+    <thead>
+        <tr>
+            <th>Output Size</th>
+            <th>Numbers x packets</th>
+            <th>Tolerance</th>
+            <th>Packing</th>
+            <th>Remarks</th>
+        </tr>
+    </thead>
+    <tbody>
+
+        {% for order_detail in order_dtl_lst %}
+
+        <tr>
+
+            <td>{{order_detail.cut_width}} x {{order_detail.cut_length}}</td>
+            <td>{{order_detail.no_per_packet}} x {{order_detail.no_of_packets}}</td>
+            <td>{{order_detail.tolerance}}</td>
+            <td>{{order_detail.packing}}</td>
+            <td>{{order_detail.remarks}}</td>
+
+        </tr>
+
+        {% endfor %}
+        </tbody>
+
+    {% endif %}
+
+    {% if operation == "Slitting" or operation == "Mini_Slitting" %}
+    <thead>
+        <tr>
+            <th>Output Size</th>
+            <th>No. of Slits</th>
+            <th>No. of Parts</th>
+            <th>Length/part</th>
+            <th>Tolerance</th>
+            <th>Packing</th>
+            <th>Remarks</th>
+        </tr>
+    </thead>
+    <tbody>
+
+        {% for order_detail in order_dtl_lst %}
+
+        <tr>
+
+            <td>{{order_detail.cut_width}} x {{order_detail.cut_length}}</td>
+            <td>{{order_detail.numbers}}</td>
+            <td>{{order_detail.no_of_packets}}</td>
+            <td>{{order_detail.no_per_packet}}</td>
+            <td>{{order_detail.tolerance}}</td>
+            <td>{{order_detail.packing}}</td>
+            <td>{{order_detail.remarks}}</td>
+
+        </tr>
+
+        {% endfor %}
+        </tbody>
+    {% endif %}
+
+
+    </table>
+    <hr style="border-top: 5px solid #4d0000;">
+    <!--p style="page-break-before: always;"-->
+    {% endfor %}
+
+    <td><div align="center" class="nopad"><a href="\main_menu">Main Menu</a></div></td>
+</body>
+</html>

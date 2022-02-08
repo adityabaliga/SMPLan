@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SMPL MRP - Daily Report</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+    <style>
+        .mytable>tbody>tr>td, .mytable>tbody>tr>th, .mytable>tfoot>tr>td, .mytable>tfoot>tr>th, .mytable>thead>tr>td, .mytable>thead>tr>th {
+    padding: 6px;
+    }
+    input,select {
+    font-family: "Verdana";
+    }
+    hr.style1{
+	        border-top: 15px solid #4d0000;
+            }
+        .oe{
+            font-family: Mathematica6 Bold, Old English Text MT, Engravers Old English BT, Old English, Collins Old English, New Old English, serif;
+            font-size: 50px;
+            color: #4d0000;
+            text-align:center;
+            }
+        .topnav a:hover {
+            color: #4d0000;
+            text-decoration: none;
+        }
+        .nopad {
+                margin: 0;
+                padding: 0;
+                margin-top: 0em;
+                margin-bottom: 0em;
+            }
+
+
+    </style>
+</head>
+<body>
+
+    <div class="topnav" id="myTopnav">
+        <br>
+        <table>
+            <td><img src="/static/logo.jpg"  height="70" width="92" align = "left"></td>
+            <td width="1050px"><div align="center" class="nopad"> <a href="\main_menu"  class="oe">SMPL</a></div></td>
+            <td><div align="left" class="nopad">Hi {{current_user.username}}<br>
+            <a href="\change_password_form">Change Password</a><br>
+            <a href="\logout">Logout</a></div></td>
+        </table>
+    </div>
+
+    <hr class ="style1">
+    <h2>Daily report for {{date}}</h2>
+    <h3>Incoming</h3>
+    <table class="table table-sm">
+        <tr>
+            <th>Customer</th>
+            <th>Total Weight (in MT)</th>
+            <th>Unit</th>
+        </tr>
+        {% for incoming in incoming_lst %}
+        <tr>
+            <td>{{incoming[0]}}</td>
+            <td>{{incoming[1]}}</td>
+            <td>{{incoming[2]}}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <hr>
+
+    <h3>Processing</h3>
+    <table class="table table-sm">
+        <tr>
+            <th>Machine</th>
+            <th>Total Weight (in MT)</th>
+            <th>Total no. of cuts</th>
+            <th>Total Time (in hrs)</th>
+        </tr>
+        {% for processing in processing_hdr_lst %}
+        <tr>
+            <td>{{processing[0]}}</td>
+            <td>{{processing[2]}}</td>
+            <td>{{processing[1]}}</td>
+            <td>{{(processing[3]/60)|round(1,'floor')}}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <hr>
+    <h3>Dispatch</h3>
+    <table class="table table-sm">
+        <tr>
+            <th>Customer</th>
+            <th>Total Dispatch Weight (in MT)</th>
+
+        </tr>
+        {% for dispatch in dispatch_hdr_lst %}
+        <tr>
+            <td>{{dispatch[1]}}</td>
+            <td>{{dispatch[0]}}</td>
+
+        </tr>
+        {% endfor %}
+    </table>
+
+    <hr>
+    <h3>Processing Details (Cuts/Min)</h3>
+    <table class="table table-sm">
+
+        <tr>
+            <th>SMPL No</th>
+            <th>Operation</th>
+            <th>Start Time</th>
+            <th>End Time</th>
+            <th>Production Time</th>
+            <th>Weight (in MT)</th>
+            <th>No of cuts</th>
+            <th>No of cuts/minute</th>
+        </tr>
+        {% for processing_dtl in processing_hdr_detail %}
+            {% if processing_dtl[2] != 'Slitting' and processing_dtl[2] != 'Mini_Slitting' %}
+                <tr>
+                    <td>{{processing_dtl[1]}}</td>
+                    <td>{{processing_dtl[2]}}</td>
+                    <td>{{processing_dtl[4]}}</td>
+                    <td>{{processing_dtl[5]}}</td>
+                    <td>{{processing_dtl[6]}}</td>
+                    <td>{{processing_dtl[14]}}</td>
+                    <td>{{processing_dtl[15]}}</td>
+                    <td>{{(processing_dtl[15]/processing_dtl[6])|round(1,'floor')}}</td>
+                </tr>
+            {% endif %}
+        {% endfor %}
+    </table>
+
+    <hr>
+    <h3>Processing Details (m/Min)</h3>
+    <table class="table table-sm">
+
+        <tr>
+            <th>SMPL No</th>
+            <th>Operation</th>
+            <th>Start Time</th>
+            <th>End Time</th>
+            <th>Production Time</th>
+            <th>Setting Time</th>
+            <th>Weight (in MT)</th>
+            <th>Length (in m)</th>
+            <th>Metres/minute</th>
+        </tr>
+        {% for processing_dtl in processing_hdr_detail %}
+            {% if processing_dtl[2] == 'Slitting' or processing_dtl[2] == 'Mini_Slitting' %}
+                <tr>
+                    <td>{{processing_dtl[1]}}</td>
+                    <td>{{processing_dtl[2]}}</td>
+                    <td>{{processing_dtl[4]}}</td>
+                    <td>{{processing_dtl[5]}}</td>
+                    <td>{{processing_dtl[6]}}</td>
+                    <td>{{processing_dtl[9]}}</td>
+                    <td>{{processing_dtl[14]}}</td>
+                    <td>{{processing_dtl[15]}}</td>
+                    <td>{{(processing_dtl[15]/processing_dtl[6])|round(1,'floor')}}</td>
+                </tr>
+            {% endif %}
+        {% endfor %}
+
+    </table>
+
+</body>
+
+
+</html>

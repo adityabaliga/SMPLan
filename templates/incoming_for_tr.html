@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SMPL MRP- TR Incoming</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+    <style>
+        hr.style1{
+	        border-top: 15px solid #4d0000;
+            }
+        .oe{
+            font-family: Mathematica6 Bold, Old English Text MT, Engravers Old English BT, Old English, Collins Old English, New Old English, serif;
+            font-size: 50px;
+            color: #4d0000;
+            text-align:center;
+            }
+        .topnav a:hover {
+            color: #4d0000;
+            text-decoration: none;
+        }
+        .nopad {
+                margin: 0;
+                padding: 0;
+                margin-top: 0em;
+                margin-bottom: 0em;
+            }
+    </style>
+</head>
+<form action="/tr_incoming_commit" method="post">
+     <div class="topnav" id="myTopnav">
+        <br>
+        <table>
+            <td><img src="/static/logo.jpg"  height="70" width="92" align = "left"></td>
+            <td width="1050px"><div align="center" class="nopad"> <a href="\main_menu"  class="oe">SMPL</a></div></td>
+            <td><div align="left" class="nopad">Hi {{current_user.username}}<br>
+            <a href="\change_password_form">Change Password</a><br>
+            <a href="\logout">Logout</a></div></td>
+        </table>
+    </div>
+
+    <hr class ="style1">
+    <table>
+    <tr>
+        <td>SMPL No</td>
+        <td><select name="tr_prefix">
+                <option value="TR" default>TR</option>
+                <option value="MRR">MRR</option>
+            </select>
+            <input type="text" name="smpl_no"  required></td>
+    </tr>
+    <tr>
+        <td>Customer</td>
+        <td><input type="text" name="customer" value="TSDPL" readonly></td>
+    </tr>
+    <tr>
+        <td>Incoming Date</td>
+        <td><input type="date" name="incoming_date" required></td>
+    </tr>
+    <tr>
+        <td>Thickness</td>
+        <td><input type="number" step="0.01" name="thickness" required></td>
+    </tr>
+    <tr>
+        <td>Width</td>
+        <td><input type="number" step="0.01" name="width" required></td>
+    </tr>
+    <tr>
+        <td>Length</td>
+        <td><input type="number" step="0.01" name="length" value="0.0"></td>
+    </tr>
+    <tr>
+        <td>Weight in MT</td>
+        <td><input type="number" step="0.001" name="weight"  required></td>
+    </tr>
+    <tr>
+        <td>Numbers</td>
+        <td><input type="number" name="numbers" step="1" required></td>
+    </tr>
+    <tr>
+        <td>Material Type</td>
+        <td><input type="text" name="material_type"></td>
+    </tr>
+    <tr>
+        <td>Internal Dia</td>
+        <td><input type="text" name="internal_dia"></td>
+    </tr>
+    <tr>
+        <td>Grade</td>
+        <td><input type="text" name="grade"></td>
+    </tr>
+    <tr>
+        <td>Mill</td>
+        <td><input type="text" name="mill"  value="Tata Steel"></td>
+    </tr>
+    <tr>
+        <td>Mill ID</td>
+        <td><input type="text" name="mill_id"></td>
+    </tr>
+    <tr>
+        <td>Unit</td>
+        <td>
+            <select name="unit">
+                <option value="1">1</option>
+                <option value="2">2</option>
+            </select>
+        </td>
+    </tr>
+    <tr>
+        <td>Remarks</td>
+        <td><input type="text" name="remarks"></td>
+    </tr>
+
+    </table>
+
+    <p><input type="submit" class="btn btn-default" value="Submit"></p>
+
+
+</form>
+</html>
