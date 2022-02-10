@@ -1270,6 +1270,7 @@ def submit_slitting_processing():
                     cs_cc.save_to_db()
         return render_template('/main_menu.html', message=Markup("Processing for " + smpl_no + " entered"))
 
+
 @app.route('/print_label', methods=['GET', 'POST'])
 def print_label():
     processing_id=0
