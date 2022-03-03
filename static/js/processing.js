@@ -298,7 +298,16 @@ function validate(){
     //if(order_completed_chk == false){
     //    document.getElementById("balance_wt").value = 0;
     //}
-    if((total_processed_wt + completed_proc_wt) > 1.05*rm_wt){
+
+    // If RM weight is more then the check of 5% is ok. But when RM weight is less, then  5% margin becomes less
+    // So, when RM less than 3MT, I am giving an allowance of 7%
+
+    var allowance = 1.05;
+    if(rm_wt < 3){
+        allowance = 1.07;
+    }
+
+    if((total_processed_wt + completed_proc_wt) > allowance*rm_wt){
         alert('Processed wt is greater than Input material weight. Please check');
         document.getElementById('submit').disabled = true;
     }
@@ -346,7 +355,7 @@ function print_label_big(){
     var data = "";
     var fg_table = document.getElementById('fg_table');
     for(i=0;i<11;i++){
-        data = data + fg_table.rows[rowId].cells[i].lastChild.data + '&';
+        data = data + fg_table.rows[rowId].cells[i].lastChild.value + '&';
     }
     // Since Comments and 2nd customer are text boxes; we will have to take value and not data property
     var comment_pos = 11;
@@ -357,7 +366,7 @@ function print_label_big(){
     var second_customer_pos = 12;
 
     var customer_pos = 2;
-    if(fg_table.rows[rowId].cells[customer_pos].lastChild.data == "TSDPL"){
+    if(fg_table.rows[rowId].cells[customer_pos].lastChild.value == "TSDPL"){
         data = data + fg_table.rows[rowId].cells[second_customer_pos].lastChild.value + '&';
         mat_type_pos = 13;
     }
@@ -569,12 +578,39 @@ function make__part_label_ctl(th){
     var newNEWHTML = '';
     var id =1;
     var packet_nos,packet_name, output_length, width, width_part_name, size, prod_date, lamination, lami_type;
-    var html = '<tr id= %id%><td>%smpl_no%</td><td>%prod_date%</td><td>%customer%</td><td>%machine%</td><td>%size%</td><td>%numbers%</td><td>%packet_no%</td><td>%lamination%</td><td>%mill_id%</td><td>%grade%</td><td>%mill%</td><td><input type="text" id="comment" name="comment"></td><td><input type="text" id="mat_type" name="mat_type" value = "%mat_type%"></td><td><input type = "button" class="btn btn-default" value="Print" onclick="print_label_big()"></td></tr>';
+    var html = '<tr id= %id%><td><input type="text" style="width:130px;border: 0px none;" id="lab_smpl_no" name="lab_smpl_no" value="%smpl_no%" readonly></td>' +
+                '<td><input type="text" style="width:130px;border: 0px none;" id="lab_prod_date" name="lab_prod_date" value="%prod_date%" readonly></td>' +
+                '<td><input type="text" style="width:130px;border: 0px none;" id="lab_customer" name="lab_customer" value="%customer%"></td>' +
+                '<td><input type="text" style="width:130px;border: 0px none;" id="lab_machine" name="lab_machine" value="%machine%" readonly></td>' +
+                '<td><input type="text" style="border: 0px none;" id="lab_size" name="lab_size" value="%size%"></td>' +
+                '<td><input type="text" style="width:130px;border: 0px none;" id="lab_numbers" name="lab_numbers" value="%numbers%" ></td>' +
+                '<td><input type="text" style="width:130px;border: 0px none;" id="lab_packet_no" name="lab_packet_no" value="%packet_no%" readonly></td>' +
+                '<td><input type="text" style="width:130px;border: 0px none;" id="lab_lamination" name="lab_lamination" value="%lamination%" readonly></td>' +
+                '<td><input type="text" style="width:130px;border: 0px none;" id="lab_mill_id" name="lab_mill_id" value="%mill_id%" readonly></td>' +
+                '<td><input type="text" style="width:130px;border: 0px none;" id="lab_grade" name="lab_grade" value="%grade%" readonly></td>' +
+                '<td><input type="text" style="width:130px;border: 0px none;" id="lab_mill" name="lab_mill" value="%mill%" readonly></td>' +
+                '<td><input type="text" id="comment" name="comment"></td>' +
+                '<td><input type="text" id="mat_type" name="mat_type" value = "%mat_type%"></td>' +
+                '<td><input type = "button" class="btn btn-default" value="Print" onclick="print_label_big()"></td></tr>';
 
     // If customer is TSDPL; 2nd customer field has to be added
     var customer = document.getElementById("customer").value;
     if (customer == "TSDPL"){
-        html = '<tr id= %id%><td>%smpl_no%</td><td>%prod_date%</td><td>%customer%</td><td>%machine%</td><td>%size%</td><td>%numbers%</td><td>%packet_no%</td><td>%lamination%</td><td>%mill_id%</td><td>%grade%</td><td>%mill%</td><td><input type="text" id="comment" name="comment"></td><td><input type="text" id="cusomter2" name="customer2"></td><td><input type="text" id="mat_type" name="mat_type" value = %mat_type%></td><td><input type = "button" class="btn btn-default" value="Print" onclick="print_label_big()"></td></tr>';
+        html = '<tr id= %id%><td><input type="text" style="width:130px;border: 0px none;" id="lab_smpl_no" name="lab_smpl_no" value="%smpl_no%" readonly></td>' +
+                '<td><input type="text" style="width:130px;border: 0px none;" id="lab_prod_date" name="lab_prod_date" value="%prod_date%" readonly></td>' +
+                '<td><input type="text" style="width:130px;border: 0px none;" id="lab_customer" name="lab_customer" value="%customer%"></td>' +
+                '<td><input type="text" style="width:130px;border: 0px none;" id="lab_machine" name="lab_machine" value="%machine%" readonly></td>' +
+                '<td><input type="text" style="border: 0px none;" id="lab_size" name="lab_size" value="%size%"></td>' +
+                '<td><input type="text" style="width:130px;border: 0px none;" id="lab_numbers" name="lab_numbers" value="%numbers%" ></td>' +
+                '<td><input type="text" style="width:130px;border: 0px none;" id="lab_packet_no" name="lab_packet_no" value="%packet_no%" readonly></td>' +
+                '<td><input type="text" style="width:130px;border: 0px none;" id="lab_lamination" name="lab_lamination" value="%lamination%" readonly></td>' +
+                '<td><input type="text" style="width:130px;border: 0px none;" id="lab_mill_id" name="lab_mill_id" value="%mill_id%" readonly></td>' +
+                '<td><input type="text" style="width:130px;border: 0px none;" id="lab_grade" name="lab_grade" value="%grade%" readonly></td>' +
+                '<td><input type="text" style="width:130px;border: 0px none;" id="lab_mill" name="lab_mill" value="%mill%" readonly></td>' +
+                '<td><input type="text" id="comment" name="comment"></td>' +
+                '<td><input type="text" id="cusomter2" name="customer2"></td>' +
+                '<td><input type="text" id="mat_type" name="mat_type" value = "%mat_type%"></td>' +
+                '<td><input type = "button" class="btn btn-default" value="Print" onclick="print_label_big()"></td></tr>';
     }
     var thickness = document.getElementById("thickness").value;
     var mill_id = document.getElementById("mill_id").value;
@@ -598,9 +634,9 @@ function make__part_label_ctl(th){
 
     mat_type = grade_field.split("ID");
     material_type = mat_type[0];
-    material_type = material_type.replace('COIL','');
-    material_type = material_type.replace('SHEETS','');
-    material_type = material_type.replace('.','');
+    material_type = material_type.replaceAll('COIL','');
+    material_type = material_type.replaceAll('SHEETS','');
+    material_type = material_type.replaceAll('.','');
 
     var machine = document.getElementById("machine").value;
 

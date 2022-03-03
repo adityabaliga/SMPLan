@@ -32,8 +32,7 @@ class CurrentStock:
     @classmethod
     def update_status_cls(cls,cs_id,status):
         with CursorFromConnectionFromPool() as cursor:
-            cursor.execute("update current_stock set status = %s where cs_id = %s",
-                           (status, cs_id))
+            cursor.execute("update current_stock set status = %s where cs_id = %s",(status, cs_id))
 
     @classmethod
     def smpl_list_for_modify_order(cls):
@@ -236,6 +235,25 @@ class CurrentStock:
                               grade=lst[9], unit=lst[10], packet_name = lst [11])
             cs_lst.append(cs)
             cs_id_lst.append(lst[0])
+
+            return zip(cs_id_lst, cs_lst)
+
+    @classmethod
+    def get_smpl_for_fg_to_wip(cls, smpl_no):
+        user_data = []
+        cs_lst = []
+        cs_id_lst = []
+        with CursorFromConnectionFromPool() as cursor:
+            cursor.execute("select * from current_stock where smpl_no = %s and status = 'FG'",(smpl_no,))
+            user_data = cursor.fetchall()
+
+            if user_data:
+                for lst in user_data:
+                    cs = CurrentStock(smpl_no=lst[1], weight=Decimal(lst[2]), numbers=int(lst[3]), width=Decimal(lst[4]),
+                                      length=Decimal(lst[5]), status=lst[6], customer=lst[7], thickness=Decimal(lst[8]),
+                                      grade=lst[9], unit=lst[10], packet_name=lst[11])
+                    cs_lst.append(cs)
+                    cs_id_lst.append(lst[0])
 
             return zip(cs_id_lst, cs_lst)
 

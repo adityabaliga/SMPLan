@@ -1254,10 +1254,19 @@ def submit_slitting_processing():
                 # Reduce weight of mother material by the processed weight of cut material
                 rm_status = CurrentStock.change_wt(smpl_no, ms_width, ms_length, part_weight, processed_numbers, "minus")
 
-                # Increase weight of cut material by processed weight. If cut material, doesn't already exist, the
-                # function returns insert => a new record has to be inserted
-                cc_insert = CurrentStock.change_wt(smpl_no, output_width, output_length, part_weight,
+                #The issue is during rewinding since mother coil and output width & length remain the same,
+                # The weight is getting added and subtracted from the same current_stock record.
+                # To avoid this; the change wt "plus" for output will only happen if the output width and ms width are
+                # not equal. Else, it will directly jump to insert. This might cause multiple current_stock records
+                # for the same size but till I come up with a better solution so be it.
+
+                if ms_width != output_width:
+                    # Increase weight of cut material by processed weight. If cut material, doesn't already exist, the
+                    # function returns insert => a new record has to be inserted
+                    cc_insert = CurrentStock.change_wt(smpl_no, output_width, output_length, part_weight,
                                                    processed_numbers, "plus")
+                else:
+                    cc_insert = "insert"
 
                 # Unit of the material is decided based on the machine used to process the material.
                 # WARNING: This is bad programming
@@ -1699,6 +1708,51 @@ def change_date_format(date):
     split_date = date.split('-')
     new_date = split_date[2] + '-' + split_date[1] + '-' + split_date[0]
     return new_date
+
+@app.route('/fg_to_wip_enter_smpl', methods=['GET', 'POST'])
+def fg_to_wip_enter_smpl():
+    return render_template('/fg_to_wip_enter_smpl.html')
+
+
+@app.route('/get_fg_to_wip_list', methods=['GET', 'POST'])
+def get_fg_to_wip_list():
+    smpl_no = ""
+    file_list = ""
+    _cs_lst = []
+    cs_lst = []
+    cs_id_lst = []
+    if request.method == 'POST':
+        smpl_no = request.form['smpl_no']
+    if request.method == 'GET':
+        smpl_no = request.args.get('smpl_no')
+
+    _cs_lst = (CurrentStock.get_smpl_for_fg_to_wip(smpl_no))
+    if _cs_lst:
+        for cs_id, cs  in _cs_lst:
+            cs_lst.append(cs)
+            cs_id_lst.append(cs_id)
+        return render_template('/fg_to_wip_display_list.html', cs_lst= zip(cs_id_lst,cs_lst))
+    else:
+        return render_template('/main_menu.html', message= smpl_no + " not found.")
+
+
+@app.route('/fg_to_wip_submit', methods=['GET', 'POST'])
+def fg_to_wip_submit():
+    smpl = ""
+    if request.method == 'POST':
+        smpl = request.form['select_smpl']
+
+
+    if request.method == 'GET':
+        smpl = request.args.get('select_smpl')
+
+
+    smpl_details = smpl.split(',')
+    #smpl_no = smpl_details[1]
+    cs_id = smpl_details[0]
+    CurrentStock.update_status_cls(cs_id, "WIP")
+
+    return render_template('/main_menu.html')
 
 if __name__ == '__main__':
     app.config["SECRET_KEY"] = "SMPLMRP"
