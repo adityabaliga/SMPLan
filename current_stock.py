@@ -189,7 +189,7 @@ class CurrentStock:
                 if customer_type == "smpl":
                     cursor.execute("select * from current_stock where (status = 'RM' or status = 'HC' or status= 'WIP')"
                                    " and "
-                                   "length = 0 and unit = %s  and customer not like 'TSDPL' and width <=500 order by "
+                                   "length = 0 and unit = %s  and customer not like 'TSDPL' and width <=600 order by "
                                    "smpl_no asc", (str(unit),))
                 if customer_type == "tr":
                     cursor.execute(
@@ -198,7 +198,7 @@ class CurrentStock:
                         , (str(unit),))
                 user_data = cursor.fetchall()
 
-        if operation == "Reshearing" or operation =="Lamination":
+        if operation == "Reshearing" or operation =="Lamination" or operation == "Levelling":
             with CursorFromConnectionFromPool() as cursor:
                 if customer_type == "smpl":
                     cursor.execute("select * from current_stock where (status = 'RM' or status = 'HC' or status= 'WIP') and "
@@ -357,11 +357,11 @@ class CurrentStock:
 
         if stock_type == 'All':
             with CursorFromConnectionFromPool() as cursor:
-                cursor.execute("select * from current_stock where unit = %s order by smpl_no asc",(unit,))
+                cursor.execute("select * from current_stock where unit = '%s' order by smpl_no asc",(unit,))
                 user_data = cursor.fetchall()
         else:
             with CursorFromConnectionFromPool() as cursor:
-                cursor.execute("select * from current_stock where status = %s and unit = %s order by smpl_no asc",(stock_type,unit))
+                cursor.execute("select * from current_stock where status = %s and unit = '%s' order by smpl_no asc",(stock_type,unit))
                 user_data = cursor.fetchall()
 
         for lst in user_data:

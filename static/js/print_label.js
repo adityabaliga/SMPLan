@@ -58,7 +58,7 @@ function get_param_reshearing(){
 
     if(queries[2] == "TSDPL"){
         document.getElementById("customer").innerHTML = queries[2]+ " - " + queries[11];
-         mat_type_pos = 13;
+         mat_type_pos = 12;
     }
     else{
         document.getElementById("customer").innerHTML = queries[2];

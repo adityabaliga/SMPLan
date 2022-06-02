@@ -333,7 +333,7 @@
             <th>Mill</th>
 
             <th>Comments</th>
-            {% if incoming.customer == "TSDPL" or incoming.customer == "TSPDL" %}
+            {% if incoming.customer == "TSDPL" or incoming.customer == "TSPDL" or "Tata Steel Downstream Products Ltd" in incoming.customer %}
             <th>2nd Customer</th>
             {% endif %}
             <th>Material Type</th>

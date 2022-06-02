@@ -97,8 +97,10 @@
             {% endif %}
             <td>
                 <a href="\orders_by_machine?select_operation=CTL&type=smpl">CTL</a><br>
+                {% if current_user.unit != 1 %}
                 <a href="\orders_by_machine?select_operation=Slitting&type=smpl">Slitting</a><br>
                 <a href="\orders_by_machine?select_operation=Mini_Slitting&type=smpl">Mini Slitting</a><br>
+                {% endif %}
                 <a href="\orders_by_machine?select_operation=Narrow_CTL&type=smpl">Narrow CTL</a><br>
                 <a href="\orders_by_machine?select_operation=Reshearing&type=smpl">Reshearing</a><br>
                 <a href="\orders_by_machine?select_operation=Levelling&type=smpl">Levelling</a><br>
@@ -108,8 +110,10 @@
             </td>
             <td>
                 <a href="\orders_by_machine?select_operation=CTL&type=tr">CTL</a><br>
+                {% if current_user.unit != 1 %}
                 <a href="\orders_by_machine?select_operation=Slitting&type=tr">Slitting</a><br>
                 <a href="\orders_by_machine?select_operation=Mini_Slitting&type=tr">Mini Slitting</a><br>
+                {% endif %}
                 <a href="\orders_by_machine?select_operation=Narrow_CTL&type=tr">Narrow CTL</a><br>
                 <a href="\orders_by_machine?select_operation=Reshearing&type=tr">Reshearing</a><br>
                 <a href="\orders_by_machine?select_operation=Levelling&type=tr">Levelling</a><br>

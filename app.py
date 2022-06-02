@@ -1,3 +1,6 @@
+from waitress import serve
+import logging
+
 from decimal import Decimal
 from flask_login import LoginManager, login_user, current_user, logout_user
 from file_uploader import FileUploader
@@ -22,9 +25,12 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 
 
+
+
 # Clicking on http://127.0.0.1:5000/ (the home page), this will redirect you to login page
 @app.route('/')
 def home(message=""):
+    #logger.info("Here's some info")
     return render_template('/home.html', message=message)
 
 
@@ -300,7 +306,7 @@ def transfer_material():
         cs_obj_lst.append(cs)
 
     if cs_obj_lst:
-        return render_template('transfer_material.html', cs_lst=zip(cs_id_lst, cs_obj_lst))
+        return render_template('transfer_material.html', cs_lst=zip(cs_id_lst, cs_obj_lst), _unit = current_user.unit)
     else:
         return render_template('/main_menu.html', message="No Raw material to transfer")
 
@@ -310,10 +316,10 @@ def transfer_pick_unit():
     stock_type = ""
     unit = ""
     if request.method == 'POST':
-        unit = request.form['select_unit']
+        unit = int(request.form['select_unit'])
         stock_type = request.form['stock_type']
     if request.method == 'GET':
-        unit = request.args.get('select_unit')
+        unit = int(request.args.get('select_unit'))
         stock_type = request.args.get('stock_type')
 
     cs_return_lst = CurrentStock.get_stock(stock_type,unit)
@@ -326,7 +332,7 @@ def transfer_pick_unit():
         cs_obj_lst.append(cs)
 
     if cs_obj_lst:
-        return render_template('transfer_material.html', cs_lst=zip(cs_id_lst, cs_obj_lst), unit = unit)
+        return render_template('transfer_material.html', cs_lst=zip(cs_id_lst, cs_obj_lst), _unit = unit)
     else:
         return render_template('/main_menu.html', message="No Raw material to transfer")
 
@@ -660,43 +666,47 @@ def orders_by_machine():
 
     if current_user.unit == 1 or current_user.unit == 2:
         smpl_for_processing_lst = CurrentStock.smpl_list_for_processing(operation, customer_type, str(current_user.unit))
-        for cs_id, cs in smpl_for_processing_lst:
-            cs_lst.append(cs)
-            cs_id_lst.append(cs_id)
-        '''order_detail_lst = OrderDetail.smpl_lst_by_operation("Ready", operation, customer_type, )
-        cs_lst = []
-        order_return_lst = []
-        expected_date_lst = []
-        _cs_lst = []
-        cs_id_lst = []
-        for order_detail in order_detail_lst:
-            _cs_lst = CurrentStock.load_smpl_by_smplno(order_detail.smpl_no, order_detail.ms_length,
-                                                       order_detail.ms_width)
-            for cs_id, cs in _cs_lst:
+        if smpl_for_processing_lst:
+            for cs_id, cs in smpl_for_processing_lst:
+                cs_lst.append(cs)
+                cs_id_lst.append(cs_id)
+            '''order_detail_lst = OrderDetail.smpl_lst_by_operation("Ready", operation, customer_type, )
+            cs_lst = []
+            order_return_lst = []
+            expected_date_lst = []
+            _cs_lst = []
+            cs_id_lst = []
+            for order_detail in order_detail_lst:
+                _cs_lst = CurrentStock.load_smpl_by_smplno(order_detail.smpl_no, order_detail.ms_length,
+                                                           order_detail.ms_width)
+                for cs_id, cs in _cs_lst:
+                    if str(cs.unit) == str(current_user.unit):
+                        cs_lst.append(cs)
+                        cs_id_lst.append(cs_id)
+                # cs_lst.append(
+                    #   CurrentStock.load_smpl_by_smplno(order_detail.smpl_no, order_detail.ms_length, order_detail.ms_width))
+                # order_return_lst = Order.load_from_db(order_detail.smpl_no, "Open")
+                # Expected date got from order and displayed in dd/mm/YYYY format
+                # for order_id, order in order_return_lst:
+                #    expected_date_lst.append(order.expected_date.strftime('%d/%m/%Y'))
+    
+            # This list are which are in Not ready state. This is to indicate the total pressure that is there on the machine
+            # order_detail_not_ready_list = OrderDetail.smpl_lst_by_operation("Not Ready", operation)
+            cs_not_ready_lst = []
+            order_not_ready_lst = []
+            expected_date_for_not_ready_lst = []
+            for order_detail in order_detail_not_ready_list:
+                cs = CurrentStock.load_smpl_by_smplno(order_detail.smpl_no, order_detail.ms_length, order_detail.ms_width)
                 if str(cs.unit) == str(current_user.unit):
-                    cs_lst.append(cs)
-                    cs_id_lst.append(cs_id)
-            # cs_lst.append(
+                    cs_not_ready_lst.append()
+                # cs_not_ready_lst.append(
                 #   CurrentStock.load_smpl_by_smplno(order_detail.smpl_no, order_detail.ms_length, order_detail.ms_width))
-            # order_return_lst = Order.load_from_db(order_detail.smpl_no, "Open")
-            # Expected date got from order and displayed in dd/mm/YYYY format
-            # for order_id, order in order_return_lst:
-            #    expected_date_lst.append(order.expected_date.strftime('%d/%m/%Y'))
+                order_not_ready_lst = Order.load_from_db(order_detail.smpl_no, "Open")
+                for order_id, _order in order_not_ready_lst:
+                    expected_date_for_not_ready_lst.append(_order.expected_date.strftime('%d/%m/%Y'))'''
+        else:
+            return render_template('/main_menu.html', message="No raw material or WIP available!")
 
-        # This list are which are in Not ready state. This is to indicate the total pressure that is there on the machine
-        # order_detail_not_ready_list = OrderDetail.smpl_lst_by_operation("Not Ready", operation)
-        cs_not_ready_lst = []
-        order_not_ready_lst = []
-        expected_date_for_not_ready_lst = []
-        for order_detail in order_detail_not_ready_list:
-            cs = CurrentStock.load_smpl_by_smplno(order_detail.smpl_no, order_detail.ms_length, order_detail.ms_width)
-            if str(cs.unit) == str(current_user.unit):
-                cs_not_ready_lst.append()
-            # cs_not_ready_lst.append(
-            #   CurrentStock.load_smpl_by_smplno(order_detail.smpl_no, order_detail.ms_length, order_detail.ms_width))
-            order_not_ready_lst = Order.load_from_db(order_detail.smpl_no, "Open")
-            for order_id, _order in order_not_ready_lst:
-                expected_date_for_not_ready_lst.append(_order.expected_date.strftime('%d/%m/%Y'))'''
 
     if current_user.unit == 0:
         return render_template('/processing_pick_unit.html', operation=operation, type = customer_type)
@@ -1256,8 +1266,8 @@ def submit_slitting_processing():
 
                 #The issue is during rewinding since mother coil and output width & length remain the same,
                 # The weight is getting added and subtracted from the same current_stock record.
-                # To avoid this; the change wt "plus" for output will only happen if the output width and ms width are
                 # not equal. Else, it will directly jump to insert. This might cause multiple current_stock records
+                # To avoid this; the change wt "plus" for output will only happen if the output width and ms width are
                 # for the same size but till I come up with a better solution so be it.
 
                 if ms_width != output_width:
@@ -1759,4 +1769,15 @@ if __name__ == '__main__':
     # app.run(debug=True)
     SERVER_NAME = '0.0.0.0'
     SERVER_PORT = 5001
-    app.run(SERVER_NAME, SERVER_PORT, threaded=True, debug=True)
+    #app.run(SERVER_NAME, SERVER_PORT, threaded=True, debug=True)
+
+
+
+    logger = logging.getLogger('waitress')
+    logger.setLevel(logging.INFO)
+
+    # Using waitress as a WSGI server.
+    # Steps here https://dev.to/thetrebelcc/how-to-run-a-flask-app-over-https-using-waitress-and-nginx-2020-235c
+
+    serve(app,host=SERVER_NAME,port=SERVER_PORT)
+

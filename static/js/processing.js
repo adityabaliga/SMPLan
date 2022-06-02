@@ -1,12 +1,15 @@
 
 // This function is to set the focus when the page loads for CTL, NCTL and Reshearing operations
 function setFocusToTextBox(operation){
+    var customer;
     if(operation == "Narrow_CTL"){
         document.getElementById("output_length").focus();
 
     }
     if(operation == "Reshearing"){
         document.getElementById("output_width").focus();
+        //customer = cust_name_for_label(document.getElementById("customer").value);
+        //document.getElementById("customer").value = customer;
     }
     if(operation == "CTL"){
         document.getElementById("output_length").focus();
@@ -392,12 +395,12 @@ function print_label_reshearing(){
     //if(fg_table.rows[rowId].cells[comment_pos].lastChild.value != ""){
     data = data + fg_table.rows[rowId].cells[comment_pos].lastChild.value + '&' ;
     //}
-    var second_customer_pos = 12;
+    var second_customer_pos = 11;
 
     var customer_pos = 2;
     if(fg_table.rows[rowId].cells[customer_pos].lastChild.data == "TSDPL"){
         data = data + fg_table.rows[rowId].cells[second_customer_pos].lastChild.value + '&';
-        mat_type_pos = 13;
+        mat_type_pos = 12;
     }
 
     data = data + fg_table.rows[rowId].cells[mat_type_pos].lastChild.value;
@@ -467,6 +470,10 @@ function cust_name_for_label(customer){
     else if(customer.startsWith("sun zone")){
         cust_name= "SUN ZONE SOLAR";
     }
+    else if(customer.startsWith("tata steel downstream products")){
+        cust_name= "TSDPL";
+    }
+
     else{
         cust_split = customer.split(' ');
         if(cust_split.length >=2){
@@ -498,6 +505,7 @@ function make__part_label_slit(th){
 
     // If customer is TSDPL; 2nd customer field has to be added
     var customer = document.getElementById("customer").value;
+    customer = cust_name_for_label(customer)
     if (customer == "TSDPL" ){
         html = '<tr id= %id%><td>%smpl_no%</td><td>%prod_date%</td><td>%customer%</td><td>%machine%</td><td><input type="text" id="size" name="size" value = "%size%"></td><td>%coil_length%</td><td>%coil_name%</td><td>%mill_id%</td><td>%grade%</td><td>%mill%</td><td><input type="text" id="comment" name="comment"></td><td><input type="text" id="customer2nd" name="customer2nd"></td><td><input type = "button" class="btn btn-default" value="Print" onclick="print_label()"></td></tr>'
     }
@@ -523,7 +531,7 @@ function make__part_label_slit(th){
 
 
     //var customer2 = document.getElementById("customer2").value;
-    customer = cust_name_for_label(customer);
+    ;
     var prod_date = document.getElementById("processing_date").value;
     prod_date = change_date_format(prod_date);
     if (grade_field.includes("GRADE")){
@@ -595,6 +603,7 @@ function make__part_label_ctl(th){
 
     // If customer is TSDPL; 2nd customer field has to be added
     var customer = document.getElementById("customer").value;
+    customer = cust_name_for_label(customer);
     if (customer == "TSDPL"){
         html = '<tr id= %id%><td><input type="text" style="width:130px;border: 0px none;" id="lab_smpl_no" name="lab_smpl_no" value="%smpl_no%" readonly></td>' +
                 '<td><input type="text" style="width:130px;border: 0px none;" id="lab_prod_date" name="lab_prod_date" value="%prod_date%" readonly></td>' +
@@ -633,6 +642,7 @@ function make__part_label_ctl(th){
     }
 
     mat_type = grade_field.split("ID");
+    mat_type = mat_type[0].split("GRADE");
     material_type = mat_type[0];
     material_type = material_type.replaceAll('COIL','');
     material_type = material_type.replaceAll('SHEETS','');
@@ -641,7 +651,7 @@ function make__part_label_ctl(th){
     var machine = document.getElementById("machine").value;
 
     //var customer2 = document.getElementById("customer2").value;
-    customer = cust_name_for_label(customer);
+
     var prod_date_check = document.getElementById("processing_date");
     var prod_date = document.getElementById("processing_date").value;
     prod_date = change_date_format(prod_date);
@@ -720,12 +730,13 @@ function make__part_label_reshearing(th){
     var newNEWHTML = '';
     var id =1;
     var packet_nos,packet_name, output_length, width, width_part_name, size, prod_date, lamination, lami_type, grade;
-    var html = '<tr id= %id%><td>%smpl_no%</td><td>%prod_date%</td><td>%customer%</td><td>%machine%</td><td>%size%</td><td>%numbers%</td><td>%packet_no%</td><td>%mill_id%</td><td>%grade%</td><td>%mill%</td><td><input type="text" id="comment" name="comment"></td><td><input type="text" id="mat_type" name="mat_type"></td><td><input type = "button" class="btn btn-default" value="Print" onclick="print_label_reshearing()"></td></tr>';
+    var html = '<tr id= %id%><td>%smpl_no%</td><td>%prod_date%</td><td>%customer%</td><td>%machine%</td><td>%size%</td><td>%numbers%</td><td>%packet_no%</td><td>%mill_id%</td><td>%grade%</td><td>%mill%</td><td><input type="text" id="comment" name="comment"></td><td><input type="text" id="mat_type" name="mat_type" value = "%mat_type%"></td><td><input type = "button" class="btn btn-default" value="Print" onclick="print_label_reshearing()"></td></tr>';
 
     // If customer is TSDPL; 2nd customer field has to be added
     var customer = document.getElementById("customer").value;
+    customer = cust_name_for_label(customer);
     if (customer == "TSDPL"){
-        html = '<tr id= %id%><td>%smpl_no%</td><td>%prod_date%</td><td>%customer%</td><td>%machine%</td><td>%size%</td><td>%numbers%</td><td>%packet_no%</td><td>%mill_id%</td><td>%grade%</td><td>%mill%</td><td><input type="text" id="comment" name="comment"></td><td><input type="text" id="cusomter2" name="customer2"></td><td><input type="text" id="mat_type" name="mat_type"></td><td><input type = "button" class="btn btn-default" value="Print" onclick="print_label_reshearing()"></td></tr>';
+        html = '<tr id= %id%><td>%smpl_no%</td><td>%prod_date%</td><td>%customer%</td><td>%machine%</td><td>%size%</td><td>%numbers%</td><td>%packet_no%</td><td>%mill_id%</td><td>%grade%</td><td>%mill%</td><td><input type="text" id="comment" name="comment"></td><td><input type="text" id="cusomter2" name="customer2"></td><td><input type="text" id="mat_type" name="mat_type" value = "%mat_type%"></td><td><input type = "button" class="btn btn-default" value="Print" onclick="print_label_reshearing()"></td></tr>';
     }
     var thickness = document.getElementById("thickness").value;
     var mill_id = document.getElementById("mill_id").value;
@@ -744,12 +755,18 @@ function make__part_label_reshearing(th){
      mill_id = 'N/A';
     }
 
+    mat_type = grade_field.split("ID");
 
+    mat_type = mat_type[0].split("GRADE");
+    material_type = mat_type[0];
+    material_type = material_type.replaceAll('COIL','');
+    material_type = material_type.replaceAll('SHEETS','');
+    material_type = material_type.replaceAll('.','');
 
     var machine = document.getElementById("machine").value;
 
     //var customer2 = document.getElementById("customer2").value;
-    customer = cust_name_for_label(customer);
+
     var prod_date_check = document.getElementById("processing_date");
     var prod_date = document.getElementById("processing_date").value;
     prod_date = change_date_format(prod_date);
@@ -788,6 +805,7 @@ function make__part_label_reshearing(th){
     newHTML = newHTML.replace('%mill_id%', mill_id);
     newHTML = newHTML.replace('%prod_date%', prod_date);
     newHTML = newHTML.replace('%mill%', mill);
+    newHTML = newHTML.replace('%mat_type%', material_type);
 
     size = thickness + " X " + width + " X " + output_length;
     newHTML = newHTML.replace('%size%', size);
@@ -830,6 +848,7 @@ function make_label_slit(){
 
     // If customer is TSDPL; 2nd customer field has to be added
     var customer = document.getElementById("customer").value;
+    customer = cust_name_for_label(customer);
     if (customer == "TSDPL"){
         html = '<tr id= %id%><td>%smpl_no%</td><td>%prod_date%</td><td>%customer%</td><td>%machine%</td><td>%size%</td><td>%coil_length%</td><td>%coil_name%</td><td>%mill_id%</td><td>%grade%</td><td>%mill%</td><td><input type="text" id="comment" name="comment"></td><td><input type="text" id="customer2nd" name="customer2nd"></td><td><input type = "button" class="btn btn-default" value="Print" onclick="print_label()"></td></tr>'
     }
@@ -843,7 +862,7 @@ function make_label_slit(){
 
 
     //var customer2 = document.getElementById("customer2").value;
-    customer = cust_name_for_label(customer);
+
     var prod_date = document.getElementById("processing_date").value;
     prod_date = change_date_format(prod_date);
     if (grade_field.includes("GRADE")){
