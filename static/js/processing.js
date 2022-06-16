@@ -26,7 +26,7 @@ function length_of_coil(){
     //if material is aluminium, the length has to be 3 times that of steel
     var grade = document.getElementById("grade").value;
 
-    if(grade.includes("ALU ")){
+    if(grade.includes("ALU ") || grade.includes("ALUMINIUM ")){
         length_of_coil= length_of_coil*(7.85/2.71);
     }
     document.getElementById("length_of_coil").value = length_of_coil.toFixed(0);
@@ -77,7 +77,7 @@ function for_packets_and_weight(table_id,table_row,operation){
     //if material is aluminium, the weight has to be 1/3 that of steel
     var grade = document.getElementById("grade").value;
 
-    if(grade.includes("ALU ")){
+    if(grade.includes("ALU ") || grade.includes("ALUMINIUM ")){
         last_row.cells[weight_pos].lastChild.value = (weight/3).toFixed(3);
     }
 
@@ -201,7 +201,7 @@ function get_part_weight(){
         width= document.getElementById("total_width").value;
     }
 
-    if(grade.includes("ALU ")){
+    if(grade.includes("ALU ") || grade.includes("ALUMINIUM ")){
         var total_processed_wt = thickness * width * total_length * aluminium_density;
         var coil_length = rm_wt/thickness/width/aluminium_density;
         document.getElementById("total_processed_wt").value = total_processed_wt.toFixed(3);

@@ -298,7 +298,8 @@ def transfer_material():
     else:
         return render_template('/transfer_pick_unit.html', stock_type='All')
 
-    cs_obj_lst = []
+    return render_template('transfer_enter_smpl_no.html', _unit=current_user.unit)
+    '''cs_obj_lst = []
     cs_id_lst = []
 
     for cs_id, cs in cs_return_lst:
@@ -308,7 +309,7 @@ def transfer_material():
     if cs_obj_lst:
         return render_template('transfer_material.html', cs_lst=zip(cs_id_lst, cs_obj_lst), _unit = current_user.unit)
     else:
-        return render_template('/main_menu.html', message="No Raw material to transfer")
+        return render_template('/main_menu.html', message="No Raw material to transfer")'''
 
 
 @app.route('/transfer_pick_unit', methods=['GET', 'POST'])
@@ -322,20 +323,49 @@ def transfer_pick_unit():
         unit = int(request.args.get('select_unit'))
         stock_type = request.args.get('stock_type')
 
-    cs_return_lst = CurrentStock.get_stock(stock_type,unit)
+    '''cs_return_lst = CurrentStock.get_stock(stock_type,unit)
 
     cs_obj_lst = []
     cs_id_lst = []
 
     for cs_id, cs in cs_return_lst:
         cs_id_lst.append(cs_id)
+        cs_obj_lst.append(cs)'''
+
+    #if cs_obj_lst:
+        #return render_template('transfer_material.html', cs_lst=zip(cs_id_lst, cs_obj_lst), _unit = unit)
+    return render_template('transfer_enter_smpl_no.html', _unit = unit)
+    #else:
+    #   return render_template('/main_menu.html', message="No Raw material to transfer")
+
+
+@app.route('/transfer_pick_size', methods=['GET', 'POST'])
+def transfer_pick_size():
+    smpl = ""
+    unit = ""
+    cs_return_lst = []
+    cs_id_lst = []
+    cs_obj_lst = []
+
+    if request.method == 'POST':
+        smpl = request.form['smpl_no']
+        unit = request.form['unit']
+
+
+    if request.method == 'GET':
+        smpl = request.args.get('smpl_no')
+        unit = request.args.get('unit')
+
+    cs_return_lst = CurrentStock.load_smpl_by_smplno(smpl, unit)
+    for cs_id, cs in cs_return_lst:
+        cs_id_lst.append(cs_id)
         cs_obj_lst.append(cs)
 
     if cs_obj_lst:
-        return render_template('transfer_material.html', cs_lst=zip(cs_id_lst, cs_obj_lst), _unit = unit)
+        return render_template('transfer_list.html', cs_lst=zip(cs_id_lst, cs_obj_lst), unit = unit)
+
     else:
         return render_template('/main_menu.html', message="No Raw material to transfer")
-
 
 # On selection and submit, the unit is changed in current_stock and remarks are updated in incoming about the transfer
 # and when it was transferred
@@ -345,22 +375,75 @@ def transfer_submit():
     unit = ""
     transfer_remarks = ""
     if request.method == 'POST':
-        smpl = request.form['select_smpl']
-        unit = request.form['unit']
-        transfer_remarks = request.form['remarks']
+        transfer_lst = request.form.getlist['select_smpl']
+        transfer_nos = request.form.getlist['dispatch_numbers']
+        transfer_quantity = request.form.getlist['dispatch_quantity']
+        vehicle_no = request.form['vehicle_no']
+        customer = request.form['customer']
+        transfer_date = request.form['dispatch_date']
+        transfer_time = request.form['dispatch_time']
+        transfer_pkts = request.form.getlist['dispatch_packets']
+        unit = request.form.getlist['unit']
+        remarks = request.form['remarks']
 
     if request.method == 'GET':
-        smpl = request.args.get('select_smpl')
-        unit = request.args.get('unit')
-        transfer_remarks = request.args.get('remarks')
+        transfer_lst = request.args.getlist('select_smpl')
+        transfer_nos = request.args.getlist('dispatch_numbers')
+        transfer_quantity = request.args.getlist('dispatch_quantity')
+        transfer_pkts = request.args.getlist('dispatch_packets')
+        unit = request.args.getlist('_unit')
+        vehicle_no = request.args.get('vehicle_no')
+        customer = request.args.get('customer')
+        transfer_date = request.args.get('dispatch_date')
+        transfer_time = request.args.get('dispatch_time')
+        remarks = request.args.get('remarks')
+        invoice_no = request.args.get('invoice_no')
 
-    smpl_details = smpl.split(',')
-    smpl_no = smpl_details[1]
-    cs_id = smpl_details[0]
-    CurrentStock.transfer_material_cls(cs_id, unit)
-    transfer_remarks = " Transferred to Unit " + unit + " for " + transfer_remarks + " on " + time.strftime("%d/%m/%Y")
-    Incoming.update_remarks(transfer_remarks, smpl_no)
+    # This fetches the list and removes the elements that are not selected
+    # The ones that are not selected are returned as None. The below list filters out the Nones
+    transfer_nos_lst = list(filter(None, transfer_nos))
+    transfer_quantity_lst = list(filter(None, transfer_quantity))
+    unit_lst = list(filter(None, unit))
+    transfer_pkts_lst = list(filter(None, transfer_pkts))
+
+    #transfer_header = DispatchHeader(vehicle_no, customer, transfer_date, transfer_time, invoice_no, remarks)
+    #transfer_id = transfer_header.save_to_db()
+
+
+    # Transfer Material has been changed for only partial material to be shifted.
+    # Logic has been borrowed from Dispatch material
+    for smpl, transfer_nos, transfer_qty, unit, no_of_packets in zip(transfer_lst, transfer_nos_lst,
+                                                                          transfer_quantity_lst, unit_lst,
+                                                                          transfer_pkts_lst):
+        smpl_details = smpl.split(',')
+        smpl_no = smpl_details[1]
+        cs_id = int(smpl_details[0])
+        cs = CurrentStock.load_smpl_by_id(cs_id)
+
+        if int(transfer_nos) == cs.numbers:
+            CurrentStock.transfer_material_cls(cs_id, unit)
+        else:
+            cs_new = CurrentStock(smpl_no, cs.customer, transfer_qty, transfer_nos, cs.thickness, cs.width,
+                                  cs.length, cs.status, cs.grade, unit, cs.packet_name)
+            cs.change_wt(smpl_no, cs.width, cs.length, transfer_qty, transfer_nos, 'minus', cs.status)
+            if cs_new.check_if_size_exists():
+                cs_new.change_wt(cs_new.smpl_no, cs_new.width, cs_new.length, transfer_qty, transfer_nos,
+                                 "plus", cs_new.status)
+            else:
+                cs_new.save_to_db()
+        transfer_remarks = "Transferred to Unit " + unit + " for " + transfer_remarks + " on " + time.strftime(
+            "%d/%m/%Y")
+        Incoming.update_remarks(transfer_remarks, smpl_no)
+
+    '''smpl_details = smpl.split(',')
+        smpl_no = smpl_details[1]
+        cs_id = smpl_details[0]
+        CurrentStock.transfer_material_cls(cs_id, unit)'''
     return render_template('/main_menu.html')
+
+
+
+
 
 
 # pick smpl for uploading documents
@@ -444,7 +527,7 @@ def order():
     if request.method == 'GET':
         smpl_no = request.args.get('select_smpl')
     incoming = Incoming.load_smpl_by_smpl_no(smpl_no)
-    current_stock = CurrentStock.load_smpl_by_smplno(smpl_no, incoming.length, incoming.width)
+    #current_stock = CurrentStock.load_smpl_by_smplno(smpl_no, incoming.length, incoming.width)
     for cs_id, _current_stock in current_stock:
         cs = _current_stock
 
@@ -556,7 +639,7 @@ def submit_order():
         incoming_new = Incoming(new_smpl_no,customer,incoming.incoming_date,thickness,width,length,grade,new_wt,new_nos,
                                 incoming.mill,incoming.mill_id,incoming.remarks, incoming.unit)
         incoming_new.savetodb()
-        rm_status = CurrentStock.change_wt(smpl_no, width, length, new_wt, new_nos, "minus")
+        rm_status = CurrentStock.change_wt(smpl_no, width, length, new_wt, new_nos, "minus", "RM")
 
 
     # The status of the smpl is updated in current_stock
@@ -1002,7 +1085,8 @@ def submit_processing():
         processing_id = processing.save_to_db()
 
         # Slitting/Mini Slitting and CTL/Reshearing/NCTL are managed differently
-        if operation == "CTL" or operation == "CTL 2" or operation == "Reshearing" or operation == "Narrow_CTL" or operation == "Lamination" or operation=="Levelling":
+        if operation == "CTL" or operation == "CTL 2" or operation == "Reshearing" or operation == "Narrow_CTL" or \
+                operation == "Lamination" or operation == "Levelling":
             lamination_lst = request.form.getlist('lamination')
             for output_width, output_length, actual_no_of_pieces, packet_name, processed_wt, \
                 lamination, fg_yes_no, remarks in zip(output_width_lst, output_length_lst, actual_no_of_pieces_lst,
@@ -1054,11 +1138,13 @@ def submit_processing():
 
                     else:
                         no_of_ms_consumed = actual_no_of_pieces
-                        rm_processed_wt =  processed_wt
+                        rm_processed_wt = processed_wt
 
                     # Reduce weight of mother material by the processed weight of cut material - balance weight remaining in the mother material
                     # rm_processed_wt = Decimal(rm_processed_wt) + balance_proc_wt
-                    rm_status = CurrentStock.change_wt(smpl_no, ms_width, ms_length, rm_processed_wt, no_of_ms_consumed, "minus")
+                    cs_rm = CurrentStock.csid_exists(cs_rm_id)
+                    if cs_rm is not None:
+                        rm_status = CurrentStock.change_wt(smpl_no, ms_width, ms_length, rm_processed_wt, no_of_ms_consumed, "minus", cs_rm.status)
 
                     # if rm_status == "complete":
                         # This is done when the RM is over but for some reason the order could not be completed
@@ -1068,7 +1154,7 @@ def submit_processing():
                     # Increase weight of cut material by processed weight. If cut material, doesn't already exist, the
                     # function returns insert => a new record has to be inserted
                     cc_insert = CurrentStock.change_wt(smpl_no, output_width, output_length, processed_wt,
-                                                       actual_no_of_pieces, "plus")
+                                                       actual_no_of_pieces, "plus", fg_yes_no)
 
                     # Unit of the material is decided based on the machine used to process the material.
                     # WARNING: This is bad programming
@@ -1132,7 +1218,10 @@ def submit_processing():
                             processing_detail.save_to_db()
 
                             # Reduce weight of mother material by the processed weight of cut material
-                            rm_status = CurrentStock.change_wt(smpl_no, ms_width, ms_length, processed_wt, length_per_part, "minus")
+                            cs_rm = CurrentStock.csid_exists(cs_rm_id)
+                            if cs_rm is not None:
+                                rm_status = CurrentStock.change_wt(smpl_no, ms_width, ms_length, processed_wt,
+                                                                   length_per_part, "minus", cs_rm.status)
 
                             #if rm_status == "complete":
                                 # This is done when the RM is over but for some reason the order could not be completed
@@ -1144,7 +1233,7 @@ def submit_processing():
                             # Increase weight of cut material by processed weight. If cut material, doesn't already exist, the
                             # function returns insert => a new record has to be inserted
                             cc_insert = CurrentStock.change_wt(smpl_no, output_width, output_length, processed_wt,
-                                                               no_of_coils, "plus")
+                                                               no_of_coils, "plus", fg_yes_no)
 
                             # Unit of the material is decided based on the machine used to process the material.
                             # WARNING: This is bad programming
@@ -1245,13 +1334,14 @@ def submit_slitting_processing():
         processing_id = processing.save_to_db()
 
         ip_size = input_size.split('x')
-        ms_width = ip_size[0]
-        ms_length = ip_size[1]
+        ms_width = Decimal(ip_size[0])
+        ms_length = Decimal(ip_size[1])
 
         for output_width, width_name, fg_yes_no in zip(output_width_lst, width_name_lst, fg_yes_no_lst):
             for part_length, part_name in zip(part_length_lst, part_name_lst):
                 output_length = 0
                 processed_numbers = 1
+                output_width = Decimal(output_width)
 
                 packet_name = width_name + part_name
                 part_weight = Decimal(thickness * float(output_width) * float(part_length) * 0.00000785)
@@ -1262,7 +1352,13 @@ def submit_slitting_processing():
                 processing_detail.save_to_db()
 
                 # Reduce weight of mother material by the processed weight of cut material
-                rm_status = CurrentStock.change_wt(smpl_no, ms_width, ms_length, part_weight, processed_numbers, "minus")
+                # In case of rewinding, there is the RM and the FG which have the same size.
+                # This check has been added so that weight is deducted from the RM only
+                cs_rm = CurrentStock.csid_exists(cs_rm_id)
+                if cs_rm is not None:
+                    rm_status = CurrentStock.change_wt(smpl_no, ms_width, ms_length, part_weight, processed_numbers,
+                                                       "minus", cs_rm.status)
+
 
                 #The issue is during rewinding since mother coil and output width & length remain the same,
                 # The weight is getting added and subtracted from the same current_stock record.
@@ -1274,7 +1370,7 @@ def submit_slitting_processing():
                     # Increase weight of cut material by processed weight. If cut material, doesn't already exist, the
                     # function returns insert => a new record has to be inserted
                     cc_insert = CurrentStock.change_wt(smpl_no, output_width, output_length, part_weight,
-                                                   processed_numbers, "plus")
+                                                   processed_numbers, "plus", fg_yes_no)
                 else:
                     cc_insert = "insert"
 
@@ -1283,10 +1379,16 @@ def submit_slitting_processing():
                 unit = '2'
 
                 # The new material is added to current stock
+                # In case of new material one more check in case material already exists. THis is especially for
+                # rewinding when FG and RM have the same size
                 if cc_insert == "insert":
                     cs_cc = CurrentStock(smpl_no, customer, part_weight, processed_numbers, thickness,
                                          output_width, output_length, fg_yes_no, grade, unit, packet_name)
-                    cs_cc.save_to_db()
+                    if cs_cc.check_if_size_exists():
+                        CurrentStock.change_wt(cs_cc.smpl_no, cs_cc.width, cs_cc.length, cs_cc.weight,
+                                               cs_cc.numbers, "plus", fg_yes_no)
+                    else:
+                        cs_cc.save_to_db()
         return render_template('/main_menu.html', message=Markup("Processing for " + smpl_no + " entered"))
 
 
@@ -1769,7 +1871,7 @@ if __name__ == '__main__':
     # app.run(debug=True)
     SERVER_NAME = '0.0.0.0'
     SERVER_PORT = 5001
-    app.run(SERVER_NAME, SERVER_PORT, threaded=True, debug=True)
+    #app.run(SERVER_NAME, SERVER_PORT, threaded=True, debug=True)
 
 
 
@@ -1779,5 +1881,5 @@ if __name__ == '__main__':
     # Using waitress as a WSGI server.
     # Steps here https://dev.to/thetrebelcc/how-to-run-a-flask-app-over-https-using-waitress-and-nginx-2020-235c
 
-    #serve(app,host=SERVER_NAME,port=SERVER_PORT)
+    serve(app,host=SERVER_NAME,port=SERVER_PORT)
 

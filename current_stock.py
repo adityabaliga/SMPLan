@@ -221,22 +221,22 @@ class CurrentStock:
             return None
 
     @classmethod
-    def load_smpl_by_smplno(cls,smpl_no,length, width):
+    def load_smpl_by_smplno(cls,smpl_no, unit):
         user_data = []
         cs_lst = []
         cs_id_lst = []
         with CursorFromConnectionFromPool() as cursor:
-            cursor.execute("select * from current_stock where smpl_no = %s and length = %s and width = %s",(smpl_no, length, width))
-            lst = cursor.fetchone()
+            cursor.execute("select * from current_stock where smpl_no = %s and unit = %s ",(smpl_no, unit))
+            user_data = cursor.fetchall()
+            if user_data:
+                for lst in user_data:
+                    cs = CurrentStock(smpl_no=lst[1], weight=Decimal(lst[2]), numbers=int(lst[3]), width=Decimal(lst[4]),
+                                      length=Decimal(lst[5]), status=lst[6], customer=lst[7], thickness=Decimal(lst[8]),
+                                      grade=lst[9], unit=lst[10], packet_name = lst [11])
+                    cs_lst.append(cs)
+                    cs_id_lst.append(lst[0])
 
-
-            cs = CurrentStock(smpl_no=lst[1], weight=Decimal(lst[2]), numbers=int(lst[3]), width=Decimal(lst[4]),
-                              length=Decimal(lst[5]), status=lst[6], customer=lst[7], thickness=Decimal(lst[8]),
-                              grade=lst[9], unit=lst[10], packet_name = lst [11])
-            cs_lst.append(cs)
-            cs_id_lst.append(lst[0])
-
-            return zip(cs_id_lst, cs_lst)
+        return zip(cs_id_lst, cs_lst)
 
     @classmethod
     def get_smpl_for_fg_to_wip(cls, smpl_no):
@@ -299,15 +299,15 @@ class CurrentStock:
                 return None
 
     @classmethod
-    def change_wt(cls, smpl_no, width, length, processed_wt, actual_no_of_pieces, sign):
+    def change_wt(cls, smpl_no, width, length, processed_wt, actual_no_of_pieces, sign, status):
         with CursorFromConnectionFromPool() as cursor:
             cursor.execute("select weight, numbers, unit, cs_id from current_stock where smpl_no = %s and width = %s "
-                           "and length = %s ",(smpl_no,width,length))
+                           "and length = %s and status = %s", (smpl_no, width, length, status))
             user_data = cursor.fetchone()
             if user_data:
                 weight = Decimal(user_data[0])
                 numbers = Decimal(user_data[1])
-                cs_id = user_data[3]
+                cs_id = int(user_data[3])
                 if sign == "minus":
                     new_weight = weight - Decimal(processed_wt)
                     new_weight = round(new_weight,3)
@@ -323,20 +323,19 @@ class CurrentStock:
                     #else:
                     #    new_numbers = numbers
 
-                if new_weight < 0.5 and sign == "minus":
+                if new_weight < 0.5 and sign == "minus" and length == 0:
                     #OrderDetail.complete_processing_on_del(smpl_no, width, length)
                     #CurrentStock.delete_record(cs_id)
 
-                    cursor.execute("delete from current_stock where smpl_no = %s and width = %s and length = %s"
-                                   ,(smpl_no,width,length))
+                    cursor.execute("delete from current_stock where cs_id = %s", (cs_id,))
+
                     # This is done when the RM is over but for some reason the order could not be completed
                     # This could when the RM is thickness is more or wrong calc of material or processing mistake/change
 
                     return "complete"
                 else:
-                    cursor.execute("update current_stock set weight = %s, numbers = %s where smpl_no = %s and width = %s"
-                                   " and length = %s",
-                                   (new_weight,new_numbers,smpl_no,width,length))
+                    cursor.execute("update current_stock set weight = %s, numbers = %s where cs_id = %s",
+                                   (new_weight, new_numbers, cs_id))
                     return "continue"
             else:
                 return "insert"
@@ -445,4 +444,37 @@ class CurrentStock:
         return zip(cs_id_lst, cs_lst)
 
 
+    def check_if_size_exists(self):
+        with CursorFromConnectionFromPool() as cursor:
+            cursor.execute("select * from current_stock where smpl_no = %s and thickness = %s and width = %s "
+                           "and length = %s and status = %s and unit = %s and customer = %s",
+                           (self.smpl_no, self.thickness, self.width, self.length, self.status, self.unit,
+                            self.customer))
+            user_data = cursor.fetchone()
 
+            if user_data:
+                '''cs = CurrentStock(smpl_no=user_data[1], weight=Decimal(user_data[2]), numbers=int(user_data[3]),
+                                  width=Decimal(user_data[4]), length=Decimal(user_data[5]), status=user_data[6],
+                                  customer=user_data[7], thickness=Decimal(user_data[8]), grade=user_data[9],
+                                  unit=user_data[10], packet_name = user_data[11])'''
+
+                return True
+            else:
+                return False
+
+    @classmethod
+    def csid_exists(cls, cs_rm_id):
+        with CursorFromConnectionFromPool() as cursor:
+            cursor.execute("select * from current_stock where cs_id = %s",
+                           (cs_rm_id,))
+            user_data = cursor.fetchone()
+
+            if user_data:
+                cs = CurrentStock(smpl_no=user_data[1], weight=Decimal(user_data[2]), numbers=int(user_data[3]),
+                                  width=Decimal(user_data[4]), length=Decimal(user_data[5]), status=user_data[6],
+                                  customer=user_data[7], thickness=Decimal(user_data[8]), grade=user_data[9],
+                                  unit=user_data[10], packet_name = user_data[11])
+
+                return cs
+            else:
+                return None
