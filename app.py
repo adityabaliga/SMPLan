@@ -1769,7 +1769,7 @@ if __name__ == '__main__':
     # app.run(debug=True)
     SERVER_NAME = '0.0.0.0'
     SERVER_PORT = 5001
-    #app.run(SERVER_NAME, SERVER_PORT, threaded=True, debug=True)
+    app.run(SERVER_NAME, SERVER_PORT, threaded=True, debug=True)
 
 
 
@@ -1779,5 +1779,5 @@ if __name__ == '__main__':
     # Using waitress as a WSGI server.
     # Steps here https://dev.to/thetrebelcc/how-to-run-a-flask-app-over-https-using-waitress-and-nginx-2020-235c
 
-    serve(app,host=SERVER_NAME,port=SERVER_PORT)
+    #serve(app,host=SERVER_NAME,port=SERVER_PORT)
 
