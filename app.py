@@ -1532,7 +1532,7 @@ def dispatch():
         if dispatch_nos == cs.numbers:
             CurrentStock.delete_record(cs_id)
         else:
-            cs.change_wt(smpl_no, cs.width, cs.length, dispatch_qty, dispatch_nos,'minus')
+            cs.change_wt(smpl_no, cs.width, cs.length, dispatch_qty, dispatch_nos,'minus', cs.status)
 
     return render_template('/main_menu.html')
 
