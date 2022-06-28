@@ -1015,7 +1015,9 @@ def processing_load():
                                completed_processing_details_lst = zip(order_detail_lst_by_operation,
                                                                                 completed_processing_wt_lst,
                                                                                 completed_processing_numbers_lst))'''
-
+    if operation == 'Levelling':
+        return render_template('processing_levelling.html', incoming=incoming, operation=operation,
+                               processing_details_lst=processing_detail_lst, cs_rm=cs_rm, cs_rm_id=cs_rm_id)
 
 # 1. Get processing and processing details from the screen
 # 2. Reduce the qty from mother material and update/insert cut material in current_stock
@@ -1310,6 +1312,7 @@ def submit_slitting_processing():
 
         no_of_qc = request.form['no_of_qc']
         no_of_helpers = request.form['no_of_helpers']
+        fg_id = request.form['fg_id']
         #names_of_qc = request.form['names_of_qc']
         #names_of_helpers = request.form['names_of_helpers']
         #name_of_packer = request.form['name_of_packer']
@@ -1346,10 +1349,14 @@ def submit_slitting_processing():
                 packet_name = width_name + part_name
                 part_weight = Decimal(thickness * float(output_width) * float(part_length) * 0.00000785)
                 part_weight = round(part_weight, 3)
+
+                _remarks = "FG ID:" + fg_id + remarks
                 processing_detail = ProcessingDetail(smpl_no, operation, machine, processing_id, output_width,
-                                                     output_length, processed_numbers, packet_name, remarks, part_weight,
+                                                     output_length, processed_numbers, packet_name, _remarks, part_weight,
                                                      ms_width, ms_length)
                 processing_detail.save_to_db()
+
+                _remarks = ''
 
                 # Reduce weight of mother material by the processed weight of cut material
                 # In case of rewinding, there is the RM and the FG which have the same size.
@@ -1871,7 +1878,7 @@ if __name__ == '__main__':
     # app.run(debug=True)
     SERVER_NAME = '0.0.0.0'
     SERVER_PORT = 5001
-    #app.run(SERVER_NAME, SERVER_PORT, threaded=True, debug=True)
+    app.run(SERVER_NAME, SERVER_PORT, threaded=True, debug=True)
 
 
 
@@ -1881,5 +1888,5 @@ if __name__ == '__main__':
     # Using waitress as a WSGI server.
     # Steps here https://dev.to/thetrebelcc/how-to-run-a-flask-app-over-https-using-waitress-and-nginx-2020-235c
 
-    serve(app,host=SERVER_NAME,port=SERVER_PORT)
+    #serve(app,host=SERVER_NAME,port=SERVER_PORT)
 

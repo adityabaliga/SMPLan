@@ -322,9 +322,23 @@
             <td><input type = "number" name = "no_of_qc" id = "no_of_qc" required></td>
             <td>No. of helpers</td>
             <td><input type = "number" name = "no_of_helpers" id = "no_of_helpers" required></td>
-            <!--td>Names of fitters</td>
+            <td>Names of fitters</td>
             <td><input type = "text" name = "names_of_qc" id = "names_of_qc"></td>
-            <td>Names of Helpers</td>
+            <td>FG ID</td>
+            <td>
+                <select name="fg_id" id="fg_id" required>
+                            <option disabled selected value></option>
+                            <option value="508">508</option>
+                            <option value="610">610</option>
+                            {% if operation == "Mini_Slitting" %}
+                            <option value="350">350</option>
+                            {% endif %}
+
+
+
+                    </select>
+            </td>
+            <!--td>Names of Helpers</td>
             <td><input type = "text" name = "names_of_helpers" id = "names_of_helpers"></td>
             <td>Names of Packers</td>
             <td><input type = "text" name = "name_of_packer" id = "name_of_packer"></td-->
