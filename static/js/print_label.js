@@ -31,10 +31,28 @@ function get_param(){
     }
 
     if(queries[8] != 'N/A'){
+        if(queries[8].includes('SCAMS NO:'))
+        {
+            grade = queries[8].split('SCAMS NO:');
+            html = '<p name="scams_no" id="scams_no">%scams_no%</p>';
+            scams_in_html = 'SCAMS NO: ' + grade[1];
+            newHTML = html.replace('%scams_no%', scams_in_html);
+            document.getElementById("grade").innerHTML = " " + 'GRADE: ' + grade[0];
+            document.getElementById('label_details').insertAdjacentHTML('beforeend', newHTML)
+        }
+        else{
          document.getElementById("grade").innerHTML = " " + 'GRADE: ' + queries[8];
+         }
     }else{
         myobj = document.getElementById("grade");
         myobj.remove();
+    }
+
+    if(queries[8].includes('SCAMS NO:')){
+        scams_no = queries[8].split('SCAMS NO:');
+        html = '<p name="scams_no" id="scams_no">%scams_no%</p>';
+        scams_in_html = 'SCAMS NO: ' + scams_no[1];
+        newHTML = html.replace('%scams_no%', scams_in_html);
     }
 
 
@@ -94,7 +112,18 @@ function get_param_reshearing(){
     }
 
     if(queries[8] != 'N/A'){
-         document.getElementById("grade").innerHTML = " " + 'GRADE: ' + queries[8];
+        if(queries[8].includes('SCAMS NO:'))
+            {
+                grade = queries[8].split('SCAMS NO:');
+                html = '<p name="scams_no" id="scams_no">%scams_no%</p>';
+                scams_in_html = 'SCAMS NO: ' + grade[1];
+                newHTML = html.replace('%scams_no%', scams_in_html);
+                document.getElementById("grade").innerHTML = " " + 'GRADE: ' + grade[0];
+                document.getElementById('label_details').insertAdjacentHTML('beforeend', newHTML)
+            }
+            else{
+             document.getElementById("grade").innerHTML = " " + 'GRADE: ' + queries[8];
+             }
     }else{
         myobj = document.getElementById("grade");
         myobj.remove();
@@ -153,8 +182,19 @@ function get_param_big(){
     document.getElementById("size").innerHTML = " " + queries[4] + " - " + queries[5] + " No.s";
     //If mill id is marked N/A in the processing page. We have to remove the line from the label
     if(queries[8] != 'N/A'){
-        document.getElementById("mill_id").innerHTML = " " + queries[10] + ' ID: ' + queries[8];
-    }else{
+        if(queries[8].includes('SCAMS NO:'))
+            {
+                grade = queries[8].split('SCAMS NO:');
+                html = '<p name="scams_no" id="scams_no">%scams_no%</p>';
+                scams_in_html = 'SCAMS NO: ' + grade[1];
+                newHTML = html.replace('%scams_no%', scams_in_html);
+                document.getElementById("grade").innerHTML = " " + 'GRADE: ' + grade[0];
+                document.getElementById('label_details').insertAdjacentHTML('beforeend', newHTML)
+            }
+            else{
+             document.getElementById("grade").innerHTML = " " + 'GRADE: ' + queries[8];
+             }
+         }else{
         myobj = document.getElementById("mill_id");
         myobj.remove();
     }

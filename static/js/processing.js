@@ -537,6 +537,8 @@ function make__part_label_slit(th){
     if (grade_field.includes("GRADE")){
         grade = grade_field.split("GRADE").pop();
         grade = grade.slice(1);
+        //grade_field = grade_field.split(".");
+        //grade = grade_field[0];
     }
     else{
         grade = grade_field;
@@ -599,7 +601,8 @@ function make__part_label_ctl(th){
                 '<td><input type="text" style="width:130px;border: 0px none;" id="lab_mill" name="lab_mill" value="%mill%" readonly></td>' +
                 '<td><input type="text" id="comment" name="comment"></td>' +
                 '<td><input type="text" id="mat_type" name="mat_type" value = "%mat_type%"></td>' +
-                '<td><input type = "button" class="btn btn-default" value="Print" onclick="print_label_big()"></td></tr>';
+                '<td><input type = "button" class="btn btn-default" value="Print" onclick="print_label_big()"></td>';
+                //+ '<td><input type = "button" class="btn btn-default" value="Export" id="export_to_excel" onclick="export_to_xls(event, this)"></td></tr>';
 
     // If customer is TSDPL; 2nd customer field has to be added
     var customer = document.getElementById("customer").value;
@@ -717,6 +720,33 @@ function make__part_label_ctl(th){
 
 
 }
+
+/*function export_to_xls(e, th){
+    e.preventDefault();
+    var rowId = parseInt(event.target.parentNode.parentNode.id);
+              //this gives id of tr whose button was clicked
+    var row_id = th.parentNode.id;
+    var export_row = "";
+    var fg_table = document.getElementById('fg_table');
+
+    for(i=0;i<fg_table.rows[rowId].cells.length-2;i++){
+            export_row += fg_table.rows[rowId].cells[i].lastChild.value + ';';
+    }
+
+    // This is an AJAX request to asynchronously send a request to Python
+    // This helps us send a request but remain on the same page
+    // https://stackoverflow.com/questions/41323679/how-to-send-data-to-flask-via-ajax
+    $.ajax({
+        url: '/background_process_test',
+        type: 'POST',
+        data: {
+                 'new_freq': export_row  //  to the GET parameters
+                },
+        success: function (response) {
+            alert(response);
+        }
+        });
+}*/
 
 ////Fill label table for Reshearing
 function make__part_label_reshearing(th){
