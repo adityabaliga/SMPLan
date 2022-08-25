@@ -48,7 +48,7 @@ function get_param(){
         myobj.remove();
     }
 
-    if(queries[8].includes('SCAMS NO:')){
+         if(queries[8].includes('SCAMS NO:')){
         scams_no = queries[8].split('SCAMS NO:');
         html = '<p name="scams_no" id="scams_no">%scams_no%</p>';
         scams_in_html = 'SCAMS NO: ' + scams_no[1];
@@ -181,10 +181,10 @@ function get_param_big(){
     document.getElementById("smpl_no").innerHTML = queries[0] + " - " + queries[6] + ' ' + mat_type;
     document.getElementById("size").innerHTML = " " + queries[4] + " - " + queries[5] + " No.s";
     //If mill id is marked N/A in the processing page. We have to remove the line from the label
-    if(queries[8] != 'N/A'){
-        if(queries[8].includes('SCAMS NO:'))
+    if(queries[9] != 'N/A'){
+        if(queries[9].includes('SCAMS NO:'))
             {
-                grade = queries[8].split('SCAMS NO:');
+                grade = queries[9].split('SCAMS NO:');
                 html = '<p name="scams_no" id="scams_no">%scams_no%</p>';
                 scams_in_html = 'SCAMS NO: ' + grade[1];
                 newHTML = html.replace('%scams_no%', scams_in_html);
@@ -192,16 +192,16 @@ function get_param_big(){
                 document.getElementById('label_details').insertAdjacentHTML('beforeend', newHTML)
             }
             else{
-             document.getElementById("grade").innerHTML = " " + 'GRADE: ' + queries[8];
+             document.getElementById("grade").innerHTML = " " + 'GRADE: ' + queries[9];
              }
          }else{
         myobj = document.getElementById("mill_id");
         myobj.remove();
     }
-    if(queries[9] != 'N/A'){
-        document.getElementById("grade").innerHTML = " " + 'GRADE: ' + queries[9];
+    if(queries[8] != 'N/A'){
+        document.getElementById("mill_id").innerHTML = " " + queries[10] + ' ID: ' + queries[8];
     }else{
-        myobj = document.getElementById("grade");
+        myobj = document.getElementById("mill_id");
         myobj.remove();
     }
     document.getElementById("prod_date").innerHTML = " " + "DATE : " + queries[1];
