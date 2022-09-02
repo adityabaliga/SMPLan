@@ -356,7 +356,7 @@ class CurrentStock:
 
         if stock_type == 'All':
             with CursorFromConnectionFromPool() as cursor:
-                cursor.execute("select * from current_stock where unit = '%s' order by smpl_no asc",(unit,))
+                cursor.execute("select * from current_stock where unit = %s order by smpl_no asc",(unit,))
                 user_data = cursor.fetchall()
         else:
             with CursorFromConnectionFromPool() as cursor:
