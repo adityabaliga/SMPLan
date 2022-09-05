@@ -293,7 +293,7 @@ def put_on_unhold():
 @app.route('/transfer_material', methods=['GET', 'POST'])
 def transfer_material():
     if current_user.unit == 1 or current_user.unit == 2:
-        cs_return_lst = CurrentStock.get_stock('All', current_user.unit)
+        cs_return_lst = CurrentStock.get_stock('All', str(current_user.unit))
     else:
         return render_template('/transfer_pick_unit.html', stock_type='All')
 
