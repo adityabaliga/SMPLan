@@ -1818,6 +1818,102 @@ return render_template('/history_view.html', incoming=incoming, file_list=file_l
                        processing_hdr_lst = zip(processing_hdr_lst,processing_id_lst), processing_dtl_lst = processing_dtl_lst)'''
 
 
+@app.route('/scams_search', methods=['GET', 'POST'])
+def scams_search():
+    return render_template('/scams_search.html')
+
+
+@app.route('/scams_show_details', methods=['GET', 'POST'])
+def scams_show_details():
+    scams_no = ""
+    file_list = ""
+    if request.method == 'POST':
+        scams_no = request.form['scams_no']
+    if request.method == 'GET':
+        scams_no = request.args.get('scams_no')
+
+    smpl_no_lst = Incoming.get_scams_no(scams_no)
+
+    dispatch_hdr_lst = []
+    dispatch_dtl_lst, _dispatch_dtl_lst = [], []
+    dispatch_id_lst = []
+    order_lst, order_id_lst, _order_lst, order_lst_by_smpl, order_id_lst_by_smpl = [], [], [], [], []
+    _processing_hdr_lst, processing_hdr_lst, processing_hdr_id_lst = [], [], []
+    _order_dtl_lst, order_dtl_lst, order_dtl_id_lst = [], [], []
+    order_dtl_lst_by_orderid, order_dtl_id_lst_by_orderid = [], []
+    processing_dtl_lst, processing_dtl_lst_by_order_dtl = [], []
+    cs_lst, _cs_lst = [], []
+
+    #smpl_number = str(smpl_number).upper().replace(" ", "")
+    # smpl_no.replace(" ", "")
+    #smpl_no_lst = Incoming.smpl_no_list_for_history(smpl_number)
+
+    if smpl_no_lst:
+        # the query from incoming returns smpl_nos in ascending order. The original number is always going to be the
+        # the first element
+        incoming = Incoming.load_smpl_by_smpl_no(smpl_no_lst[0])
+        for smpl_no in smpl_no_lst:
+            _cs_lst = (CurrentStock.load_smpl_for_history(smpl_no))
+            if _cs_lst:
+                for cs in _cs_lst:
+                    cs_lst.append(cs)
+
+            _processing = Processing.load_history(smpl_no)
+            for processing_id, processing in _processing:
+                processing_hdr_lst.append(processing)
+                processing_hdr_id_lst.append(processing_id)
+                processing_dtl_lst.append(ProcessingDetail.load_history(processing_id))
+
+            '''_order_lst = Order.history_load_from_db(smpl_no)
+            for ordr_id, ordr in _order_lst:
+                order_id_lst.append(ordr_id)
+                order_lst.append(ordr)
+                _order_dtl_lst = OrderDetail.load_from_db(smpl_no,ordr_id)
+                for _ordr_dtl_id, _ordr_dtl in _order_dtl_lst:
+                    order_dtl_id_lst.append(_ordr_dtl_id)
+                    order_dtl_lst.append(_ordr_dtl)
+                    processing_dtl_lst.append(ProcessingDetail.load_history(_ordr_dtl_id))
+                _processing = Processing.load_history(ordr_id)
+                for processing_id, processing in _processing:
+                    processing_hdr_lst.append(processing)
+                    processing_hdr_id_lst.append(processing_id)
+            order_lst_by_smpl.append(order_lst)
+            order_id_lst_by_smpl.append(order_id_lst)
+            order_dtl_lst_by_orderid.append(order_dtl_lst)
+            order_dtl_id_lst_by_orderid.append(order_dtl_id_lst)'''
+
+            _dispatch_dtl_lst.append(DispatchDetail.load_from_db(smpl_no))
+            for dispatch_dtl_sublst in _dispatch_dtl_lst:
+                for dispatch_dtl in dispatch_dtl_sublst:
+                    dispatch_id_lst.append(int(dispatch_dtl.dispatch_id))
+                    dispatch_dtl_lst.append(dispatch_dtl)
+
+        dispatch_id_lst = list(set(dispatch_id_lst))
+        dispatch_lst = []
+        i = 0
+        for dispatch_id in dispatch_id_lst:
+            dispatch_hdr_lst.append(DispatchHeader.load_from_db(dispatch_id))
+            dispatch_lst.append(dispatch_hdr_lst[i][0])
+            i += 1
+
+        return render_template('/hist_view.html', incoming=incoming, file_list=file_list,
+                               smpl_no_lst=smpl_no_lst,
+                               order_lst_by_smpl=zip(order_lst, order_id_lst),
+                               order_id_lst_by_smpl=order_id_lst_by_smpl,
+                               order_dtl_id_lst_by_orderid=order_dtl_id_lst_by_orderid,
+                               order_dtl_lst_by_orderid=order_dtl_lst_by_orderid,
+                               order_dtl_lst=order_dtl_lst,
+                               processing_dtl_lst=processing_dtl_lst,
+                               processing_hdr_lst=zip(processing_hdr_lst, processing_hdr_id_lst),
+                               dispatch_hdr_lst=zip(dispatch_lst, dispatch_id_lst),
+                               dispatch_dtl_lst=dispatch_dtl_lst,
+                               cs_lst=cs_lst)
+
+    else:
+        return render_template('/main_menu.html', message=smpl_number + " not found.")
+
+
+
 @app.route('/daily_report_pick_date', methods=['GET', 'POST'])
 def daily_report_pick_date():
     return render_template('/daily_report_pick_date.html')
@@ -1907,7 +2003,7 @@ if __name__ == '__main__':
     # app.run(debug=True)
     SERVER_NAME = '0.0.0.0'
     SERVER_PORT = 5001
-    #app.run(SERVER_NAME, SERVER_PORT, threaded=True, debug=True)
+    app.run(SERVER_NAME, SERVER_PORT, threaded=True, debug=True)
 
     logger = logging.getLogger('waitress')
     logger.setLevel(logging.INFO)
@@ -1915,4 +2011,4 @@ if __name__ == '__main__':
     # Using waitress as a WSGI server.
     # Steps here https://dev.to/thetrebelcc/how-to-run-a-flask-app-over-https-using-waitress-and-nginx-2020-235c
 
-    serve(app,host=SERVER_NAME,port=SERVER_PORT)
+    #serve(app,host=SERVER_NAME,port=SERVER_PORT)

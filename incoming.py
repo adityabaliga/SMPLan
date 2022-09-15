@@ -179,7 +179,21 @@ class Incoming:
         smpl_no_lst = []
         with CursorFromConnectionFromPool() as cursor:
             cursor.execute("select smpl_no from incoming where smpl_no like %s order by smpl_no asc",(query_smpl_no,))
-            user_data = cursor.fetchall()
+            user_data = cursor.fetchone()
+        if user_data:
+            for smpl_no in user_data:
+                smpl_no_lst.append(smpl_no)
+
+        return smpl_no_lst
+
+    @classmethod
+    def get_scams_no(cls, scams_no):
+        query_scams_no = '%' + scams_no + '%'
+        smpl_no_lst = []
+        smpl_no = ''
+        with CursorFromConnectionFromPool() as cursor:
+            cursor.execute("select smpl_no from incoming where grade like %s order by smpl_no asc", (query_scams_no,))
+            user_data = cursor.fetchone()
         for smpl_no in user_data:
             smpl_no_lst.append(smpl_no)
         return smpl_no_lst
