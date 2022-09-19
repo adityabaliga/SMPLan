@@ -1463,6 +1463,32 @@ def print_label_reshearing():
 def check_stock():
     return render_template('check_stock.html')
 
+@app.route('/check_stock_ttssi_fg', methods=['GET', 'POST'])
+def check_stock_ttssi_fg():
+    _cs_lst = []
+    _cs_id_lst = []
+    cs_lst = []
+    scams_no_lst = []
+
+    cs_lst = CurrentStock.get_stock_by_customer('TT STEEL SERVICE INDIA PVT.LTD.', 'FG')
+
+    for cs_id, cs in cs_lst:
+        _cs_id_lst.append(cs_id)
+        _cs_lst.append(cs)
+        scams_no = cs.grade.split('SCAMS NO')
+        if len(scams_no) > 1:
+            scams_no = scams_no[1]
+            scams_no = scams_no.replace(':', '')
+            scams_no = scams_no.replace(';', '')
+            scams_no = scams_no.replace('.', '')
+            scams_no = scams_no.replace(' ', '')
+            scams_no_lst.append(scams_no)
+        else:
+            scams_no_lst.append('')
+
+    cs_lst = zip(_cs_id_lst, _cs_lst, scams_no_lst)
+    return render_template('stock_display_ttssi.html', cs_lst=cs_lst)
+
 
 # Function displays stock based on stock type selected
 @app.route('/stock', methods=['GET', 'POST'])
