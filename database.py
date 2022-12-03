@@ -6,9 +6,9 @@ class Database:
 
     @classmethod
     def initialise(cls):
-        cls.__connection_pool = pool.SimpleConnectionPool(10, 50, user='postgres', password='smpl@509',
+        cls.__connection_pool = pool.SimpleConnectionPool(1, 10, user='postgres', password='smpl@509',
                                                           database='smpl_prodn',
-                                                          host='localhost')
+                                                          host='localhost', gssencmode='disable', sslmode='disable')
 
     @classmethod
     def get_connection(cls):
