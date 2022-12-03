@@ -99,7 +99,7 @@ class Incoming:
             mill = rm.getElementsByTagName("UDF:RNMFR")
 
             unit = ''
-            if smpl_no.childNodes[0].data.startswith('2SMPL'):
+            if smpl_no.childNodes[0].data.startswith('2SMPL') or smpl_no.childNodes[0].data.startswith('TTS') or smpl_no.childNodes[0].data.startswith('TSL'):
                 unit = '2'
             if smpl_no.childNodes[0].data.startswith('SMPL'):
                 unit = '1'
