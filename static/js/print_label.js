@@ -166,7 +166,7 @@ function get_param_big(){
         document.getElementById("customer").style.fontSize = "55px";
     }
     else{
-        document.getElementById("customer").style.fontSize = "45px";
+        document.getElementById("customer").style.fontSize = "35px";
     }
 
     var myobj;
