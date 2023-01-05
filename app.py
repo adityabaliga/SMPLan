@@ -1,5 +1,6 @@
 from waitress import serve
 import logging
+from werkzeug.middleware.profiler import ProfilerMiddleware
 
 from decimal import Decimal
 from flask_login import LoginManager, login_user, current_user, logout_user
@@ -2028,8 +2029,13 @@ if __name__ == '__main__':
     app.config["SECRET_KEY"] = "SMPLMRP"
     # app.run(debug=True)
     SERVER_NAME = '0.0.0.0'
+    #SERVER_NAME = '127.0.0.1'
     SERVER_PORT = 5001
-    app.run(SERVER_NAME, SERVER_PORT, threaded=True, debug=True)
+
+
+    app.wsgi_app = ProfilerMiddleware(app.wsgi_app, restrictions=[5], profile_dir='E:\postgres_data_bkp\PROFILING')
+    #app.run(debug=True)
+    #app.run(SERVER_NAME, SERVER_PORT, threaded=True, debug=True)
 
     logger = logging.getLogger('waitress')
     logger.setLevel(logging.INFO)
@@ -2037,4 +2043,4 @@ if __name__ == '__main__':
     # Using waitress as a WSGI server.
     # Steps here https://dev.to/thetrebelcc/how-to-run-a-flask-app-over-https-using-waitress-and-nginx-2020-235c
 
-    #serve(app,host=SERVER_NAME,port=SERVER_PORT)
+    serve(app,host=SERVER_NAME,port=SERVER_PORT)
