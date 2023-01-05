@@ -341,7 +341,7 @@ class CurrentStock:
                     #else:
                     #    new_numbers = numbers
 
-                if (new_weight < 0.5 and sign == "minus" and Decimal(length) == 0) or ((new_numbers <= 0 or new_weight < 0.2) and sign == "minus" and Decimal(length) > 0):
+                if (new_weight < 0.5 and sign == "minus" and Decimal(length) == 0) or ((new_weight < 0.2) and sign == "minus" and Decimal(length) > 0):
                     #OrderDetail.complete_processing_on_del(smpl_no, width, length)
                     #CurrentStock.delete_record(cs_id)
 
