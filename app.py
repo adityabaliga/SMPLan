@@ -522,7 +522,7 @@ def order():
     if request.method == 'GET':
         smpl_no = request.args.get('select_smpl')
     incoming = Incoming.load_smpl_by_smpl_no(smpl_no)
-    # current_stock = CurrentStock.load_smpl_by_smplno(smpl_no, incoming.length, incoming.width)
+    current_stock = CurrentStock.load_smpl_by_smplno(smpl_no, incoming.length, incoming.width)
     for cs_id, _current_stock in current_stock:
         cs = _current_stock
 
@@ -1147,8 +1147,13 @@ def submit_processing():
 
                     # Increase weight of cut material by processed weight. If cut material, doesn't already exist, the
                     # function returns insert => a new record has to be inserted
+                    if customer.startswith("HONDA"):
+                        _packet_name = packet_name
+                    else:
+                        _packet_name = ""
+
                     cc_insert = CurrentStock.change_wt(smpl_no, output_width, output_length, processed_wt,
-                                                       actual_no_of_pieces, "plus", fg_yes_no)
+                                                       actual_no_of_pieces, "plus", fg_yes_no,_packet_name)
 
                     # Unit of the material is decided based on the machine used to process the material.
                     # WARNING: This is bad programming
@@ -1472,6 +1477,8 @@ def check_stock_ttssi_fg():
     scams_no_lst = []
 
     cs_lst = CurrentStock.get_stock_by_customer('TT STEEL SERVICE INDIA PVT.LTD.', 'FG')
+    #cs_lst.append(CurrentStock.get_stock_by_customer('TT STEEL SERVICE INDIA PVT.LTD [ #509 ]', 'FG'))
+    #cs_lst.append(CurrentStock.get_stock_by_customer('TT STEEL SERVICE INDIA PVT LTD', 'FG'))
 
     for cs_id, cs in cs_lst:
         _cs_id_lst.append(cs_id)
@@ -1489,6 +1496,120 @@ def check_stock_ttssi_fg():
 
     cs_lst = zip(_cs_id_lst, _cs_lst, scams_no_lst)
     return render_template('stock_display_ttssi.html', cs_lst=cs_lst)
+
+@app.route('/check_stock_htid', methods=['GET', 'POST'])
+def check_stock_htid():
+    _cs_lst = []
+    _cs_id_lst = []
+    cs_lst = []
+    part_no_lst = []
+    wt_per_sheet_lst = []
+    coating_lst = []
+    packet_wt_lst = []
+    mill_lst = []
+    mill_id_lst = []
+
+
+    part_no = ""
+    coating = ""
+    wt_per_sheet = 0
+    packet_wt = 0
+
+    cs_lst = CurrentStock.get_stock_by_customer('HONDA TRADING CORPORATION INDIA PVT LTD', 'All')
+
+    for cs_id, cs in cs_lst:
+        _cs_id_lst.append(cs_id)
+        _cs_lst.append(cs)
+        if cs.width == 720 and cs.length == 745:
+            part_no = "KONA PLATE BOTTOM"
+            wt_per_sheet = 3.37
+            coating = "20/0"
+        if cs.width == 600 and cs.length == 820:
+            part_no = "KONA HALF OTHER RL"
+            wt_per_sheet = 3.09
+            coating = "0/20"
+        if cs.width == 370 and cs.length == 415:
+            part_no = "K0LA+K0PA+K0YA, Tank Upper"
+            wt_per_sheet = 0.97
+            coating = "0/20"
+        if cs.width == 430 and cs.length == 455:
+            part_no = "K0LA+K0PA+K0YA, Tank Lower"
+            wt_per_sheet = 1.23
+            coating = "0/20"
+        if cs.width == 570 and cs.length == 830:
+            part_no = "K1KA HALF OTHER RL"
+            wt_per_sheet = 2.97
+            coating = "0/20"
+        if cs.width == 600 and cs.length == 715:
+            part_no = "K1KA PLATE BOTTOM"
+            wt_per_sheet = 2.69
+            coating = "20/0"
+        if cs.width == 550 and cs.length == 790:
+            part_no = "K1CA-BS-6 HALF OTHER RL"
+            wt_per_sheet = 2.73
+            coating = "0/20"
+        if cs.width == 590 and cs.length == 705:
+            part_no = "K1CA-BS-6 PLATE BOTTOM"
+            wt_per_sheet = 2.61
+            coating = "20/0"
+        if cs.width == 530 and cs.length == 765:
+            part_no = "K67-BS4 HALF OTHER RL"
+            wt_per_sheet = 2.55
+            coating = "0/20"
+        if cs.width == 575 and cs.length == 640:
+            part_no = "K67-BS4 PLATE BOTTOM"
+            wt_per_sheet = 2.31
+            coating = "20/0"
+        if cs.width == 510 and cs.length == 785:
+            part_no = "K0VA HALF OTHER RL"
+            wt_per_sheet = 2.50
+            coating = "0/20"
+        if cs.width == 600 and cs.length == 660:
+            part_no = "K0VA PLATE BOTTOM"
+            wt_per_sheet = 2.29
+            coating = "20/0"
+        if cs.width == 520 and cs.length == 765:
+            part_no = "KTEM-BS4 HALF OTHER RL"
+            wt_per_sheet = 2.50
+            coating = "0/20"
+        if cs.width == 565 and cs.length == 645:
+            part_no = "KTEM-BS4 PLATE BOTTOM"
+            wt_per_sheet = 2.29
+            coating = "20/0"
+        if cs.width == 515 and cs.length == 715:
+            part_no = "K1EA-BS6 HALF OTHER RL"
+            wt_per_sheet = 2.31
+            coating = "0/20"
+        if cs.width == 620 and cs.length == 675:
+            part_no = "K1EA-BS6 PLATE BOTTOM"
+            wt_per_sheet = 2.63
+            coating = "20/0"
+        if cs.width == 655 and cs.length == 740:
+            part_no = "K3CA HALF OTHER RL"
+            wt_per_sheet = 2.66
+            coating = "0/30"
+        if cs.width == 565 and cs.length == 645:
+            part_no = "K3CA PLATE BOTTOM"
+            wt_per_sheet = 2.29
+            coating = "20/0"
+        if cs.length > 0:
+            packet_wt = round(cs.numbers * wt_per_sheet,0)
+        else:
+            packet_wt = cs.weight
+
+        incoming = Incoming.load_smpl_by_smpl_no(cs.smpl_no)
+        mill_lst.append(incoming.mill)
+        mill_id_lst.append(incoming.mill_id)
+        part_no_lst.append(part_no)
+        wt_per_sheet_lst.append(wt_per_sheet)
+        coating_lst.append(coating)
+        packet_wt_lst.append(packet_wt)
+        grade = (cs.grade.split("GRADE:"))
+        if len(grade) > 1:
+            cs.grade = grade[1]
+
+    cs_lst = zip(_cs_id_lst, _cs_lst, part_no_lst, wt_per_sheet_lst, coating_lst, packet_wt_lst, mill_lst, mill_id_lst)
+    return render_template('stock_display_htid.html', cs_lst=cs_lst, i=0)
 
 
 # Function displays stock based on stock type selected
@@ -1550,6 +1671,7 @@ def dispatch_list():
 def dispatch():
     if request.method == 'POST':
         dispatch_lst = request.form.getlist['select_smpl']
+        pkt_name_lst = request.form.getlist['packet_name']
         dispatch_nos = request.form.getlist['dispatch_numbers']
         dispatch_quantity = request.form.getlist['dispatch_quantity']
         vehicle_no = request.form['vehicle_no']
@@ -1561,6 +1683,7 @@ def dispatch():
 
     if request.method == 'GET':
         dispatch_lst = request.args.getlist('select_smpl')
+        pkt_name_lst = request.args.getlist('packet_name')
         dispatch_nos = request.args.getlist('dispatch_numbers')
         dispatch_quantity = request.args.getlist('dispatch_quantity')
         dispatch_pkts = request.args.getlist('dispatch_packets')
@@ -1593,10 +1716,10 @@ def dispatch():
         dispatch_detail = DispatchDetail(dispatch_id, cs.smpl_no, cs.thickness, cs.width, cs.length, int(dispatch_nos),
                                          Decimal(dispatch_qty), defective, int(no_of_packets))
         dispatch_detail.save_to_db()
-        if dispatch_nos == cs.numbers:
+        if int(dispatch_nos) == cs.numbers:
             CurrentStock.delete_record(cs_id)
         else:
-            cs.change_wt(smpl_no, cs.width, cs.length, dispatch_qty, dispatch_nos, 'minus', cs.status)
+            cs.change_wt(smpl_no, cs.width, cs.length, dispatch_qty, dispatch_nos, 'minus', cs.status, cs.packet_name)
 
     return render_template('/main_menu.html')
 
@@ -1937,7 +2060,7 @@ def scams_show_details():
                                cs_lst=cs_lst)
 
     else:
-        return render_template('/main_menu.html', message=smpl_number + " not found.")
+        return render_template('/main_menu.html', message=scams_no + " not found.")
 
 
 

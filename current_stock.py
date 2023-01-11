@@ -317,11 +317,18 @@ class CurrentStock:
                 return None
 
     @classmethod
-    def change_wt(cls, smpl_no, width, length, processed_wt, actual_no_of_pieces, sign, status):
+    def change_wt(cls, smpl_no, width, length, processed_wt, actual_no_of_pieces, sign, status, packet_name = ""):
         with CursorFromConnectionFromPool() as cursor:
-            cursor.execute("select weight, numbers, unit, cs_id from current_stock where smpl_no = %s and width = %s "
-                           "and length = %s and status = %s", (smpl_no, width, length, status))
-            user_data = cursor.fetchone()
+            if packet_name == "":
+                cursor.execute("select weight, numbers, unit, cs_id from current_stock where smpl_no = %s and width = %s "
+                               "and length = %s and status = %s", (smpl_no, width, length, status))
+                user_data = cursor.fetchone()
+            else:
+                cursor.execute(
+                    "select weight, numbers, unit, cs_id from current_stock where smpl_no = %s and width = %s "
+                    "and length = %s and status = %s and packet_name = %s",
+                    (smpl_no, width, length, status, packet_name))
+                user_data = cursor.fetchone()
             if user_data:
                 weight = Decimal(user_data[0])
                 numbers = Decimal(user_data[1])
@@ -451,6 +458,10 @@ class CurrentStock:
         if display_type == 'FGandRM':
             with CursorFromConnectionFromPool() as cursor:
                 cursor.execute("select * from current_stock where customer=%s and (status = 'FG' or status = 'RM') order by smpl_no asc", (customer,))
+                user_data = cursor.fetchall()
+        if display_type == 'All':
+            with CursorFromConnectionFromPool() as cursor:
+                cursor.execute("select * from current_stock where customer=%s order by status, smpl_no asc", (customer,))
                 user_data = cursor.fetchall()
         for lst in user_data:
             cs = CurrentStock(smpl_no=lst[1],weight = Decimal(lst[2]),numbers=int(lst[3]),width=Decimal(lst[4]),
