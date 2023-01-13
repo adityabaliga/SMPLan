@@ -1147,7 +1147,7 @@ def submit_processing():
 
                     # Increase weight of cut material by processed weight. If cut material, doesn't already exist, the
                     # function returns insert => a new record has to be inserted
-                    if customer.startswith("HONDA"):
+                    if customer.startswith("HONDA" and fg_yes_no == "FG"):
                         _packet_name = packet_name
                     else:
                         _packet_name = ""

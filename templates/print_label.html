@@ -14,8 +14,8 @@
         }
         .label_details{
         font-family: Tahoma, Verdana, sans-serif;
-        font-size : 23px;
-        font-weight : 550;
+        font-size : 15px;
+        font-weight : normal;
         line-height: 1%;
         padding: 0px;
         }
@@ -23,19 +23,29 @@
     </style>
 
 </head>
-<body onload="get_param()">
+<body onload="get_param_new()">
 <div class = "label">
     <table>
-        <td name="machine" id="machine" text-align="right" width="225">M/C No - 07 Packet - 06</td>
-
-        <td text-align="right" font = "sans-serif"> <div align="right" text-align="right" name="prod_date" id="prod_date">DATE : 10/10/2020</div></td>
+        <tr>
+            <td name="machine" id="machine" text-align="right" width="210" style = "font-size: 13px;">Reshearing 07</td>
+            <td name="top_comment" id="top_comment" text-align="centre" style = "font-size:17px;font-weight: 550;" width="210">Defectives</td>
+            <td text-align="right" style = "font-size: 13px;" font = "sans-serif"> <div align="right" text-align="right" name="prod_date" id="prod_date">10/10/2020</div></td>
+        </tr>
     </table>
-    <div  width = "9.9cm" style = "vertical-align: top;text-align: center;line-height: 55%;margin-bottom:0;font-weight: 550;" name = "customer" id="customer">NASH INDUSTRIES</div>
+    <div  width = "9.9cm" style = "vertical-align: top;text-align: center;line-height: 75%;margin-bottom:0;font-weight: 550; font-size: 32px;" name = "customer" id="customer">NASH INDUSTRIES</div>
     <div class = "label_details" id="label_details" style="vertical-align: top;line-height: 0px;line-height: 0.1;margin : 0; padding-top:0; ">
-        <p name="smpl_no" id = "smpl_no">2SMPL6868B (EGI sheets)</p>
-        <p name = "size" id="size" >1.00 x 285 x 1180 - 328 no.s</p>
+        <p name="smpl_no" id = "smpl_no" style = "font-weight: bold;">2SMPL6868B - W1P1P1 (EGI sheets)</p>
+        <p name ="batch_no" id="batch_no">BATCH NO: 1111AW1P1</p>
+        <p name = "size" id="size" style = "font-weight: bold;">0.80 X 650 x 294 X 1359 - 328 no.s</p>
+        <p name ="coating" id="coating" style = "font-weight: bold;">COATING : 0/20</p>
         <p name = "mill_id" id="mill_id">COIL ID: NE2000179102</p>
         <p name ="grade" id="grade">GRADE : SECC</p>
+        <p name ="net_wt" id="net_wt">Net WT: 2300kgs   GROSS WT: 2350kgs</p>
+
+
+        <p name ="scams_no" id="scams_no">SCAMS NO : T111111A1P01</p>
+        <p name ="part_no" id="part_no">PART: K0LA+K0PA+K0YA, TANK Lower</p>
+        <p name="lamination" id="lamination">BOTH SIDE LAMINATION</p>
         <p name="comments" id="comments"> </p>
 
     </div>
