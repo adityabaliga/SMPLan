@@ -19,6 +19,7 @@ var lbl_batch_no_pos = 17;
 var lbl_net_wt_pos = 18;
 var lbl_gross_wt_pos = 19;
 var lbl_top_comment_pos = 20;
+var lbl_format_size = 21;
 
 function get_param_new(){
     var queryString = decodeURIComponent(window.location.search);
@@ -114,14 +115,32 @@ function get_param_new(){
     }
 
     // Formatting
-    if((document.getElementById("customer").innerHTML).length < 20){
-        document.getElementById("customer").style.fontSize = "32px";
-    }else if((document.getElementById("customer").innerHTML).length > 20 && (document.getElementById("customer").innerHTML).length < 23){
-        document.getElementById("customer").style.fontSize = "28px";
+    if(queries[lbl_format_size] == 'big'){
+        if((document.getElementById("customer").innerHTML).length < 20){
+            document.getElementById("customer").style.fontSize = "50px";
+        }else if((document.getElementById("customer").innerHTML).length > 20 && (document.getElementById("customer").innerHTML).length < 23){
+            document.getElementById("customer").style.fontSize = "45px";
+        }
+        else{
+            document.getElementById("customer").style.fontSize = "40px";
+        }
+    }else{
+        if((document.getElementById("customer").innerHTML).length < 20){
+            document.getElementById("customer").style.fontSize = "32px";
+        }else if((document.getElementById("customer").innerHTML).length > 20 && (document.getElementById("customer").innerHTML).length < 23){
+            document.getElementById("customer").style.fontSize = "28px";
+        }
+        else{
+            document.getElementById("customer").style.fontSize = "22px";
+        }
     }
-    else{
-        document.getElementById("customer").style.fontSize = "22px";
+
+
+    if(queries[lbl_format_size] == 'big'){
+        document.getElementById('label_size').className = 'label_big';
+        document.getElementById('label_details_size').className = 'label_details_big';
     }
+
 
 }
 

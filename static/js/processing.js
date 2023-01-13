@@ -378,6 +378,7 @@ function print_label_new(){
     data += document.getElementById('lbl_net_wt').value + '&';
     data += document.getElementById('lbl_gross_wt').value + '&';
     data += document.getElementById('lbl_top_comment').value + '&';
+    data += document.getElementById('lbl_format_size').value;
 
     var new_page;
 
