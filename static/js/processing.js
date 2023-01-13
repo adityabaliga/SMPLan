@@ -352,6 +352,38 @@ function print_label(){
     //new_page.document.write("output");
 }
 
+function print_label_new(){
+    lbl_format = document.getElementById('lbl_format').value;
+    lbl_format_size = document.getElementById('lbl_format_size').value;
+    var fg_table = document.getElementById('label_table');
+    var data = "";
+    data += document.getElementById('lbl_smpl_no').value + '&';
+    data += document.getElementById('lbl_prod_date').value + '&';
+    data += document.getElementById('lbl_customer').value + '&';
+    data += document.getElementById('lbl_machine').value + '&';
+    data += document.getElementById('lbl_size').value + '&';
+    data += document.getElementById('lbl_numbers').value + '&';
+    data += document.getElementById('lbl_packet_name').value + '&';
+    data += document.getElementById('lbl_lamination').value + '&';
+    data += document.getElementById('lbl_mill_id').value + '&';
+    data += document.getElementById('lbl_grade').value + '&';
+    data += document.getElementById('lbl_mill').value + '&';
+    data += document.getElementById('lbl_comment').value + '&';
+    data += document.getElementById('lbl_2nd_customer').value + '&';
+    data += document.getElementById('lbl_mat_type').value + '&';
+    data += document.getElementById('lbl_scams_no').value + '&';
+    data += document.getElementById('lbl_coating').value + '&';
+    data += document.getElementById('lbl_part_no').value + '&';
+    data += document.getElementById('lbl_batch_no').value + '&';
+    data += document.getElementById('lbl_net_wt').value + '&';
+    data += document.getElementById('lbl_gross_wt').value + '&';
+    data += document.getElementById('lbl_top_comment').value + '&';
+
+    var new_page;
+
+    new_page = window.open('print_label?' + data);
+}
+
 function print_label_big(){
    var rowId = parseInt(event.target.parentNode.parentNode.id);
               //this gives id of tr whose button was clicked
@@ -747,6 +779,242 @@ function make__part_label_ctl(th){
         }
         });
 }*/
+
+function honda_part_no(width,length){
+    var part_no = "";
+    var coating = "";
+    var wt_per_sheet = "";
+
+            if (width == 720 && length == 745){
+            part_no = "KONA PLATE BOTTOM";
+            wt_per_sheet = 3.37;
+            coating = "20/0";
+        }
+    else if (width == 600 && length == 820){
+                part_no = "KONA HALF OTHER RL";
+                wt_per_sheet = 3.09;
+                coating = "0/20";
+            }
+    else if (width == 370 && length == 415){
+                part_no = "K0LA+K0PA+K0YA, Tank Upper";
+                wt_per_sheet = 0.97;
+                coating = "0/20";
+            }
+    else if (width == 430 && length == 455){
+                part_no = "K0LA+K0PA+K0YA, Tank Lower";
+                wt_per_sheet = 1.23;
+                coating = "0/20";
+            }
+    else if (width == 570 && length == 830){
+                part_no = "K1KA HALF OTHER RL";
+                wt_per_sheet = 2.97;
+                coating = "0/20";
+            }
+    else if (width == 600 && length == 715){
+                part_no = "K1KA PLATE BOTTOM";
+                wt_per_sheet = 2.69;
+                coating = "20/0";
+            }
+    else if (width == 550 && length == 790){
+                part_no = "K1CA-BS-6 HALF OTHER RL";
+                wt_per_sheet = 2.73;
+                coating = "0/20";
+            }
+    else if (width == 590 && length == 705){
+                part_no = "K1CA-BS-6 PLATE BOTTOM";
+                wt_per_sheet = 2.61;
+                coating = "20/0";
+            }
+    else if (width == 530 && length == 765){
+                part_no = "K67-BS4 HALF OTHER RL";
+                wt_per_sheet = 2.55;
+                coating = "0/20";
+            }
+    else if (width == 575 && length == 640){
+                part_no = "K67-BS4 PLATE BOTTOM";
+                wt_per_sheet = 2.31;
+                coating = "20/0";
+            }
+    else if (width == 510 && length == 785){
+                part_no = "K0VA HALF OTHER RL";
+                wt_per_sheet = 2.50;
+                coating = "0/20";
+            }
+    else if (width == 600 && length == 660){
+                part_no = "K0VA PLATE BOTTOM";
+                wt_per_sheet = 2.29;
+                coating = "20/0";
+            }
+    else if (width == 520 && length == 765){
+                part_no = "KTEM-BS4 HALF OTHER RL";
+                wt_per_sheet = 2.50;
+                coating = "0/20";
+            }
+    else if (width == 565 && length == 645){
+                part_no = "KTEM-BS4 PLATE BOTTOM";
+                wt_per_sheet = 2.29;
+                coating = "20/0";
+            }
+    else if (width == 515 && length == 715){
+                part_no = "K1EA-BS6 HALF OTHER RL";
+                wt_per_sheet = 2.31;
+                coating = "0/20";
+            }
+    else if (width == 620 && length == 675){
+                part_no = "K1EA-BS6 PLATE BOTTOM";
+                wt_per_sheet = 2.63;
+                coating = "20/0";
+            }
+    else if (width == 655 && length == 740){
+                part_no = "K3CA HALF OTHER RL";
+                wt_per_sheet = 2.66;
+                coating = "0/30";
+            }
+    else if (width == 565 && length == 645){
+                part_no = "K3CA PLATE BOTTOM";
+                wt_per_sheet = 2.29;
+                coating = "20/0";
+    }
+    else{
+        part_no = "";
+        wt_per_sheet = 1;
+        coating = "";
+    }
+    return (part_no + "," + wt_per_sheet + "," +coating);
+    //return part_no;
+}
+
+//Fill label details new version. This will allow for all formats and sizes
+function make_label_new(th){
+    var rowId = parseInt(event.target.parentNode.parentNode.id);
+              //this gives id of tr whose button was clicked
+    var row_id = th.parentNode.id;
+
+    var numbers_table = document.getElementById('numbers_pkts');
+
+    // First step is to clear all old values in the Label table
+    var label_table = document.getElementById('label_table');
+
+    //if (label_table.style.display =='table-row') {
+        //label_table.style.display = 'none';
+        var inputs = label_table.getElementsByTagName('input');
+        for (i = 0; i < inputs.length; i++) {
+            inputs[i].value = "";
+        }
+    //}
+
+    /*else {
+        label_table.style.display = 'table-row';
+    }*/
+
+    // Get values for the fields one by one
+    //Row 1
+    var smpl_no = document.getElementById("smpl_no").value;
+    var prod_date = document.getElementById("processing_date").value;
+    prod_date = change_date_format(prod_date);
+    var machine = document.getElementById("machine").value;
+    var width = numbers_table.rows[rowId].cells[0].lastChild.value;
+    var output_length = numbers_table.rows[rowId].cells[1].lastChild.value;
+    var thickness = document.getElementById("thickness").value;
+    var size = thickness + " X " + width + " X " + output_length;
+
+
+
+
+    //Row 2
+    var customer = document.getElementById("customer").value;
+    customer = cust_name_for_label(customer);
+    var mill_name = document.getElementById("mill").value;
+    mill_name = mill_name.split(' ');
+    var mill;
+    if(mill_name[0] == ''){
+        mill = "MILL"
+    }else{
+        mill = mill_name[0];
+    }
+    if(mill_id == ''){
+     mill_id = 'N/A';
+    }
+    var mill_id = document.getElementById("mill_id").value;
+
+    //Row 3
+    var lamination = numbers_table.rows[rowId].cells[2].lastElementChild.selectedOptions[0].innerHTML;
+    var packet_name = numbers_table.rows[rowId].cells[3].lastChild.value;
+    var packet_nos = numbers_table.rows[rowId].cells[4].lastChild.value;
+    if (customer.startsWith("HONDA") || customer.startsWith("TT STEEL")){
+        var honda_part_num = honda_part_no(Number(width), Number(output_length));
+        honda_part_num = honda_part_num.split(',');
+        document.getElementById('lbl_part_no').value = honda_part_num[0];
+
+        document.getElementById('lbl_net_wt').value = Math.round(Number(honda_part_num[1]) * Number(numbers_table.rows[rowId].cells[4].lastChild.value));
+         document.getElementById('lbl_coating').value = honda_part_num[2];
+    }
+
+    var lami_type;
+
+    if(lamination == "No Lamination"){
+        lami_type = " ";
+    }else{
+        lamination = lamination.split('-');
+        lami_type = lamination[0].toUpperCase() + "LAMINATION";
+    }
+
+    //Row 4
+    var grade_field = document.getElementById("grade").value;
+    //Grade. Check if grade exists
+    if (grade_field.includes("GRADE")){
+        grade = grade_field.split("GRADE").pop();
+        grade = grade.slice(1);
+    }
+    else if(grade_field == ''){
+        grade = 'N/A';
+    }
+    else{
+        grade = grade_field;
+    }
+    //Material Type
+    var mat_type = grade_field.split("ID");
+
+    mat_type = mat_type[0].split("GRADE");
+    var material_type = mat_type[0];
+    material_type = material_type.replaceAll('COIL','');
+    material_type = material_type.replaceAll('SHEETS','');
+    material_type = material_type.replaceAll('.','');
+    //SCAMS No.
+    var scams_no;
+    var scams_no_field = grade_field.split('SCAMS NO');
+    if(scams_no_field[1]){
+        scams_no = scams_no_field[1].slice(1);
+    }
+
+    // Populate the label_table with the values
+    //Row 1
+    document.getElementById('lbl_smpl_no').value = smpl_no;
+    document.getElementById('lbl_prod_date').value = prod_date;
+    document.getElementById('lbl_machine').value = machine;
+    document.getElementById('lbl_size').value = size;
+
+    //Row 2
+    document.getElementById('lbl_customer').value = customer;
+    //document.getElementById('lbl_prod_date').value = prod_date;
+    document.getElementById('lbl_mill').value = mill;
+    document.getElementById('lbl_mill_id').value = mill_id;
+
+    //Row 3
+    document.getElementById('lbl_numbers').value = packet_nos;
+    document.getElementById('lbl_packet_name').value = packet_name;
+    document.getElementById('lbl_lamination').value = lamination;
+    //document.getElementById('lbl_size').value = size;
+
+    //Row 4
+    document.getElementById('lbl_grade').value = grade.trimEnd();
+    document.getElementById('lbl_mat_type').value = material_type.trimEnd();
+    document.getElementById('lbl_scams_no').value = scams_no.trimEnd();
+    //document.getElementById('lbl_size').value = size;
+
+}
+
+
 
 ////Fill label table for Reshearing
 function make__part_label_reshearing(th){
