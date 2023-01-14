@@ -1147,7 +1147,7 @@ def submit_processing():
 
                     # Increase weight of cut material by processed weight. If cut material, doesn't already exist, the
                     # function returns insert => a new record has to be inserted
-                    if customer.startswith("HONDA" and fg_yes_no == "FG"):
+                    if (customer.startswith("HONDA") and fg_yes_no == "FG"):
                         _packet_name = packet_name
                     else:
                         _packet_name = ""
@@ -2158,7 +2158,7 @@ if __name__ == '__main__':
 
     app.wsgi_app = ProfilerMiddleware(app.wsgi_app, restrictions=[5], profile_dir='E:\postgres_data_bkp\PROFILING')
     #app.run(debug=True)
-    #app.run(SERVER_NAME, SERVER_PORT, threaded=True, debug=True)
+    app.run(SERVER_NAME, SERVER_PORT, threaded=True, debug=True)
 
     logger = logging.getLogger('waitress')
     logger.setLevel(logging.INFO)
@@ -2166,4 +2166,4 @@ if __name__ == '__main__':
     # Using waitress as a WSGI server.
     # Steps here https://dev.to/thetrebelcc/how-to-run-a-flask-app-over-https-using-waitress-and-nginx-2020-235c
 
-    serve(app,host=SERVER_NAME,port=SERVER_PORT)
+    #serve(app,host=SERVER_NAME,port=SERVER_PORT)
