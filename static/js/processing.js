@@ -348,9 +348,11 @@ function print_label(){
     }
     var new_page;
 
-    new_page = window.open('print_label?' + data);
+    new_page = window.open('print_label_slit?' + data);
     //new_page.document.write("output");
 }
+
+
 
 function print_label_new(){
     lbl_format = document.getElementById('lbl_format').value;

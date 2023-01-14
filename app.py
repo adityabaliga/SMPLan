@@ -1442,6 +1442,16 @@ def print_label():
         processing_id = request.args.get('processing_id')
     return render_template('print_label.html')
 
+@app.route('/print_label_slit', methods=['GET', 'POST'])
+def print_label_slit():
+    processing_id = 0
+    if request.method == 'POST':
+        processing_id = request.form['processing_id']
+
+    if request.method == 'GET':
+        processing_id = request.args.get('processing_id')
+    return render_template('print_label_slit.html')
+
 
 @app.route('/print_label_big', methods=['GET', 'POST'])
 def print_label_big():
@@ -2158,7 +2168,7 @@ if __name__ == '__main__':
 
     app.wsgi_app = ProfilerMiddleware(app.wsgi_app, restrictions=[5], profile_dir='E:\postgres_data_bkp\PROFILING')
     #app.run(debug=True)
-    #app.run(SERVER_NAME, SERVER_PORT, threaded=True, debug=True)
+    app.run(SERVER_NAME, SERVER_PORT, threaded=True, debug=True)
 
     logger = logging.getLogger('waitress')
     logger.setLevel(logging.INFO)
@@ -2166,4 +2176,4 @@ if __name__ == '__main__':
     # Using waitress as a WSGI server.
     # Steps here https://dev.to/thetrebelcc/how-to-run-a-flask-app-over-https-using-waitress-and-nginx-2020-235c
 
-    serve(app,host=SERVER_NAME,port=SERVER_PORT)
+    #serve(app,host=SERVER_NAME,port=SERVER_PORT)
