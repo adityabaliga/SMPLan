@@ -964,10 +964,14 @@ function make_label_new(th){
 
     //Row 4
     var grade_field = document.getElementById("grade").value;
+    var grade_coating = "";
     //Grade. Check if grade exists
     if (grade_field.includes("GRADE")){
         grade = grade_field.split("GRADE").pop();
+        grade_coating = grade.split(' ');
+        grade=grade_coating[0];
         grade = grade.slice(1);
+
     }
     else if(grade_field == ''){
         grade = 'N/A';
@@ -988,6 +992,7 @@ function make_label_new(th){
     var scams_no_field = grade_field.split('SCAMS NO');
     if(scams_no_field[1]){
         scams_no = scams_no_field[1].slice(1);
+        scams_no = (scams_no.split(' '))[0];
     }
 
     // Populate the label_table with the values
