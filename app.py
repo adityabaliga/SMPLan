@@ -1463,6 +1463,16 @@ def print_label_big():
         processing_id = request.args.get('processing_id')
     return render_template('print_label_big.html')
 
+@app.route('/print_label_tsl', methods=['GET', 'POST'])
+def print_label_tsl():
+    processing_id = 0
+    if request.method == 'POST':
+        processing_id = request.form['processing_id']
+
+    if request.method == 'GET':
+        processing_id = request.args.get('processing_id')
+    return render_template('print_label_tsl.html')
+
 
 @app.route('/print_label_reshearing', methods=['GET', 'POST'])
 def print_label_reshearing():

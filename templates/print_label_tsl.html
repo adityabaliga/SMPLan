@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Print Label</title>
+    <style>
+        .label{
+        width : 15cm;
+        height : 10cm;
+        border-style : solid;
+        font-family:Tahoma, Verdana, sans-serif;
+        }
+        .label_details{
+        font-family: Tahoma, Verdana, sans-serif;
+        font-size : 22px;
+        line-height: 130%;
+        padding: 5px;
+        vertical-align: text-top;
+        }
+
+    </style>
+
+</head>
+<body onload="get_param_big()">
+<div class = "label">
+    <table>
+        <td name="machine" id="machine" text-align="right" width="210">Reshearing 07</td>
+        <td name="top_comment" id="top_comment" style="align:centre; font-size: 30px;" width="510"><div style="text-align:centre;"></div></td>
+
+
+    </table>
+    <div  width = "15cm" align="centre" style = "font-size: 50px;vertical-align: top;text-align: center;line-height: 75%;;margin-bottom:0;font-weight: 550;"  name = "customer" id="customer">TATA STEEL</div>
+    <div  width = "15cm" align="centre" style = "font-size: 20px;vertical-align: top;text-align: center;line-height:  100%;;margin-bottom:0;font-weight: 550;" >(PROCESSING AGENCY)</div>
+    <div class = "label_details" id = "label_details" style="font-weight: 550;margin : 0;">
+        <table>
+            <tr>
+                <td name="smpl_no" id = "smpl_no" width="350">TSL1008</td>
+                <td  name="prod_date" id="prod_date" width="350">DATE: 10/10/2020</td>
+            </tr>
+            <tr>
+                <td name="batch_no" id = "batch_no">BATCH No.: 1008W1P1</td>
+                <td name="prod_date" id="mill_id">COIL ID: 2B95550000</td>
+            </tr>
+            <tr>
+                <td  name = "size" id="size" >SIZE: 1.00x285.5x1180.6</td>
+                <td  name = "numbers" id="numbers" >NUMBERS: 375</td>
+
+
+            </tr>
+            <tr>
+                <td  name = "net_wt" id="net_wt">NET WT(kgs): 1603 </td>
+                <td  name = "gross_wt" id="gross_wt">GROSS WT(kgs): 1620 </td>
+
+            </tr>
+        </table>
+
+
+            <div  name="2nd_customer" id="2nd_customer">CUSTOMER: TVS </div>
+
+
+            <div  name ="grade" id="grade">GRADE : IF GA04 - TOP CHROME </div>
+
+
+
+
+
+    </div>
+</div>
+<script src = "{{ url_for('static', filename='js/print_label.js') }}"></script>
+</body>
+</html>

@@ -383,8 +383,12 @@ function print_label_new(){
     data += document.getElementById('lbl_format_size').value;
 
     var new_page;
+    if(document.getElementById('lbl_format').value == "TSL"){
+        new_page = window.open('print_label_tsl?' + data);
+    }else{
+        new_page = window.open('print_label?' + data);
+    }
 
-    new_page = window.open('print_label?' + data);
 }
 
 function print_label_big(){
@@ -971,6 +975,7 @@ function make_label_new(th){
         grade_coating = grade.split(' ');
         grade=grade_coating[0];
         grade = grade.slice(1);
+        grade = grade.replace('.','');
 
     }
     else if(grade_field == ''){
@@ -993,6 +998,7 @@ function make_label_new(th){
     if(scams_no_field[1]){
         scams_no = scams_no_field[1].slice(1);
         scams_no = (scams_no.split(' '))[0];
+        scams_no = scams_no.replace('.','');
     }
 
     // Populate the label_table with the values
