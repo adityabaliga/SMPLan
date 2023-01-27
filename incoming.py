@@ -81,6 +81,12 @@ class Incoming:
             weight = Decimal(weight_list[1])
 
             # Grade is extracted
+            # Changed of Material Receipt Voucher changed in Tally
+            # grade = rm.getElementsByTagName("BASICUSERDESCRIPTION")
+            mat_type = rm.getElementsByTagName("UDF:RNMTRLTYPEBATCH")
+            mat_grade = rm.getElementsByTagName("UDF:RNGRADEBATCH")
+            mat_coating = rm.getElementsByTagName("UDF:RNCOATBATCH")
+            mat_scams_no = rm.getElementsByTagName("UDF:RNSCAMSBATCH")
             grade = rm.getElementsByTagName("BASICUSERDESCRIPTION")
 
             # Numbers of RM is extracted. In the xml, the numbers are suffixed with MT. This is split and numbers kept
@@ -111,9 +117,27 @@ class Incoming:
             _smpl_no = smpl_no.childNodes[0].data.replace(" ","")
             _customer = customer[0].childNodes[0]._data
 
+
+
+            # In Tally, Material receipt was implemented by splitting these fields. Earlier they were all
+            # together as part of the userdescription field
+            # I am building the string so we can split it in javascript and build the fields for sticker
+            _grade = "MAT TYPE: "
+            if mat_type:
+                _grade += mat_type[0].firstChild._data
+            _grade += "; GRADE: "
+            if mat_grade:
+                _grade += mat_grade[0].firstChild._data
+            _grade += "; COATING: "
+            if mat_coating:
+                _grade += mat_coating[0].firstChild._data
+            _grade += "; "
+            if mat_scams_no:
+                _grade += "SCAMS No: " + mat_scams_no[0].firstChild._data
+            _grade += ";"
+
             # Additional comments have been added in this node in Tally such as for ID and IS grade
             # All this is being extracted and added to the grade column
-            _grade = ""
             if grade:
                 for gr in grade:
                     _grade += gr.firstChild._data + ". "

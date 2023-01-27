@@ -970,13 +970,50 @@ function make_label_new(th){
     var grade_field = document.getElementById("grade").value;
     var grade_coating = "";
     //Grade. Check if grade exists
-    if (grade_field.includes("GRADE")){
+    /*if (grade_field.includes("GRADE")){
         grade = grade_field.split("GRADE").pop();
         grade_coating = grade.split(' ');
         grade=grade_coating[0];
         grade = grade.slice(1);
         grade = grade.replace('.','');
 
+    }*/
+
+    var material_type = '';
+    if (grade_field.length > 0){
+        grade_field = grade_field.split(';');
+        //Material Type
+        /*var mat_type = grade_field.split("ID");
+
+        mat_type = mat_type[0].split("GRADE");
+        var material_type = mat_type[0];
+        material_type = material_type.replaceAll('COIL','');
+        material_type = material_type.replaceAll('SHEETS','');
+        material_type = material_type.replaceAll('.','');*/
+        material_type = grade_field[0];
+        material_type = material_type.replaceAll('COIL','');
+        material_type = material_type.replaceAll('SHEETS','');
+        material_type = material_type.replaceAll('.','');
+        material_type = material_type.replaceAll('MAT TYPE:','');
+
+        for(i=1;i<grade_field.length;i++){
+            if(grade_field[i].includes("GRADE")){
+                grade = grade_field[i].split("GRADE").pop();
+                grade = grade.replaceAll(':','');
+                grade = grade.replaceAll(' ','');
+            }
+            if(grade_field[i].includes("COATING")){
+                coating = grade_field[i].split("COATING").pop();
+                coating = coating.replaceAll(':','');
+                coating = coating.replaceAll(' ','');
+            }
+
+            if(grade_field[i].includes("SCAMS NO")){
+                scams_no = grade_field[i].split("SCAMS NO").pop();
+                scams_no = scams_no.replaceAll(':','');
+                scams_no = scams_no.replaceAll(' ','');
+            }
+        }
     }
     else if(grade_field == ''){
         grade = 'N/A';
@@ -984,22 +1021,17 @@ function make_label_new(th){
     else{
         grade = grade_field;
     }
-    //Material Type
-    var mat_type = grade_field.split("ID");
 
-    mat_type = mat_type[0].split("GRADE");
-    var material_type = mat_type[0];
-    material_type = material_type.replaceAll('COIL','');
-    material_type = material_type.replaceAll('SHEETS','');
-    material_type = material_type.replaceAll('.','');
     //SCAMS No.
-    var scams_no;
+    /*var scams_no = "";
     var scams_no_field = grade_field.split('SCAMS NO');
     if(scams_no_field[1]){
         scams_no = scams_no_field[1].slice(1);
         scams_no = (scams_no.split(' '))[0];
         scams_no = scams_no.replace('.','');
-    }
+    }*/
+    var mat_status = numbers_table.rows[rowId].cells[6].lastElementChild.selectedOptions[0].innerHTML;
+
 
     // Populate the label_table with the values
     //Row 1
@@ -1025,6 +1057,13 @@ function make_label_new(th){
     document.getElementById('lbl_mat_type').value = material_type.trimEnd();
     document.getElementById('lbl_scams_no').value = scams_no.trimEnd();
     //document.getElementById('lbl_size').value = size;
+
+    //Row 5
+    if(document.getElementById('lbl_customer').value == "TATA STEEL"){
+        document.getElementById('lbl_batch_no').value = document.getElementById('lbl_smpl_no').value + document.getElementById('lbl_packet_name').value;
+    }
+    document.getElementById('lbl_mat_status').value = mat_status;
+
 
 }
 

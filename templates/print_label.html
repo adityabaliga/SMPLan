@@ -9,7 +9,7 @@
         height : 7.25cm;
         border-style : solid;
         font-family:Tahoma, Verdana, sans-serif;
-
+        overflow: hidden;
 
         }
         .label_details{
@@ -24,14 +24,31 @@
         height : 10cm;
         border-style : solid;
         font-family:Tahoma, Verdana, sans-serif;
+        overflow: hidden;
         }
-        .label_details_big{
+    .label_details_big{
         font-family: Tahoma, Verdana, sans-serif;
-        font-size : 25px;
+        font-size : 20px;
         line-height: 10%;
         padding: 5px;
         font-weight : 550;
+        width : 12.5cm;
+
+        float: left;
         }
+    .qr_code{
+
+
+        align : right;
+        margin-left: 12.5cm;
+
+    }
+    .center {
+          display: flex
+          align-items: center;
+          justify-content: center;
+          border-style: dotted;
+    }
     </style>
 
 </head>
@@ -45,14 +62,15 @@
         </tr>
     </table>
     <div  width = "9.9cm" style = "vertical-align: top;text-align: center;line-height: 75%;margin-bottom:0;font-weight: 550; font-size: 28px;" name = "customer" id="customer">NASH INDUSTRIES</div>
-    <div class = "label_details" id="label_details_size" style="vertical-align: top;line-height: 0px;line-height: 0.1;margin : 0; padding-top:0; ">
+    <div class = "label_details" id="label_details_size" style="vertical-align: top;line-height: 0.1;margin : 0; padding-top:0; ">
         <p name="smpl_no" id = "smpl_no" >2SMPL6868B - W1P1P1 (EGI sheets)</p>
         <p name ="batch_no" id="batch_no">BATCH NO: 1111AW1P1</p>
         <p name = "size" id="size" >0.80 X 650 x 294 X 1359 - 328 no.s</p>
         <p name ="coating" id="coating" >COATING : 0/20</p>
         <p name = "mill_id" id="mill_id">COIL ID: NE2000179102</p>
         <p name ="grade" id="grade">GRADE : SECC</p>
-        <p name ="net_wt" id="net_wt">Net WT: 2300kgs   GROSS WT: 2350kgs</p>
+        <p name ="net_wt" id="net_wt">Net WT: 2300kgs</p>
+        <p name ="gross_wt" id="gross_wt">GROSS WT: 2350kgs</p>
 
 
         <p name ="scams_no" id="scams_no">SCAMS NO : T111111A1P01</p>
@@ -61,7 +79,17 @@
         <p name="comments" id="comments"> </p>
 
     </div>
+    <div class = "qr_code" id ="qr_code">
+
+
+                <div id="qr_code_block" class = "center"></div>
+
+        <!--p style = "height : 5cm;"></p-->
+    </div>
 </div>
 <script src = "{{ url_for('static', filename='js/print_label.js') }}"></script>
+<script src=
+"https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js">
+    </script>
 </body>
 </html>

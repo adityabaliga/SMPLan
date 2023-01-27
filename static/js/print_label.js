@@ -20,25 +20,36 @@ var lbl_net_wt_pos = 18;
 var lbl_gross_wt_pos = 19;
 var lbl_top_comment_pos = 20;
 var lbl_format_size = 21;
+var lbl_mat_status = 22;
 
 function get_param_new(){
     var queryString = decodeURIComponent(window.location.search);
+    var url = window.location.href;
     queryString = queryString.substring(1);
     var queries = queryString.split("&");
     var line_count=4;
 
     document.getElementById("machine").innerHTML = queries[lbl_machine_pos];
     document.getElementById("top_comment").innerHTML = queries[lbl_top_comment_pos];
-    document.getElementById("prod_date").innerHTML = queries[lbl_prod_date_pos];
+    document.getElementById("prod_date").innerHTML = "DATE: " + queries[lbl_prod_date_pos];
 
-    if (queries[lbl_2nd_customer_pos] != ""){
+    if (queries[lbl_2nd_customer_pos] != "" && !url.includes("print_label_tsl")){
         document.getElementById("customer").innerHTML = queries[lbl_customer_pos]+ " - " + queries[lbl_2nd_customer_pos];
     }else{
         document.getElementById("customer").innerHTML = queries[lbl_customer_pos];
     }
 
     document.getElementById("smpl_no").innerHTML = queries[lbl_smpl_no_pos] + " - " + queries[lbl_packet_name_pos] + " (" +queries[lbl_mat_type_pos] + ")";
-    document.getElementById("size").innerHTML = " " + queries[lbl_size_pos] + " - " + queries[lbl_numbers_pos] + " Nos";
+    document.getElementById("size").innerHTML = "SIZE(mm):  " + queries[lbl_size_pos];
+
+
+     if(url.includes('print_label_tsl')){
+      document.getElementById("numbers").innerHTML = "NUMBERS: " + queries[lbl_numbers_pos];
+     }else{
+        document.getElementById("size").innerHTML +=  " - " + queries[lbl_numbers_pos] + " Nos";
+
+     }
+
 
     if(queries[lbl_coating_pos] != ""){
         document.getElementById("coating").innerHTML = 'COATING: ' + queries[lbl_coating_pos];
@@ -69,7 +80,7 @@ function get_param_new(){
     }
 
     if(queries[lbl_grade_pos] != ""){
-        document.getElementById("grade").innerHTML = 'GRADE: ' + queries[lbl_grade_pos];
+        document.getElementById("grade").innerHTML = "GRADE: " + queries[lbl_grade_pos];
         line_count+=1;
         }else{
         myobj = document.getElementById("grade");
@@ -80,15 +91,24 @@ function get_param_new(){
         document.getElementById("net_wt").innerHTML = "";
         if(queries[lbl_net_wt_pos] != ""){
             document.getElementById("net_wt").innerHTML = 'NET WT: ' + queries[lbl_net_wt_pos] + 'kgs';
+        }else{
+            myobj = document.getElementById("net_wt");
+            myobj.remove();
         }
         if(queries[lbl_gross_wt_pos] != ""){
-            document.getElementById("net_wt").innerHTML += '&nbsp;&nbsp;&nbsp;&nbsp;  GROSS WT: ' + queries[lbl_gross_wt_pos] + 'kgs';
+            document.getElementById("gross_wt").innerHTML = 'GROSS WT: ' + queries[lbl_gross_wt_pos] + 'kgs';
+
+        }else{
+            myobj = document.getElementById("gross_wt");
+            myobj.remove();
         }
         line_count+=1;
         }else{
-        myobj = document.getElementById("net_wt");
-        myobj.remove();
-    }
+            myobj = document.getElementById("net_wt");
+            myobj.remove();
+            myobj = document.getElementById("gross_wt");
+            myobj.remove();
+        }
 
     if(queries[lbl_scams_no_pos] != ""){
         document.getElementById("scams_no").innerHTML = 'SCAMS NO: ' + queries[lbl_scams_no_pos];
@@ -135,11 +155,20 @@ function get_param_new(){
         }
     }
 
-
     if(queries[lbl_format_size] == 'big'){
         document.getElementById('label_size').className = 'label_big';
         document.getElementById('label_details_size').className = 'label_details_big';
     }
+
+    /*var qrcode = new QRCode(document.getElementById("qr_code_block"),{
+    text: queryString,
+    width: 90,
+    height: 90,
+    colorDark : "#000000",
+    colorLight : "#ffffff",
+    correctLevel : QRCode.CorrectLevel.H
+        });*/
+
 
 
 }

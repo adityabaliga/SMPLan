@@ -236,7 +236,7 @@
 
 
             <td><input type ="number" name = "processed_wt" style="width:150px;" id = "processed_wt" readonly></td>
-            <!--td><input type = "text" name = "remarks" style="width:300px;" id = "remarks"></td>
+            <!--td><input type = "text" name = "remarks" style="width:300px;" id = "remarks"></td-->
             <!--td><input type = "number" name = "order_detail_id" id = "order_detail_id" value = {{order_detail_id}} hidden></td-->
             <td><select id = "fg_yes_no" name= "fg_yes_no" >
                 <option value = "FG">FG</option>
@@ -244,7 +244,7 @@
             </select>
             </td>
             <td><input type = "text" name ="remarks" style="width:150px;" id = "remarks"></td>
-            <td><input type = "button" value="Make Label" onclick="make__part_label_ctl(this)"></td>
+            <td><input type = "button" value="Make Label" onclick="make_label_new(this)"></td>
             <td><input type="button" name="add_size" id="add_size" value="Add Size" onclick="addRow('numbers_pkts')"></td>
 
         </tr>
@@ -318,7 +318,7 @@
     </table>
 
 
-    <table class="table table-sm" id="fg_table">
+    <!--table class="table table-sm" id="fg_table">
         <tr>
             <th>SMPL No</th>
             <th>Date</th>
@@ -339,7 +339,7 @@
             {% endif %}
             <th>Material Type</th>
             <th></th>
-        </tr>
+        </tr-->
         <!--tr>
             <td><input type="text" style="width:50px;" id="lab_smpl_no" name="lab_smpl_no" value="%smpl_no%" readonly></td>
             <td>%prod_date%</td>
@@ -361,10 +361,99 @@
             <td><input type = "button" class="btn btn-default" value="Print" onclick="print_label()"></td>
 
 
-        </tr-->
+        </tr>
 
 
 
+
+    </table-->
+
+    <h3 align = "center">Label</h3>
+        <table class="table table-sm" id="label_table">
+        <tr>
+            <td>SMPL No</td>
+            <td><input type="text"  name="lbl_smpl_no" id="lbl_smpl_no" readonly></td>
+            <td>Date</td>
+            <td><input type="text"  name="lbl_prod_date" id="lbl_prod_date" readonly></td>
+            <td>Machine</td>
+            <td><input type="text"  name="lbl_machine" id="lbl_machine" readonly></td>
+            <td>Size</td>
+            <td><input type="text" name="lbl_size" id="lbl_size" ></td>
+        </tr>
+        <tr>
+            <td>Customer</td>
+            <td><input type="text" name="lbl_customer" id="lbl_customer" readonly></td>
+            <td>2nd Customer</td>
+            <td><input type="text" name="lbl_2nd_customer" id="lbl_2nd_customer"></td>
+            <td>Mill</td>
+            <td><input type="text" name="lbl_mill" id="lbl_mill" readonly></td>
+            <td>Mill ID</td>
+            <td><input type="text" name="lbl_mill_id" id="lbl_mill_id" readonly></td>
+        </tr>
+        <tr>
+
+            <td>Numbers</td>
+            <td><input type="text" name="lbl_numbers" id="lbl_numbers" readonly></td>
+            <td>Packet Name</td>
+            <td><input type="text" name="lbl_packet_name" id="lbl_packet_name" readonly></td>
+            <td>Lamination</td>
+            <td><input type="text" name="lbl_lamination" id="lbl_lamination" readonly></td>
+        </tr>
+        <tr>
+            <td>Grade</td>
+            <td><input type="text" name="lbl_grade" id="lbl_grade"></td>
+            <td>Material Type</td>
+            <td><input type="text" name="lbl_mat_type" id="lbl_mat_type"></td>
+            <td>SCAMS No</td>
+            <td><input type="text" name="lbl_scams_no" id="lbl_scams_no"></td>
+            <td>Coating</td>
+            <td><input type="text" name="lbl_coating" id="lbl_coating"></td>
+        </tr>
+        <tr>
+            <td>Part No</td>
+            <td><input type="text" name="lbl_part_no" id="lbl_part_no"></td>
+            <td>Batch No</td>
+            <td><input type="text" name="lbl_batch_no" id="lbl_batch_no"></td>
+            <td>Net Wt (kgs)</td>
+            <td><input type="text" name="lbl_net_wt" id="lbl_net_wt"></td>
+            <td>Gross Wt (kgs)</td>
+            <td><input type="text" name="lbl_gross_wt" id="lbl_gross_wt"></td>
+        </tr>
+        <tr>
+            <td>Sticker Top Comment</td>
+            <td><input type="text" name="lbl_top_comment" id="lbl_top_comment"></td>
+            <td>Comment</td>
+            <td><input type="text" name="lbl_comment" id="lbl_comment"></td>
+            <td>Status</td>
+            <td><input type="text" name="lbl_mat_status" id="lbl_mat_status"></td>
+        </tr>
+    </table>
+    <table class="table table-sm">
+        <tr>
+            <td>Label Format</td>
+            <td>
+                <select name ="lbl_format" id="lbl_format">
+                    <option value ="SMPL">SMPL</option>
+                    <option value ="TTS">TTS</option>
+                    <option value ="HONDA">HONDA</option>
+                    <option value ="TSL">TSL</option>
+                </select>
+
+            </td>
+
+            <td>Label size</td>
+            <td>
+                <select name ="lbl_format_size" id="lbl_format_size">
+                    <option value ="big">BIG</option>
+                    <option value ="small">SMALL</option>
+
+                </select>
+
+            </td>
+            <td><input type = "button" class="btn btn-default" value="Print Label" onclick="print_label_new()"></td>
+
+
+        </tr>
 
     </table>
 
