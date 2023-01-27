@@ -195,7 +195,7 @@ def tr_incoming_commit():
         material_type = request.form['material_type']
         interal_dia = request.form['internal_dia']
         grade = request.form['grade']
-        final_grade = material_type + '. ID:' + interal_dia + '. GRADE: ' + grade
+        final_grade = material_type + '; ID:' + interal_dia + '; GRADE: ' + grade
         weight = Decimal(request.form['weight'])
         numbers = int((request.form['numbers']))
         mill = request.form['mill']
