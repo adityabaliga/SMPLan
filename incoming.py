@@ -86,8 +86,8 @@ class Incoming:
             mat_type = rm.getElementsByTagName("UDF:RNMTRLTYPEBATCH")
             mat_grade = rm.getElementsByTagName("UDF:RNGRADEBATCH")
             mat_coating = rm.getElementsByTagName("UDF:RNCOATBATCH")
-            mat_scams_no = rm.getElementsByTagName("UDF:RNSCAMSBATCH")
-            grade = rm.getElementsByTagName("BASICUSERDESCRIPTION")
+            mat_scams_no = rm.getElementsByTagName("UDF:RNCUSTIDBATCH")
+            grade = rm.getElementsByTagName("UDF:RNGRADEBATCH")
 
             # Numbers of RM is extracted. In the xml, the numbers are suffixed with MT. This is split and numbers kept
             numbers_coll = rm.getElementsByTagName("UDF:SBATCHNOOFPCS")
@@ -138,11 +138,11 @@ class Incoming:
 
             # Additional comments have been added in this node in Tally such as for ID and IS grade
             # All this is being extracted and added to the grade column
-            if grade:
-                for gr in grade:
-                    _grade += gr.firstChild._data + ". "
-            else:
-                _grade = ''
+            #if grade:
+            #   for gr in grade:
+            #        _grade += gr.firstChild._data + ". "
+            #else:
+            #    _grade = ''
             if mill:
                 _mill = mill[0].firstChild._data
             else:
