@@ -1195,6 +1195,9 @@ function make_label_new(th){
     }*/
 
     var material_type = '';
+    var grade='';
+    var coating='';
+    var scams_no='';
     if (grade_field.length > 0){
         grade_field = grade_field.split(';');
         //Material Type
