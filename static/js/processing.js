@@ -352,7 +352,56 @@ function print_label(){
     //new_page.document.write("output");
 }
 
+function print_label_slit_new(){
+    var rowId = parseInt(event.target.parentNode.parentNode.id);
+              //this gives id of tr whose button was clicked
+    var data = "";
+    var size_pos = 0;
+    var coil_length_pos = 1;
+    var packet_name_pos = 2;
+    var second_customer_pos = 3;
+    var net_wt_pos = 4;
+    var gross_wt_pos = 5;
+    var lamination_pos = 6;
+    var top_comment_pos = 7;
+    var comment_pos = 8;
+    var status_pos = 9;
+    var label_size_pos = 10;
 
+    var fg_table = document.getElementById('fg_table');
+
+    //Keeping same format as other stickers for ease of processing in print_label.js
+    data += document.getElementById('lbl_smpl_no').value + '&';
+    data += document.getElementById('lbl_prod_date').value + '&';
+    data += document.getElementById('lbl_customer').value + '&';
+    data += document.getElementById('lbl_machine').value + '&';
+    data += fg_table.rows[rowId].cells[size_pos].lastChild.value + '&';
+    data += fg_table.rows[rowId].cells[coil_length_pos].lastChild.value + '&';
+    data += fg_table.rows[rowId].cells[packet_name_pos].lastChild.value + '&';
+    data += fg_table.rows[rowId].cells[lamination_pos].lastChild.value + '&';
+    data += document.getElementById('lbl_mill_id').value + '&';
+    data += document.getElementById('lbl_grade').value + '&';
+    data += document.getElementById('lbl_mill').value + '&';
+    data += fg_table.rows[rowId].cells[comment_pos].lastChild.value + '&';
+    data += fg_table.rows[rowId].cells[second_customer_pos].lastChild.value + '&';
+    data += document.getElementById('lbl_mat_type').value + '&';
+    data += document.getElementById('lbl_scams_no').value + '&';
+
+    //Adding blanks for coating, part_no and batch_no
+    data += '&' + '&' + '&';
+    data += fg_table.rows[rowId].cells[net_wt_pos].lastChild.value + '&';
+    data += fg_table.rows[rowId].cells[gross_wt_pos].lastChild.value + '&';
+    data += fg_table.rows[rowId].cells[top_comment_pos].lastChild.value + '&';
+    data += fg_table.rows[rowId].cells[label_size_pos].lastChild.value + '&';
+    data += fg_table.rows[rowId].cells[status_pos].lastChild.value;
+
+    var new_page;
+    /*if(document.getElementById('lbl_format').value == "TSL"){
+        new_page = window.open('print_label_tsl?' + data);
+    }else{*/
+        new_page = window.open('print_label?' + data);
+    //}
+}
 
 function print_label_new(){
     lbl_format = document.getElementById('lbl_format').value;
@@ -380,7 +429,8 @@ function print_label_new(){
     data += document.getElementById('lbl_net_wt').value + '&';
     data += document.getElementById('lbl_gross_wt').value + '&';
     data += document.getElementById('lbl_top_comment').value + '&';
-    data += document.getElementById('lbl_format_size').value;
+    data += document.getElementById('lbl_format_size').value + '&';
+    data += document.getElementById('lbl_mat_status').value + '&';
 
     var new_page;
     if(document.getElementById('lbl_format').value == "TSL"){
@@ -524,6 +574,165 @@ function cust_name_for_label(customer){
     return cust_name;
 }
 
+//This is for label in new format for slitting
+function make_label_new_slit(th){
+    var rowId = parseInt(event.target.parentNode.parentNode.id);
+              //this gives id of tr whose button was clicked
+    var row_id = th.parentNode.id;
+
+    var width_table = document.getElementById('numbers_pkts1');
+    var parts_table = document.getElementById('part_tbl');
+    var fg_table = document.getElementById('fg_table');
+
+    //Get values for the rows
+    //Row 1
+    var smpl_no = document.getElementById("smpl_no").value;
+    var prod_date = document.getElementById("processing_date").value;
+    prod_date = change_date_format(prod_date);
+    var machine = document.getElementById("operation").value;
+
+    //Row 2
+    var mill_name = document.getElementById("mill").value;
+    mill_name = mill_name.split(' ');
+    var mill;
+    if(mill_name[0] == ''){
+        mill = "MILL"
+    }else{
+        mill = mill_name[0];
+    }
+    var mill_id = document.getElementById("mill_id").value;
+    if(mill_name[0] == ''){
+        mill = "MILL"
+    }else{
+        mill = mill_name[0];
+    }
+    if(mill_id == ''){
+     mill_id = 'N/A';
+    }
+    var customer = document.getElementById("customer").value;
+    customer = cust_name_for_label(customer);
+
+    //Row 3
+    var grade_field = document.getElementById("grade").value;
+    var grade_coating = "";
+    //Grade. Check if grade exists
+    /*if (grade_field.includes("GRADE")){
+        grade = grade_field.split("GRADE").pop();
+        grade_coating = grade.split(' ');
+        grade=grade_coating[0];
+        grade = grade.slice(1);
+        grade = grade.replace('.','');
+
+    }*/
+
+    var material_type = '';
+    if (grade_field.length > 0){
+        grade_field = grade_field.split(';');
+        //Material Type
+        /*var mat_type = grade_field.split("ID");
+
+        mat_type = mat_type[0].split("GRADE");
+        var material_type = mat_type[0];
+        material_type = material_type.replaceAll('COIL','');
+        material_type = material_type.replaceAll('SHEETS','');
+        material_type = material_type.replaceAll('.','');*/
+        material_type = grade_field[0];
+        material_type = material_type.replaceAll('COIL','');
+        material_type = material_type.replaceAll('SHEETS','');
+        material_type = material_type.replaceAll('.','');
+        material_type = material_type.replaceAll('MAT TYPE:','');
+
+        for(i=1;i<grade_field.length;i++){
+            if(grade_field[i].includes("GRADE")){
+                grade = grade_field[i].split("GRADE").pop();
+                grade = grade.replaceAll(':','');
+                grade = grade.replaceAll(' ','');
+            }
+            if(grade_field[i].includes("COATING")){
+                coating = grade_field[i].split("COATING").pop();
+                coating = coating.replaceAll(':','');
+                coating = coating.replaceAll(' ','');
+            }
+
+            if(grade_field[i].includes("SCAMS NO")){
+                scams_no = grade_field[i].split("SCAMS NO").pop();
+                scams_no = scams_no.replaceAll(':','');
+                scams_no = scams_no.replaceAll(' ','');
+            }
+        }
+    }
+    else if(grade_field == ''){
+        grade = 'N/A';
+    }
+    else{
+        grade = grade_field;
+    }
+
+    //Populate the rows
+    //Row 1
+    document.getElementById('lbl_smpl_no').value = smpl_no;
+    document.getElementById('lbl_prod_date').value = prod_date;
+    document.getElementById('lbl_machine').value = machine;
+
+    //Row 2
+    document.getElementById('lbl_mill').value = mill;
+    document.getElementById('lbl_mill_id').value = mill_id;
+    document.getElementById('lbl_customer').value = customer;
+
+    //Row 3
+    document.getElementById('lbl_grade').value = grade.trimEnd();
+    document.getElementById('lbl_mat_type').value = material_type.trimEnd();
+    document.getElementById('lbl_scams_no').value = scams_no.trimEnd();
+
+    //FG_Table population
+    var html = '<tr id= %id%>' +
+            '<td><input type="text" style="width:100px;border: 0px none;" id="lbl_size" name="lbl_size" value="%size%"></td>' +
+            '<td><input type="text" style="width:100px;border: 0px none;" id="lbl_coil_length" name="lbl_coil_length" value="%coil_length%"></td>' +
+            '<td><input type="text" style="width:100px;" id="lbl_packet_name" name="lbl_packet_name" value="%packet_name%"></td>' +
+            '<td><input type="text" style="width:130px;"  id="lbl_2nd_customer" name="lbl_2nd_customer"></td>' +
+            '<td><input type="text" style="width:100px;"  id="lbl_net_wt" name="lbl_net_wt"></td>' +
+            '<td><input type="text" style="width:100px;" id="lbl_gross_wt" name="lbl_gross_wt"></td>' +
+            '<td><input type="text" style="width:130px;"  id="lbl_lamination" name="lbl_gross_wt"></td>' +
+            '<td><input type="text" style="width:130px;"  id="lbl_top_comment" name="lbl_top_comment"></td>' +
+            '<td><input type="text" style="width:130px;"  id="lbl_comment" name="lbl_comment"></td>' +
+            '<td><input type="text" style="width:50px;"  id="lbl_mat_status" name="lbl_mat_status" value="%status%"></td>' +
+
+            '<td><select name ="lbl_format_size" id="lbl_format_size">' +
+            '<option value ="big">BIG</option><option value ="small">SMALL</option></select></td>' +
+            '<td><input type = "button" class="btn btn-default" value="Print" onclick="print_label_slit_new()"></td>' +
+            '</tr>';
+
+    var part_length = parts_table.rows[rowId].cells[0].lastChild.value;
+    var part_name = parts_table.rows[rowId].cells[1].lastChild.value;
+    var newHTML = html.replace('%coil_length%', part_length);
+    var newNEWHTML= '';
+    var width, width_name, width_part_name, width_status;
+    var thickness = document.getElementById("thickness").value;
+    var id = 1;
+    if (fg_table.rows.length > 2){
+        id = fg_table.rows.length;
+    }
+
+    for(j=1;j<width_table.rows.length;j++){
+        width = width_table.rows[j].cells[0].lastChild.value;
+        if( width_table.rows[j].cells[0].lastChild.value == "0"){
+            width = "BAL";
+        }
+        width_name = width_table.rows[j].cells[1].lastChild.value;
+        width_status = width_table.rows[j].cells[2].lastElementChild.selectedOptions[0].innerHTML;
+        size = thickness + " X " + width + " x Coil";
+        width_part_name = width_name + part_name;
+        newNEWHTML = newHTML.replace('%packet_name%', width_part_name);
+        newNEWHTML = newNEWHTML.replace('%size%', size);
+        //newNEWHTML = newNEWHTML.replace('%coil_name%', width_part_name);
+        newNEWHTML = newNEWHTML.replace('%status%', width_status);
+        newNEWHTML = newNEWHTML.replace('%id%', id);
+        document.getElementById('fg_table').insertAdjacentHTML('beforeend', newNEWHTML);
+        id = id +1;
+    }
+
+}
+
 //This function is to get details for the sticker for the specific part
 function make__part_label_slit(th){
     var rowId = parseInt(event.target.parentNode.parentNode.id);
@@ -544,10 +753,11 @@ function make__part_label_slit(th){
 
     // If customer is TSDPL; 2nd customer field has to be added
     var customer = document.getElementById("customer").value;
-    customer = cust_name_for_label(customer)
-    if (customer == "TSDPL" ){
+    customer = cust_name_for_label(customer);
+    /*if (customer == "TSDPL" ){
         html = '<tr id= %id%><td>%smpl_no%</td><td>%prod_date%</td><td>%customer%</td><td>%machine%</td><td><input type="text" id="size" name="size" value = "%size%"></td><td>%coil_length%</td><td>%coil_name%</td><td>%mill_id%</td><td>%grade%</td><td>%mill%</td><td><input type="text" id="comment" name="comment"></td><td><input type="text" id="customer2nd" name="customer2nd"></td><td><input type = "button" class="btn btn-default" value="Print" onclick="print_label()"></td></tr>'
-    }
+    }*/
+
     var thickness = document.getElementById("thickness").value;
 
     var mill_id = document.getElementById("mill_id").value;
@@ -570,7 +780,7 @@ function make__part_label_slit(th){
 
 
     //var customer2 = document.getElementById("customer2").value;
-    ;
+
     var prod_date = document.getElementById("processing_date").value;
     prod_date = change_date_format(prod_date);
     if (grade_field.includes("GRADE")){

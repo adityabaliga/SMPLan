@@ -46,8 +46,11 @@ function get_param_new(){
      if(url.includes('print_label_tsl')){
       document.getElementById("numbers").innerHTML = "NUMBERS: " + queries[lbl_numbers_pos];
      }else{
+        if(queries[lbl_size_pos].includes("Coil")){
+            document.getElementById("size").innerHTML +=  " - " + queries[lbl_numbers_pos] + " metres";
+        }else{
         document.getElementById("size").innerHTML +=  " - " + queries[lbl_numbers_pos] + " Nos";
-
+        }
      }
 
 
@@ -84,6 +87,14 @@ function get_param_new(){
         line_count+=1;
         }else{
         myobj = document.getElementById("grade");
+        myobj.remove();
+    }
+
+    if(queries[lbl_comment_pos] != ""){
+        document.getElementById("comments").innerHTML = queries[lbl_comment_pos];
+        line_count+=1;
+        }else{
+        myobj = document.getElementById("comments");
         myobj.remove();
     }
 
@@ -126,8 +137,12 @@ function get_param_new(){
         myobj.remove();
     }
 
-    if(queries[lbl_lamination_pos] != "No Lamination"){
-        document.getElementById("lamination").innerHTML = queries[lbl_lamination_pos];
+    if(queries[lbl_lamination_pos] == "" ){
+        queries[lbl_lamination_pos] = "No Lamination";
+    }
+
+    if(queries[lbl_lamination_pos] != "No Lamination") {
+        document.getElementById("lamination").innerHTML = "LAMI: " + queries[lbl_lamination_pos];
         line_count+=1;
         }else{
         myobj = document.getElementById("lamination");
@@ -158,16 +173,20 @@ function get_param_new(){
     if(queries[lbl_format_size] == 'big'){
         document.getElementById('label_size').className = 'label_big';
         document.getElementById('label_details_size').className = 'label_details_big';
+        document.getElementById('machine').setAttribute("style","width:210px");
+        document.getElementById('top_comment').setAttribute("style","width:210px");
     }
 
-    /*var qrcode = new QRCode(document.getElementById("qr_code_block"),{
-    text: queryString,
+    qr_string = queries[lbl_smpl_no_pos] + ',' + queries[lbl_size_pos] + ',' + queries[lbl_numbers_pos] + ',';
+     qr_string+= queries[lbl_net_wt_pos] + ',' + queries[lbl_gross_wt_pos] + ',' + queries[lbl_mat_status];
+    var qrcode = new QRCode(document.getElementById("qr_code_block"),{
+    text: qr_string,
     width: 90,
     height: 90,
     colorDark : "#000000",
     colorLight : "#ffffff",
     correctLevel : QRCode.CorrectLevel.H
-        });*/
+        });
 
 
 

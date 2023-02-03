@@ -253,7 +253,7 @@
         <tr id = 1>
             <td><input type="number" name="part_length" id="part_length" onchange="change_part_length('part_tbl')"></td>
             <td><input type = "text" name = "part_name" id = "part_name"></td>
-            <td><input type = "button" value="Make Label" onclick="make__part_label_slit(this)"></td>
+            <td><input type = "button" value="Make Label" onclick="make_label_new_slit(this)"></td>
             <td><input type="button" name="add_part" id="add_part" value="Add Part" onclick="addRow('part_tbl')"></td>
         </tr>
     </table>
@@ -399,41 +399,69 @@
     </p-->
 
     <!--input type = "button" class="btn btn-default" value="Make Label" onclick="make_label_slit()"-->
+    <h3 align = "center">Label</h3>
+        <table class="table table-sm" id="label_table">
+        <tr>
+            <td>SMPL No</td>
+            <td><input type="text"  name="lbl_smpl_no" id="lbl_smpl_no" readonly></td>
+            <td>Date</td>
+            <td><input type="text"  name="lbl_prod_date" id="lbl_prod_date" readonly></td>
+            <td>Machine</td>
+            <td><input type="text"  name="lbl_machine" id="lbl_machine" readonly></td>
+        </tr>
+        <tr>
+            <td>Mill</td>
+            <td><input type="text" name="lbl_mill" id="lbl_mill" readonly></td>
+            <td>Mill ID</td>
+            <td><input type="text" name="lbl_mill_id" id="lbl_mill_id" readonly></td>
+            <td>Customer</td>
+            <td><input type="text" name="lbl_customer" id="lbl_customer" readonly></td>
+        </tr>
+        <tr>
+            <td>Grade</td>
+            <td><input type="text" name="lbl_grade" id="lbl_grade"></td>
+            <td>Material Type</td>
+            <td><input type="text" name="lbl_mat_type" id="lbl_mat_type"></td>
+            <td>SCAMS No</td>
+            <td><input type="text" name="lbl_scams_no" id="lbl_scams_no"></td>
+
+        </tr>
+        </table>
     <table class="table table-sm" id="fg_table">
         <tr>
-            <th>SMPL No</th>
-            <th>Date</th>
-            <th>Customer</th>
-
-            <th>Machine</th>
             <th>Size</th>
-            <th>Coil Length</th>
-            <th>Coil Name</th>
-            <th>Mill ID</th>
-            <th>Grade</th>
-            <th>Mill</th>
-            <th>Comments</th>
-            {% if incoming.customer == "TSDPL" or incoming.customer == "TSPDL" %}
+            <th>Coil Length(metres)</th>
+            <th>Packet Name</th>
             <th>2nd Customer</th>
-            {% endif %}
-            <th></th>
+            <th>Net Wt (kgs)</th>
+            <th>Gross Wt (kgs)</th>
+            <th>Lamination</th>
+            <!--th>Coating</th>
+            <th>Part No</th>
+            <th>Batch No</th-->
+
+            <th>Top Comment</th>
+            <th>Comments</th>
+            <th>Status</th>
+            <th>Label size</th>
+
+
+
+
         </tr>
         <!--tr>
-            <td>%smpl_no%</td>
-            <td>%prod_date%</td>
-            <td>%customer%</td>
-            <td>%machine%</td>
-            <td>%size%</td>
-            <td>%coil_length%</td>
-            <td>%coil_name%</td>
-            <td>%mill_id%</td>
-            <td>%grade%</td>
-            <td>%mill%<td>
+            <td><input type="text" style="width:100px;border: 0px none;" id="lbl_size" name="lbl_size" value="%size%"></td>
+            <td><input type="text" style="width:100px;border: 0px none;" id="lbl_coil_length" name="lbl_coil_length" value="%coil_length%"></td>
+            <td><input type="text" style="width:100px;" id="lbl_packet_name" name="lbl_packet_name" value="%packet_name%"></td>
+            <td><input type="text" style="width:130px;"  id="lbl_2nd_customer" name="lbl_2nd_customer"></td>
+            <td><input type="text" style="width:100px;"  id="lbl_net_wt" name="lbl_net_wt"></td>
+            <td><input type="text" style="width:100px;" id="lbl_gross_wt" name="lbl_gross_wt"></td>
+            <td><input type="text" style="width:130px;"  id="lbl_lamination" name="lbl_gross_wt"></td>
+            <td><input type="text" style="width:130px;"  id="lbl_top_comment" name="lbl_top_comment"></td>
+            <td><input type="text" style="width:130px;"  id="lbl_comment" name="lbl_comment"></td>
+            <td><input type="text" style="width:50px;"  id="lbl_mat_status" name="lbl_mat_status" value="%status%"></td>
 
-            <td><input type="text" id="comment" name="comment"></td>
-            {% if customer == "TSDPL" or customer == "TSPDL" %}
-            <td><input type="text" id="cusomter2" name="customer2"></td>
-            {% endif %}
+
             <td><input type = "button" class="btn btn-default" value="Print" onclick="print_label_slit()"></td>
 
 
