@@ -626,6 +626,11 @@ function make_label_new_slit(th){
     }*/
 
     var material_type = '';
+    var grade = '';
+    var coating = '';
+    var scams_no = '';
+
+
     if (grade_field.length > 0){
         grade_field = grade_field.split(';');
         //Material Type
@@ -698,7 +703,7 @@ function make_label_new_slit(th){
             '<td><input type="text" style="width:50px;"  id="lbl_mat_status" name="lbl_mat_status" value="%status%"></td>' +
 
             '<td><select name ="lbl_format_size" id="lbl_format_size">' +
-            '<option value ="big">BIG</option><option value ="small">SMALL</option></select></td>' +
+            '<option value ="small">SMALL</option><option value ="big">BIG</option></select></td>' +
             '<td><input type = "button" class="btn btn-default" value="Print" onclick="print_label_slit_new()"></td>' +
             '</tr>';
 
