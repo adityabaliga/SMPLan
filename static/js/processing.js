@@ -562,6 +562,12 @@ function cust_name_for_label(customer){
     else if(customer.startsWith("tata steel downstream products")){
         cust_name= "TSDPL";
     }
+    else if(customer.startsWith("honda")){
+        cust_name= "HONDA";
+    }
+    else if(customer.startsWith("tt steel")){
+        cust_name= "TTSSI";
+    }
 
     else{
         cust_split = customer.split(' ');
