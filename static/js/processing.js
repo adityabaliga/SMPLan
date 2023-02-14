@@ -1108,7 +1108,7 @@ function honda_part_no(width,length){
         wt_per_sheet = 1;
         coating = "";
     }
-    return (part_no + "," + wt_per_sheet + "," +coating);
+    return (part_no + ";" + wt_per_sheet + ";" +coating);
     //return part_no;
 }
 
@@ -1169,9 +1169,9 @@ function make_label_new(th){
     var lamination = numbers_table.rows[rowId].cells[2].lastElementChild.selectedOptions[0].innerHTML;
     var packet_name = numbers_table.rows[rowId].cells[3].lastChild.value;
     var packet_nos = numbers_table.rows[rowId].cells[4].lastChild.value;
-    if (customer.startsWith("HONDA") || customer.startsWith("TT STEEL")){
+    if (customer.startsWith("HONDA") || customer.startsWith("TTSSI")){
         var honda_part_num = honda_part_no(Number(width), Number(output_length));
-        honda_part_num = honda_part_num.split(',');
+        honda_part_num = honda_part_num.split(';');
         document.getElementById('lbl_part_no').value = honda_part_num[0];
 
         document.getElementById('lbl_net_wt').value = Math.round(Number(honda_part_num[1]) * Number(numbers_table.rows[rowId].cells[4].lastChild.value));
