@@ -1105,7 +1105,7 @@ function honda_part_no(width,length){
     }
     else{
         part_no = "";
-        wt_per_sheet = 1;
+        wt_per_sheet = 0;
         coating = "";
     }
     return (part_no + ";" + wt_per_sheet + ";" +coating);
@@ -1221,6 +1221,7 @@ function make_label_new(th){
         material_type = material_type.replaceAll('MAT TYPE:','');
 
         for(i=1;i<grade_field.length;i++){
+            grade_field[i] = (grade_field[i].toUpperCase());
             if((grade_field[i].toUpperCase()).includes("GRADE")){
                 grade = grade_field[i].split("GRADE").pop();
                 grade = grade.replaceAll(':','');

@@ -205,6 +205,7 @@ function get_param_new(){
     }
 
     resize_to_fit("customer");
+    resize_to_fit("size");
     resize_to_fit("part_no");
     resize_to_fit("top_comment");
 
