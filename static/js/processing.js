@@ -1173,9 +1173,10 @@ function make_label_new(th){
         var honda_part_num = honda_part_no(Number(width), Number(output_length));
         honda_part_num = honda_part_num.split(';');
         document.getElementById('lbl_part_no').value = honda_part_num[0];
-
-        document.getElementById('lbl_net_wt').value = Math.round(Number(honda_part_num[1]) * Number(numbers_table.rows[rowId].cells[4].lastChild.value));
-         document.getElementById('lbl_coating').value = honda_part_num[2];
+        if(honda_part_num[1] != 0){
+            document.getElementById('lbl_net_wt').value = Math.round(Number(honda_part_num[1]) * Number(numbers_table.rows[rowId].cells[4].lastChild.value));
+        }
+        document.getElementById('lbl_coating').value = honda_part_num[2];
     }
 
     var lami_type;
