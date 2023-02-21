@@ -25,7 +25,10 @@ var lbl_mat_status = 22;
 //function to reduce the font size when length of text is long
 //https://stackoverflow.com/questions/18229230/dynamically-change-the-size-of-the-font-size-based-on-text-length
 function resize_to_fit(elementID){
-    var fontSize = window.getComputedStyle(document.getElementById(elementID)).fontSize;
+    var docElement = document.getElementById(elementID);
+    var windowStyle = window.getComputedStyle(docElement);
+    var fontSize = windowStyle.fontSize;
+    //var fontSize = window.getComputedStyle(document.getElementById(elementID)).fontSize;
     document.getElementById(elementID).style.fontSize = (parseFloat(fontSize) - 1) + 'px';
     var font_test = document.getElementById(elementID).style.fontSize;
     var elementClientHeight = parseFloat(document.getElementById(elementID).outerText.length) * parseFloat(font_test);
@@ -196,7 +199,8 @@ function get_param_new(){
         var elements = document.getElementsByClassName('label_details2');
         for (var i = 0; i < elements.length; i++) {
           var element = elements[i];
-          element.style.fontSize = "18px";
+          element.style.fontSize = "22px";
+
         }
 
         document.getElementById('machine').setAttribute("style","width:210px");
@@ -206,7 +210,12 @@ function get_param_new(){
 
     resize_to_fit("customer");
     resize_to_fit("size");
+    resize_to_fit("mill_id");
+    resize_to_fit("grade");
+    resize_to_fit("scams_no");
     resize_to_fit("part_no");
+    resize_to_fit("lamination");
+    resize_to_fit("comments");
     resize_to_fit("top_comment");
 
     qr_string = queries[lbl_smpl_no_pos] + ',' + queries[lbl_size_pos] + ',' + queries[lbl_numbers_pos] + ',';
