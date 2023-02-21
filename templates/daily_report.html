@@ -118,7 +118,7 @@
         {% for processing_dtl in processing_hdr_detail %}
             {% if processing_dtl[2] != 'Slitting' and processing_dtl[2] != 'Mini_Slitting' %}
                 <tr>
-                    <td>{{processing_dtl[1]}}</td>
+                    <td><a href="/history_show_details?smpl_no={{processing_dtl[1]}}">{{processing_dtl[1]}}</a></td>
                     <td>{{processing_dtl[2]}}</td>
                     <td>{{processing_dtl[4]}}</td>
                     <td>{{processing_dtl[5]}}</td>
@@ -149,7 +149,7 @@
         {% for processing_dtl in processing_hdr_detail %}
             {% if processing_dtl[2] == 'Slitting' or processing_dtl[2] == 'Mini_Slitting' %}
                 <tr>
-                    <td>{{processing_dtl[1]}}</td>
+                    <td><a href="/history_show_details?smpl_no={{processing_dtl[1]}}">{{processing_dtl[1]}}</a></td>
                     <td>{{processing_dtl[2]}}</td>
                     <td>{{processing_dtl[4]}}</td>
                     <td>{{processing_dtl[5]}}</td>

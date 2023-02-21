@@ -22,6 +22,24 @@ var lbl_top_comment_pos = 20;
 var lbl_format_size = 21;
 var lbl_mat_status = 22;
 
+//function to reduce the font size when length of text is long
+//https://stackoverflow.com/questions/18229230/dynamically-change-the-size-of-the-font-size-based-on-text-length
+function resize_to_fit(elementID){
+    var fontSize = window.getComputedStyle(document.getElementById(elementID)).fontSize;
+    document.getElementById(elementID).style.fontSize = (parseFloat(fontSize) - 1) + 'px';
+    var font_test = document.getElementById(elementID).style.fontSize;
+    var elementClientHeight = parseFloat(document.getElementById(elementID).outerText.length) * parseFloat(font_test);
+    var elementClientWidth = (document.getElementById(elementID).clientWidth);
+    var par = document.getElementById('label_details_size');
+    var child = document.getElementById(elementID);
+    var parentClientHeight = document.getElementById('label_details_size').clientWidth;
+    if(elementClientHeight >=  1.5*parentClientHeight){
+        resize_to_fit(elementID);
+    }
+
+}
+
+
 function get_param_new(){
     var queryString = decodeURIComponent(window.location.search);
     var url = window.location.href;
@@ -151,6 +169,7 @@ function get_param_new(){
 
     // Formatting
     if(queries[lbl_format_size] == 'big'){
+
         if((document.getElementById("customer").innerHTML).length < 20){
             document.getElementById("customer").style.fontSize = "50px";
         }else if((document.getElementById("customer").innerHTML).length > 20 && (document.getElementById("customer").innerHTML).length < 23){
@@ -173,12 +192,25 @@ function get_param_new(){
     if(queries[lbl_format_size] == 'big'){
         document.getElementById('label_size').className = 'label_big';
         document.getElementById('label_details_size').className = 'label_details_big';
+        //document.getElementById('label_details2').setAttribute("style","font-size:18px");
+        var elements = document.getElementsByClassName('label_details2');
+        for (var i = 0; i < elements.length; i++) {
+          var element = elements[i];
+          element.style.fontSize = "18px";
+        }
+
         document.getElementById('machine').setAttribute("style","width:210px");
         document.getElementById('top_comment').setAttribute("style","width:210px");
+
     }
 
+    resize_to_fit("customer");
+    resize_to_fit("part_no");
+    resize_to_fit("top_comment");
+
     qr_string = queries[lbl_smpl_no_pos] + ',' + queries[lbl_size_pos] + ',' + queries[lbl_numbers_pos] + ',';
-     qr_string+= queries[lbl_net_wt_pos] + ',' + queries[lbl_gross_wt_pos] + ',' + queries[lbl_mat_status];
+    qr_string+= queries[lbl_net_wt_pos] + ',' + queries[lbl_gross_wt_pos] + ',' + queries[lbl_mat_status];
+
     var qrcode = new QRCode(document.getElementById("qr_code_block"),{
     text: qr_string,
     width: 90,
