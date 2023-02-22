@@ -36,7 +36,7 @@ function resize_to_fit(elementID){
     var par = document.getElementById('label_details_size');
     var child = document.getElementById(elementID);
     var parentClientHeight = document.getElementById('label_details_size').clientWidth;
-    if(elementClientHeight >=  1.5*parentClientHeight){
+    if(elementClientHeight >=  1.7*parentClientHeight){
         resize_to_fit(elementID);
     }
 
@@ -61,7 +61,7 @@ function get_param_new(){
     }
 
     document.getElementById("smpl_no").innerHTML = queries[lbl_smpl_no_pos] + " - " + queries[lbl_packet_name_pos] + " (" +queries[lbl_mat_type_pos] + ")";
-    document.getElementById("size").innerHTML = "SIZE(mm):  " + queries[lbl_size_pos];
+    document.getElementById("size").innerHTML = queries[lbl_size_pos];
 
 
      if(url.includes('print_label_tsl')){
@@ -212,10 +212,10 @@ function get_param_new(){
     resize_to_fit("size");
     resize_to_fit("mill_id");
     resize_to_fit("grade");
-    resize_to_fit("scams_no");
+    /*resize_to_fit("scams_no");
     resize_to_fit("part_no");
     resize_to_fit("lamination");
-    resize_to_fit("comments");
+    resize_to_fit("comments");*/
     resize_to_fit("top_comment");
 
     qr_string = queries[lbl_smpl_no_pos] + ',' + queries[lbl_size_pos] + ',' + queries[lbl_numbers_pos] + ',';
