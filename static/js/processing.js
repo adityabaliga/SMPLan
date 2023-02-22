@@ -302,12 +302,12 @@ function validate(){
     //    document.getElementById("balance_wt").value = 0;
     //}
 
-    // If RM weight is more then the check of 5% is ok. But when RM weight is less, then  5% margin becomes less
-    // So, when RM less than 3MT, I am giving an allowance of 7%
+    // If RM weight is more then the check of 7% is ok. But when RM weight is less, then  5% margin becomes less
+    // So, when RM less than 3MT, I am giving an allowance of 8%
 
-    var allowance = 1.05;
+    var allowance = 1.07;
     if(rm_wt < 3){
-        allowance = 1.07;
+        allowance = 1.08;
     }
 
     if((total_processed_wt + completed_proc_wt) > allowance*rm_wt){
