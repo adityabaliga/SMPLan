@@ -26,20 +26,21 @@ var lbl_mat_status = 22;
 //https://stackoverflow.com/questions/18229230/dynamically-change-the-size-of-the-font-size-based-on-text-length
 function resize_to_fit(elementID){
     var docElement = document.getElementById(elementID);
-    var windowStyle = window.getComputedStyle(docElement);
-    var fontSize = windowStyle.fontSize;
-    //var fontSize = window.getComputedStyle(document.getElementById(elementID)).fontSize;
-    document.getElementById(elementID).style.fontSize = (parseFloat(fontSize) - 1) + 'px';
-    var font_test = document.getElementById(elementID).style.fontSize;
-    var elementClientHeight = parseFloat(document.getElementById(elementID).outerText.length) * parseFloat(font_test);
-    var elementClientWidth = (document.getElementById(elementID).clientWidth);
-    var par = document.getElementById('label_details_size');
-    var child = document.getElementById(elementID);
-    var parentClientHeight = document.getElementById('label_details_size').clientWidth;
-    if(elementClientHeight >=  1.7*parentClientHeight){
-        resize_to_fit(elementID);
+    if(docElement != null){
+        var windowStyle = window.getComputedStyle(docElement);
+        var fontSize = windowStyle.fontSize;
+        //var fontSize = window.getComputedStyle(document.getElementById(elementID)).fontSize;
+        document.getElementById(elementID).style.fontSize = (parseFloat(fontSize) - 1) + 'px';
+        var font_test = document.getElementById(elementID).style.fontSize;
+        var elementClientHeight = parseFloat(document.getElementById(elementID).outerText.length) * parseFloat(font_test);
+        var elementClientWidth = (document.getElementById(elementID).clientWidth);
+        var par = document.getElementById('label_details_size');
+        var child = document.getElementById(elementID);
+        var parentClientHeight = document.getElementById('label_details_size').clientWidth;
+        if(elementClientHeight >=  1.7*parentClientHeight){
+            resize_to_fit(elementID);
+        }
     }
-
 }
 
 
@@ -212,10 +213,10 @@ function get_param_new(){
     resize_to_fit("size");
     resize_to_fit("mill_id");
     resize_to_fit("grade");
-    /*resize_to_fit("scams_no");
+    resize_to_fit("scams_no");
     resize_to_fit("part_no");
     resize_to_fit("lamination");
-    resize_to_fit("comments");*/
+    resize_to_fit("comments");
     resize_to_fit("top_comment");
 
     qr_string = queries[lbl_smpl_no_pos] + ',' + queries[lbl_size_pos] + ',' + queries[lbl_numbers_pos] + ',';
