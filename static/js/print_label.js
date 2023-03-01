@@ -53,6 +53,9 @@ function get_param_new(){
 
     document.getElementById("machine").innerHTML = queries[lbl_machine_pos];
     document.getElementById("top_comment").innerHTML = queries[lbl_top_comment_pos];
+    if(queries[lbl_top_comment_pos] == "RH" || queries[lbl_top_comment_pos] == "LH"){
+        document.getElementById("top_comment").style.fontSize = "23px";
+    }
     document.getElementById("prod_date").innerHTML = "DATE: " + queries[lbl_prod_date_pos];
 
     if (queries[lbl_2nd_customer_pos] != "" && !url.includes("print_label_tsl")){
