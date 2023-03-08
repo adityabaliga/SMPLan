@@ -24,7 +24,7 @@ var lbl_mat_status = 22;
 
 //function to reduce the font size when length of text is long
 //https://stackoverflow.com/questions/18229230/dynamically-change-the-size-of-the-font-size-based-on-text-length
-function resize_to_fit(elementID){
+function resize_to_fit(elementID, width_factor){
     var docElement = document.getElementById(elementID);
     if(docElement != null){
         var windowStyle = window.getComputedStyle(docElement);
@@ -37,7 +37,7 @@ function resize_to_fit(elementID){
         var par = document.getElementById('label_details_size');
         var child = document.getElementById(elementID);
         var parentClientHeight = document.getElementById('label_details_size').clientWidth;
-        if(elementClientHeight >=  1.7*parentClientHeight){
+        if(elementClientHeight >=  width_factor*parentClientHeight){
             resize_to_fit(elementID);
         }
     }
@@ -212,15 +212,15 @@ function get_param_new(){
 
     }
 
-    resize_to_fit("customer");
-    resize_to_fit("size");
-    resize_to_fit("mill_id");
-    resize_to_fit("grade");
-    resize_to_fit("scams_no");
-    resize_to_fit("part_no");
-    resize_to_fit("lamination");
-    resize_to_fit("comments");
-    resize_to_fit("top_comment");
+    resize_to_fit("customer", 1.7);
+    resize_to_fit("size", 1.7);
+    resize_to_fit("mill_id", 1.5);
+    resize_to_fit("grade", 1.5);
+    resize_to_fit("scams_no", 1.5);
+    resize_to_fit("part_no", 1.2);
+    resize_to_fit("lamination", 1.2);
+    resize_to_fit("comments", 1.4);
+    resize_to_fit("top_comment", 1.5);
 
     qr_string = queries[lbl_smpl_no_pos] + ',' + queries[lbl_size_pos] + ',' + queries[lbl_numbers_pos] + ',';
     qr_string+= queries[lbl_net_wt_pos] + ',' + queries[lbl_gross_wt_pos] + ',' + queries[lbl_mat_status];
