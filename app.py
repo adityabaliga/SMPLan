@@ -1432,6 +1432,16 @@ def background_process_test():
     return jsonify("nothing")
 
 
+@app.route('/make_label_hist', methods=['GET', 'POST'])
+def make_label_hist():
+    processing_id = 0
+    if request.method == 'POST':
+        processing_id = request.form['processing_id']
+
+    if request.method == 'GET':
+        processing_id = request.args.get('processing_id')
+    return render_template('make_label.html')
+
 @app.route('/print_label', methods=['GET', 'POST'])
 def print_label():
     processing_id = 0
@@ -2084,6 +2094,49 @@ def scams_show_details():
 
 
 
+@app.route('/print_old_label', methods=['GET', 'POST'])
+def print_old_label():
+    return render_template('/print_old_label.html')
+
+
+@app.route('/print_label_smpl_pick', methods=['GET', 'POST'])
+def print_label_smpl_pick():
+    smpl_number = ""
+    processing_lst = []
+    processing_detail_lst = []
+    _processing_detail_lst = []
+    processing_date_lst = []
+
+    if request.method == 'POST':
+        smpl_number = request.form['smpl_no']
+    if request.method == 'GET':
+        smpl_number = request.args.get('smpl_no')
+
+    processing_lst = Processing.load_history(smpl_number)
+    for processing_id, processing in processing_lst:
+        _processing_detail_lst = (ProcessingDetail.load_history(processing_id))
+        for processing_detail in _processing_detail_lst:
+            processing_detail_lst.append(processing_detail)
+            processing_date_lst.append(processing.processing_date)
+
+    return render_template('/print_label_pick_processing.html', processing_detail_lst=zip(processing_detail_lst, processing_date_lst))
+
+@app.route('/print_old_label_format', methods=['GET', 'POST'])
+def print_old_label_format():
+    smpl_number = ""
+
+    if request.method == 'POST':
+        smpl_number = request.form['select_processing_id']
+    if request.method == 'GET':
+        smpl_number = request.args.get('select_processing_id')
+
+    smpl_no = smpl_number.split(';')
+
+
+    incoming = Incoming.load_smpl_by_smpl_no(smpl_no[0])
+
+    return render_template('/make_label.html', incoming = incoming)
+
 @app.route('/daily_report_pick_date', methods=['GET', 'POST'])
 def daily_report_pick_date():
     return render_template('/daily_report_pick_date.html')
@@ -2178,7 +2231,7 @@ if __name__ == '__main__':
 
     app.wsgi_app = ProfilerMiddleware(app.wsgi_app, restrictions=[5], profile_dir='E:\postgres_data_bkp\PROFILING')
     #app.run(debug=True)
-    #app.run(SERVER_NAME, SERVER_PORT, threaded=True, debug=True)
+    app.run(SERVER_NAME, SERVER_PORT, threaded=True, debug=True)
 
     logger = logging.getLogger('waitress')
     logger.setLevel(logging.INFO)
@@ -2186,4 +2239,4 @@ if __name__ == '__main__':
     # Using waitress as a WSGI server.
     # Steps here https://dev.to/thetrebelcc/how-to-run-a-flask-app-over-https-using-waitress-and-nginx-2020-235c
 
-    serve(app,host=SERVER_NAME,port=SERVER_PORT)
+    #serve(app,host=SERVER_NAME,port=SERVER_PORT)

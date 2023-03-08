@@ -71,7 +71,7 @@ function get_param_new(){
      if(url.includes('print_label_tsl')){
       document.getElementById("numbers").innerHTML = "NUMBERS: " + queries[lbl_numbers_pos];
      }else{
-        if(queries[lbl_size_pos].includes("Coil")){
+        if(queries[lbl_size_pos].includes("c")){
             document.getElementById("size").innerHTML +=  " - " + queries[lbl_numbers_pos] + " metres";
         }else{
         document.getElementById("size").innerHTML +=  " - " + queries[lbl_numbers_pos] + " Nos";

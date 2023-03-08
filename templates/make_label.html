@@ -1,0 +1,176 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SMPL MRP- Processing</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+    <style>
+        .mytable>tbody>tr>td, .mytable>tbody>tr>th, .mytable>tfoot>tr>td, .mytable>tfoot>tr>th, .mytable>thead>tr>td, .mytable>thead>tr>th {
+    padding: 6px;
+    }
+    input,select {
+    font-family: "Verdana";
+    }
+    hr.style1{
+	        border-top: 15px solid #4d0000;
+    }
+    .oe{
+            font-family: Mathematica6 Bold, Old English Text MT, Engravers Old English BT, Old English, Collins Old English, New Old English, serif;
+            font-size: 50px;
+            color: #4d0000;
+            text-align:center;
+    }
+    .topnav a:hover {
+            color: #4d0000;
+            text-decoration: none;
+    }
+    .nopad {
+                margin: 0;
+                padding: 0;
+                margin-top: 0em;
+                margin-bottom: 0em;
+    }
+   </style>
+</head>
+
+<body onload="make_label_old()">
+<form>
+     <div class="topnav" id="myTopnav">
+        <br>
+        <table>
+            <td><img src="/static/logo.jpg"  height="70" width="92" align = "left"></td>
+            <td width="1050px"><div align="center" class="nopad"> <a href="\main_menu"  class="oe">SMPL</a></div></td>
+		</table>
+    </div>
+
+
+    <h3 align = "center">Label</h3>
+        <table class="table table-sm" id="label_table">
+        <tr>
+            <td>SMPL No</td>
+            <td><input type="text"  name="lbl_smpl_no" id="lbl_smpl_no" readonly></td>
+            <td>Date</td>
+            <td><input type="text"  name="lbl_prod_date" id="lbl_prod_date" readonly></td>
+            <td>Machine</td>
+            <td><input type="text"  name="lbl_machine" id="lbl_machine" ></td>
+            <td>Size</td>
+            <td><input type="text" name="lbl_size" id="lbl_size" value = "{{incoming.thickness}}"></td>
+        </tr>
+        <tr>
+            <td>Customer</td>
+            <td><input type="text" name="lbl_customer" id="lbl_customer" value = "{{incoming.customer}}"></td>
+            <td>2nd Customer</td>
+            <td><input type="text" name="lbl_2nd_customer" id="lbl_2nd_customer"></td>
+            <td>Mill</td>
+            <td><input type="text" name="lbl_mill" id="lbl_mill" value = "{{incoming.mill}}" readonly></td>
+            <td>Mill ID</td>
+            <td><input type="text" name="lbl_mill_id" id="lbl_mill_id" value = "{{incoming.mill_id}}" readonly></td>
+        </tr>
+        <tr>
+
+            <td>Numbers</td>
+            <td><input type="text" name="lbl_numbers" id="lbl_numbers" ></td>
+            <td>Packet Name</td>
+            <td><input type="text" name="lbl_packet_name" id="lbl_packet_name" readonly></td>
+            <td>Lamination</td>
+            <td><input type="text" name="lbl_lamination" id="lbl_lamination" ></td>
+        </tr>
+        <tr>
+            <td>Grade</td>
+            <td><input type="text" name="lbl_grade" id="lbl_grade" value = "{{incoming.grade}}"></td>
+            <td>Material Type</td>
+            <td><input type="text" name="lbl_mat_type" id="lbl_mat_type"></td>
+            <td>SCAMS No</td>
+            <td><input type="text" name="lbl_scams_no" id="lbl_scams_no"></td>
+            <td>Coating</td>
+            <td><input type="text" name="lbl_coating" id="lbl_coating"></td>
+        </tr>
+        <tr>
+            <td>Part No</td>
+            <td><input type="text" name="lbl_part_no" id="lbl_part_no"></td>
+            <td>Batch No</td>
+            <td><input type="text" name="lbl_batch_no" id="lbl_batch_no"></td>
+            <td>Net Wt (kgs)</td>
+            <td><input type="text" name="lbl_net_wt" id="lbl_net_wt"></td>
+            <td>Gross Wt (kgs)</td>
+            <td><input type="text" name="lbl_gross_wt" id="lbl_gross_wt"></td>
+        </tr>
+        <tr>
+            <td>Sticker Top Comment</td>
+            <td><input type="text" name="lbl_top_comment" id="lbl_top_comment"></td>
+            <td>Comment</td>
+            <td><input type="text" name="lbl_comment" id="lbl_comment"></td>
+            <td>Status</td>
+            <td><input type="text" name="lbl_mat_status" id="lbl_mat_status"></td>
+        </tr>
+
+
+        <!--tr>
+            <td>%smpl_no%</td>
+            <td>%prod_date%</td>
+            <td>%customer%</td>
+            <td>%machine%</td>
+            <td>%size%</td>
+            <td>%numbers%</td>
+            <td>%packet_no%</td>
+            <td>%lamination%</td>
+            <td>%mill_id%</td>
+            <td>%grade%</td>
+            <td>%mill%<td>
+
+            <td><input type="text" id="comment" name="comment"></td>
+            {% if customer == "TSDPL" or customer == "TSPDL" %}
+            <td><input type="text" id="cusomter2" name="customer2"></td>
+            {% endif %}
+            <td><input type="text" id="mat_type" name=""mat_type""></td>
+            <td><input type = "button" class="btn btn-default" value="Print" onclick="print_label()"></td>
+
+
+        </tr-->
+
+
+
+
+    </table>
+    <table class="table table-sm">
+        <tr>
+            <td>Label Format</td>
+            <td>
+                <select name ="lbl_format" id="lbl_format">
+                    <option value ="SMPL">SMPL</option>
+                    <option value ="TTS">TTS</option>
+                    <option value ="HONDA">HONDA</option>
+                    <option value ="TSL">TSL</option>
+                </select>
+
+            </td>
+
+            <td>Label size</td>
+            <td>
+                <select name ="lbl_format_size" id="lbl_format_size">
+                    <option value ="big">BIG</option>
+                    <option value ="small">SMALL</option>
+
+                </select>
+
+            </td>
+            <td><input type = "button" class="btn btn-default" value="Print Label" onclick="print_label_new()"></td>
+
+
+        </tr>
+
+    </table>
+
+
+
+    <p>
+        <!--button type ="button" class="btn btn-default">Start</button-->
+
+
+    </p>
+
+    <script src = "{{ url_for('static', filename='js/make_label_old.js') }}"></script>
+    <script src = "{{ url_for('static', filename='js/processing.js') }}"></script>
+
+</form>
+</body>
+</html>
