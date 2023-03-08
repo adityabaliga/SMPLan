@@ -89,7 +89,7 @@ function make_label_old(smpl_no, customer){
     document.getElementById('lbl_scams_no').value = scams_no.trimEnd();
 
     var customer = document.getElementById('lbl_customer').value;
-    var size = queries[2].split('x');
+    var size = queries[2].split('X');
     var width = size[0];
     var output_length = size[1];
 
@@ -110,4 +110,4 @@ function make_label_old(smpl_no, customer){
 }
 
 //This is to call functions in processing.js
-cust_name_for_label();
+//cust_name_for_label();
