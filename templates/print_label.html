@@ -16,7 +16,7 @@
         font-family: Tahoma, Verdana, sans-serif;
         font-size : 20px;
         font-weight : 550;
-        line-height: 1%;
+        line-height: 1;
         padding: 0px;
         }
     .label_big{
@@ -31,10 +31,10 @@
         font-family: Tahoma, Verdana, sans-serif;
         display: inline-block;
         font-size : 25px;
-        line-height: 1%;
+        line-height: 1;
         padding: 5px;
         padding-bottom: 0px;
-        padding-top: 0px;
+        padding-top: 5px;
         font-weight : 550;
         width : 15cm;
         border-style: none;
@@ -47,7 +47,7 @@
     .label_details2{
         font-family: Tahoma, Verdana, sans-serif;
         font-size : 18px;
-        padding: 0px;
+        padding-left: 0px;
         padding-top: 0px;
         width:11.7cm;
         border-style: none;
@@ -81,27 +81,30 @@
     <div  width = "9.9cm" style = "vertical-align: top;text-align: center;line-height: 75%;margin-bottom:0;font-weight: 550; font-size: 28px;" name = "customer" id="customer">NASH INDUSTRIES</div>
     <div class = "label_details" id="label_details_size" style="">
 
-        <p name="smpl_no" id = "smpl_no" >2SMPL6868B - W1P1P1 (EGI sheets)</p>
-        <p name ="batch_no" id="batch_no">BATCH NO: 1111AW1P1</p>
-        <p name = "size" id="size" >0.80 X 650 x 294 X 1359 - 328 no.s</p>
-        <p name ="coating" id="coating" >COATING : 0/20</p>
-        <p name = "mill_id" id="mill_id" class = "label_details2">COIL ID: NE2000179102</p>
-        <p name ="grade" id="grade" class = "label_details2">GRADE : SECC</p>
+        <div name="smpl_no" id = "smpl_no" >2SMPL6868B - W1P1P1 (EGI sheets)</div>
+        <div name ="batch_no" id="batch_no">BATCH NO: 1111AW1P1</div>
+        <div name = "size" id="size" >0.80 X 650 x 294 X 1359 - 328 no.s</div>
+        <div name ="coating" id="coating" >COATING : 0/20</div>
+    </div>
+    <div class = "label_details2">
+        <div name = "mill_id" id="mill_id" class = "label_details2">COIL ID: NE2000179102</div>
+        <div name ="grade" id="grade" class = "label_details2">GRADE : SECC</div>
 
-        <p name ="net_wt" id="net_wt" class = "label_details2">Net WT: 2300kgs</p>
-        <p name ="gross_wt" id="gross_wt" class = "label_details2">GROSS WT: 2350kgs</p>
-        <p name ="scams_no" id="scams_no" class = "label_details2">SCAMS NO : T111111A1P01</p>
-        <p name ="part_no" id="part_no" class = "label_details2">PART: K0LA+K0PA+K0YA, TANK Lower</p>
-        <p name="lamination" id="lamination" class = "label_details2">BOTH SIDE LAMINATION</p>
-        <p name="comments" id="comments" class = "label_details2"> </p>
+
+        <div name ="net_wt" id="net_wt" >Net WT: 2300kgs</div>
+        <!--div name ="gross_wt" id="gross_wt" >GROSS WT: 2350kgs</div-->
+        <div name ="scams_no" id="scams_no" >SCAMS NO : T111111A1P01</div>
+        <div name ="part_no" id="part_no" >PART: K0LA+K0PA+K0YA, TANK Lower</div>
+        <div name="lamination" id="lamination" >BOTH SIDE LAMINATION</div>
+        <div name="comments" id="comments" > </div>
         <!--p id="qr_code_block" class = "qr_code"></p-->
     </div>
-    <!--div class = "qr_code" id ="qr_code">
+    <div class = "qr_code" id ="qr_code">
 
                 <div id="qr_code_block" style = "vertical-align: bottom;"></div>
 
 
-    </div-->
+    </div>
 </div>
 <script src = "{{ url_for('static', filename='js/print_label.js') }}"></script>
 <script src=

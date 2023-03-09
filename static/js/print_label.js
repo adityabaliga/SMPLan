@@ -71,7 +71,7 @@ function get_param_new(){
      if(url.includes('print_label_tsl')){
       document.getElementById("numbers").innerHTML = "NUMBERS: " + queries[lbl_numbers_pos];
      }else{
-        if(queries[lbl_size_pos].includes("c")){
+        if(queries[lbl_size_pos].includes("coil") || queries[lbl_size_pos].includes("Coil")){
             document.getElementById("size").innerHTML +=  " - " + queries[lbl_numbers_pos] + " metres";
         }else{
         document.getElementById("size").innerHTML +=  " - " + queries[lbl_numbers_pos] + " Nos";
@@ -132,18 +132,18 @@ function get_param_new(){
             myobj.remove();
         }
         if(queries[lbl_gross_wt_pos] != ""){
-            document.getElementById("gross_wt").innerHTML = 'GROSS WT: ' + queries[lbl_gross_wt_pos] + 'kgs';
+            document.getElementById("net_wt").innerHTML += '  GROSS WT: ' + queries[lbl_gross_wt_pos] + 'kgs';
 
         }else{
-            myobj = document.getElementById("gross_wt");
-            myobj.remove();
+            //myobj = document.getElementById("gross_wt");
+            //myobj.remove();
         }
         line_count+=1;
         }else{
             myobj = document.getElementById("net_wt");
             myobj.remove();
-            myobj = document.getElementById("gross_wt");
-            myobj.remove();
+            //myobj = document.getElementById("gross_wt");
+            //myobj.remove();
         }
 
     if(queries[lbl_scams_no_pos] != ""){
@@ -217,6 +217,9 @@ function get_param_new(){
     resize_to_fit("mill_id", 1.5);
     resize_to_fit("grade", 1.5);
     resize_to_fit("scams_no", 1.5);
+    resize_to_fit("net_wt", 1.2);
+    //resize_to_fit("gross_wt", 1.5);
+
     resize_to_fit("part_no", 1.2);
     resize_to_fit("lamination", 1.2);
     resize_to_fit("comments", 1.4);
