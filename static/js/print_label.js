@@ -130,18 +130,23 @@ function get_param_new(){
 
     if(queries[lbl_net_wt_pos] != "" || queries[lbl_gross_wt_pos] != ""){
         document.getElementById("net_wt").innerHTML = "";
-        if(queries[lbl_net_wt_pos] != ""){
+        if(url.includes("print_label_tsl")){
             document.getElementById("net_wt").innerHTML = 'NET WT: ' + queries[lbl_net_wt_pos] + 'kgs';
+            document.getElementById("gross_wt").innerHTML = 'GROSS WT: ' + queries[lbl_gross_wt_pos] + 'kgs';
         }else{
-            myobj = document.getElementById("net_wt");
-            myobj.remove();
-        }
-        if(queries[lbl_gross_wt_pos] != ""){
-            document.getElementById("net_wt").innerHTML += '  GROSS WT: ' + queries[lbl_gross_wt_pos] + 'kgs';
+            if(queries[lbl_net_wt_pos] != ""){
+                document.getElementById("net_wt").innerHTML = 'NET WT: ' + queries[lbl_net_wt_pos] + 'kgs';
+            }else{
+                myobj = document.getElementById("net_wt");
+                myobj.remove();
+            }
+            if(queries[lbl_gross_wt_pos] != ""){
+                document.getElementById("net_wt").innerHTML += '  GROSS WT: ' + queries[lbl_gross_wt_pos] + 'kgs';
 
-        }else{
-            //myobj = document.getElementById("gross_wt");
-            //myobj.remove();
+            }else{
+                //myobj = document.getElementById("gross_wt");
+                //myobj.remove();
+            }
         }
         line_count+=1;
         }else{
