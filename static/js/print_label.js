@@ -61,7 +61,7 @@ function get_param_new(){
     if (queries[lbl_2nd_customer_pos] != "" && !url.includes("print_label_tsl")){
         document.getElementById("customer").innerHTML = queries[lbl_customer_pos]+ " - " + queries[lbl_2nd_customer_pos];
     }else{
-        document.getElementById("customer").innerHTML = queries[lbl_customer_pos];
+        document.getElementById("2nd_customer").innerHTML = 'CUSTOMER: ' + queries[lbl_2nd_customer_pos];
     }
 
     document.getElementById("smpl_no").innerHTML = queries[lbl_smpl_no_pos] + " - " + queries[lbl_packet_name_pos] + " (" +queries[lbl_mat_type_pos] + ")";

@@ -657,18 +657,18 @@ function make_label_new_slit(th){
             if(grade_field[i].includes("GRADE")){
                 grade = grade_field[i].split("GRADE").pop();
                 grade = grade.replaceAll(':','');
-                grade = grade.replaceAll(' ','');
+                grade = grade.trim();
             }
             if(grade_field[i].includes("COATING")){
                 coating = grade_field[i].split("COATING").pop();
                 coating = coating.replaceAll(':','');
-                coating = coating.replaceAll(' ','');
+                coating = coating.trim();
             }
 
             if(grade_field[i].includes("SCAMS NO")){
                 scams_no = grade_field[i].split("SCAMS NO").pop();
                 scams_no = scams_no.replaceAll(':','');
-                scams_no = scams_no.replaceAll(' ','');
+                scams_no = scams_no.trim();
             }
         }
     }
