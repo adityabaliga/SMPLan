@@ -119,12 +119,12 @@ class CurrentStock:
                 if unit == '0':
                     cursor.execute("select * from current_stock where (status = 'RM' or status = 'HC' or status= 'WIP')"
                                    " and "
-                                   "length = 0 and smpl_no like %s and width <=500 order by "
+                                   "length = 0 and smpl_no like %s and width <=600 order by "
                                    "smpl_no asc", (smpl_no_like,))
                 else:
                     cursor.execute("select * from current_stock where (status = 'RM' or status = 'HC' or status= 'WIP')"
                                    " and "
-                                   "length = 0 and unit = %s  and smpl_no like %s and width <=500 order by "
+                                   "length = 0 and unit = %s  and smpl_no like %s and width <=600 order by "
                                    "smpl_no asc", (str(unit),smpl_no_like))
 
 
@@ -204,12 +204,12 @@ class CurrentStock:
                 if customer_type == "tr":
                     cursor.execute(
                         "select * from current_stock where (status = 'RM' or status = 'HC' or status= 'WIP') and "
-                        "length = 0 and unit = %s  and customer like 'TSDPL' and width <=500 order by smpl_no asc"
+                        "length = 0 and unit = %s  and customer like 'TSDPL' and width <=600 order by smpl_no asc"
                         , (str(unit),))
                 if customer_type == "tts":
                     cursor.execute(
                         "select * from current_stock where (status = 'RM' or status = 'HC' or status= 'WIP') and "
-                        "length = 0 and unit = %s  and smpl_no like 'TTS%%' and width <=500 order by smpl_no asc"
+                        "length = 0 and unit = %s  and smpl_no like 'TTS%%' and width <=600 order by smpl_no asc"
                         , (str(unit),))
                 user_data = cursor.fetchall()
 
@@ -490,6 +490,33 @@ class CurrentStock:
                 return True
             else:
                 return False
+
+    @classmethod
+    def get_cs_for_qr_dispath(cls, smpl_no, packet_name, width, length, status):
+        cs_lst = []
+        cs_id_lst = []
+        with CursorFromConnectionFromPool() as cursor:
+            #if packet_name == "":
+            cursor.execute("select * from current_stock where smpl_no = %s and width = %s "
+                           "and length = %s and status = %s", (smpl_no, width, length, status))
+            user_data = cursor.fetchone()
+            '''else:
+                cursor.execute(
+                    "select * from current_stock where smpl_no = %s and width = %s "
+                    "and length = %s and status = %s and packet_name = %s",
+                    (smpl_no, width, length, status, packet_name))
+                user_data = cursor.fetchone()'''
+            if user_data:
+                cs = CurrentStock(smpl_no=user_data[1], weight=Decimal(user_data[2]), numbers=int(user_data[3]),
+                                  width=Decimal(user_data[4]), length=Decimal(user_data[5]), status=user_data[6],
+                                  customer=user_data[7], thickness=Decimal(user_data[8]), grade=user_data[9],
+                                  unit=user_data[10], packet_name=user_data[11])
+                cs_lst.append(cs)
+                cs_id_lst.append(user_data[0])
+                return zip(cs_id_lst, cs_lst)
+            else:
+                return None
+
 
     @classmethod
     def csid_exists(cls, cs_rm_id):

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SMPL MRP - Dispatch</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+    <style>
+        hr.style1{
+	        border-top: 15px solid #4d0000;
+            }
+        .oe{
+            font-family: Mathematica6 Bold, Old English Text MT, Engravers Old English BT, Old English, Collins Old English, New Old English, serif;
+            font-size: 50px;
+            color: #4d0000;
+            text-align:center;
+            }
+        .topnav a:hover {
+            color: #4d0000;
+            text-decoration: none;
+        }
+        .nopad {
+                margin: 0;
+                padding: 0;
+                margin-top: 0em;
+                margin-bottom: 0em;
+            }
+    </style>
+
+</head>
+<form action="/dispatch">
+    <div class="topnav" id="myTopnav">
+        <br>
+        <table>
+            <td><img src="/static/logo.jpg"  height="70" width="92" align = "left"></td>
+            <td width="1050px"><div align="center" class="nopad"> <a href="\main_menu"  class="oe">SMPL</a></div></td>
+            <td><div align="left" class="nopad">Hi {{current_user.username}}<br>
+            <a href="\change_password_form">Change Password</a><br>
+            <a href="\logout">Logout</a></div></td>
+        </table>
+    </div>
+
+    <hr class ="style1">
+    <h2><input type = "text"  name = "customer" value ="{{customer}}" style = "width:750px;border: none;border-color: transparent;" readonly></h2>
+    <table class = "table table-sm" id = 'dispatch_list'>
+            <tr>
+
+                <th>SMPL No.</th>
+                <th>Packet Name</th>
+                <th>Thickness</th>
+                <th>Width x Length</th>
+                <th>Numbers</th>
+                <th>Weight (in MT)</th>
+                <th>Grade</th>
+                <th>Status</th>
+                <th>Full Dispatch</th>
+                <th>Dispatch Numbers</th>
+                <th>Dispatch Qty (in MT)</th>
+                <th>No. of packets</th>
+                <th>Defective</th>
+
+            </tr>
+        {% for cs_id, cs in cs_lst %}
+            <tr>
+                <td><input type = "checkbox" name = "select_smpl" value ="{{cs_id}},{{cs.smpl_no}}" onchange="enable_dispatch(this, 'dispatch_list')">{{cs.smpl_no}}</td>
+
+                <td><input type = "text" id = "packet_name" name = "packet_name" style = "width:80px;" value ="{{cs.packet_name}}"  readonly></td>
+
+                <td><input type = "text" id = "thickness" style = "width:80px;" value ="{{cs.thickness}}"  readonly></td>
+                <td><input type = "text" id = "widthxlength" value ="{{cs.width}} x  {{cs.length}}" style = "width:150px;" readonly></td>
+                <td><input type = "text" id = "numbers" value ="{{cs.numbers}}" style = "width:80px;" readonly></td>
+                <td><input type = "text" name = "dispatch_wt" value ="{{cs.weight}}" style = "width:80px;" readonly></td>
+                <td><input type = "text" name = "grade" value ="{{cs.grade}}" style = "width:80px;" readonly></td>
+                <td><input type = "text" value ="{{cs.status}}" style = "width:80px;" readonly></td>
+                <td><input type ="checkbox" name = "full_quantity" style = "width:80px;" onchange="full_dispatch(this, 'dispatch_list')" disabled></td>
+                <td><input type ="text" name = "dispatch_numbers" style = "width:80px;" onchange="check_numbers(this, 'dispatch_list')" readonly></td>
+                <td><input type ="text" name = "dispatch_quantity" style = "width:80px;" onchange="total_dispatch_wt()"tabindex="-1" readonly></td>
+                <td><input type ="text" name = "dispatch_packets" style = "width:80px;" readonly></td>
+                <td><input type ="text" name = "defective" style = "width:80px;" readonly></td>
+            </tr>
+        {% endfor %}
+
+        </table>
+
+        <p>Total Dispatch Wt (in MT) <input type = "number" step = "3" id = "total_disp_wt" value = "0.0" readonly> </p>
+        <p>Vehicle Number <input type = "text" name = "vehicle_no" required> </p>
+        <p>Dispatch Date <input type = "date" name = "dispatch_date" required></p>
+        <p>Dispatch Time <input type ="time" name = "dispatch_time" required></p>
+        <p>Invoice No <input type ="text" name = "invoice_no"></p>
+        <p>Remarks <input type ="text" style = "width:200px;"  name = "remarks"></p>
+
+        <input class="btn btn-default" type="submit" value="Submit">
+
+
+    <script src = "{{ url_for('static', filename='js/dispatch.js') }}"></script>
+    </form>
+</html>
