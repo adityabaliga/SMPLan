@@ -1226,18 +1226,18 @@ function make_label_new(th){
             if((grade_field[i].toUpperCase()).includes("GRADE")){
                 grade = grade_field[i].split("GRADE").pop();
                 grade = grade.replaceAll(':','');
-                grade = grade.replaceAll(' ','');
+                grade = grade.trim();
             }
             if((grade_field[i].toUpperCase()).includes("COATING")){
                 coating = grade_field[i].split("COATING").pop();
                 coating = coating.replaceAll(':','');
-                coating = coating.replaceAll(' ','');
+                coating = coating.trim();
             }
 
             if((grade_field[i].toUpperCase()).includes("SCAMS NO")){
                 scams_no = grade_field[i].split("SCAMS NO").pop();
                 scams_no = scams_no.replaceAll(':','');
-                scams_no = scams_no.replaceAll(' ','');
+                scams_no = scams_no.trim();
             }
         }
     }
@@ -1284,9 +1284,11 @@ function make_label_new(th){
     document.getElementById('lbl_scams_no').value = scams_no.trimEnd();
     //document.getElementById('lbl_size').value = size;
 
+    var tsl_no;
     //Row 5
     if(document.getElementById('lbl_customer').value == "TATA STEEL"){
-        document.getElementById('lbl_batch_no').value = document.getElementById('lbl_smpl_no').value + document.getElementById('lbl_packet_name').value;
+        tsl_no = document.getElementById('lbl_smpl_no').value.slice(3);
+        document.getElementById('lbl_batch_no').value = tsl_no + 'P';
     }
     document.getElementById('lbl_mat_status').value = mat_status;
 

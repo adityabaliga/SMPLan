@@ -1754,6 +1754,43 @@ def dispatch():
     return render_template('/main_menu.html')
 
 
+@app.route('/qr_dispatch', methods=['GET', 'POST'])
+def qr_dispatch():
+    return render_template('qr_dispatch.html')
+
+@app.route('/qr_dispatch_submit', methods=['GET', 'POST'])
+def qr_dispatch_submit():
+    cs_lst = []
+    cs_id_lst = []
+    cs_qr_lst = []
+    if request.method == 'POST':
+        dispatch_lst = request.form.getlist['qr_dispatch']
+
+    if request.method == 'GET':
+        dispatch_lst = request.args.getlist('qr_dispatch')
+
+    dispatch_string_lst = dispatch_lst[0].split('\n')
+
+    for dispatch_string in dispatch_string_lst:
+        dispatch_string = dispatch_string.split(',')
+        size = dispatch_string[2].upper().split('X')
+        thickness = size[0]
+        width = size[1]
+        length = size[2]
+        if length == 'COIL':
+            length = 0
+        cs_qr_lst = CurrentStock.get_cs_for_qr_dispath(dispatch_string[0], dispatch_string[1], width, length,
+                                           dispatch_string[6])
+
+        if cs_qr_lst:
+            for cs_id, cs in cs_lst:
+                cs_lst.append(cs)
+                cs_id_lst.append(cs_id)
+
+
+        return render_template('qr_dispatch_list.html', cs_lst = zip(cs_id_lst,cs_lst))
+
+
 @app.route('/display_dispatch_pick_day', methods=['GET', 'POST'])
 def display_dispatch_pick_day():
     return render_template('dispatch_pick_date.html')

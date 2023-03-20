@@ -74,7 +74,7 @@ function get_param_new(){
      if(url.includes('print_label_tsl')){
       document.getElementById("numbers").innerHTML = "NUMBERS: " + queries[lbl_numbers_pos];
       document.getElementById("packet_name").innerHTML = queries[lbl_packet_name_pos];
-      document.getElementById("smpl_no").innerHTML = queries[lbl_smpl_no_pos];
+      //document.getElementById("smpl_no").innerHTML = queries[lbl_smpl_no_pos];
      }else{
         if(queries[lbl_size_pos].includes("coil") || queries[lbl_size_pos].includes("Coil")){
             document.getElementById("size").innerHTML +=  " - " + queries[lbl_numbers_pos] + " metres";
@@ -237,8 +237,8 @@ function get_param_new(){
     resize_to_fit("comments", 1.4);
     resize_to_fit("top_comment", 1.5);
 
-    qr_string = queries[lbl_smpl_no_pos] + ',' + queries[lbl_size_pos] + ',' + queries[lbl_numbers_pos] + ',';
-    qr_string+= queries[lbl_net_wt_pos] + ',' + queries[lbl_gross_wt_pos] + ',' + queries[lbl_mat_status];
+    qr_string = queries[lbl_smpl_no_pos] + ',' + queries[lbl_packet_name_pos] + ',' + queries[lbl_size_pos] + ',' + queries[lbl_numbers_pos] + ',';
+    qr_string+= queries[lbl_net_wt_pos] + ',' + queries[lbl_gross_wt_pos] + ',' + queries[lbl_mat_status] + ',' + queries[lbl_customer_pos];
 
     var qrcode = new QRCode(document.getElementById("qr_code_block"),{
     text: qr_string,
