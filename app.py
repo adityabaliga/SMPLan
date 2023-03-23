@@ -1685,16 +1685,21 @@ def dispatch_pick_customer():
 def dispatch_list():
     customer = ""
     display_type = ""
+    dispatch_type = ""
     if request.method == 'POST':
         customer = request.form['select_customer']
         display_type = request.form['FG/RM']
+        dispatch_type = request.form['dispatch_type']
     if request.method == 'GET':
         customer = request.args.get('select_customer')
         display_type = request.args.get('FG/RM')
+        dispatch_type = request.args.get('dispatch_type')
 
     cs_lst = CurrentStock.get_stock_by_customer(customer, display_type)
-
-    return render_template('dispatch_list.html', cs_lst=cs_lst, customer=customer)
+    if dispatch_type == 'qr':
+        return render_template('qr_dispatch.html', customer=customer)
+    else:
+        return render_template('dispatch_list.html', cs_lst=cs_lst, customer=customer)
 
 
 @app.route('/dispatch', methods=['GET', 'POST'])
@@ -1761,34 +1766,49 @@ def qr_dispatch():
 @app.route('/qr_dispatch_submit', methods=['GET', 'POST'])
 def qr_dispatch_submit():
     cs_lst = []
+    _cs_lst = []
     cs_id_lst = []
     cs_qr_lst = []
+    dispatch_lst = []
+    dispatch_numbers_lst = []
+    dispatch_wt_lst = []
     if request.method == 'POST':
         dispatch_lst = request.form.getlist['qr_dispatch']
+        customer = request.form['customer']
 
     if request.method == 'GET':
         dispatch_lst = request.args.getlist('qr_dispatch')
+        customer = request.args.get('customer')
 
     dispatch_string_lst = dispatch_lst[0].split('\n')
+    #dispatch_record = dispatch_string_lst.split(',')
+
 
     for dispatch_string in dispatch_string_lst:
         dispatch_string = dispatch_string.split(',')
+        smpl_no = dispatch_string[0]
+        packet_name = dispatch_string[1]
         size = dispatch_string[2].upper().split('X')
         thickness = size[0]
         width = size[1]
         length = size[2]
+        dispatch_weight = ''
         if length == 'COIL':
-            length = 0
-        cs_qr_lst = CurrentStock.get_cs_for_qr_dispath(dispatch_string[0], dispatch_string[1], width, length,
-                                           dispatch_string[6])
+            length = '0'
+        status = dispatch_string[6].replace('\r', '')
+        cs_qr_lst = CurrentStock.get_cs_for_qr_dispath(smpl_no, packet_name, width, length, status, customer)
 
         if cs_qr_lst:
-            for cs_id, cs in cs_lst:
-                cs_lst.append(cs)
+            for cs_id, cs in cs_qr_lst:
                 cs_id_lst.append(cs_id)
+                cs_lst.append(cs)
+                dispatch_numbers_lst.append(dispatch_string[3])
+                if dispatch_string[4]:
+                    dispatch_weight = Decimal(dispatch_string[4])/1000
+                dispatch_wt_lst.append(dispatch_weight)
 
-
-        return render_template('qr_dispatch_list.html', cs_lst = zip(cs_id_lst,cs_lst))
+    _cs_lst = zip(cs_id_lst, cs_lst, dispatch_numbers_lst, dispatch_wt_lst)
+    return render_template('qr_dispatch_list.html', _cs_lst = _cs_lst, customer = customer)
 
 
 @app.route('/display_dispatch_pick_day', methods=['GET', 'POST'])
@@ -1817,8 +1837,21 @@ def dispatch_view_detail():
     dispatch_detail_lst = DispatchDetail.get_details_by_id(select_dispatch_hdr_id)
     dispatch_hdr = DispatchHeader.get_hdr_by_id(select_dispatch_hdr_id)
 
-    return render_template('dispatch_view.html', dispatch_hdr=dispatch_hdr, dispatch_detail_lst=dispatch_detail_lst)
+    return render_template('dispatch_view.html', dispatch_hdr=dispatch_hdr, dispatch_detail_lst=dispatch_detail_lst,
+                           dispatch_hdr_id=select_dispatch_hdr_id)
 
+
+@app.route('/dispatch_view_invoice_no_update', methods=['GET', 'POST'])
+def dispatch_view_invoice_no_update():
+    if request.method == 'POST':
+        invoice_no = request.form['invoice_no']
+        dispatch_hdr_id = request.form['dispatch_hdr_id']
+    if request.method == 'GET':
+        invoice_no = request.args.get('invoice_no')
+        dispatch_hdr_id = request.args.get('dispatch_hdr_id')
+
+    DispatchHeader.update_invoice_no(dispatch_hdr_id, invoice_no)
+    return render_template('main_menu.html')
 
 @app.route('/pick_slitting_batch', methods=['GET', 'POST'])
 def pick_slitting_batch():

@@ -492,24 +492,27 @@ class CurrentStock:
                 return False
 
     @classmethod
-    def get_cs_for_qr_dispath(cls, smpl_no, packet_name, width, length, status):
+    def get_cs_for_qr_dispath(cls, smpl_no, packet_name, width, length, status, customer):
         cs_lst = []
         cs_id_lst = []
         with CursorFromConnectionFromPool() as cursor:
-            #if packet_name == "":
-            cursor.execute("select * from current_stock where smpl_no = %s and width = %s "
-                           "and length = %s and status = %s", (smpl_no, width, length, status))
-            user_data = cursor.fetchone()
-            '''else:
+            if "HONDA" in customer:
                 cursor.execute(
                     "select * from current_stock where smpl_no = %s and width = %s "
-                    "and length = %s and status = %s and packet_name = %s",
-                    (smpl_no, width, length, status, packet_name))
-                user_data = cursor.fetchone()'''
+                    "and length = %s and status = %s and packet_name = %s and customer = %s",
+                    (smpl_no, width, length, status, packet_name, customer))
+                user_data = cursor.fetchone()
+            else:
+                cursor.execute("select * from current_stock where smpl_no = %s and width = %s "
+                               "and length = %s and status = %s and customer = %s",
+                               (smpl_no, width, length, status, customer))
+                user_data = cursor.fetchone()
             if user_data:
+
                 cs = CurrentStock(smpl_no=user_data[1], weight=Decimal(user_data[2]), numbers=int(user_data[3]),
-                                  width=Decimal(user_data[4]), length=Decimal(user_data[5]), status=user_data[6],
-                                  customer=user_data[7], thickness=Decimal(user_data[8]), grade=user_data[9],
+                                  width=Decimal(user_data[4]), length=Decimal(user_data[5]),
+                                  status=user_data[6], customer=user_data[7],
+                                  thickness=Decimal(user_data[8]), grade=user_data[9],
                                   unit=user_data[10], packet_name=user_data[11])
                 cs_lst.append(cs)
                 cs_id_lst.append(user_data[0])

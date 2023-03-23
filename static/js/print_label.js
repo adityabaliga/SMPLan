@@ -238,7 +238,7 @@ function get_param_new(){
     resize_to_fit("top_comment", 1.5);
 
     qr_string = queries[lbl_smpl_no_pos] + ',' + queries[lbl_packet_name_pos] + ',' + queries[lbl_size_pos] + ',' + queries[lbl_numbers_pos] + ',';
-    qr_string+= queries[lbl_net_wt_pos] + ',' + queries[lbl_gross_wt_pos] + ',' + queries[lbl_mat_status] + ',' + queries[lbl_customer_pos];
+    qr_string+= queries[lbl_net_wt_pos] + ',' + queries[lbl_gross_wt_pos] + ',' + queries[lbl_mat_status];
 
     var qrcode = new QRCode(document.getElementById("qr_code_block"),{
     text: qr_string,

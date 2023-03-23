@@ -32,6 +32,28 @@ window.addEventListener('beforeunload', function (e) {
   document.getElementById("submit").disabled = true;
 });
 
+function checkbox_enable(){
+    var dispatch_table = document.getElementById("dispatch_list");
+    var dispatch_wt = document.getElementById("total_disp_wt").value;
+    var qty, dispatch_qty, numbers;
+    for(i=1;i<dispatch_table.rows.length;i++){
+        dispatch_table.rows[i].cells[0].childNodes[0].checked = true;
+        dispatch_table.rows[i].cells[defective_pos].lastChild.value = ' ';
+        dispatch_table.rows[i].cells[defective_pos].lastChild.readOnly = false;
+
+        qty = dispatch_table.rows[i].cells[weight_pos].lastElementChild.value;
+        numbers = dispatch_table.rows[i].cells[numbers_pos].lastElementChild.value;
+        dispatch_nos = dispatch_table.rows[i].cells[dispatch_nos_pos].lastElementChild.value;
+        dispatch_qty = qty/numbers * dispatch_nos;
+        dispatch_table.rows[i].cells[dispatch_qty_pos].lastElementChild.value = dispatch_qty.toFixed(3);
+        dispatch_table.rows[i].cells[dispatch_qty_pos].lastElementChild.readOnly = true;
+        //total_dispatch_wt(tableID);
+
+    }
+    total_dispatch_wt("dispatch_list");
+
+}
+
 
 function full_dispatch(th, tableID)
 {
@@ -124,9 +146,10 @@ function check_numbers(th, tableID)
  }
 
 function total_dispatch_wt(tableID){
-        var total_disp_wt, row;
+        var total_disp_wt, row, total_packets;
 
         total_disp_wt = 0.0;
+        total_packets = 0;
         var table = document.getElementById(tableID);
 
         var rowCount = table.rows.length;
@@ -134,7 +157,9 @@ function total_dispatch_wt(tableID){
         for(i=1;i<rowCount;i++){
             row = table.rows[i];
             total_disp_wt = total_disp_wt + Number(row.cells[dispatch_qty_pos].lastElementChild.value);
+            total_packets = total_packets + Number(row.cells[no_of_pkts_pos].lastElementChild.value);
         }
 
         document.getElementById("total_disp_wt").value = total_disp_wt.toFixed(3);
+        document.getElementById("total_packets").value = total_packets;
 }
