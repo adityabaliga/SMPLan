@@ -27,7 +27,8 @@
     </style>
 
 </head>
-<form action="/dispatch">
+<body onload="checkbox_enable()">
+<form action="/dispatch" >
     <div class="topnav" id="myTopnav">
         <br>
         <table>
@@ -41,47 +42,50 @@
 
     <hr class ="style1">
     <h2><input type = "text"  name = "customer" value ="{{customer}}" style = "width:750px;border: none;border-color: transparent;" readonly></h2>
-    <table class = "table table-sm" id = 'dispatch_list'>
+    <table class = "table table-sm" id = "dispatch_list">
             <tr>
 
                 <th>SMPL No.</th>
                 <th>Packet Name</th>
                 <th>Thickness</th>
                 <th>Width x Length</th>
-                <th>Numbers</th>
-                <th>Weight (in MT)</th>
+                <th></th>
+                <th></th>
                 <th>Grade</th>
                 <th>Status</th>
-                <th>Full Dispatch</th>
+                <th></th>
                 <th>Dispatch Numbers</th>
                 <th>Dispatch Qty (in MT)</th>
                 <th>No. of packets</th>
                 <th>Defective</th>
 
             </tr>
-        {% for cs_id, cs in cs_lst %}
+
+        {% for cs_id, cs, dispatch_numbers, dispatch_wt in _cs_lst %}
             <tr>
                 <td><input type = "checkbox" name = "select_smpl" value ="{{cs_id}},{{cs.smpl_no}}" onchange="enable_dispatch(this, 'dispatch_list')">{{cs.smpl_no}}</td>
 
-                <td><input type = "text" id = "packet_name" name = "packet_name" style = "width:80px;" value ="{{cs.packet_name}}"  readonly></td>
+                <td><input type = "text" id = "packet_name" name = "packet_name" style = "width:80px;border: 0px none;" value ="{{cs.packet_name}}"  readonly></td>
 
-                <td><input type = "text" id = "thickness" style = "width:80px;" value ="{{cs.thickness}}"  readonly></td>
-                <td><input type = "text" id = "widthxlength" value ="{{cs.width}} x  {{cs.length}}" style = "width:150px;" readonly></td>
-                <td><input type = "text" id = "numbers" value ="{{cs.numbers}}" style = "width:80px;" readonly></td>
-                <td><input type = "text" name = "dispatch_wt" value ="{{cs.weight}}" style = "width:80px;" readonly></td>
-                <td><input type = "text" name = "grade" value ="{{cs.grade}}" style = "width:80px;" readonly></td>
-                <td><input type = "text" value ="{{cs.status}}" style = "width:80px;" readonly></td>
-                <td><input type ="checkbox" name = "full_quantity" style = "width:80px;" onchange="full_dispatch(this, 'dispatch_list')" disabled></td>
-                <td><input type ="text" name = "dispatch_numbers" style = "width:80px;" onchange="check_numbers(this, 'dispatch_list')" readonly></td>
-                <td><input type ="text" name = "dispatch_quantity" style = "width:80px;" onchange="total_dispatch_wt()"tabindex="-1" readonly></td>
-                <td><input type ="text" name = "dispatch_packets" style = "width:80px;" readonly></td>
+                <td><input type = "text" id = "thickness" style = "width:80px;border: 0px none;" value ="{{cs.thickness}}"  readonly></td>
+                <td><input type = "text" id = "widthxlength" value ="{{cs.width}} x  {{cs.length}}" style = "width:150px;border: 0px none;" readonly></td>
+                <td><input type = "text" id = "numbers" value ="{{cs.numbers}}" style = "width:80px;" readonly hidden></td>
+                <td><input type = "text" name = "dispatch_wt" value ="{{cs.weight}}" style = "width:80px;" readonly hidden></td>
+                <td><input type = "text" name = "grade" value ="{{cs.grade}}" style = "width:80px;border: 0px none;" readonly></td>
+                <td><input type = "text" value ="{{cs.status}}" style = "width:80px;border: 0px none;" readonly></td>
+                <td><!--input type ="checkbox" name = "full_quantity" style = "width:80px;" onchange="full_dispatch(this, 'dispatch_list')" disabled--></td>
+                <td><input type ="text" name = "dispatch_numbers" style = "width:80px;border: 0px none;" value = "{{dispatch_numbers}}" onchange="check_numbers(this, 'dispatch_list')" readonly></td>
+                <td><input type ="text" name = "dispatch_quantity" style = "width:80px;border: 0px none;" value = "{{dispatch_wt}}" onchange="total_dispatch_wt()" tabindex="-1" readonly></td>
+                <td><input type ="text" name = "dispatch_packets" style = "width:80px;border: 0px none;" value = "1" readonly></td>
                 <td><input type ="text" name = "defective" style = "width:80px;" readonly></td>
             </tr>
+
         {% endfor %}
 
         </table>
 
         <p>Total Dispatch Wt (in MT) <input type = "number" step = "3" id = "total_disp_wt" value = "0.0" readonly> </p>
+        <p>Total Packets <input type = "number" step = "0" id = "total_packets" value = "0" readonly> </p>
         <p>Vehicle Number <input type = "text" name = "vehicle_no" required> </p>
         <p>Dispatch Date <input type = "date" name = "dispatch_date" required></p>
         <p>Dispatch Time <input type ="time" name = "dispatch_time" required></p>
@@ -93,4 +97,5 @@
 
     <script src = "{{ url_for('static', filename='js/dispatch.js') }}"></script>
     </form>
+</body>
 </html>

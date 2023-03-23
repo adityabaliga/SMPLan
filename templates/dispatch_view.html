@@ -27,7 +27,7 @@
     </style>
 
 </head>
-<form action="/dispatch_list_hdr_by_date">
+<form action="/dispatch_view_invoice_no_update">
     <div class="topnav" id="myTopnav">
         <br>
         <table>
@@ -55,8 +55,9 @@
                 <td>{{dispatch_hdr.customer}}</td>
                 <td>{{dispatch_hdr.dispatch_date}}</td>
                 <td>{{dispatch_hdr.dispatch_time}}</td>
-                <td>{{dispatch_hdr.invoice_no}}</td>
+                <td><input type ="text" name = "invoice_no" id = "invoice_no" value = {{dispatch_hdr.invoice_no}}></td>
                 <td>{{dispatch_hdr.remarks}}</td>
+                <td><input type ="text" name = "dispatch_hdr_id" id = "dispatch_hdr_id" value = {{dispatch_hdr_id}} value></td>
         </tr>
     </table>
 
@@ -86,5 +87,6 @@
         </tr>
         {% endfor %}
     </table>
+    <input class="btn btn-default" type="submit" value="Submit">
 </form>
 </html>
