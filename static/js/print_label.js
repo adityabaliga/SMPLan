@@ -73,7 +73,7 @@ function get_param_new(){
 
      if(url.includes('print_label_tsl')){
       document.getElementById("numbers").innerHTML = "NUMBERS: " + queries[lbl_numbers_pos];
-      document.getElementById("packet_name").innerHTML = queries[lbl_packet_name_pos];
+      //document.getElementById("packet_name").innerHTML = queries[lbl_packet_name_pos];
       //document.getElementById("smpl_no").innerHTML = queries[lbl_smpl_no_pos];
      }else{
         if(queries[lbl_size_pos].includes("coil") || queries[lbl_size_pos].includes("Coil")){

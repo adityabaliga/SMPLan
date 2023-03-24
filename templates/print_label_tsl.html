@@ -30,6 +30,28 @@
         padding: 5px;
         vertical-align: text-top;
         }
+        .label_details2{
+        font-family: Tahoma, Verdana, sans-serif;
+        font-size : 18px;
+        padding-left: 0px;
+        padding-top: 0px;
+        width:11.7cm;
+        border-style: none;
+        float: left;
+        vertical-align: top;
+        line-height: 1;
+        margin : 0px;
+
+        font-weight : 550;
+
+    }
+    .qr_code{
+
+
+        align : right;
+        margin-left: 12.5cm;
+        border-style: none;
+    }
 
     </style>
 
@@ -67,11 +89,7 @@
         </table>
 
 
-
-
-
-
-
+        <div class = "label_details2">
             <div  name="2nd_customer" id="2nd_customer">CUSTOMER: TVS </div>
 
 
@@ -81,6 +99,13 @@
             <div name ="scams_no" id="scams_no" hidden></div>
             <div name ="part_no" id="part_no" hidden></div>
             <div name="lamination" id="lamination" hidden></div>
+        </div>
+            <div class = "qr_code" id ="qr_code">
+
+                    <div id="qr_code_block" style = "vertical-align: bottom;"></div>
+
+
+            </div>
 
 
 
@@ -89,5 +114,8 @@
     </div>
 </div>
 <script src = "{{ url_for('static', filename='js/print_label.js') }}"></script>
+<script src=
+"https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js">
+    </script>
 </body>
 </html>
