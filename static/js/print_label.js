@@ -236,6 +236,10 @@ function get_param_new(){
     resize_to_fit("lamination", 1.2);
     resize_to_fit("comments", 1.4);
     resize_to_fit("top_comment", 1.5);
+    if(queries[lbl_top_comment_pos] == "RH" || queries[lbl_top_comment_pos] == "LH"){
+        document.getElementById("top_comment").style.fontSize = "25px";
+        document.getElementById("top_comment").style.fontWeight = "550";
+    }
 
     qr_string = queries[lbl_smpl_no_pos] + ',' + queries[lbl_packet_name_pos] + ',' + queries[lbl_size_pos] + ',' + queries[lbl_numbers_pos] + ',';
     qr_string+= queries[lbl_net_wt_pos] + ',' + queries[lbl_gross_wt_pos] + ',' + queries[lbl_mat_status];
