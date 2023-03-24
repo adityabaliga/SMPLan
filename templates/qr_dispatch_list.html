@@ -45,37 +45,38 @@
     <table class = "table table-sm" id = "dispatch_list">
             <tr>
 
-                <th>SMPL No.</th>
-                <th>Packet Name</th>
-                <th>Thickness</th>
-                <th>Width x Length</th>
-                <th></th>
-                <th></th>
-                <th>Grade</th>
-                <th>Status</th>
-                <th></th>
-                <th>Dispatch Numbers</th>
-                <th>Dispatch Qty (in MT)</th>
-                <th>No. of packets</th>
-                <th>Defective</th>
+                <th style = "width:120px;">SMPL No.</th>
+                <th style = "width:80px;">Packet Name</th>
+                <th style = "width:80px;">Thickness</th>
+                <th style = "width:80px;">Width x Length</th>
+                <th style = "width:10px;"></th>
+                <th style = "width:10px;"></th>
+                <th style = "width:80px;">Sticker Wt(in kgs)</th>
+                <th style = "width:80px;">Status</th>
+                <th style = "width:10px;"></th>
+                <th style = "width:80px;">Dispatch Numbers</th>
+                <th style = "width:80px;">Dispatch Qty (in MT)</th>
+                <th style = "width:80px;">No. of packets</th>
+                <th style = "width:80px;">Defective</th>
 
             </tr>
 
-        {% for cs_id, cs, dispatch_numbers, dispatch_wt in _cs_lst %}
+        {% for cs_id, cs, dispatch_numbers, dispatch_wt, packet_name in _cs_lst %}
             <tr>
                 <td><input type = "checkbox" name = "select_smpl" value ="{{cs_id}},{{cs.smpl_no}}" onchange="enable_dispatch(this, 'dispatch_list')">{{cs.smpl_no}}</td>
 
-                <td><input type = "text" id = "packet_name" name = "packet_name" style = "width:80px;border: 0px none;" value ="{{cs.packet_name}}"  readonly></td>
+                <td><input type = "text" id = "packet_name" name = "packet_name" style = "width:80px;border: 0px none;" value ="{{packet_name}}"  readonly></td>
 
                 <td><input type = "text" id = "thickness" style = "width:80px;border: 0px none;" value ="{{cs.thickness}}"  readonly></td>
                 <td><input type = "text" id = "widthxlength" value ="{{cs.width}} x  {{cs.length}}" style = "width:150px;border: 0px none;" readonly></td>
                 <td><input type = "text" id = "numbers" value ="{{cs.numbers}}" style = "width:80px;" readonly hidden></td>
                 <td><input type = "text" name = "dispatch_wt" value ="{{cs.weight}}" style = "width:80px;" readonly hidden></td>
-                <td><input type = "text" name = "grade" value ="{{cs.grade}}" style = "width:80px;border: 0px none;" readonly></td>
+                <td><input type = "text" name = "sticker_wt" value ="{{dispatch_wt}}" style = "width:60px;border: 0px none;" readonly></td>
+                <!--td><input type = "text" name = "grade" value ="{{cs.grade}}" style = "width:80px;border: 0px none;" readonly></td-->
                 <td><input type = "text" value ="{{cs.status}}" style = "width:80px;border: 0px none;" readonly></td>
                 <td><!--input type ="checkbox" name = "full_quantity" style = "width:80px;" onchange="full_dispatch(this, 'dispatch_list')" disabled--></td>
                 <td><input type ="text" name = "dispatch_numbers" style = "width:80px;border: 0px none;" value = "{{dispatch_numbers}}" onchange="check_numbers(this, 'dispatch_list')" readonly></td>
-                <td><input type ="text" name = "dispatch_quantity" style = "width:80px;border: 0px none;" value = "{{dispatch_wt}}" onchange="total_dispatch_wt()" tabindex="-1" readonly></td>
+                <td><input type ="text" name = "dispatch_quantity" style = "width:80px;border: 0px none;" value = onchange="total_dispatch_wt()" tabindex="-1" readonly></td>
                 <td><input type ="text" name = "dispatch_packets" style = "width:80px;border: 0px none;" value = "1" readonly></td>
                 <td><input type ="text" name = "defective" style = "width:80px;" readonly></td>
             </tr>

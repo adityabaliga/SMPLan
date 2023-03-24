@@ -1772,6 +1772,7 @@ def qr_dispatch_submit():
     dispatch_lst = []
     dispatch_numbers_lst = []
     dispatch_wt_lst = []
+    packet_name_lst = []
     if request.method == 'POST':
         dispatch_lst = request.form.getlist['qr_dispatch']
         customer = request.form['customer']
@@ -1789,12 +1790,21 @@ def qr_dispatch_submit():
         smpl_no = dispatch_string[0]
         packet_name = dispatch_string[1]
         size = dispatch_string[2].upper().split('X')
-        thickness = size[0]
-        width = size[1]
-        length = size[2]
-        dispatch_weight = ''
-        if length == 'COIL':
-            length = '0'
+        if len(size) == 3:
+            thickness = size[0]
+            width = size[1]
+            length = size[2]
+            dispatch_weight = ''
+            if length == 'COIL':
+                length = '0'
+        # This is for trap sizes
+        if len(size) == 4:
+            thickness = size[0]
+            width = round(((Decimal(size[1]) + Decimal(size[2]))/2), 0)
+            length = size[3]
+            dispatch_weight = ''
+            if length == 'COIL':
+                length = '0'
         status = dispatch_string[6].replace('\r', '')
         cs_qr_lst = CurrentStock.get_cs_for_qr_dispath(smpl_no, packet_name, width, length, status, customer)
 
@@ -1805,9 +1815,12 @@ def qr_dispatch_submit():
                 dispatch_numbers_lst.append(dispatch_string[3])
                 if dispatch_string[4]:
                     dispatch_weight = Decimal(dispatch_string[4])/1000
+                else:
+                    dispatch_weight = '0'
                 dispatch_wt_lst.append(dispatch_weight)
+                packet_name_lst.append(dispatch_string[1])
 
-    _cs_lst = zip(cs_id_lst, cs_lst, dispatch_numbers_lst, dispatch_wt_lst)
+    _cs_lst = zip(cs_id_lst, cs_lst, dispatch_numbers_lst, dispatch_wt_lst, packet_name_lst)
     return render_template('qr_dispatch_list.html', _cs_lst = _cs_lst, customer = customer)
 
 
