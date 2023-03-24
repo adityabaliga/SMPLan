@@ -1772,6 +1772,7 @@ def qr_dispatch_submit():
     dispatch_lst = []
     dispatch_numbers_lst = []
     dispatch_wt_lst = []
+    packet_name_lst = []
     if request.method == 'POST':
         dispatch_lst = request.form.getlist['qr_dispatch']
         customer = request.form['customer']
@@ -1814,9 +1815,12 @@ def qr_dispatch_submit():
                 dispatch_numbers_lst.append(dispatch_string[3])
                 if dispatch_string[4]:
                     dispatch_weight = Decimal(dispatch_string[4])/1000
+                else:
+                    dispatch_weight = '0'
                 dispatch_wt_lst.append(dispatch_weight)
+                packet_name_lst.append(dispatch_string[1])
 
-    _cs_lst = zip(cs_id_lst, cs_lst, dispatch_numbers_lst, dispatch_wt_lst)
+    _cs_lst = zip(cs_id_lst, cs_lst, dispatch_numbers_lst, dispatch_wt_lst, packet_name_lst)
     return render_template('qr_dispatch_list.html', _cs_lst = _cs_lst, customer = customer)
 
 
