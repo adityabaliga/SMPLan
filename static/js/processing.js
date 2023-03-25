@@ -732,7 +732,7 @@ function make_label_new_slit(th){
         width_name = width_table.rows[j].cells[1].lastChild.value;
         width_status = width_table.rows[j].cells[2].lastElementChild.selectedOptions[0].innerHTML;
         size = thickness + " X " + width + " x Coil";
-        width_part_name = width_name + part_name;
+        width_part_name = part_name + width_name;
         newNEWHTML = newHTML.replace('%packet_name%', width_part_name);
         newNEWHTML = newNEWHTML.replace('%size%', size);
         //newNEWHTML = newNEWHTML.replace('%coil_name%', width_part_name);
