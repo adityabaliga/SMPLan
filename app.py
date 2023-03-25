@@ -1094,7 +1094,7 @@ def submit_processing():
                     processing_detail = ProcessingDetail(smpl_no, operation, machine, processing_id, output_width,
                                                          output_length, actual_no_of_pieces,
                                                          packet_name, remarks, processed_wt, ms_width,
-                                                         ms_length)
+                                                         ms_length, fg_yes_no)
                     processing_detail.save_to_db()
 
                     if operation == "Reshearing":
@@ -1210,7 +1210,7 @@ def submit_processing():
                                                                  output_width,
                                                                  output_length, no_of_coils, length_per_part,
                                                                  remarks, processed_wt, ms_width, ms_length,
-                                                                 order_detail_id)
+                                                                 order_detail_id,fg_yes_no)
 
                             processing_detail.save_to_db()
 
@@ -1351,7 +1351,7 @@ def submit_slitting_processing():
                 processing_detail = ProcessingDetail(smpl_no, operation, machine, processing_id, output_width,
                                                      output_length, processed_numbers, packet_name, _remarks,
                                                      part_weight,
-                                                     ms_width, ms_length)
+                                                     ms_width, ms_length, fg_yes_no)
                 processing_detail.save_to_db()
 
                 _remarks = ''
@@ -1786,39 +1786,40 @@ def qr_dispatch_submit():
 
 
     for dispatch_string in dispatch_string_lst:
-        dispatch_string = dispatch_string.split(',')
-        smpl_no = dispatch_string[0]
-        packet_name = dispatch_string[1]
-        size = dispatch_string[2].upper().split('X')
-        if len(size) == 3:
-            thickness = size[0]
-            width = size[1]
-            length = size[2]
-            dispatch_weight = ''
-            if length == 'COIL':
-                length = '0'
-        # This is for trap sizes
-        if len(size) == 4:
-            thickness = size[0]
-            width = round(((Decimal(size[1]) + Decimal(size[2]))/2), 0)
-            length = size[3]
-            dispatch_weight = ''
-            if length == 'COIL':
-                length = '0'
-        status = dispatch_string[6].replace('\r', '')
-        cs_qr_lst = CurrentStock.get_cs_for_qr_dispath(smpl_no, packet_name, width, length, status, customer)
+        if dispatch_string:
+            dispatch_string = dispatch_string.split(',')
+            smpl_no = dispatch_string[0]
+            packet_name = dispatch_string[1]
+            size = dispatch_string[2].upper().split('X')
+            if len(size) == 3:
+                thickness = size[0]
+                width = size[1]
+                length = size[2]
+                dispatch_weight = ''
+                if length == 'COIL':
+                    length = '0'
+            # This is for trap sizes
+            if len(size) == 4:
+                thickness = size[0]
+                width = round(((Decimal(size[1]) + Decimal(size[2]))/2), 0)
+                length = size[3]
+                dispatch_weight = ''
+                if length == 'COIL':
+                    length = '0'
+            status = dispatch_string[6].replace('\r', '')
+            cs_qr_lst = CurrentStock.get_cs_for_qr_dispath(smpl_no, packet_name, width, length, status, customer)
 
-        if cs_qr_lst:
-            for cs_id, cs in cs_qr_lst:
-                cs_id_lst.append(cs_id)
-                cs_lst.append(cs)
-                dispatch_numbers_lst.append(dispatch_string[3])
-                if dispatch_string[4]:
-                    dispatch_weight = Decimal(dispatch_string[4])/1000
-                else:
-                    dispatch_weight = '0'
-                dispatch_wt_lst.append(dispatch_weight)
-                packet_name_lst.append(dispatch_string[1])
+            if cs_qr_lst:
+                for cs_id, cs in cs_qr_lst:
+                    cs_id_lst.append(cs_id)
+                    cs_lst.append(cs)
+                    dispatch_numbers_lst.append(dispatch_string[3])
+                    if dispatch_string[4]:
+                        dispatch_weight = Decimal(dispatch_string[4])/1000
+                    else:
+                        dispatch_weight = '0'
+                    dispatch_wt_lst.append(dispatch_weight)
+                    packet_name_lst.append(dispatch_string[1])
 
     _cs_lst = zip(cs_id_lst, cs_lst, dispatch_numbers_lst, dispatch_wt_lst, packet_name_lst)
     return render_template('qr_dispatch_list.html', _cs_lst = _cs_lst, customer = customer)

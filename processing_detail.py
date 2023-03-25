@@ -3,7 +3,7 @@ from decimal import *
 
 class ProcessingDetail:
     def __init__(self, smpl_no, operation, machine, processing_id, cut_width, cut_length,  processed_numbers,
-                 packet_name, remarks, processed_wt, input_width, input_length):
+                 packet_name, remarks, processed_wt, input_width, input_length, status):
         self.smpl_no = smpl_no
         self.operation = operation
         self.machine = machine
@@ -16,6 +16,7 @@ class ProcessingDetail:
         self.processed_wt = processed_wt
         self.input_width = input_width
         self.input_length = input_length
+        self.status = status
         #self.order_detail_id = order_detail_id
         #self.lamination = lamination
 
@@ -27,7 +28,7 @@ class ProcessingDetail:
         with CursorFromConnectionFromPool() as cursor:
             cursor.execute("insert into processing_detail (smpl_no, operation, machine, processing_id, input_width,"
                            "input_length, cut_width, cut_length, processed_numbers, packet_name, processed_wt, "
-                           "remarks) values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", (self.smpl_no,
+                           "remarks, status) values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", (self.smpl_no,
                                                                                             self.operation,
                                                                                             self.machine,
                                                                                             self.processing_id,
@@ -38,7 +39,8 @@ class ProcessingDetail:
                                                                                             self.processed_numbers,
                                                                                             self.packet_name,
                                                                                             self.processed_wt,
-                                                                                            self.remarks))
+                                                                                            self.remarks,
+                                                                                            self.status))
 
 
     @classmethod
@@ -55,7 +57,7 @@ class ProcessingDetail:
                                                   processed_numbers=int(lst[7]),
                                                   remarks=lst[8], processed_wt=Decimal(lst[9]),
                                                   input_width=Decimal(lst[10]), input_length=Decimal(lst[11]),
-                                                  packet_name = lst[12])
+                                                  packet_name = lst[12], status = lst[13])
                 processing_dtl_lst.append(processing_dtl)
             return processing_dtl_lst
 
@@ -72,7 +74,7 @@ class ProcessingDetail:
                                                   , processed_numbers=int(lst[7]),
                                                   processed_wt=Decimal(lst[9]), remarks=lst[8],
                                                   input_width=Decimal(lst[10]), input_length=Decimal(lst[11]),
-                                                  packet_name = lst[12])
+                                                  packet_name = lst[12], status = lst[13])
                 processing_dtl_lst.append(processing_dtl)
             return processing_dtl_lst
 
@@ -89,6 +91,6 @@ class ProcessingDetail:
                                                   , processed_numbers=int(lst[7]),
                                                   processed_wt=Decimal(lst[9]), remarks=lst[8],
                                                   input_width=Decimal(lst[10]), input_length=Decimal(lst[11]),
-                                                  packet_name = lst[12])
+                                                  packet_name = lst[12], status = lst[13])
                 processing_dtl_lst.append(processing_dtl)
             return processing_dtl_lst

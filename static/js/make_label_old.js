@@ -24,6 +24,7 @@ function make_label_old(smpl_no, customer){
     document.getElementById('lbl_customer').value = cust_name_for_label(document.getElementById('lbl_customer').value);
     document.getElementById('lbl_numbers').value = queries[4];
     document.getElementById('lbl_packet_name').value = queries[3];
+    document.getElementById('lbl_mat_status').value = queries[6];
 
     var grade_field = document.getElementById("lbl_grade").value;
     var grade_coating = "";

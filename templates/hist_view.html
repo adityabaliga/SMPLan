@@ -169,6 +169,7 @@
                             <th>Output Size</th>
                             <th>No.s </th>
                             <th>Packet Name</th>
+                            <th>FG/WIP</th>
                             <th>Remarks </th>
                          </tr>
 
@@ -180,6 +181,7 @@
 
                             <td>{{processing_dtl.processed_numbers}} </td>
                              <td>{{processing_dtl.packet_name}}</td>
+                             <td>{{processing_dtl.status}}</td>
                              <td>{{processing_dtl.remarks}}</td>
 
 
@@ -232,6 +234,7 @@
                     <th>No. of Packets</th>
                     <th>Defectives</th>
 
+
             </tr>
             {% for detail in dispatch_dtl_lst %}
 
@@ -245,6 +248,7 @@
                         <td>{{detail.dispatch_wt}}</td>
                         <td>{{detail.no_of_pkts}}</td>
                         <td>{{detail.defective}}</td>
+
 
                 </tr>
                 {% endif %}
