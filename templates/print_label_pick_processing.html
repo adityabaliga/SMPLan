@@ -53,13 +53,14 @@
                 <th>Packet Name</th>
                 <th>Weight (in MT)</th>
                 <th>Processing Date</th>
+                <th>FG/WIP</th>
 
 
             </tr>
 
         {% for processing_detail, processing_date in processing_detail_lst %}
             <tr>
-                <td><input type = "radio" name = "select_processing_id" value = "{{processing_detail.smpl_no}};{{processing_detail.machine}};{{processing_detail.cut_width}}x{{processing_detail.cut_length}};{{processing_detail.packet_name}};{{processing_detail.processed_numbers}};{{processing_date}}" required>  {{processing_detail.smpl_no}}</input></td>
+                <td><input type = "radio" name = "select_processing_id" value = "{{processing_detail.smpl_no}};{{processing_detail.machine}};{{processing_detail.cut_width}}x{{processing_detail.cut_length}};{{processing_detail.packet_name}};{{processing_detail.processed_numbers}};{{processing_date}};{{processing_detail.status}}" required>  {{processing_detail.smpl_no}}</input></td>
 
                 <td>{{processing_detail.machine}}</td>
                 <td>{{processing_detail.cut_width}} x {{processing_detail.cut_length}}</td>
@@ -67,8 +68,9 @@
                 <td>{{processing_detail.packet_name}} </td>
 
                 <td>{{processing_detail.processed_wt}}</td>
-                <td>{{processing_date}}</td>
 
+                <td>{{processing_date}}</td>
+                <td>{{processing_detail.status}}</td>
 
             </tr>
         {% endfor %}
