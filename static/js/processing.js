@@ -517,6 +517,7 @@ function cust_name_for_label(customer){
     customer = customer.replace("pvt",'');
     customer = customer.replace("ltd",'');
     customer = customer.replaceAll(".",'');
+    customer = customer.replaceAll("&",' AND ');
 
     temp_customer = customer.split('[');
     customer =  temp_customer[0];
