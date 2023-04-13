@@ -32,6 +32,18 @@ window.addEventListener('beforeunload', function (e) {
   document.getElementById("submit").disabled = true;
 });
 
+//This function reloads the page if the user uses back to come to the page
+//https://stackoverflow.com/questions/43043113/how-to-force-reloading-a-page-when-using-browser-back-button
+window.addEventListener( "pageshow", function ( event ) {
+  var historyTraversal = event.persisted ||
+                         ( typeof window.performance != "undefined" &&
+                              window.performance.navigation.type === 2 );
+  if ( historyTraversal ) {
+    // Handle page restore.
+    window.location.reload();
+  }
+});
+
 function checkbox_enable(){
     var dispatch_table = document.getElementById("dispatch_list");
     var dispatch_wt = document.getElementById("total_disp_wt").value;

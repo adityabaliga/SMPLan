@@ -55,55 +55,59 @@
     </div>
 
     <hr class ="style1">
-    {% set count=i %}
+
     <table class = "table table-sm">
     <tr>
-        <th>Sl No</th>
-        <th>SMPL No</th>
-        <th>Packet No</th>
-        <th>Part No</th>
+        <!--th>Sl No</th-->
         <th>Mill</th>
-        <th>Mill ID</th>
-        <th> Thickness</th>
+        <th>DC No</th>
+        <th>Incoming Date</th>
+        <th>SMPL No</th>
+        <th>Spec</th>
+        <th>Coating</th>
+
+
+
+        <th>Thickness</th>
         <th> Width</th>
         <th> Length</th>
 
         <th>Numbers</th>
-        <th>Wt per sheet</th>
+
         <th>Net Weight</th>
-        <th>Gross Weight</th>
-        <th>Grade</th>
-        <th>Coating</th>
-        <th>DC No</th>
-        <th>Date</th>
+        <th>Mill ID</th>
+        <th>Part No</th>
+        <th>Status</th>
+
 
     </tr>
 
-    {% for cs_id, cs, part_no, wt_per_sheet, coating, packet_wt,mill, mill_id in cs_lst %}
+    {% for cs_id, cs, part_no, wt_per_sheet, coating, packet_wt,mill, mill_id, incoming_date in cs_lst %}
 
         <tr>
-            {% set count = count+1 %}
-            <td>{{count}}</td>
-            <td>{{cs.smpl_no}}</td>
-            <td>{{cs.packet_name}}</td>
-            <td>{{part_no}}</td>
+
+            <!--td>{{loop.index}}</td-->
             <td>{{mill}}</td>
-            <td>{{mill_id}}</td>
+            <td></td>
+            <td>{{incoming_date}}</td>
+            <td>{{cs.smpl_no}}{{cs.packet_name}}</td>
+            <td>{{cs.grade}}</td>
+            <td>{{coating}} </td>
+
 
             <td>{{cs.thickness}}</td>
             <td>{{cs.width}}</td>
             <td>{{cs.length}}</td>
 
             <td>{{cs.numbers}} </td>
-            <td>{{wt_per_sheet}} </td>
+
 
             <td>{{packet_wt}} </td>
-            <td></td>
-            <td>{{cs.grade}} </td>
+            <td>{{mill_id}}</td>
+            <td>{{part_no}}</td>
+            <td>{{cs.status}} </td>
 
-            <td>{{coating}} </td>
-            <td></td>
-            <td></td>
+
 
 
         </tr>

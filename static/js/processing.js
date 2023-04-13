@@ -16,6 +16,18 @@ function setFocusToTextBox(operation){
     }
 }
 
+//This function reloads the page if the user uses back to come to the page
+//https://stackoverflow.com/questions/43043113/how-to-force-reloading-a-page-when-using-browser-back-button
+window.addEventListener( "pageshow", function ( event ) {
+  var historyTraversal = event.persisted ||
+                         ( typeof window.performance != "undefined" &&
+                              window.performance.navigation.type === 2 );
+  if ( historyTraversal ) {
+    // Handle page restore.
+    window.location.reload();
+  }
+});
+
 function length_of_coil(){
     var thickness = Number(document.getElementById("thickness").value);
     var input_material = document.getElementById("input_material").value;

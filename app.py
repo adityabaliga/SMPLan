@@ -1176,102 +1176,6 @@ def submit_processing():
                     # If this is the last stage of the order, it marks the order as closed
                     # OrderDetail.detail_complete(order_detail_id)
 
-        if operation == "Slitting" or operation == "Mini_Slitting":
-            ip_size = input_size.split('x')
-            ms_width = ip_size[0]
-            ms_length = ip_size[1]
-            actual_no_of_packets_lst = request.form.getlist('actual_no_of_pieces')
-            # actual_no_of_pieces = no of slits * no of parts
-            # actual_no_of_packets = length_per_part
-            # numbers =
-            total_length = float(request.form['total_length'])
-
-            no_of_parts = int(actual_no_of_packets_lst[0])
-            length_per_part = float(total_length / no_of_parts)
-            no_of_slits_lst = request.form.getlist('no_of_slits')
-            # processed_wt = processed_wt_lst[0]
-            remarks = remarks_lst[0]
-            output_length = 0
-
-            for output_width, fg_yes_no, no_of_slits, order_detail_id in zip(
-                    output_width_lst, fg_yes_no_lst, no_of_slits_lst):
-                if no_of_slits != '':
-                    if int(no_of_slits) > 0 and no_of_parts > 0:
-                        # Get number of coils produced for size = no of slits x no of parts
-                        no_of_coils = int(no_of_slits) * no_of_parts
-                        # This is processed weight for that size
-                        processed_wt = Decimal(
-                            thickness * float(output_width) * length_per_part * 0.00000785 * no_of_coils)
-                        processed_wt = round(processed_wt, 3)
-
-                        # Processing details updated to db
-                        if processed_wt > 0:
-                            processing_detail = ProcessingDetail(smpl_no, operation, machine, processing_id,
-                                                                 output_width,
-                                                                 output_length, no_of_coils, length_per_part,
-                                                                 remarks, processed_wt, ms_width, ms_length,
-                                                                 order_detail_id,fg_yes_no)
-
-                            processing_detail.save_to_db()
-
-                            # Reduce weight of mother material by the processed weight of cut material
-                            cs_rm = CurrentStock.csid_exists(cs_rm_id)
-                            if cs_rm is not None:
-                                rm_status = CurrentStock.change_wt(smpl_no, ms_width, ms_length, processed_wt,
-                                                                   length_per_part, "minus", cs_rm.status)
-
-                            # if rm_status == "complete":
-                            # This is done when the RM is over but for some reason the order could not be completed
-                            # This could when the RM is thickness is more or wrong calc of material or processing mistake/change
-                            #    OrderDetail.complete_processing_on_del(smpl_no, ms_width, ms_length)
-
-                            # If the mother material is completed, then the order detail which has this
-
-                            # Increase weight of cut material by processed weight. If cut material, doesn't already exist, the
-                            # function returns insert => a new record has to be inserted
-                            cc_insert = CurrentStock.change_wt(smpl_no, output_width, output_length, processed_wt,
-                                                               no_of_coils, "plus", fg_yes_no)
-
-                            # Unit of the material is decided based on the machine used to process the material.
-                            # WARNING: This is bad programming
-                            unit = '2'
-
-                            # The new material is added to current stock
-                            if cc_insert == "insert":
-                                cs_cc = CurrentStock(smpl_no, customer, processed_wt, no_of_coils, thickness,
-                                                     output_width, output_length, fg_yes_no, grade, unit)
-                                cs_cc.save_to_db()
-
-                            # This checks if detail is complete by comparing the processed weight and order detail weight.
-                            # If the order detail is complete, it checks if all the order details in that stage are complete
-                            # (check_stage_complete)
-                            # If all the order details in that stage are complete, it makes the order details of the next stage
-                            # ready for production
-                            # If this is the last stage of the order, it marks the order as closed
-                            # OrderDetail.detail_complete(order_detail_id)
-
-            # This is for the slitter maintenance
-            # Get the slitter batches and numbers used in slitting
-            slitter_batch_lst = request.form.getlist('slitter_batch')
-            slitter_number_lst = request.form.getlist('slitter_number')
-
-            # The meterage is updated to the slitter usage  and slitter grinding table
-            for slitter_batch, slitter_numbers in zip(slitter_batch_lst, slitter_number_lst):
-                slitter_numbers = slitter_numbers.split(' ')
-                for slitter_number in slitter_numbers:
-                    if slitter_number != '':
-                        slitter_usage = SlitterUsage(processing_id, smpl_no, slitter_batch, slitter_number,
-                                                     total_length,
-                                                     thickness)
-                        slitter_usage.save_to_db()
-
-        # I'm assuming if less than 3% of the rm weight remains, that the material is over and the rm can be deleted
-        # balance_proc_wt is >0, if the mother material if order wt > processed wt but user wants to mark the order complete
-        # subtracting this from rm_wt will make the balance wt < 0.03 of rm_wt and thus, help us mark the order complete
-        '''balance_wt = (rm_wt - total_processed_wt - abs(balance_proc_wt))
-        if (balance_wt/rm_wt) < 0.03:
-            OrderDetail.complete_processing_on_del(smpl_no, ms_width, ms_length)
-            CurrentStock.delete_record(cs_rm_id)'''
 
         return render_template('/main_menu.html', message="Processing for " + smpl_no + " entered.")
 
@@ -1538,6 +1442,7 @@ def check_stock_htid():
     packet_wt_lst = []
     mill_lst = []
     mill_id_lst = []
+    incoming_date_lst = []
 
 
     part_no = ""
@@ -1625,21 +1530,25 @@ def check_stock_htid():
         if cs.length > 0:
             packet_wt = round(cs.numbers * wt_per_sheet,0)
         else:
+            part_no = ''
             packet_wt = cs.weight
 
         incoming = Incoming.load_smpl_by_smpl_no(cs.smpl_no)
         mill_lst.append(incoming.mill)
         mill_id_lst.append(incoming.mill_id)
+        incoming_date_lst.append(incoming.incoming_date)
         part_no_lst.append(part_no)
         wt_per_sheet_lst.append(wt_per_sheet)
         coating_lst.append(coating)
         packet_wt_lst.append(packet_wt)
         grade = (cs.grade.split("GRADE:"))
         if len(grade) > 1:
-            cs.grade = grade[1]
+            grade = grade[1].split(';')
+            cs.grade = grade[0]
 
-    cs_lst = zip(_cs_id_lst, _cs_lst, part_no_lst, wt_per_sheet_lst, coating_lst, packet_wt_lst, mill_lst, mill_id_lst)
-    return render_template('stock_display_htid.html', cs_lst=cs_lst, i=0)
+    cs_lst = zip(_cs_id_lst, _cs_lst, part_no_lst, wt_per_sheet_lst, coating_lst, packet_wt_lst, mill_lst, mill_id_lst,
+                 incoming_date_lst)
+    return render_template('stock_display_htid.html', cs_lst=cs_lst)
 
 
 # Function displays stock based on stock type selected
