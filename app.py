@@ -150,11 +150,14 @@ def smpl_incoming():
     if request.method == 'POST':
 
         xml_filename = request.files['xml_filename']
+        unit = request.form['unit']
+
 
     else:
         xml_filename = request.args.get('xml_filename')
+        unit = request.args.get('unit')
 
-    incoming_lst = Incoming.fromfile(xml_filename)
+    incoming_lst = Incoming.fromfile(xml_filename, unit)
     # The details got from the XML file are updated to the database. The details are displayed for review and if any
     # remarks are to be entered
     for incoming_coil in incoming_lst:

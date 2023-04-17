@@ -25,7 +25,7 @@ class Incoming:
         self.unit = unit
 
     @classmethod
-    def fromfile(cls, filename):
+    def fromfile(cls, filename, _unit):
         # Adding the path to the filename to open PDF file
         # From http://stackoverflow.com/questions/36476659/how-to-add-a-relative-path-in-python-to-find-image-and-other-
         # file-with-a-short-p
@@ -109,6 +109,9 @@ class Incoming:
                 unit = '2'
             if smpl_no.childNodes[0].data.startswith('SMPL'):
                 unit = '1'
+
+            if _unit:
+                unit = _unit
 
             # incoming_coil = smpl_no.childNodes[0].data + "," + customer[0].childNodes[0].data+ "," + incoming_date + "," + thickness+ "," + width+ "," + length+ "," + grade[0].firstChild.data+ "," + weight+ "," + numbers+ "," +mill[0].firstChild.data+ "," + mill_id[0].firstChild.data+ "," + " "
 
