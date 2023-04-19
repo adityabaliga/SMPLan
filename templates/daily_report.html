@@ -102,7 +102,8 @@
     </table>
 
     <hr>
-    <h3>Processing Details (Cuts/Min)</h3>
+    {% for machine in machine_lst%}
+    <h3>{{machine}} Processing Details (Cuts/Min)</h3>
     <table class="table table-sm">
 
         <tr>
@@ -116,7 +117,7 @@
             <th>No of cuts/minute</th>
         </tr>
         {% for processing_dtl in processing_hdr_detail %}
-            {% if processing_dtl[2] != 'Slitting' and processing_dtl[2] != 'Mini_Slitting' %}
+            {% if processing_dtl[2] == machine %}
                 <tr>
                     <td><a href="/history_show_details?smpl_no={{processing_dtl[1]}}">{{processing_dtl[1]}}</a></td>
                     <td>{{processing_dtl[2]}}</td>
@@ -129,7 +130,25 @@
                 </tr>
             {% endif %}
         {% endfor %}
+        {% for processing in processing_hdr_lst %}
+            {% if processing[0] == machine %}
+            <tr>
+                <th></th>
+                <th></th>
+                <th></th>
+
+                <th><b>TOTAL</b></th>
+                <th><b>{{processing[3]}}</b></th>
+                <th><b>{{processing[2]}}</b></th>
+                <th><b>{{processing[1]}}</b></th>
+                <th><b>{{(processing[1]/processing[3])|round(1,'floor')}}</b></th>
+
+
+            </tr>
+            {% endif %}
+        {% endfor %}
     </table>
+    {% endfor %}
 
     <hr>
     <h3>Processing Details (m/Min)</h3>
@@ -159,6 +178,42 @@
                     <td>{{processing_dtl[15]}}</td>
                     <td>{{(processing_dtl[15]/processing_dtl[6])|round(1,'floor')}}</td>
                 </tr>
+            {% endif %}
+        {% endfor %}
+        {% for processing in processing_hdr_lst %}
+            {% if processing[0] == 'Slitting' %}
+            <tr>
+                <th></th>
+                <th><b>Slitting</b></th>
+                <th></th>
+
+                <th><b>TOTAL</b></th>
+
+                <th><b>{{processing[3]}}</b></th>
+                <th></th>
+                <th><b>{{processing[2]}}</b></th>
+                <th><b>{{processing[1]}}</b></th>
+                <th><b>{{(processing[1]/processing[3])|round(1,'floor')}}</b></th>
+
+            </tr>
+            {% endif %}
+        {% endfor %}
+        {% for processing in processing_hdr_lst %}
+            {% if processing[0] == 'Mini_Slitting' %}
+            <tr>
+                <th></th>
+                <th><b>Slitting</b></th>
+                <th></th>
+
+                <th><b>TOTAL</b></th>
+
+                <th><b>{{processing[3]}}</b></th>
+                <th></th>
+                <th><b>{{processing[2]}}</b></th>
+                <th><b>{{processing[1]}}</b></th>
+                <th><b>{{(processing[1]/processing[3])|round(1,'floor')}}</b></th>
+
+            </tr>
             {% endif %}
         {% endfor %}
 

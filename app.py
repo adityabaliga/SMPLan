@@ -2162,9 +2162,13 @@ def get_daily_report():
 
     dispatch_hdr_lst = DispatchHeader.get_daily_report(report_date)
 
+    machine_lst = ['CTL 1', 'CTL 2', 'NCTL 1', 'NCTL 2', 'NCTL 3', 'NCTL 4', 'Reshearing 1', 'Reshearing 2', 'Reshearing 3',
+                    'Reshearing 4', 'Reshearing 5', 'Reshearing 6', 'Reshearing 7', 'Reshearing 8']
+
     return render_template('/daily_report.html', date=change_date_format(report_date), incoming_lst=incoming_lst,
                            total_incoming=total_incoming, processing_hdr_lst=processing_hdr_lst,
-                           dispatch_hdr_lst=dispatch_hdr_lst, processing_hdr_detail=processing_hdr_detail)
+                           dispatch_hdr_lst=dispatch_hdr_lst, processing_hdr_detail=processing_hdr_detail,
+                           machine_lst = machine_lst)
 
 
 def change_date_format(date):
