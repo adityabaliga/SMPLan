@@ -103,6 +103,7 @@
 
     <hr>
     {% for machine in machine_lst%}
+    {% if machine != 'Slitting' and machine != 'Mini_Slitting' %}
     <h3>{{machine}} Processing Details (Cuts/Min)</h3>
     <table class="table table-sm">
 
@@ -148,6 +149,7 @@
             {% endif %}
         {% endfor %}
     </table>
+    {% endif %}
     {% endfor %}
 
     <hr>

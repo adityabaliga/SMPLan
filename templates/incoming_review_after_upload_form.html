@@ -68,6 +68,9 @@
         <th> Mill</th>
         <th> Mill ID</th>
         <th>Unit</th>
+        <th>Mat Type</th>
+        <th>Scams No</th>
+        <th>Coating</th>
         <th> Remarks</th>
 
     </tr>
@@ -85,7 +88,10 @@
             <td>{{incoming.mill}} </td>
             <td>{{incoming.mill_id}}</td>
             <td>{{incoming.unit}}</td>
-            <td><input type="text" id="remarks" name="remarks" value=""></td>
+            <td>{{incoming.material_type}}</td>
+            <td>{{incoming.scams_no}}</td>
+            <td>{{incoming.coating}}</td>
+            <td><input type="text" id="remarks" name="remarks" value="{{incoming.remarks}}"></td>
             <td><input type="hidden" name="smpl_nos" value="{{ incoming.smpl_no }}"/></td>
         </tr>
     {% endfor %}

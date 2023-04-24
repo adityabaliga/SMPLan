@@ -1220,39 +1220,62 @@ function make_label_new(th){
     var grade='';
     var coating='';
     var scams_no='';
+    var incoming_date = (document.getElementById('incoming_date').value);
+
+
     if (grade_field.length > 0){
-        grade_field = grade_field.split(';');
-        //Material Type
-        /*var mat_type = grade_field.split("ID");
+         if((("25/04/2023") < (incoming_date))){
+            grade_field = grade_field.split(';');
+            //Material Type
+            /*var mat_type = grade_field.split("ID");
 
-        mat_type = mat_type[0].split("GRADE");
-        var material_type = mat_type[0];
-        material_type = material_type.replaceAll('COIL','');
-        material_type = material_type.replaceAll('SHEETS','');
-        material_type = material_type.replaceAll('.','');*/
-        material_type = grade_field[0].toUpperCase();
-        material_type = material_type.replaceAll('COIL','');
-        material_type = material_type.replaceAll('SHEETS','');
-        material_type = material_type.replaceAll('.','');
-        material_type = material_type.replaceAll('MAT TYPE:','');
+            mat_type = mat_type[0].split("GRADE");
+            var material_type = mat_type[0];
+            material_type = material_type.replaceAll('COIL','');
+            material_type = material_type.replaceAll('SHEETS','');
+            material_type = material_type.replaceAll('.','');*/
+            material_type = grade_field[0].toUpperCase();
+            material_type = material_type.replaceAll('COIL','');
+            material_type = material_type.replaceAll('SHEETS','');
+            material_type = material_type.replaceAll('.','');
+            material_type = material_type.replaceAll('MAT TYPE:','');
 
-        for(i=1;i<grade_field.length;i++){
-            grade_field[i] = (grade_field[i].toUpperCase());
-            if((grade_field[i].toUpperCase()).includes("GRADE")){
-                grade = grade_field[i].split("GRADE").pop();
-                grade = grade.replaceAll(':','');
-                grade = grade.trim();
+            for(i=1;i<grade_field.length;i++){
+                grade_field[i] = (grade_field[i].toUpperCase());
+                if((grade_field[i].toUpperCase()).includes("GRADE")){
+                    grade = grade_field[i].split("GRADE").pop();
+                    grade = grade.replaceAll(':','');
+                    grade = grade.trim();
+                }
+                if((grade_field[i].toUpperCase()).includes("COATING")){
+                    coating = grade_field[i].split("COATING").pop();
+                    coating = coating.replaceAll(':','');
+                    coating = coating.trim();
+                }
+
+                if((grade_field[i].toUpperCase()).includes("SCAMS NO")){
+                    scams_no = grade_field[i].split("SCAMS NO").pop();
+                    scams_no = scams_no.replaceAll(':','');
+                    scams_no = scams_no.trim();
+                }
             }
-            if((grade_field[i].toUpperCase()).includes("COATING")){
-                coating = grade_field[i].split("COATING").pop();
-                coating = coating.replaceAll(':','');
-                coating = coating.trim();
-            }
+        }
+        else{
+            material_type = document.getElementById('mat_type').value;
 
-            if((grade_field[i].toUpperCase()).includes("SCAMS NO")){
-                scams_no = grade_field[i].split("SCAMS NO").pop();
-                scams_no = scams_no.replaceAll(':','');
-                scams_no = scams_no.trim();
+            material_type = material_type.replaceAll('COIL','');
+            material_type = material_type.replaceAll('SHEETS','');
+            material_type = material_type.replaceAll('.','');
+
+
+            grade = document.getElementById('grade').value;
+            scams_no = document.getElementById('scams_no').value;
+            if(scams_no == 'None'){
+                scams_no = '';
+            }
+            coating = document.getElementById('coating').value;
+            if(coating == 'None'){
+                coating = '';
             }
         }
     }

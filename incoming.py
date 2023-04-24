@@ -8,7 +8,7 @@ from decimal import *
 
 class Incoming:
     def __init__(self, smpl_no, customer, incoming_date, thickness, width, length, grade, weight, numbers, mill,
-                 mill_id, remarks, unit):
+                 mill_id, remarks, unit, material_type, coating, scams_no, dc_number, dc_date):
         # incoming_string=incoming_str.split(',')
         self.smpl_no = smpl_no
         self.customer = customer
@@ -23,6 +23,11 @@ class Incoming:
         self.mill_id = mill_id
         self.remarks = remarks
         self.unit = unit
+        self.material_type = material_type
+        self.coating = coating
+        self.scams_no = scams_no
+        self.dc_number = dc_number
+        self.dc_date = dc_date
 
     @classmethod
     def fromfile(cls, filename, _unit):
@@ -49,6 +54,9 @@ class Incoming:
 
         # This entire set is for each entry of a SMPL. Each SMPL's details have to be extracted from this
         raw_material = collection.getElementsByTagName("ALLINVENTORYENTRIES.LIST")
+
+        dc_number = collection.getElementsByTagName("UDF:PARTYINVDCNO")
+        dc_date = collection.getElementsByTagName("UDF:PARTYINVDCDATE")
 
         for rm in raw_material:
 
@@ -82,12 +90,18 @@ class Incoming:
 
             # Grade is extracted
             # Changed of Material Receipt Voucher changed in Tally
-            # grade = rm.getElementsByTagName("BASICUSERDESCRIPTION")
+            remarks = ''
+            _remarks = rm.getElementsByTagName("BASICUSERDESCRIPTION")
+            for r in _remarks:
+                  remarks += r.firstChild.data
+
+
             mat_type = rm.getElementsByTagName("UDF:RNMTRLTYPEBATCH")
             mat_grade = rm.getElementsByTagName("UDF:RNGRADEBATCH")
             mat_coating = rm.getElementsByTagName("UDF:RNCOATBATCH")
             mat_scams_no = rm.getElementsByTagName("UDF:RNCUSTIDBATCH")
             grade = rm.getElementsByTagName("UDF:RNGRADEBATCH")
+
 
             # Numbers of RM is extracted. In the xml, the numbers are suffixed with MT. This is split and numbers kept
             numbers_coll = rm.getElementsByTagName("UDF:SBATCHNOOFPCS")
@@ -119,13 +133,15 @@ class Incoming:
             # Remove all spaces from the SMPL in tally, this will keep searching simple
             _smpl_no = smpl_no.childNodes[0].data.replace(" ","")
             _customer = customer[0].childNodes[0]._data
+            _dc_number = dc_number[0].childNodes[0]._data
+            _dc_date = dc_date[0].childNodes[0]._data
 
 
 
             # In Tally, Material receipt was implemented by splitting these fields. Earlier they were all
             # together as part of the userdescription field
             # I am building the string so we can split it in javascript and build the fields for sticker
-            _grade = "MAT TYPE: "
+            '''_grade = "MAT TYPE: "
             if mat_type:
                 _grade += mat_type[0].firstChild._data
             _grade += "; GRADE: "
@@ -137,7 +153,22 @@ class Incoming:
             _grade += "; "
             if mat_scams_no:
                 _grade += "SCAMS No: " + mat_scams_no[0].firstChild._data
-            _grade += ";"
+            _grade += ";"'''
+
+            material_type = ''
+            if mat_type:
+                material_type = mat_type[0].firstChild._data
+            _grade = ''
+            if mat_grade:
+                _grade = mat_grade[0].firstChild._data
+
+            coating = ''
+            if mat_coating:
+                coating = mat_coating[0].firstChild._data
+
+            scams_no = ''
+            if mat_scams_no:
+                scams_no = mat_scams_no[0].firstChild._data
 
             # Additional comments have been added in this node in Tally such as for ID and IS grade
             # All this is being extracted and added to the grade column
@@ -155,7 +186,8 @@ class Incoming:
             else:
                 _mill_id = ''
             incoming_coil = Incoming(_smpl_no, _customer, incoming_date, thickness, width, length, _grade, weight, numbers,
-                                     _mill, _mill_id, '', unit)
+                                     _mill, _mill_id, remarks, unit, material_type, coating, scams_no,
+                                     _dc_number, _dc_date)
 
             # print (incoming_coil.smpl_no + " " + incoming_coil.incoming_date.strftime('%d%m%Y'))
             incoming_lst.append(incoming_coil)
@@ -167,10 +199,13 @@ class Incoming:
             # with psycopg2.connect(user='postgres', password='smpl@526', database='SMPL', host='localhost') as connection:
             #    with connection.cursor() as cursor:
             cursor.execute('insert into Incoming (SMPL_No, Customer, Incoming_Date, Thickness, Width, '
-                           'Length, Grade, Weight, Numbers, Mill, Mill_ID, Remarks, Unit) values(%s,%s,%s,%s,%s,%s,%s,%s,'
-                           '%s,%s,%s,%s, %s)', (self.smpl_no, self.customer, self.incoming_date, self.thickness, self.width,
+                           'Length, Grade, Weight, Numbers, Mill, Mill_ID, Remarks, Unit, material_type, coating, '
+                           'scams_no, dc_number, dc_date) values(%s,%s,%s,%s,%s,%s,%s,%s,'
+                           '%s,%s,%s,%s, %s, %s, %s, %s, %s, %s)', (self.smpl_no, self.customer, self.incoming_date,
+                                                                    self.thickness, self.width,
                                             self.length, self.grade, self.weight, self.numbers, self.mill, self.mill_id,
-                                            self.remarks, self.unit))
+                                            self.remarks, self.unit, self.material_type, self.coating, self.scams_no,
+                                                                    self.dc_number, self.dc_date))
 
     @classmethod
     def load_smpl_by_smpl_no(cls, smpl_no):
@@ -181,7 +216,9 @@ class Incoming:
                 return cls(smpl_no=user_data[1], customer=user_data[2], incoming_date=change_date_format(user_data[3]), thickness=user_data[4],
                            width=user_data[5], length=user_data[6], grade=user_data[7], weight=user_data[8],
                            numbers=user_data[9],
-                           mill=user_data[10], mill_id=user_data[11], remarks=user_data[12], unit = user_data[13])
+                           mill=user_data[10], mill_id=user_data[11], remarks=user_data[12], unit = user_data[13],
+                           material_type=user_data[14], coating=user_data[15], scams_no=user_data[16],
+                           dc_number=user_data[17], dc_date=user_data[18])
             else:
                 return False
 
