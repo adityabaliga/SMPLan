@@ -650,9 +650,15 @@ function make_label_new_slit(th){
     var grade = '';
     var coating = '';
     var scams_no = '';
+    var incoming_date = (document.getElementById('incoming_date').value);
+    incoming_date = incoming_date.split('/');
+    var new_incoming_date = incoming_date[1] + '/' + incoming_date[0] + '/' + incoming_date[2];
+    new_incoming_date = new Date(new_incoming_date);
+    var check_date = new Date("04/25/2023");
 
 
     if (grade_field.length > 0){
+    if(new_incoming_date < check_date){
         grade_field = grade_field.split(';');
         //Material Type
         /*var mat_type = grade_field.split("ID");
@@ -684,6 +690,24 @@ function make_label_new_slit(th){
                 scams_no = grade_field[i].split("SCAMS NO").pop();
                 scams_no = scams_no.replaceAll(':','');
                 scams_no = scams_no.trim();
+            }
+        }
+    }else{
+            material_type = document.getElementById('mat_type').value;
+
+            material_type = material_type.replaceAll('COIL','');
+            material_type = material_type.replaceAll('SHEETS','');
+            material_type = material_type.replaceAll('.','');
+
+
+            grade = document.getElementById('grade').value;
+            scams_no = document.getElementById('scams_no').value;
+            if(scams_no == 'None'){
+                scams_no = '';
+            }
+            coating = document.getElementById('coating').value;
+            if(coating == 'None'){
+                coating = '';
             }
         }
     }
@@ -1221,10 +1245,13 @@ function make_label_new(th){
     var coating='';
     var scams_no='';
     var incoming_date = (document.getElementById('incoming_date').value);
-
+    incoming_date = incoming_date.split('/');
+    var new_incoming_date = incoming_date[1] + '/' + incoming_date[0] + '/' + incoming_date[2];
+    new_incoming_date = new Date(new_incoming_date);
+    var check_date = new Date("04/25/2023");
 
     if (grade_field.length > 0){
-         if((("25/04/2023") < (incoming_date))){
+         if(new_incoming_date < check_date){
             grade_field = grade_field.split(';');
             //Material Type
             /*var mat_type = grade_field.split("ID");
