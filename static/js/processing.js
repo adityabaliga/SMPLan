@@ -37,8 +37,16 @@ function length_of_coil(){
     length_of_coil = input_weight/thickness/width/0.00000785;
     //if material is aluminium, the length has to be 3 times that of steel
     var grade = document.getElementById("grade").value;
+    var mat_type = document.getElementById("mat_type").value;
+    var mat_type_true = false;
+    if(mat_type){
+        if(mat_type.includes("ALUMINIUM")){
+            mat_type_true = true;
+        }
+    }
 
-    if(grade.includes("ALU ") || grade.includes("ALUMINIUM ")){
+
+    if(grade.includes("ALU ") || grade.includes("ALUMINIUM ") || mat_type_true){
         length_of_coil= length_of_coil*(7.85/2.71);
     }
     document.getElementById("length_of_coil").value = length_of_coil.toFixed(0);
@@ -88,8 +96,15 @@ function for_packets_and_weight(table_id,table_row,operation){
 
     //if material is aluminium, the weight has to be 1/3 that of steel
     var grade = document.getElementById("grade").value;
+    var mat_type = document.getElementById("mat_type").value;
+    var mat_type_true = false;
+    if(mat_type){
+        if(mat_type.includes("ALUMINIUM")){
+            mat_type_true = true;
+        }
+    }
 
-    if(grade.includes("ALU ") || grade.includes("ALUMINIUM ")){
+    if(grade.includes("ALU ") || grade.includes("ALUMINIUM ") || mat_type_true){
         last_row.cells[weight_pos].lastChild.value = (weight/3).toFixed(3);
     }
 
@@ -201,6 +216,7 @@ function get_part_weight(){
     var thickness = Number(document.getElementById("thickness").value);
     var input_material = (document.getElementById("input_material").value);
     var grade = document.getElementById("grade").value;
+    var mat_type = document.getElementById("mat_type").value;
 
     input_material = input_material.split("x");
 
@@ -213,7 +229,14 @@ function get_part_weight(){
         width= document.getElementById("total_width").value;
     }
 
-    if(grade.includes("ALU ") || grade.includes("ALUMINIUM ")){
+    var mat_type_true = false;
+    if(mat_type){
+        if(mat_type.includes("ALUMINIUM")){
+            mat_type_true = true;
+        }
+    }
+
+    if(grade.includes("ALU ") || grade.includes("ALUMINIUM ") || mat_type_true){
         var total_processed_wt = thickness * width * total_length * aluminium_density;
         var coil_length = rm_wt/thickness/width/aluminium_density;
         document.getElementById("total_processed_wt").value = total_processed_wt.toFixed(3);
@@ -1112,6 +1135,16 @@ function honda_part_no(width,length){
                 wt_per_sheet = 2.29;
                 coating = "20/0";
             }
+    else if (width == 655 && length == 740){
+                part_no = "K3CA UPPER";
+                wt_per_sheet = 2.66;
+                coating = "0/30";
+            }
+    else if (width == 565 && length == 645){
+                part_no = "K3CA BTM";
+                wt_per_sheet = 2.29;
+                coating = "20/0";
+    }
     else if (width == 520 && length == 765){
                 part_no = "KTEM-BS4 HALF OTHER RL";
                 wt_per_sheet = 2.50;
@@ -1132,16 +1165,7 @@ function honda_part_no(width,length){
                 wt_per_sheet = 2.63;
                 coating = "20/0";
             }
-    else if (width == 655 && length == 740){
-                part_no = "K3CA HALF OTHER RL";
-                wt_per_sheet = 2.66;
-                coating = "0/30";
-            }
-    else if (width == 565 && length == 645){
-                part_no = "K3CA PLATE BOTTOM";
-                wt_per_sheet = 2.29;
-                coating = "20/0";
-    }
+
     else{
         part_no = "";
         wt_per_sheet = 0;

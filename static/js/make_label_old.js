@@ -42,39 +42,66 @@ function make_label_old(smpl_no, customer){
     var grade='';
     var coating='';
     var scams_no='';
+
+    var incoming_date = (document.getElementById('incoming_date').value);
+    incoming_date = incoming_date.split('/');
+    var new_incoming_date = incoming_date[1] + '/' + incoming_date[0] + '/' + incoming_date[2];
+    new_incoming_date = new Date(new_incoming_date);
+    var check_date = new Date("04/25/2023");
+
     if (grade_field.length > 0){
-        grade_field = grade_field.split(';');
-        //Material Type
-        /*var mat_type = grade_field.split("ID");
+         if(new_incoming_date < check_date){
+            grade_field = grade_field.split(';');
 
-        mat_type = mat_type[0].split("GRADE");
-        var material_type = mat_type[0];
-        material_type = material_type.replaceAll('COIL','');
-        material_type = material_type.replaceAll('SHEETS','');
-        material_type = material_type.replaceAll('.','');*/
-        material_type = grade_field[0].toUpperCase();
-        material_type = material_type.replaceAll('COIL','');
-        material_type = material_type.replaceAll('SHEETS','');
-        material_type = material_type.replaceAll('.','');
-        material_type = material_type.replaceAll('MAT TYPE:','');
+            //Material Type
+            /*var mat_type = grade_field.split("ID");
 
-        for(i=1;i<grade_field.length;i++){
-            grade_field[i] = (grade_field[i].toUpperCase());
-            if((grade_field[i].toUpperCase()).includes("GRADE")){
-                grade = grade_field[i].split("GRADE").pop();
-                grade = grade.replaceAll(':','');
-                grade = grade.replaceAll(' ','');
+            mat_type = mat_type[0].split("GRADE");
+            var material_type = mat_type[0];
+            material_type = material_type.replaceAll('COIL','');
+            material_type = material_type.replaceAll('SHEETS','');
+            material_type = material_type.replaceAll('.','');*/
+            material_type = grade_field[0].toUpperCase();
+            material_type = material_type.replaceAll('COIL','');
+            material_type = material_type.replaceAll('SHEETS','');
+            material_type = material_type.replaceAll('.','');
+            material_type = material_type.replaceAll('MAT TYPE:','');
+
+            for(i=1;i<grade_field.length;i++){
+                grade_field[i] = (grade_field[i].toUpperCase());
+                if((grade_field[i].toUpperCase()).includes("GRADE")){
+                    grade = grade_field[i].split("GRADE").pop();
+                    grade = grade.replaceAll(':','');
+                    grade = grade.replaceAll(' ','');
+                }
+                if((grade_field[i].toUpperCase()).includes("COATING")){
+                    coating = grade_field[i].split("COATING").pop();
+                    coating = coating.replaceAll(':','');
+                    coating = coating.replaceAll(' ','');
+                }
+
+                if((grade_field[i].toUpperCase()).includes("SCAMS NO")){
+                    scams_no = grade_field[i].split("SCAMS NO").pop();
+                    scams_no = scams_no.replaceAll(':','');
+                    scams_no = scams_no.replaceAll(' ','');
+                }
             }
-            if((grade_field[i].toUpperCase()).includes("COATING")){
-                coating = grade_field[i].split("COATING").pop();
-                coating = coating.replaceAll(':','');
-                coating = coating.replaceAll(' ','');
-            }
+    }else{
+            material_type = document.getElementById('lbl_mat_type').value;
 
-            if((grade_field[i].toUpperCase()).includes("SCAMS NO")){
-                scams_no = grade_field[i].split("SCAMS NO").pop();
-                scams_no = scams_no.replaceAll(':','');
-                scams_no = scams_no.replaceAll(' ','');
+            material_type = material_type.replaceAll('COIL','');
+            material_type = material_type.replaceAll('SHEETS','');
+            material_type = material_type.replaceAll('.','');
+
+
+            grade = document.getElementById('lbl_grade').value;
+            scams_no = document.getElementById('lbl_scams_no').value;
+            if(scams_no == 'None'){
+                scams_no = '';
+            }
+            coating = document.getElementById('lbl_coating').value;
+            if(coating == 'None'){
+                coating = '';
             }
         }
     }
