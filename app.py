@@ -1708,7 +1708,7 @@ def qr_dispatch_submit():
                 width = size[1]
                 length = size[2]
                 dispatch_weight = ''
-                if length == 'COIL':
+                if 'COIL' in length:
                     length = '0'
             # This is for trap sizes
             if len(size) == 4:
@@ -1716,7 +1716,7 @@ def qr_dispatch_submit():
                 width = round(((Decimal(size[1]) + Decimal(size[2]))/2), 0)
                 length = size[3]
                 dispatch_weight = ''
-                if length == 'COIL':
+                if 'COIL' in length:
                     length = '0'
             status = dispatch_string[6].replace('\r', '')
             cs_qr_lst = CurrentStock.get_cs_for_qr_dispath(smpl_no, packet_name, width, length, status, customer)
