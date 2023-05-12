@@ -256,7 +256,7 @@ class Incoming:
         smpl_no_lst = []
         smpl_no = ''
         with CursorFromConnectionFromPool() as cursor:
-            cursor.execute("select smpl_no from incoming where grade like %s order by smpl_no asc", (query_scams_no,))
+            cursor.execute("select smpl_no from incoming where grade like %s or scams_no like %s order by smpl_no asc", (query_scams_no, query_scams_no))
             user_data = cursor.fetchone()
         for smpl_no in user_data:
             smpl_no_lst.append(smpl_no)
