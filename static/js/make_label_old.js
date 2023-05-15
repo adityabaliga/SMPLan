@@ -5,13 +5,19 @@ function make_label_old(smpl_no, customer){
     queryString = queryString.substring(1);
     var queries = queryString.split(";");
 
-
-
-
     queries[2] = queries[2].replace('x', ' X ');
     var width_length = queries[2].split('X');
+    var coil_length = 0;
+    var packet_wt = document.getElementById('lbl_pkt_wt').value;
+    var thickness = document.getElementById('lbl_size').value;
+    var numbers_for_lbl = queries[4];
+
     if(width_length[1].trim() == '0'){
         width_length[1] = 'Coil';
+        //if material is coil, numbers should show length
+        var material_density = 0.00000785;
+        coil_length = packet_wt/Number(thickness)/Number(width_length[0])/material_density;
+        numbers_for_lbl = coil_length.toFixed(0);
     }
 
     var size = ' X ' +  width_length[0] + ' X ' + width_length[1];
@@ -22,7 +28,7 @@ function make_label_old(smpl_no, customer){
     document.getElementById('lbl_machine').value = queries[1].replace('+',' ');
     document.getElementById('lbl_size').value += size;
     document.getElementById('lbl_customer').value = cust_name_for_label(document.getElementById('lbl_customer').value);
-    document.getElementById('lbl_numbers').value = queries[4];
+    document.getElementById('lbl_numbers').value = numbers_for_lbl;
     document.getElementById('lbl_packet_name').value = queries[3];
     document.getElementById('lbl_mat_status').value = queries[6];
 

@@ -1725,7 +1725,11 @@ def qr_dispatch_submit():
                 for cs_id, cs in cs_qr_lst:
                     cs_id_lst.append(cs_id)
                     cs_lst.append(cs)
-                    dispatch_numbers_lst.append(dispatch_string[3])
+                    # if coil then numbers =1, else take numbers from sticker
+                    if cs.length == 0:
+                        dispatch_numbers_lst.append(1)
+                    else:
+                        dispatch_numbers_lst.append(dispatch_string[3])
                     if dispatch_string[4]:
                         dispatch_weight = Decimal(dispatch_string[4])/1000
                     else:
@@ -2127,11 +2131,17 @@ def print_old_label_format():
         smpl_number = request.args.get('select_processing_id')
 
     smpl_no = smpl_number.split(';')
+    size = smpl_no[2].split('x')
+    packet_wt = smpl_no[7]
+    _packet_wt = 0
+
+    if size[1] == '0':
+        _packet_wt = packet_wt
 
 
     incoming = Incoming.load_smpl_by_smpl_no(smpl_no[0])
 
-    return render_template('/make_label.html', incoming = incoming)
+    return render_template('/make_label.html', incoming = incoming, _packet_wt=_packet_wt)
 
 @app.route('/daily_report_pick_date', methods=['GET', 'POST'])
 def daily_report_pick_date():
