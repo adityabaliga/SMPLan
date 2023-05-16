@@ -398,10 +398,12 @@ function print_label_slit_new(){
     var net_wt_pos = 4;
     var gross_wt_pos = 5;
     var lamination_pos = 6;
-    var top_comment_pos = 7;
-    var comment_pos = 8;
-    var status_pos = 9;
-    var label_size_pos = 10;
+    var batch_no_pos = 7;
+    var top_comment_pos = 8;
+    var comment_pos = 9;
+    var status_pos = 10;
+    var label_size_pos = 11;
+    var label_format_pos = 12;
 
     var fg_table = document.getElementById('fg_table');
 
@@ -422,8 +424,9 @@ function print_label_slit_new(){
     data += document.getElementById('lbl_mat_type').value + '&';
     data += document.getElementById('lbl_scams_no').value + '&';
 
-    //Adding blanks for coating, part_no and batch_no
-    data += '&' + '&' + '&';
+    //Adding blanks for coating, part_no
+    data += '&' + '&';
+    data += fg_table.rows[rowId].cells[batch_no_pos].lastChild.value + '&';
     data += fg_table.rows[rowId].cells[net_wt_pos].lastChild.value + '&';
     data += fg_table.rows[rowId].cells[gross_wt_pos].lastChild.value + '&';
     data += fg_table.rows[rowId].cells[top_comment_pos].lastChild.value + '&';
@@ -431,11 +434,11 @@ function print_label_slit_new(){
     data += fg_table.rows[rowId].cells[status_pos].lastChild.value;
 
     var new_page;
-    /*if(document.getElementById('lbl_format').value == "TSL"){
+    if(document.getElementById('lbl_format').value == "TSL"){
         new_page = window.open('print_label_tsl?' + data);
-    }else{*/
+    }else{
         new_page = window.open('print_label?' + data);
-    //}
+    }
 }
 
 function print_label_new(){
@@ -765,13 +768,17 @@ function make_label_new_slit(th){
             '<td><input type="text" style="width:130px;"  id="lbl_2nd_customer" name="lbl_2nd_customer"></td>' +
             '<td><input type="text" style="width:100px;"  id="lbl_net_wt" name="lbl_net_wt"></td>' +
             '<td><input type="text" style="width:100px;" id="lbl_gross_wt" name="lbl_gross_wt"></td>' +
-            '<td><input type="text" style="width:130px;"  id="lbl_lamination" name="lbl_gross_wt"></td>' +
+            '<td><input type="text" style="width:130px;"  id="lbl_lamination" name="lbl_lamination"></td>' +
+            '<td><input type="text" style="width:130px;"  id="lbl_batch_no" name="lbl_batch_no"></td>' +
             '<td><input type="text" style="width:130px;"  id="lbl_top_comment" name="lbl_top_comment"></td>' +
             '<td><input type="text" style="width:130px;"  id="lbl_comment" name="lbl_comment"></td>' +
             '<td><input type="text" style="width:50px;"  id="lbl_mat_status" name="lbl_mat_status" value="%status%"></td>' +
 
             '<td><select name ="lbl_format_size" id="lbl_format_size">' +
-            '<option value ="small">SMALL</option><option value ="big">BIG</option></select></td>' +
+            '<option value ="big">BIG</option><option value ="small">SMALL</option></select></td>' +
+            '<td><select name ="lbl_format" id="lbl_format"><option value ="SMPL">SMPL</option>' +
+            '<option value ="TTS">TTS</option><option value ="HONDA">HONDA</option>' +
+            '<option value ="TSL">TSL</option></select></td>' +
             '<td><input type = "button" class="btn btn-default" value="Print" onclick="print_label_slit_new()"></td>' +
             '</tr>';
 
