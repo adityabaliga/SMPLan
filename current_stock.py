@@ -171,7 +171,7 @@ class CurrentStock:
                 if customer_type == "tr":
                     cursor.execute(
                         "select * from current_stock where (status = 'RM' or status = 'HC' or status= 'WIP') and "
-                        "length = 0 and unit = %s  and customer like 'TSDPL' order by smpl_no asc", (str(unit),))
+                        "length = 0 and unit = %s  and smpl_no like 'TR%%' order by smpl_no asc", (str(unit),))
 
                 user_data = cursor.fetchall()
 
