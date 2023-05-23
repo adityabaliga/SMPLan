@@ -453,15 +453,15 @@ class CurrentStock:
         cs_id_lst = []
         if display_type == 'FG':
             with CursorFromConnectionFromPool() as cursor:
-                cursor.execute("select * from current_stock where customer=%s and status = 'FG' order by smpl_no asc",(customer,))
+                cursor.execute("select * from current_stock where customer=%s and status = 'FG' order by smpl_no, packet_name asc",(customer,))
                 user_data = cursor.fetchall()
         if display_type == 'FGandRM':
             with CursorFromConnectionFromPool() as cursor:
-                cursor.execute("select * from current_stock where customer=%s and (status = 'FG' or status = 'RM') order by smpl_no asc", (customer,))
+                cursor.execute("select * from current_stock where customer=%s and (status = 'FG' or status = 'RM') order by smpl_no, packet_name asc", (customer,))
                 user_data = cursor.fetchall()
         if display_type == 'All':
             with CursorFromConnectionFromPool() as cursor:
-                cursor.execute("select * from current_stock where customer=%s order by status, smpl_no asc", (customer,))
+                cursor.execute("select * from current_stock where customer=%s order by status, smpl_no, packet_name asc", (customer,))
                 user_data = cursor.fetchall()
         for lst in user_data:
             cs = CurrentStock(smpl_no=lst[1],weight = Decimal(lst[2]),numbers=int(lst[3]),width=Decimal(lst[4]),
