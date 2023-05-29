@@ -82,14 +82,14 @@
 
     </tr>
 
-    {% for cs_id, cs, part_no, wt_per_sheet, coating, packet_wt,mill, mill_id, incoming_date in cs_lst %}
+    {% for cs_id, cs, part_no, wt_per_sheet, coating, packet_wt,mill, mill_id, incoming_date, dc_number, dc_date in cs_lst %}
 
         <tr>
 
             <!--td>{{loop.index}}</td-->
             <td>{{mill}}</td>
-            <td></td>
-            <td>{{incoming_date}}</td>
+            <td>{{dc_number}}</td>
+            <td>{{dc_date}}</td>
             <td>{{cs.smpl_no}}{{cs.packet_name}}</td>
             <td>{{cs.grade}}</td>
             <td>{{coating}} </td>

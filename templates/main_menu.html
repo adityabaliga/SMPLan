@@ -94,6 +94,10 @@
                 <a href ="transfer_material">Transfer Material</a>
                     <br>
                 <a href ="\fg_to_wip_enter_smpl">FG to WIP</a>
+                    <br>
+                {% if current_user.user_type == "all" or current_user.user_type == "plan_head" %}
+                <a href ="\incoming_update_pick_smpl">Update Incoming Details</a>
+                {% endif %}
             </td>
             {% endif %}
             <td>

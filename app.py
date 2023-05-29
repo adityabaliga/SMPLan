@@ -443,6 +443,60 @@ def transfer_submit():
         CurrentStock.transfer_material_cls(cs_id, unit)'''
     return render_template('/main_menu.html')
 
+#Pick SMPL No to update incoming details
+@app.route('/incoming_update_pick_smpl', methods=['GET', 'POST'])
+def incoming_update_pick_smpl(message=""):
+    return render_template('/incoming_update_pick_smpl.html')
+
+#Load SMPL No to update incoming details
+@app.route('/incoming_update_show_details', methods=['GET', 'POST'])
+def incoming_update_show_details():
+    smpl_no = ""
+    if request.method == 'POST':
+        smpl_no = request.form['smpl_no']
+    if request.method == 'GET':
+        smpl_no = request.args.get('smpl_no')
+
+    incoming = Incoming.load_smpl_by_smpl_no(smpl_no)
+    if incoming:
+        return render_template('/incoming_update_details.html', incoming=incoming)
+    else:
+        return render_template('/main_menu.html', message = "SMPL No. not found")
+
+
+#Sumbmit details for SMPL No to update incoming details
+@app.route('/incoming_update_submit', methods=['GET', 'POST'])
+def incoming_update_submit():
+    smpl_no, customer, incoming_date, thickness, width, length, material_type = '','','','','','',''
+    material_type, grade, scams_no, coating, weight, mill, mill_id, remarks, unit = '','','','','','','','',''
+
+    if request.method == 'POST':
+        smpl_no = request.form['smpl_no']
+        customer = request.form['customer']
+        incoming_date = request.form['incoming_date']
+        thickness = Decimal(request.form['thickness'])
+        width = Decimal(request.form['width'])
+        length = (request.form['length'])
+        material_type = request.form['material_type']
+        grade = request.form['grade']
+        scams_no = request.form['scams_no']
+        coating = request.form['coating']
+
+        weight = Decimal(request.form['weight'])
+        numbers = Decimal((request.form['numbers']))
+        mill = request.form['mill']
+        mill_id = request.form['mill_id']
+        remarks = request.form['remarks']
+        unit = request.form['unit']
+        dc_number = request.form['dc_number']
+        dc_date = request.form['dc_date']
+
+    incoming = Incoming(smpl_no, customer, incoming_date, thickness, width, length, grade, weight, numbers, mill,
+                        mill_id, remarks, unit, material_type, coating, scams_no, dc_number, dc_date)
+
+    incoming.update_details()
+    return render_template('/main_menu.html', message="")
+
 
 # pick smpl for uploading documents
 @app.route('/upload_pick_smpl', methods=['GET', 'POST'])
@@ -1446,6 +1500,8 @@ def check_stock_htid():
     mill_lst = []
     mill_id_lst = []
     incoming_date_lst = []
+    dc_number_lst = []
+    dc_date_lst = []
 
 
     part_no = ""
@@ -1523,11 +1579,11 @@ def check_stock_htid():
             wt_per_sheet = 2.63
             coating = "20/0"
         if cs.width == 655 and cs.length == 740:
-            part_no = "K3CA HALF OTHER RL"
+            part_no = "K3CA Upper"
             wt_per_sheet = 2.66
             coating = "0/30"
         if cs.width == 565 and cs.length == 645:
-            part_no = "K3CA PLATE BOTTOM"
+            part_no = "K3CA BTM"
             wt_per_sheet = 2.29
             coating = "20/0"
         if cs.length > 0:
@@ -1544,13 +1600,15 @@ def check_stock_htid():
         wt_per_sheet_lst.append(wt_per_sheet)
         coating_lst.append(coating)
         packet_wt_lst.append(packet_wt)
+        dc_number_lst.append(incoming.dc_number)
+        dc_date_lst.append(incoming.dc_date)
         grade = (cs.grade.split("GRADE:"))
         if len(grade) > 1:
             grade = grade[1].split(';')
             cs.grade = grade[0]
 
     cs_lst = zip(_cs_id_lst, _cs_lst, part_no_lst, wt_per_sheet_lst, coating_lst, packet_wt_lst, mill_lst, mill_id_lst,
-                 incoming_date_lst)
+                 incoming_date_lst, dc_number_lst, dc_date_lst)
     return render_template('stock_display_htid.html', cs_lst=cs_lst)
 
 

@@ -237,6 +237,16 @@ class Incoming:
                            (remarks, smpl_no))
 
 
+    def update_details(self):
+        with CursorFromConnectionFromPool() as cursor:
+            cursor.execute("update incoming set customer = %s, incoming_date = %s, thickness = %s,"
+                           "width=%s, length=%s, grade=%s, weight=%s, numbers=%s, mill=%s, mill_id=%s,"
+                           "remarks=%s, unit = %s, material_type=%s, coating=%s,"
+                           "scams_no=%s, dc_number=%s, dc_date=%s where smpl_no = %s",
+                           (self.customer, self.incoming_date, self.thickness, self.width, self.length, self.grade,
+                            self.weight, self.numbers, self.mill, self.mill_id, self.remarks, self.unit,
+                            self.material_type, self.coating, self.scams_no, self.dc_number, self.dc_date, self.smpl_no))
+
     @classmethod
     def smpl_no_list_for_history(cls,smpl_no):
         query_smpl_no = '%' + smpl_no + '%'
