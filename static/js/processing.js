@@ -303,11 +303,36 @@ function addRow(tableID)
 
 				newcell.innerHTML = table.rows[1].cells[i].innerHTML;
 				newcell.hidden = table.rows[1].cells[i].hidden;
+
+                if(tableID == "numbers_pkts"){
+                    if(newcell.lastElementChild.id == 'output_width' || newcell.lastElementChild.id == 'output_length'){
+				        newcell.lastElementChild.value = last_row.cells[i].lastElementChild.value;
+                    }
+
+                if(newcell.lastElementChild.id == 'packet_name'){
+                    var str = last_row.cells[i].lastElementChild.value;
+                    var index = str.length - 1;
+
+                      while (index >= 0) {
+                        if (/[a-zA-Z]/.test(str[index])) {
+                          break;
+                        }
+                        index--;
+                      }
+
+                    var firstPart = str.substring(0, index+1);
+                    var secondPart = parseInt(str.substring(index+1)) +1;
+
+                    console.log(firstPart);
+                    console.log(secondPart);
+                    newcell.lastElementChild.value = firstPart + secondPart.toString();
+                    //return [firstPart, secondPart];
+                }
 				//if(operation == 'Reshearing' || operation == 'Narrow_CTL'){
 				//    newcell.lastChild.value = table.rows[rowCount-1].cells[i].lastChild.value;
 				//}
 				//alert(newcell.childNodes);
-				switch(newcell.childNodes[0].type) {
+				/*switch(newcell.childNodes[0].type) {
 					case "text":
 							newcell.childNodes[0].value = "";
 							break;
@@ -317,6 +342,7 @@ function addRow(tableID)
 					case "select-one":
 							newcell.childNodes[0].selectedIndex = 0;
 							break;
+				}*/
 				}
 			}
     }

@@ -90,7 +90,11 @@
             <td>{{mill}}</td>
             <td>{{dc_number}}</td>
             <td>{{dc_date}}</td>
+            {% if cs.packet_name == "MC"%}
+            <td>{{cs.smpl_no}}</td>
+            {% else %}
             <td>{{cs.smpl_no}}{{cs.packet_name}}</td>
+            {% endif %}
             <td>{{cs.grade}}</td>
             <td>{{coating}} </td>
 
