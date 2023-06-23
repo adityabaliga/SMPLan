@@ -2245,6 +2245,83 @@ def get_daily_report():
                            dispatch_hdr_lst=dispatch_hdr_lst, processing_hdr_detail=processing_hdr_detail,
                            machine_lst = machine_lst)
 
+@app.route('/get_monthly_report', methods=['GET', 'POST'])
+def get_monthly_report():
+    report_month = 0
+    report_year = 0
+    if request.method == 'POST':
+        report_month = int(request.form['report_month'])
+        report_year = int(request.form['report_year'])
+    if request.method == 'GET':
+        report_month = int(request.args.get('report_month'))
+        report_year = int(request.args.get('report_year'))
+
+    month_data = CurrentStock.monthly_report_hdr((report_month), (report_year))
+    prev_month_data = []
+    prev_prev_month_data = []
+    if report_month != 1 or report_month != 2:
+        prev_month_data = CurrentStock.monthly_report_hdr((report_month- 1), (report_year))
+        prev_prev_month_data = CurrentStock.monthly_report_hdr((report_month- 2), (report_year))
+    if report_month == 1:
+       prev_month_data = CurrentStock.monthly_report_hdr((12), (report_year -1))
+       prev_prev_month_data = CurrentStock.monthly_report_hdr((11), (report_year -1))
+    if report_month == 2:
+       prev_month_data = CurrentStock.monthly_report_hdr((report_month- 1), (report_year))
+       prev_prev_month_data = CurrentStock.monthly_report_hdr((12), (report_year -1))
+
+    machine_lst = ['CTL 1', 'CTL 2', 'NCTL 1', 'NCTL 2', 'NCTL 3', 'NCTL 4', 'NCTL 5','Reshearing 1',
+                   'Reshearing 2', 'Reshearing 3', 'Reshearing 4', 'Reshearing 5', 'Reshearing 6',
+                   'Reshearing 7', 'Reshearing 8', 'Slitting', 'Mini_Slitting']
+
+    month_wt_lst_arr = [0]*17
+    month_cuts_lst_arr = [0]*17
+    month_time_lst_arr = [0]*17
+    prev_month_wt_lst_arr = [0]*17
+    prev_month_cuts_lst_arr = [0]*17
+    prev_month_time_lst_arr = [0]*17
+    prev_prev_month_wt_lst_arr = [0]*17
+    prev_prev_month_cuts_lst_arr = [0]*17
+    prev_prev_month_time_lst_arr = [0]*17
+
+    i = 0
+    month_total_wt=0
+    prev_month_total_wt=0
+    prev_prev_month_total_wt=0
+    for machine in machine_lst:
+
+        for data in month_data:
+            if data[0] == machine:
+                month_wt_lst_arr[i] += data[1]
+                month_cuts_lst_arr[i] += data[2]
+                month_time_lst_arr[i] += data[3]
+                month_total_wt += data[1]
+        for prev_data in prev_month_data:
+            if prev_data[0] == machine:
+                prev_month_wt_lst_arr[i] += prev_data[1]
+                prev_month_cuts_lst_arr[i] += prev_data[2]
+                prev_month_time_lst_arr[i] += prev_data[3]
+                prev_month_total_wt += prev_data[1]
+        for prev_prev_data in prev_prev_month_data:
+            if prev_prev_data[0] == machine:
+                prev_prev_month_wt_lst_arr[i] += prev_prev_data[1]
+                prev_prev_month_cuts_lst_arr[i] += prev_prev_data[2]
+                prev_prev_month_time_lst_arr[i] += prev_prev_data[3]
+                prev_month_total_wt += prev_prev_data[1]
+        i += 1
+
+
+    return render_template('/monthly_report_display.html', report_month= report_month,
+                           report_year= report_year,
+                           month_lst = zip(machine_lst, month_wt_lst_arr, month_cuts_lst_arr, month_time_lst_arr,
+                                           prev_month_wt_lst_arr, prev_month_cuts_lst_arr, prev_month_time_lst_arr,
+                                           prev_prev_month_wt_lst_arr, prev_prev_month_cuts_lst_arr, prev_prev_month_time_lst_arr),
+                                            month_total_wt = month_total_wt, prev_prev_month_total_wt = prev_prev_month_total_wt,
+                                            prev_month_total_wt = prev_month_total_wt)
+
+
+@app.route('/daily_report_pick_month_year', methods=['GET', 'POST'])
+def daily_report_pick_month_year():
+    return render_template('/daily_report_pick_month_year.html')
 
 def change_date_format(date):
     split_date = date.split('-')

@@ -537,3 +537,30 @@ class CurrentStock:
                 return cs
             else:
                 return None
+
+    @classmethod
+    def monthly_report_dtl(cls, month, year):
+        with CursorFromConnectionFromPool() as cursor:
+            cursor.execute("select processing_date, operation, sum(total_processed_wt) as total_wt, sum(total_cuts) "
+                "as total_cuts, sum(production_time + setting_time) as total_time from processing p "
+                "where extract(month from processing_date) = %s and extract(year from processing_date) = %s"
+                "group by processing_date, operation order by processing_date desc, operation asc", (month, year))
+            user_data = cursor.fetchall()
+            if user_data:
+                return user_data
+            else:
+                return None
+
+    @classmethod
+    def monthly_report_hdr(cls, month, year):
+        with CursorFromConnectionFromPool() as cursor:
+            cursor.execute("select operation, sum(total_processed_wt) as total_wt, sum(total_cuts) "
+                           "as total_cuts, sum(production_time + setting_time) as total_time from processing p "
+                           "where extract(month from processing_date) = %s and extract(year from processing_date) = %s"
+                           "group by operation order by operation asc",
+                           (month, year))
+            user_data = cursor.fetchall()
+            if user_data:
+                return user_data
+            else:
+                return None

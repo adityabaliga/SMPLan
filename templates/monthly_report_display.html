@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SMPL MRP - Daily Report</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+    <style>
+        .mytable>tbody>tr>td, .mytable>tbody>tr>th, .mytable>tfoot>tr>td, .mytable>tfoot>tr>th, .mytable>thead>tr>td, .mytable>thead>tr>th {
+    padding: 6px;
+    }
+    input,select {
+    font-family: "Verdana";
+    }
+    hr.style1{
+	        border-top: 15px solid #4d0000;
+            }
+        .oe{
+            font-family: Mathematica6 Bold, Old English Text MT, Engravers Old English BT, Old English, Collins Old English, New Old English, serif;
+            font-size: 50px;
+            color: #4d0000;
+            text-align:center;
+            }
+        .topnav a:hover {
+            color: #4d0000;
+            text-decoration: none;
+        }
+        .nopad {
+                margin: 0;
+                padding: 0;
+                margin-top: 0em;
+                margin-bottom: 0em;
+            }
+
+
+    </style>
+</head>
+<body>
+
+    <div class="topnav" id="myTopnav">
+        <br>
+        <table>
+            <td><img src="/static/logo.jpg"  height="70" width="92" align = "left"></td>
+            <td width="1050px"><div align="center" class="nopad"> <a href="\main_menu"  class="oe">SMPL</a></div></td>
+            <td><div align="left" class="nopad">Hi {{current_user.username}}<br>
+            <a href="\change_password_form">Change Password</a><br>
+            <a href="\logout">Logout</a></div></td>
+        </table>
+    </div>
+
+    <hr class ="style1">
+    <h2>Monthly report for {{report_month}}/{{report_year}}</h2>
+
+    <h3>Processing</h3>
+    <table class="table table-bordered">
+        <tr>
+            <th></th>
+            <th colspan = "3" style ="text-align: centre">Current Month</th>
+            <th colspan = "3" text-align="centre">Prev Month  </th>
+            <th colspan = "3" text-align="centre">Prev Prev Month</th>
+
+        </tr>
+        <tr>
+            <th>Machine</th>
+            <th>Total Weight (in MT)</th>
+            <th>Total no. of cuts</th>
+            <th>Total Time (in hrs)</th>
+            <th>Total Weight (in MT)</th>
+            <th>Total no. of cuts</th>
+            <th>Total Time (in hrs)</th>
+            <th>Total Weight (in MT)</th>
+            <th>Total no. of cuts</th>
+            <th>Total Time (in hrs)</th>
+        </tr>
+        {% for machine, wt, cuts, time, prev_wt, prev_cuts, prev_time, prev_prev_wt, prev_prev_cuts, prev_prev_time  in month_lst %}
+        <tr>
+
+                <td>{{machine}}</td>
+                <td>{{wt}}</td>
+                <td>{{cuts}}</td>
+                <td>{{(time/60)|round(1,'floor')}}</td>
+
+
+                <td>{{prev_wt}}</td>
+                <td>{{prev_cuts}}</td>
+                <td>{{(prev_time/60)|round(1,'floor')}}</td>
+
+
+
+
+                <td>{{prev_prev_wt}}</td>
+                <td>{{prev_prev_cuts}}</td>
+                <td>{{(prev_prev_time/60)|round(1,'floor')}}</td>
+
+        </tr>
+        {% endfor %}
+        <tr>
+            <td>Total</td>
+            <td>{{month_total_wt}}</td>
+            <td></td>
+            <td></td>
+            <td>{{prev_month_total_wt}}</td>
+            <td></td>
+            <td></td>
+            <td>{{prev_prev_month_total_wt}}</td>
+            <td></td>
+            <td></td>
+        </tr>
+    </table>
+
+    <hr>
+
+</body>
+
+
+</html>
