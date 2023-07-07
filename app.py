@@ -2330,7 +2330,7 @@ def get_monthly_report():
                 prev_prev_month_wt_lst_arr[i] += prev_prev_data[1]
                 prev_prev_month_cuts_lst_arr[i] += prev_prev_data[2]
                 prev_prev_month_time_lst_arr[i] += prev_prev_data[3]
-                prev_month_total_wt += prev_prev_data[1]
+                prev_prev_month_total_wt += prev_prev_data[1]
         i += 1
 
 
