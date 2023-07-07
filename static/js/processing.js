@@ -14,6 +14,20 @@ function setFocusToTextBox(operation){
     if(operation == "CTL"){
         document.getElementById("output_length").focus();
     }
+
+    // Set processing date as today's date and disable future dates
+    // Get the current date
+    var currentDate = new Date();
+
+    // Format the date to yyyy-mm-dd
+    var year = currentDate.getFullYear();
+    var month = String(currentDate.getMonth() + 1).padStart(2, '0');
+    var day = String(currentDate.getDate()).padStart(2, '0');
+    var formattedDate = year + '-' + month + '-' + day;
+
+    // Set the max attribute of the date picker input
+    var processing_date = document.getElementById('processing_date');
+    processing_date.setAttribute('max', formattedDate);
 }
 
 //This function reloads the page if the user uses back to come to the page
@@ -60,6 +74,26 @@ function setFocusToTextBox_Slit(operation){
             //add_row_for_length();
         }
         length_of_coil();
+
+        //Set Processing Date and Setting date as today's date as max
+        // Set processing date as today's date and disable future dates
+    // Get the current date
+    var currentDate = new Date();
+
+    // Format the date to yyyy-mm-dd
+    var year = currentDate.getFullYear();
+    var month = String(currentDate.getMonth() + 1).padStart(2, '0');
+    var day = String(currentDate.getDate()).padStart(2, '0');
+    var formattedDate = year + '-' + month + '-' + day;
+
+    // Set the max attribute of the date picker input
+    var processing_date = document.getElementById('processing_date');
+    processing_date.setAttribute('max', formattedDate);
+
+    var setting_date = document.getElementById('setting_date');
+    setting_date.setAttribute('max', formattedDate);
+
+
 
 }
 

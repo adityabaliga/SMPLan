@@ -135,6 +135,8 @@ class Incoming:
             _customer = customer[0].childNodes[0]._data
             _dc_number = dc_number[0].childNodes[0]._data
             _dc_date = dc_date[0].childNodes[0]._data
+            if(_dc_date):
+                _dc_date = datetime.datetime.strptime(dc_date[0].childNodes[0]._data, '%Y%m%d').date()
 
 
 
