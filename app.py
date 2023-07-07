@@ -1595,13 +1595,37 @@ def check_stock_htid():
         incoming = Incoming.load_smpl_by_smpl_no(cs.smpl_no)
         mill_lst.append(incoming.mill)
         mill_id_lst.append(incoming.mill_id)
-        incoming_date_lst.append(incoming.incoming_date)
+        incoming_date = incoming.incoming_date.replace('/', '-')
+        incoming_date_lst.append(incoming_date)
         part_no_lst.append(part_no)
         wt_per_sheet_lst.append(wt_per_sheet)
         coating_lst.append(coating)
         packet_wt_lst.append(packet_wt)
         dc_number_lst.append(incoming.dc_number)
-        dc_date_lst.append(incoming.dc_date)
+
+
+        dc_date_year = ''
+        dc_date_month = ''
+        dc_date = ''
+        if incoming.dc_date:
+            if len(incoming.dc_date) > 7:
+                dc_date = change_date_format(incoming.dc_date)
+            '''dc_date = incoming.dc_date.replace('/', '-')
+            i=0
+            while i<4:
+                dc_date_year= dc_date_year + (dc_date[i])
+                i=i+1
+            while i<6:
+                dc_date_month = dc_date_month + (dc_date[i])
+                i=i+1
+            while i<8:
+                dc_date_date = dc_date_date + (dc_date[i])
+                i=i+1
+            dc_date = dc_date_date + '-' + dc_date_month + '-' + dc_date_year'''
+
+        #else:
+        #    dc_date = change_date_format(incoming.incoming_date)
+        dc_date_lst.append(dc_date)
         grade = (cs.grade.split("GRADE:"))
         if len(grade) > 1:
             grade = grade[1].split(';')

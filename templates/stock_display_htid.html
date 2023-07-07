@@ -56,7 +56,7 @@
 
     <hr class ="style1">
 
-    <table class = "table table-sm">
+    <table class = "table table-sm" id="htid_stock">
     <tr>
         <!--th>Sl No</th-->
         <th>Mill</th>
@@ -83,7 +83,7 @@
     </tr>
 
     {% for cs_id, cs, part_no, wt_per_sheet, coating, packet_wt,mill, mill_id, incoming_date, dc_number, dc_date in cs_lst %}
-
+        {% if cs.packet_name != "W0P0" %}
         <tr>
 
             <!--td>{{loop.index}}</td-->
@@ -109,8 +109,8 @@
             <td>{{packet_wt}} </td>
             <td>{{mill_id}}</td>
             <td>{{part_no}}</td>
-            <td>{{cs.status}} </td>
-
+            <td class = "status">{{cs.status}} </td>
+        {% endif %}
 
 
 
@@ -119,6 +119,9 @@
     {% endfor %}
 
     </table>
+    <td><input type = "button" class="btn btn-default" value="Download" onclick="generateExcel()"></td>
 
 </form>
+<script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+<script src = "{{ url_for('static', filename='js/stock.js') }}"></script>
 </html>
