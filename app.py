@@ -2348,6 +2348,8 @@ def daily_report_pick_month_year():
     return render_template('/daily_report_pick_month_year.html')
 
 def change_date_format(date):
+
+
     split_date = date.split('-')
     new_date = split_date[2] + '-' + split_date[1] + '-' + split_date[0]
     return new_date
