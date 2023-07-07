@@ -1608,8 +1608,8 @@ def check_stock_htid():
         dc_date_month = ''
         dc_date = ''
         if incoming.dc_date:
-            if len(incoming.dc_date) > 7:
-                dc_date = change_date_format(incoming.dc_date)
+            #if len(incoming.dc_date) > 7:
+            dc_date = incoming.dc_date.strftime('%d-%m-%Y')
             '''dc_date = incoming.dc_date.replace('/', '-')
             i=0
             while i<4:
