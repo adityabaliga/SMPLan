@@ -57,7 +57,7 @@
                 <td>{{dispatch_hdr.dispatch_time}}</td>
                 <td><input type ="text" name = "invoice_no" id = "invoice_no" value = {{dispatch_hdr.invoice_no}}></td>
                 <td>{{dispatch_hdr.remarks}}</td>
-                <td><input type ="text" name = "dispatch_hdr_id" id = "dispatch_hdr_id" value = {{dispatch_hdr_id}} value></td>
+                <!--td><input type ="text" name = "dispatch_hdr_id" id = "dispatch_hdr_id" value = {{dispatch_hdr_id}} value></td-->
         </tr>
     </table>
 
@@ -78,7 +78,11 @@
 
                 <td>{{detail.smpl_no}}</td>
                 <td>{{detail.thickness}}</td>
+                {% if detail.length2 != 0 %}
+                <td>{{detail.width}} x {{detail.length}} - {{detail.length2}}</td>
+                {% else %}
                 <td>{{detail.width}} x {{detail.length}}</td>
+                {% endif %}
                 <td>{{detail.numbers}}</td>
                 <td>{{detail.dispatch_wt}}</td>
                 <td>{{detail.no_of_pkts}}</td>

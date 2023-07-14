@@ -145,6 +145,47 @@ function for_packets_and_weight(table_id,table_row,operation){
     calculate_wt_and_cuts(table_id);
 }
 
+// This function calculates the weight for Trap NCTL and Reshearing functions
+function for_packets_and_weight_trap(table_id,table_row,operation){
+
+   // Get the row where the change was made and calculate the weight of the processed material
+	var rowCount = table_row.offsetParent.parentElement.rowIndex;
+	var last_row = document.getElementById(table_id).rows[rowCount];
+	//var numbers = Number(last_row.cells[3].lastChild.value);
+	var thk = Number(document.getElementById('thickness').value);
+	//var weight_pos = 5;
+    var width =  Number(last_row.cells[0].lastChild.value);
+
+
+    var length1 =  Number(last_row.cells[1].lastChild.value);
+    var length2 =  Number(last_row.cells[2].lastChild.value);
+
+    var numbers =  Number(last_row.cells[5].lastChild.value);
+    weight_pos = 6;
+
+    var length = (length1+length2)/2;
+    var weight = (thk * width * length * numbers * 0.00000785)/1000;
+    last_row.cells[weight_pos].lastChild.value = weight.toFixed(3);
+    var rm_weight = Number(document.getElementById("weight").value);
+
+    //if material is aluminium, the weight has to be 1/3 that of steel
+    var grade = document.getElementById("grade").value;
+    var mat_type = document.getElementById("mat_type").value;
+    var mat_type_true = false;
+    if(mat_type){
+        if(mat_type.includes("ALUMINIUM")){
+            mat_type_true = true;
+        }
+    }
+
+    if(grade.includes("ALU ") || grade.includes("ALUMINIUM ") || mat_type_true){
+        last_row.cells[weight_pos].lastChild.value = (weight/3).toFixed(3);
+    }
+
+    calculate_wt_and_cuts_trap(table_id);
+}
+
+
 // To calculate processed weight and no of cuts every time numbers are changed
 function calculate_wt_and_cuts(table_id){
     var table = document.getElementById(table_id);
@@ -154,6 +195,32 @@ function calculate_wt_and_cuts(table_id){
     for (var i = 1, row; row = table.rows[i]; i++) {
         total_processed_wt += Number(row.cells[5].lastChild.value);
         total_cuts += Number(row.cells[4].lastChild.value);
+
+    }
+    //var total_order_wt = Number(document.getElementById("order_wt").value);
+    //var completed_proc_wt = Number(document.getElementById("tot_proc_wt").value);
+    //var scrap_wt = total_order_wt - total_processed_wt - completed_proc_wt ;
+
+
+    document.getElementById("total_processed_wt").value = Number(total_processed_wt.toFixed(3));
+    document.getElementById("total_cuts").value = total_cuts;
+    document.getElementById("total_packets").value = table.rows.length - 1;
+
+    validate();
+
+    //document.getElementById("balance_wt").value = scrap_wt.toFixed(3);
+    //document.getElementById("scrap_wt").value = Number(scrap_wt.toFixed(3));
+}
+
+// To calculate processed weight and no of cuts every time numbers are changed
+function calculate_wt_and_cuts_trap(table_id){
+    var table = document.getElementById(table_id);
+    var total_processed_wt =0;
+    var total_cuts = 0;
+    var total_pkts;
+    for (var i = 1, row; row = table.rows[i]; i++) {
+        total_processed_wt += Number(row.cells[6].lastChild.value);
+        total_cuts += Number(row.cells[5].lastChild.value);
 
     }
     //var total_order_wt = Number(document.getElementById("order_wt").value);
@@ -1247,7 +1314,7 @@ function make_label_new(th){
     var rowId = parseInt(event.target.parentNode.parentNode.id);
               //this gives id of tr whose button was clicked
     var row_id = th.parentNode.id;
-
+    var operation = document.getElementById("operation").value;
     var numbers_table = document.getElementById('numbers_pkts');
 
     // First step is to clear all old values in the Label table
@@ -1273,6 +1340,10 @@ function make_label_new(th){
     var machine = document.getElementById("machine").value;
     var width = numbers_table.rows[rowId].cells[0].lastChild.value;
     var output_length = numbers_table.rows[rowId].cells[1].lastChild.value;
+    if(operation.includes('Trap')){
+        output_length = numbers_table.rows[rowId].cells[1].lastChild.value + ' - ' + numbers_table.rows[rowId].cells[2].lastChild.value;
+    }
+
     var thickness = document.getElementById("thickness").value;
     var size = thickness + " X " + width + " X " + output_length;
 
@@ -1451,6 +1522,219 @@ function make_label_new(th){
 
 }
 
+
+//Fill label details new version. This will allow for all formats and sizes
+function make_label_trap_new(th){
+    var rowId = parseInt(event.target.parentNode.parentNode.id);
+              //this gives id of tr whose button was clicked
+    var row_id = th.parentNode.id;
+    var operation = document.getElementById("operation").value;
+    var numbers_table = document.getElementById('numbers_pkts');
+
+    // First step is to clear all old values in the Label table
+    var label_table = document.getElementById('label_table');
+
+    //if (label_table.style.display =='table-row') {
+        //label_table.style.display = 'none';
+        var inputs = label_table.getElementsByTagName('input');
+        for (i = 0; i < inputs.length; i++) {
+            inputs[i].value = "";
+        }
+    //}
+
+    /*else {
+        label_table.style.display = 'table-row';
+    }*/
+
+    // Get values for the fields one by one
+    //Row 1
+    var smpl_no = document.getElementById("smpl_no").value;
+    var prod_date = document.getElementById("processing_date").value;
+    prod_date = change_date_format(prod_date);
+    var machine = document.getElementById("machine").value;
+    var width = numbers_table.rows[rowId].cells[0].lastChild.value;
+    var output_length = numbers_table.rows[rowId].cells[1].lastChild.value;
+    if(operation.includes('Trap')){
+        output_length = numbers_table.rows[rowId].cells[1].lastChild.value + ' - ' + numbers_table.rows[rowId].cells[2].lastChild.value;
+    }
+
+    var thickness = document.getElementById("thickness").value;
+    var size = thickness + " X " + width + " X " + output_length;
+
+
+
+
+    //Row 2
+    var customer = document.getElementById("customer").value;
+    customer = cust_name_for_label(customer);
+    var mill_name = document.getElementById("mill").value;
+    mill_name = mill_name.split(' ');
+    var mill;
+    if(mill_name[0] == ''){
+        mill = "MILL"
+    }else{
+        mill = mill_name[0];
+    }
+    if(mill_id == ''){
+     mill_id = 'N/A';
+    }
+    var mill_id = document.getElementById("mill_id").value;
+
+    //Row 3
+    var lamination = numbers_table.rows[rowId].cells[3].lastElementChild.selectedOptions[0].innerHTML;
+    var packet_name = numbers_table.rows[rowId].cells[4].lastChild.value;
+    var packet_nos = numbers_table.rows[rowId].cells[5].lastChild.value;
+    if (customer.startsWith("HONDA") || customer.startsWith("TTSSI")){
+        var honda_part_num = honda_part_no(Number(width), Number(output_length));
+        honda_part_num = honda_part_num.split(';');
+        document.getElementById('lbl_part_no').value = honda_part_num[0];
+        if(honda_part_num[1] != 0){
+            document.getElementById('lbl_net_wt').value = Math.round(Number(honda_part_num[1]) * Number(numbers_table.rows[rowId].cells[4].lastChild.value));
+        }
+        document.getElementById('lbl_coating').value = honda_part_num[2];
+    }
+
+    var lami_type;
+
+    if(lamination == "No Lamination"){
+        lami_type = " ";
+    }else{
+        lamination = lamination.split('-');
+        lami_type = lamination[0].toUpperCase() + "LAMINATION";
+    }
+
+    //Row 4
+    var grade_field = document.getElementById("grade").value;
+    var grade_coating = "";
+    //Grade. Check if grade exists
+    /*if (grade_field.includes("GRADE")){
+        grade = grade_field.split("GRADE").pop();
+        grade_coating = grade.split(' ');
+        grade=grade_coating[0];
+        grade = grade.slice(1);
+        grade = grade.replace('.','');
+
+    }*/
+
+    var material_type = '';
+    var grade='';
+    var coating='';
+    var scams_no='';
+    var incoming_date = (document.getElementById('incoming_date').value);
+    incoming_date = incoming_date.split('/');
+    var new_incoming_date = incoming_date[1] + '/' + incoming_date[0] + '/' + incoming_date[2];
+    new_incoming_date = new Date(new_incoming_date);
+    var check_date = new Date("04/25/2023");
+
+    if (grade_field.length > 0){
+         if(new_incoming_date < check_date){
+            grade_field = grade_field.split(';');
+            //Material Type
+            /*var mat_type = grade_field.split("ID");
+
+            mat_type = mat_type[0].split("GRADE");
+            var material_type = mat_type[0];
+            material_type = material_type.replaceAll('COIL','');
+            material_type = material_type.replaceAll('SHEETS','');
+            material_type = material_type.replaceAll('.','');*/
+            material_type = grade_field[0].toUpperCase();
+            material_type = material_type.replaceAll('COIL','');
+            material_type = material_type.replaceAll('SHEETS','');
+            material_type = material_type.replaceAll('.','');
+            material_type = material_type.replaceAll('MAT TYPE:','');
+
+            for(i=1;i<grade_field.length;i++){
+                grade_field[i] = (grade_field[i].toUpperCase());
+                if((grade_field[i].toUpperCase()).includes("GRADE")){
+                    grade = grade_field[i].split("GRADE").pop();
+                    grade = grade.replaceAll(':','');
+                    grade = grade.trim();
+                }
+                if((grade_field[i].toUpperCase()).includes("COATING")){
+                    coating = grade_field[i].split("COATING").pop();
+                    coating = coating.replaceAll(':','');
+                    coating = coating.trim();
+                }
+
+                if((grade_field[i].toUpperCase()).includes("SCAMS NO")){
+                    scams_no = grade_field[i].split("SCAMS NO").pop();
+                    scams_no = scams_no.replaceAll(':','');
+                    scams_no = scams_no.trim();
+                }
+            }
+        }
+        else{
+            material_type = document.getElementById('mat_type').value;
+
+            material_type = material_type.replaceAll('COIL','');
+            material_type = material_type.replaceAll('SHEETS','');
+            material_type = material_type.replaceAll('.','');
+
+
+            grade = document.getElementById('grade').value;
+            scams_no = document.getElementById('scams_no').value;
+            if(scams_no == 'None'){
+                scams_no = '';
+            }
+            coating = document.getElementById('coating').value;
+            if(coating == 'None'){
+                coating = '';
+            }
+        }
+    }
+    else if(grade_field == ''){
+        grade = 'N/A';
+    }
+    else{
+        grade = grade_field;
+    }
+
+    //SCAMS No.
+    /*var scams_no = "";
+    var scams_no_field = grade_field.split('SCAMS NO');
+    if(scams_no_field[1]){
+        scams_no = scams_no_field[1].slice(1);
+        scams_no = (scams_no.split(' '))[0];
+        scams_no = scams_no.replace('.','');
+    }*/
+    var mat_status = numbers_table.rows[rowId].cells[7].lastElementChild.selectedOptions[0].innerHTML;
+
+
+    // Populate the label_table with the values
+    //Row 1
+    document.getElementById('lbl_smpl_no').value = smpl_no;
+    document.getElementById('lbl_prod_date').value = prod_date;
+    document.getElementById('lbl_machine').value = machine;
+    document.getElementById('lbl_size').value = size;
+
+    //Row 2
+    document.getElementById('lbl_customer').value = customer;
+    //document.getElementById('lbl_prod_date').value = prod_date;
+    document.getElementById('lbl_mill').value = mill;
+    document.getElementById('lbl_mill_id').value = mill_id;
+
+    //Row 3
+    document.getElementById('lbl_numbers').value = packet_nos;
+    document.getElementById('lbl_packet_name').value = packet_name;
+    document.getElementById('lbl_lamination').value = lamination;
+    //document.getElementById('lbl_size').value = size;
+
+    //Row 4
+    document.getElementById('lbl_grade').value = grade.trimEnd();
+    document.getElementById('lbl_mat_type').value = material_type.trimEnd();
+    document.getElementById('lbl_scams_no').value = scams_no.trimEnd();
+    //document.getElementById('lbl_size').value = size;
+
+    var tsl_no;
+    //Row 5
+    if(document.getElementById('lbl_customer').value == "TATA STEEL"){
+        tsl_no = document.getElementById('lbl_smpl_no').value.slice(3);
+        document.getElementById('lbl_batch_no').value = tsl_no + 'P';
+    }
+    document.getElementById('lbl_mat_status').value = mat_status;
+
+
+}
 
 
 ////Fill label table for Reshearing

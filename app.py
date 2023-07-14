@@ -427,10 +427,10 @@ def transfer_submit():
         else:
             cs_new = CurrentStock(smpl_no, cs.customer, transfer_qty, transfer_nos, cs.thickness, cs.width,
                                   cs.length, cs.status, cs.grade, unit, cs.packet_name)
-            cs.change_wt(smpl_no, cs.width, cs.length, transfer_qty, transfer_nos, 'minus', cs.status)
+            cs.change_wt(smpl_no, cs.width, cs.length, transfer_qty, transfer_nos, 'minus', cs.status, cs.length2)
             if cs_new.check_if_size_exists():
                 cs_new.change_wt(cs_new.smpl_no, cs_new.width, cs_new.length, transfer_qty, transfer_nos,
-                                 "plus", cs_new.status)
+                                 "plus", cs_new.status, cs_new.length2)
             else:
                 cs_new.save_to_db()
         transfer_remarks = "Transferred to Unit " + unit + " for " + transfer_remarks + " on " + time.strftime(
@@ -688,7 +688,7 @@ def submit_order():
                                 new_nos,
                                 incoming.mill, incoming.mill_id, incoming.remarks, incoming.unit)
         incoming_new.savetodb()
-        rm_status = CurrentStock.change_wt(smpl_no, width, length, new_wt, new_nos, "minus", "RM")
+        rm_status = CurrentStock.change_wt(smpl_no, width, length, new_wt, new_nos, "minus", "RM", 0)
 
     # The status of the smpl is updated in current_stock
     cs = CurrentStock(smpl_no, customer, available_wt, available_numbers, thickness, width, length, "RM", grade, "X")
@@ -1008,7 +1008,7 @@ def processing_load():
                                                                                 completed_processing_wt_lst,
                                                                                 completed_processing_numbers_lst))'''
 
-    if operation == "Narrow_CTL":
+    if operation == 'Narrow_CTL':
         return render_template('processing_nctl.html', incoming=incoming, operation=operation,
                                processing_details_lst=processing_detail_lst, cs_rm=cs_rm, cs_rm_id=cs_rm_id)
         ''', order=order,
@@ -1019,6 +1019,15 @@ def processing_load():
                                completed_processing_details_lst = zip(order_detail_lst_by_operation,
                                                                                 completed_processing_wt_lst,
                                                                                 completed_processing_numbers_lst))'''
+
+    if operation == 'Trap_NCTL':
+        return render_template('processing_trap_nctl.html', incoming=incoming, operation=operation,
+                               processing_details_lst=processing_detail_lst, cs_rm=cs_rm, cs_rm_id=cs_rm_id)
+
+    if operation == 'Trap_Reshearing':
+        return render_template('processing_trap_reshearing.html', incoming=incoming, operation=operation,
+                               processing_details_lst=processing_detail_lst, cs_rm=cs_rm, cs_rm_id=cs_rm_id)
+
 
     if operation == 'Slitting' or operation == 'Mini_Slitting':
         # if operation == 'Slitting':
@@ -1080,6 +1089,7 @@ def submit_processing():
         input_size = request.form['input_material']
         output_width_lst = request.form.getlist('output_width')
         output_length_lst = request.form.getlist('output_length')
+        output_length2_lst = request.form.getlist('output_length2')
         # order_detail_id_lst = request.form.getlist('order_detail_id')
 
         fg_yes_no_lst = request.form.getlist('fg_yes_no')
@@ -1133,10 +1143,11 @@ def submit_processing():
 
         # Slitting/Mini Slitting and CTL/Reshearing/NCTL are managed differently
         if operation == "CTL" or operation == "CTL 2" or operation == "Reshearing" or operation == "Narrow_CTL" or \
-                operation == "Lamination" or operation == "Levelling":
+                operation == "Lamination" or operation == "Levelling" or operation == 'Trap_NCTL' or operation == 'Trap_Reshearing':
             lamination_lst = request.form.getlist('lamination')
-            for output_width, output_length, actual_no_of_pieces, packet_name, processed_wt, \
-                lamination, fg_yes_no, remarks in zip(output_width_lst, output_length_lst, actual_no_of_pieces_lst,
+            for output_width, output_length, output_length2, actual_no_of_pieces, packet_name, processed_wt, \
+                lamination, fg_yes_no, remarks in zip(output_width_lst, output_length_lst, output_length2_lst,
+                                                      actual_no_of_pieces_lst,
                                                       packet_name_lst, processed_wt_lst,
                                                       lamination_lst, fg_yes_no_lst, remarks_lst):
                 ip_size = input_size.split('x')
@@ -1151,7 +1162,7 @@ def submit_processing():
                     processing_detail = ProcessingDetail(smpl_no, operation, machine, processing_id, output_width,
                                                          output_length, actual_no_of_pieces,
                                                          packet_name, remarks, processed_wt, ms_width,
-                                                         ms_length, fg_yes_no)
+                                                         ms_length, fg_yes_no, output_length2)
                     processing_detail.save_to_db()
 
                     if operation == "Reshearing":
@@ -1195,7 +1206,7 @@ def submit_processing():
                     cs_rm = CurrentStock.csid_exists(cs_rm_id)
                     if cs_rm is not None:
                         rm_status = CurrentStock.change_wt(smpl_no, ms_width, ms_length, rm_processed_wt,
-                                                           no_of_ms_consumed, "minus", cs_rm.status)
+                                                           no_of_ms_consumed, "minus", cs_rm.status, cs_rm.length2)
 
                     # if rm_status == "complete":
                     # This is done when the RM is over but for some reason the order could not be completed
@@ -1210,7 +1221,8 @@ def submit_processing():
                         _packet_name = ""
 
                     cc_insert = CurrentStock.change_wt(smpl_no, output_width, output_length, processed_wt,
-                                                       actual_no_of_pieces, "plus", fg_yes_no,_packet_name)
+                                                       actual_no_of_pieces, "plus", fg_yes_no,output_length2,
+                                                       _packet_name)
 
                     # Unit of the material is decided based on the machine used to process the material.
                     # WARNING: This is bad programming
@@ -1224,7 +1236,8 @@ def submit_processing():
                     # The new material is inserted in to current stock
                     if cc_insert == "insert":
                         cs_cc = CurrentStock(smpl_no, customer, processed_wt, actual_no_of_pieces, thickness,
-                                             output_width, output_length, fg_yes_no, grade, unit, packet_name)
+                                             output_width, output_length, fg_yes_no, grade, unit, packet_name,
+                                             output_length2)
                         cs_cc.save_to_db()
 
                     # This checks if detail is complete by comparing the processed weight and order detail weight.
@@ -1299,6 +1312,7 @@ def submit_slitting_processing():
         for output_width, width_name, fg_yes_no in zip(output_width_lst, width_name_lst, fg_yes_no_lst):
             for part_length, part_name in zip(part_length_lst, part_name_lst):
                 output_length = 0
+                output_length2 = 0
                 processed_numbers = 1
                 output_width = Decimal(output_width)
 
@@ -1312,7 +1326,7 @@ def submit_slitting_processing():
                 processing_detail = ProcessingDetail(smpl_no, operation, machine, processing_id, output_width,
                                                      output_length, processed_numbers, packet_name, _remarks,
                                                      part_weight,
-                                                     ms_width, ms_length, fg_yes_no)
+                                                     ms_width, ms_length, fg_yes_no, output_length2)
                 processing_detail.save_to_db()
 
                 _remarks = ''
@@ -1323,7 +1337,7 @@ def submit_slitting_processing():
                 cs_rm = CurrentStock.csid_exists(cs_rm_id)
                 if cs_rm is not None:
                     rm_status = CurrentStock.change_wt(smpl_no, ms_width, ms_length, part_weight, processed_numbers,
-                                                       "minus", cs_rm.status)
+                                                       "minus", cs_rm.status, 0)
 
                 # The issue is during rewinding since mother coil and output width & length remain the same,
                 # The weight is getting added and subtracted from the same current_stock record.
@@ -1335,7 +1349,7 @@ def submit_slitting_processing():
                     # Increase weight of cut material by processed weight. If cut material, doesn't already exist, the
                     # function returns insert => a new record has to be inserted
                     cc_insert = CurrentStock.change_wt(smpl_no, output_width, output_length, part_weight,
-                                                       processed_numbers, "plus", fg_yes_no)
+                                                       processed_numbers, "plus", fg_yes_no, 0)
                 else:
                     cc_insert = "insert"
 
@@ -1348,10 +1362,11 @@ def submit_slitting_processing():
                 # rewinding when FG and RM have the same size
                 if cc_insert == "insert":
                     cs_cc = CurrentStock(smpl_no, customer, part_weight, processed_numbers, thickness,
-                                         output_width, output_length, fg_yes_no, grade, unit, packet_name)
+                                         output_width, output_length, fg_yes_no, grade, unit, packet_name,
+                                         output_length2)
                     if cs_cc.check_if_size_exists():
                         CurrentStock.change_wt(cs_cc.smpl_no, cs_cc.width, cs_cc.length, cs_cc.weight,
-                                               cs_cc.numbers, "plus", fg_yes_no)
+                                               cs_cc.numbers, "plus", fg_yes_no, 0)
                     else:
                         cs_cc.save_to_db()
         return render_template('/main_menu.html', message=Markup("Processing for " + smpl_no + " entered"))
@@ -1587,7 +1602,7 @@ def check_stock_htid():
             wt_per_sheet = 2.29
             coating = "20/0"
         if cs.length > 0:
-            packet_wt = round(cs.numbers * wt_per_sheet,0)
+            packet_wt = round((cs.numbers * wt_per_sheet)/1000, 3)
         else:
             part_no = ''
             packet_wt = cs.weight
@@ -1743,12 +1758,13 @@ def dispatch():
         cs_id = smpl_details[0]
         cs = CurrentStock.load_smpl_by_id(cs_id)
         dispatch_detail = DispatchDetail(dispatch_id, cs.smpl_no, cs.thickness, cs.width, cs.length, int(dispatch_nos),
-                                         Decimal(dispatch_qty), defective, int(no_of_packets))
+                                         Decimal(dispatch_qty), defective, int(no_of_packets), cs.length2)
         dispatch_detail.save_to_db()
         if int(dispatch_nos) == cs.numbers:
             CurrentStock.delete_record(cs_id)
         else:
-            cs.change_wt(smpl_no, cs.width, cs.length, dispatch_qty, dispatch_nos, 'minus', cs.status, cs.packet_name)
+            cs.change_wt(smpl_no, cs.width, cs.length, dispatch_qty, dispatch_nos, 'minus', cs.status, cs.length2,
+                         cs.packet_name)
 
     return render_template('/main_menu.html')
 
@@ -1789,6 +1805,12 @@ def qr_dispatch_submit():
                 thickness = size[0]
                 width = size[1]
                 length = size[2]
+                if '-' in length:
+                    _length = length.split(' - ')
+                    length = _length[0]
+                    length2 = _length[1]
+                else:
+                    length2 = 0
                 dispatch_weight = ''
                 if 'COIL' in length:
                     length = '0'
@@ -1801,7 +1823,7 @@ def qr_dispatch_submit():
                 if 'COIL' in length:
                     length = '0'
             status = dispatch_string[6].replace('\r', '')
-            cs_qr_lst = CurrentStock.get_cs_for_qr_dispath(smpl_no, packet_name, width, length, status, customer)
+            cs_qr_lst = CurrentStock.get_cs_for_qr_dispath(smpl_no, packet_name, width, length, status, customer, length2)
 
             if cs_qr_lst:
                 for cs_id, cs in cs_qr_lst:

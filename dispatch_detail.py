@@ -2,7 +2,7 @@ from database import CursorFromConnectionFromPool
 from decimal import *
 
 class DispatchDetail:
-    def __init__(self, dispatch_id, smpl_no, thickness, width, length, numbers, dispatch_wt, defective, no_of_pkts):
+    def __init__(self, dispatch_id, smpl_no, thickness, width, length, numbers, dispatch_wt, defective, no_of_pkts, length2):
         self.dispatch_id = dispatch_id
         self.smpl_no = smpl_no
         self.thickness = thickness
@@ -12,16 +12,22 @@ class DispatchDetail:
         self.dispatch_wt = dispatch_wt
         self.defective = defective
         self.no_of_pkts = no_of_pkts
-
+        self.length2 = length2
 
     def save_to_db(self):
         with CursorFromConnectionFromPool() as cursor:
             cursor.execute("insert into dispatch_detail (dispatch_id, smpl_no, thickness, width, length, numbers, "
-                           "weight, defective, no_of_packets) values (%s, %s, %s, %s, %s, %s, %s, %s, %s)",(self.dispatch_id, self.smpl_no,
-                                                                                              self.thickness, self.width,
-                                                                                              self.length, self.numbers,
-                                                                                              self.dispatch_wt,
-                                                                                              self.defective, self.no_of_pkts))
+                           "weight, defective, no_of_packets, length2) values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                                                                                            (self.dispatch_id,
+                                                                                             self.smpl_no,
+                                                                                             self.thickness,
+                                                                                             self.width,
+                                                                                             self.length,
+                                                                                             self.numbers,
+                                                                                             self.dispatch_wt,
+                                                                                             self.defective,
+                                                                                             self.no_of_pkts,
+                                                                                             self.length2))
 
 
     @classmethod
@@ -33,7 +39,7 @@ class DispatchDetail:
             for detail in user_data:
                 dispatch_detail = DispatchDetail(select_dispatch_hdr_id, detail[2], float(detail[3]), float(detail[4]),
                                                  float(detail[5]), int(detail[6]), float(detail[7]), detail[8],
-                                                 detail[9])
+                                                 detail[9], float(detail[10]))
                 dispatch_detail_lst.append(dispatch_detail)
 
         return dispatch_detail_lst
@@ -48,7 +54,7 @@ class DispatchDetail:
             for detail in user_data:
                 dispatch_detail = DispatchDetail(int(detail[1]), detail[2], float(detail[3]), float(detail[4]),
                                                  float(detail[5]), int(detail[6]), float(detail[7]), detail[8],
-                                                 detail[9])
+                                                 detail[9], float(detail[10]))
                 dispatch_detail_lst.append(dispatch_detail)
 
         return dispatch_detail_lst
@@ -62,7 +68,7 @@ class DispatchDetail:
             for detail in user_data:
                 dispatch_detail = DispatchDetail(int(detail[1]), detail[2], float(detail[3]), float(detail[4]),
                                                  float(detail[5]), int(detail[6]), float(detail[7]), detail[8],
-                                                 detail[9])
+                                                 detail[9], float(detail[10]))
                 dispatch_detail_lst.append(dispatch_detail)
 
         return dispatch_detail_lst

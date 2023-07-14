@@ -118,7 +118,11 @@
             {% for cs in cs_lst %}
             <tr>
                 <td>{{cs.smpl_no}}</td>
-                <td>{{cs.width}} x {{cs.length}}</td>
+                {% if cs.length2 != 0 %}
+                    <td>{{cs.width}} x {{cs.length}} - {{cs.length2}}</td>
+                {% else %}
+                    <td>{{cs.width}} x {{cs.length}}</td>
+                {% endif %}
                 <td>{{cs.weight}}</td>
                 <td>{{cs.numbers}}</td>
                 <td>{{cs.status}}</td>
@@ -185,8 +189,11 @@
                              <td>{{processing_dtl.machine}}</td>
                             <td>{{processing_dtl.processed_wt}}</td>
                             <td>{{processing_dtl.input_width}} x {{processing_dtl.input_length}}</td>
-                            <td>{{processing_dtl.cut_width}} x {{processing_dtl.cut_length}}</td>
-
+                            {% if processing_dtl.cut_length2 != 0 %}
+                                <td>{{processing_dtl.cut_width}}  x {{processing_dtl.cut_length}} - {{processing_dtl.cut_length2}}</td>
+                             {% else %}
+                             <td>{{processing_dtl.cut_width}} x {{processing_dtl.cut_length}}</td>
+                            {% endif %}
                             <td>{{processing_dtl.processed_numbers}} </td>
                              <td>{{processing_dtl.packet_name}}</td>
                              <td>{{processing_dtl.status}}</td>

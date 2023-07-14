@@ -96,7 +96,7 @@
                 <a href ="\fg_to_wip_enter_smpl">FG to WIP</a>
                     <br>
                 {% if current_user.user_type == "all" or current_user.user_type == "plan_head" %}
-                <a href ="\incoming_update_pick_smpl">Update Incoming Details</a>
+                <!--a href ="\incoming_update_pick_smpl">Update Incoming Details</a-->
                 {% endif %}
             </td>
             {% endif %}
@@ -110,6 +110,8 @@
                 <a href="\orders_by_machine?select_operation=Reshearing&type=smpl">Reshearing</a><br>
                 <a href="\orders_by_machine?select_operation=Levelling&type=smpl">Levelling</a><br>
                 <a href="\orders_by_machine?select_operation=Lamination&type=smpl">Lamination</a><br>
+                <a href="\orders_by_machine?select_operation=Trap_NCTL&type=smpl">Trap NCTL</a><br>
+                <a href="\orders_by_machine?select_operation=Trap_Reshearing&type=smpl">Trap Reshearing</a><br>
                 <a href="\processing_search">SMPL Search</a><br>
 
             </td>
@@ -123,6 +125,8 @@
                 <a href="\orders_by_machine?select_operation=Reshearing&type=tr">Reshearing</a><br>
                 <a href="\orders_by_machine?select_operation=Levelling&type=tr">Levelling</a><br>
                 <a href="\orders_by_machine?select_operation=Lamination&type=tr">Lamination</a><br>
+                <a href="\orders_by_machine?select_operation=Trap_NCTL&type=smpl">Trap NCTL</a><br>
+                <a href="\orders_by_machine?select_operation=Trap_Reshearing&type=smpl">Trap Reshearing</a><br>
             </td>
 
         <td>
@@ -135,6 +139,8 @@
                 <a href="\orders_by_machine?select_operation=Reshearing&type=tts">Reshearing</a><br>
                 <a href="\orders_by_machine?select_operation=Levelling&type=tts">Levelling</a><br>
                 <a href="\orders_by_machine?select_operation=Lamination&type=tts">Lamination</a><br>
+                <a href="\orders_by_machine?select_operation=Trap_NCTL&type=smpl">Trap NCTL</a><br>
+                <a href="\orders_by_machine?select_operation=Trap_Reshearing&type=smpl">Trap Reshearing</a><br>
             </td>
         <tr>
 
