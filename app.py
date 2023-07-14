@@ -2352,7 +2352,7 @@ def get_monthly_report():
                 prev_prev_month_wt_lst_arr[i] += prev_prev_data[1]
                 prev_prev_month_cuts_lst_arr[i] += prev_prev_data[2]
                 prev_prev_month_time_lst_arr[i] += prev_prev_data[3]
-                prev_month_total_wt += prev_prev_data[1]
+                prev_prev_month_total_wt += prev_prev_data[1]
         i += 1
 
 
@@ -2370,6 +2370,8 @@ def daily_report_pick_month_year():
     return render_template('/daily_report_pick_month_year.html')
 
 def change_date_format(date):
+
+
     split_date = date.split('-')
     new_date = split_date[2] + '-' + split_date[1] + '-' + split_date[0]
     return new_date
