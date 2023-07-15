@@ -43,12 +43,32 @@ function generateExcel() {
     sheets[fieldValue].push(rowData);
   }
 
-  // Add worksheets to the workbook
+      // Get the column indexes that need number formatting
+  var numberFormatColumns  = [9, 10]; // Example: columns 2 and 4
+
+   // Add worksheets to the workbook
   for (var sheetName in sheets) {
     var ws = XLSX.utils.aoa_to_sheet(sheets[sheetName]);
+    // Set number formatting for the specified columns
+    /*var range = XLSX.utils.decode_range(ws['!ref']);
+    for (var row = range.s.r + 1; row <= range.e.r; row++) {
+    for (var col = range.s.c; col <= range.e.c; col++) {
+      var cellAddress = XLSX.utils.encode_cell({ r: row, c: col });
+      if (numberFormatColumns.includes(col)) {
+        var cellValue = ws[cellAddress].v;
+
+        ws[cellAddress].z = '#,##0.000'; // Set number formatting for the column
+        var trimmedValue = parseFloat(cellValue);
+        ws[cellAddress].v = trimmedValue.toFixed(3);
+      }
+    }
+  }*/
+
     XLSX.utils.book_append_sheet(wb, ws, sheetName);
 
   }
+
+
 
   // Generate the binary data of the Excel file
   var wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
@@ -57,8 +77,18 @@ function generateExcel() {
   var blob = new Blob([wbout], { type: 'application/octet-stream' });
 
   // Create a download link and trigger the download
+  // Get the current date
+    var currentDate = new Date();
+
+    // Format the date to yyyy-mm-dd
+    var year = currentDate.getFullYear();
+    var month = String(currentDate.getMonth() + 1).padStart(2, '0');
+    var day = String(currentDate.getDate()).padStart(2, '0');
+    var formattedDate = day + '-' + month + '-' + year;
+
   var a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = 'HTID_Stock_.xlsx';
+  var file_name = 'HTID_Stock_' + formattedDate + '.xlsx';
+  a.download = file_name;
   a.click();
 }

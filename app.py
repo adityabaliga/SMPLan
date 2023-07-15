@@ -1480,13 +1480,28 @@ def check_stock_ttssi_fg():
     _cs_lst = []
     _cs_id_lst = []
     cs_lst = []
+    cs_509_lst = []
     scams_no_lst = []
 
-    cs_lst = CurrentStock.get_stock_by_customer('TT STEEL SERVICE INDIA PVT.LTD.', 'FG')
-    #cs_lst.append(CurrentStock.get_stock_by_customer('TT STEEL SERVICE INDIA PVT.LTD [ #509 ]', 'FG'))
+    cs_lst = CurrentStock.get_stock_by_customer('TT STEEL SERVICE INDIA PVT.LTD.', 'FGandWIP')
+    cs_509_lst = (CurrentStock.get_stock_by_customer('TT STEEL SERVICE INDIA PVT.LTD [ #509 ]', 'FGandWIP'))
     #cs_lst.append(CurrentStock.get_stock_by_customer('TT STEEL SERVICE INDIA PVT LTD', 'FG'))
 
     for cs_id, cs in cs_lst:
+        _cs_id_lst.append(cs_id)
+        _cs_lst.append(cs)
+        scams_no = cs.grade.split('SCAMS NO')
+        if len(scams_no) > 1:
+            scams_no = scams_no[1]
+            scams_no = scams_no.replace(':', '')
+            scams_no = scams_no.replace(';', '')
+            scams_no = scams_no.replace('.', '')
+            scams_no = scams_no.replace(' ', '')
+            scams_no_lst.append(scams_no)
+        else:
+            scams_no_lst.append('')
+
+    for cs_id, cs in cs_509_lst:
         _cs_id_lst.append(cs_id)
         _cs_lst.append(cs)
         scams_no = cs.grade.split('SCAMS NO')
