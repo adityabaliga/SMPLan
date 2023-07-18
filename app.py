@@ -20,6 +20,7 @@ from dispatch_header import DispatchHeader
 from dispatch_detail import DispatchDetail
 from slitter_batch import SlitterBatch
 import time
+import psycopg2
 
 app = Flask(__name__)
 login_manager = LoginManager()
@@ -1135,117 +1136,295 @@ def submit_processing():
         rm_wt = Decimal(request.form['input_weight'])
         cs_rm_id = request.form['cs_rm_id']
 
-        # Processing object created and saved to db
-        processing = Processing(smpl_no, op_for_hdr, processing_date, start_time, end_time, setting_start_time,
-                                setting_end_time, processing_time, setting_time, no_of_qc, no_of_helpers, names_of_qc,
-                                setting_date, total_processed_wt, total_cuts)
-        processing_id = processing.save_to_db()
+        # Establish a database connection
+        connection = psycopg2.connect(
+            dbname='smpl_prodn',
+            user='postgres',
+            password='smpl@509',
+            host='localhost',
+            port=5432
+        )
 
-        # Slitting/Mini Slitting and CTL/Reshearing/NCTL are managed differently
-        if operation == "CTL" or operation == "CTL 2" or operation == "Reshearing" or operation == "Narrow_CTL" or \
-                operation == "Lamination" or operation == "Levelling" or operation == 'Trap_NCTL' or operation == 'Trap_Reshearing':
-            lamination_lst = request.form.getlist('lamination')
-            for output_width, output_length, output_length2, actual_no_of_pieces, packet_name, processed_wt, \
-                lamination, fg_yes_no, remarks in zip(output_width_lst, output_length_lst, output_length2_lst,
-                                                      actual_no_of_pieces_lst,
-                                                      packet_name_lst, processed_wt_lst,
-                                                      lamination_lst, fg_yes_no_lst, remarks_lst):
-                ip_size = input_size.split('x')
-                ms_width = ip_size[0]
-                ms_length = ip_size[1]
+        try:
+            # Begin a transaction
+            connection.autocommit = False
+            cursor = connection.cursor()
 
-                if lamination != "no-lami" and lamination != "No Lamination":
-                    machine = temp_machine + " " + lamination
+            try:
+                # Processing object created and saved to db
+                processing = Processing(smpl_no, op_for_hdr, processing_date, start_time, end_time, setting_start_time,
+                                        setting_end_time, processing_time, setting_time, no_of_qc, no_of_helpers, names_of_qc,
+                                        setting_date, total_processed_wt, total_cuts)
 
-                if processed_wt != '' and Decimal(processed_wt) > 0.0:
-                    # Get mother size and cut size from the screen. Create processing detail and then update to db
-                    processing_detail = ProcessingDetail(smpl_no, operation, machine, processing_id, output_width,
-                                                         output_length, actual_no_of_pieces,
-                                                         packet_name, remarks, processed_wt, ms_width,
-                                                         ms_length, fg_yes_no, output_length2)
-                    processing_detail.save_to_db()
+                cursor.execute("insert into processing (smpl_no, operation, processing_date, start_time, "
+                               "end_time, setting_start_time, setting_end_time, production_time, setting_time, no_of_qc, "
+                               "no_of_helpers, names_of_qc,setting_date, total_processed_wt,"
+                               "total_cuts) values (%s, %s,%s, %s, "
+                               "%s, %s, %s, %s, %s, %s,%s, %s, %s, %s, %s)",
+                               (processing.smpl_no, processing.operation, processing.processing_date,
+                                processing.start_time, processing.end_time, processing.setting_start_time,
+                                processing.setting_end_time, processing.processing_time, processing.setting_time,
+                                processing.no_of_qc, processing.no_of_helpers, processing.names_of_qc,
+                                processing.setting_date,
+                                processing.total_processed_wt, processing.total_cuts))
 
-                    if operation == "Reshearing":
-                        # For reshearing, the mother material no. of pieces consumed have to be calculated and scrap
-                        # per mother piece has to be calculated and subtracted from the weight
-                        ms_weight = round(
-                            (Decimal(thickness) * Decimal(ms_width) * Decimal(ms_length) * Decimal(0.00000785)), 3)
-                        output_weight = round(
-                            (Decimal(thickness) * Decimal(output_length) * Decimal(output_width) * Decimal(0.00000785)),
-                            3)
-                        # Calculate no of pieces got per mother sheet and then divide by no of output pieces to get
-                        # no. of mother sheets consumed
-                        no_of_pieces_per_ms = round((ms_weight / output_weight), 0)
-                        no_of_ms_consumed = round((int(actual_no_of_pieces) / no_of_pieces_per_ms), 0)
+                cursor.execute("select processing_id from processing where oid= %s", (cursor.lastrowid,))
+                processing_id = cursor.fetchone()
+                #processing_id = processing.save_to_db()
 
-                        # I am not handling scrap as of now because I don't know if the balance width is to be returned
-                        # as balance or scrap. I have to think of how to do this.
-                        # For scrap per mother sheet
-                        # scrap_per_ms = (ms_weight - (output_weight*no_of_pieces_per_ms))
-                        # total_scrap = Decimal(scrap_per_ms) * Decimal(no_of_ms_consumed) / Decimal(1000)
+                # Slitting/Mini Slitting and CTL/Reshearing/NCTL are managed differently
+                if operation == "CTL" or operation == "CTL 2" or operation == "Reshearing" or operation == "Narrow_CTL" or \
+                        operation == "Lamination" or operation == "Levelling" or operation == 'Trap_NCTL' or operation == 'Trap_Reshearing':
+                    lamination_lst = request.form.getlist('lamination')
+                    for output_width, output_length, output_length2, actual_no_of_pieces, packet_name, processed_wt, \
+                        lamination, fg_yes_no, remarks in zip(output_width_lst, output_length_lst, output_length2_lst,
+                                                              actual_no_of_pieces_lst,
+                                                              packet_name_lst, processed_wt_lst,
+                                                              lamination_lst, fg_yes_no_lst, remarks_lst):
+                        ip_size = input_size.split('x')
+                        ms_width = ip_size[0]
+                        ms_length = ip_size[1]
 
-                        # the weight of RM to be reduced is the weight of FG + the scrap generated
-                        # rm_processed_wt = Decimal(processed_wt) + round(total_scrap,3)
+                        if lamination != "no-lami" and lamination != "No Lamination":
+                            machine = temp_machine + " " + lamination
 
-                        rm_processed_wt = Decimal(processed_wt)
+                        if processed_wt != '' and Decimal(processed_wt) > 0.0:
+                            # Get mother size and cut size from the screen. Create processing detail and then update to db
+                            processing_detail = ProcessingDetail(smpl_no, operation, machine, processing_id, output_width,
+                                                                 output_length, actual_no_of_pieces,
+                                                                 packet_name, remarks, processed_wt, ms_width,
+                                                                 ms_length, fg_yes_no, output_length2)
 
-                    elif operation == "Narrow_CTL":
-                        no_of_ms_consumed = rm_wt / Decimal(processed_wt)
-                        rm_processed_wt = processed_wt
+                            cursor.execute(
+                                "insert into processing_detail (smpl_no, operation, machine, processing_id, input_width,"
+                                "input_length, cut_width, cut_length, processed_numbers, packet_name, processed_wt, "
+                                "remarks, status, cut_length2) values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                                (processing_detail.smpl_no,
+                                 processing_detail.operation,
+                                 processing_detail.machine,
+                                 processing_detail.processing_id,
+                                 processing_detail.input_width,
+                                 processing_detail.input_length,
+                                 processing_detail.cut_width,
+                                 processing_detail.cut_length,
+                                 processing_detail.processed_numbers,
+                                 processing_detail.packet_name,
+                                 processing_detail.processed_wt,
+                                 processing_detail.remarks,
+                                 processing_detail.status,
+                                 processing_detail.cut_length2))
+                            #processing_detail.save_to_db()
 
-                    elif operation == "CTL":
-                        no_of_ms_consumed = 0
-                        rm_processed_wt = processed_wt
+                            if operation == "Reshearing":
+                                # For reshearing, the mother material no. of pieces consumed have to be calculated and scrap
+                                # per mother piece has to be calculated and subtracted from the weight
+                                ms_weight = round(
+                                    (Decimal(thickness) * Decimal(ms_width) * Decimal(ms_length) * Decimal(0.00000785)), 3)
+                                output_weight = round(
+                                    (Decimal(thickness) * Decimal(output_length) * Decimal(output_width) * Decimal(0.00000785)),
+                                    3)
+                                # Calculate no of pieces got per mother sheet and then divide by no of output pieces to get
+                                # no. of mother sheets consumed
+                                no_of_pieces_per_ms = round((ms_weight / output_weight), 0)
+                                no_of_ms_consumed = round((int(actual_no_of_pieces) / no_of_pieces_per_ms), 0)
 
-                    else:
-                        no_of_ms_consumed = actual_no_of_pieces
-                        rm_processed_wt = processed_wt
+                                # I am not handling scrap as of now because I don't know if the balance width is to be returned
+                                # as balance or scrap. I have to think of how to do this.
+                                # For scrap per mother sheet
+                                # scrap_per_ms = (ms_weight - (output_weight*no_of_pieces_per_ms))
+                                # total_scrap = Decimal(scrap_per_ms) * Decimal(no_of_ms_consumed) / Decimal(1000)
 
-                    # Reduce weight of mother material by the processed weight of cut material - balance weight remaining in the mother material
-                    # rm_processed_wt = Decimal(rm_processed_wt) + balance_proc_wt
-                    cs_rm = CurrentStock.csid_exists(cs_rm_id)
-                    if cs_rm is not None:
-                        rm_status = CurrentStock.change_wt(smpl_no, ms_width, ms_length, rm_processed_wt,
-                                                           no_of_ms_consumed, "minus", cs_rm.status, cs_rm.length2)
+                                # the weight of RM to be reduced is the weight of FG + the scrap generated
+                                # rm_processed_wt = Decimal(processed_wt) + round(total_scrap,3)
 
-                    # if rm_status == "complete":
-                    # This is done when the RM is over but for some reason the order could not be completed
-                    # This could when the RM is thickness is more or wrong calc of material or processing mistake/change
-                    # OrderDetail.complete_processing_on_del(smpl_no, ms_width, ms_length)
+                                rm_processed_wt = Decimal(processed_wt)
 
-                    # Increase weight of cut material by processed weight. If cut material, doesn't already exist, the
-                    # function returns insert => a new record has to be inserted
-                    if (customer.startswith("HONDA") and fg_yes_no == "FG"):
-                        _packet_name = packet_name
-                    else:
-                        _packet_name = ""
+                            elif operation == "Narrow_CTL":
+                                no_of_ms_consumed = rm_wt / Decimal(processed_wt)
+                                rm_processed_wt = processed_wt
 
-                    cc_insert = CurrentStock.change_wt(smpl_no, output_width, output_length, processed_wt,
-                                                       actual_no_of_pieces, "plus", fg_yes_no,output_length2,
-                                                       _packet_name)
+                            elif operation == "CTL" or operation == "CTL 2":
+                                no_of_ms_consumed = 0
+                                rm_processed_wt = processed_wt
 
-                    # Unit of the material is decided based on the machine used to process the material.
-                    # WARNING: This is bad programming
-                    if machine.startswith("CTL 2") or machine == "Slitting" or machine == "Mini_Slitting" or \
-                            machine == "Reshearing 5" or machine == "Reshearing 6" or machine == "Reshearing 7" or \
-                            machine == "NCTL 2" or machine == "NCTL 3":
-                        unit = '2'
-                    else:
-                        unit = '1'
+                            else:
+                                no_of_ms_consumed = actual_no_of_pieces
+                                rm_processed_wt = processed_wt
 
-                    # The new material is inserted in to current stock
-                    if cc_insert == "insert":
-                        cs_cc = CurrentStock(smpl_no, customer, processed_wt, actual_no_of_pieces, thickness,
-                                             output_width, output_length, fg_yes_no, grade, unit, packet_name,
-                                             output_length2)
-                        cs_cc.save_to_db()
+                            # Reduce weight of mother material by the processed weight of cut material - balance weight remaining in the mother material
+                            # rm_processed_wt = Decimal(rm_processed_wt) + balance_proc_wt
+                            cs_rm = CurrentStock.csid_exists(cs_rm_id)
+                            if cs_rm is not None:
+                                #rm_status = CurrentStock.change_wt(smpl_no, ms_width, ms_length, rm_processed_wt,
+                                #                                   no_of_ms_consumed, "minus", cs_rm.status, cs_rm.length2)
+                                ########################################################################################
+                                # Change wt of RM in current stock
 
-                    # This checks if detail is complete by comparing the processed weight and order detail weight.
-                    # If the order detail is complete, it checks if all the order details in that stage are complete (check_stage_complete)
-                    # If all the order details in that stage are complete, it makes the order details of the next stage ready for production
-                    # If this is the last stage of the order, it marks the order as closed
-                    # OrderDetail.detail_complete(order_detail_id)
 
+                                sign = 'minus'
+                                #length = ms_length
+                                if packet_name == "":
+                                    cursor.execute(
+                                        "select weight, numbers, unit, cs_id from current_stock where smpl_no = %s and width = %s "
+                                        "and length = %s and status = %s and length2 = %s",
+                                        (smpl_no, ms_width, ms_length, cs_rm.status, cs_rm.length2))
+                                    user_data = cursor.fetchone()
+                                else:
+                                    cursor.execute(
+                                        "select weight, numbers, unit, cs_id from current_stock where smpl_no = %s and width = %s "
+                                        "and length = %s and status = %s and packet_name = %s and length2 = %s",
+                                        (smpl_no, ms_width, ms_length, cs_rm.status, cs_rm.packet_name, cs_rm.length2))
+                                    user_data = cursor.fetchone()
+                                if user_data:
+                                    weight = Decimal(user_data[0])
+                                    numbers = Decimal(user_data[1])
+                                    cs_id = int(user_data[3])
+                                    new_weight = weight - Decimal(processed_wt)
+                                    new_weight = round(new_weight, 3)
+                                    if numbers > 1:
+                                        new_numbers = numbers - Decimal(actual_no_of_pieces)
+                                    else:
+                                        new_numbers = numbers
+                                    if (new_weight < 0.5 and sign == "minus" and Decimal(ms_length) == 0) or (
+                                            (new_weight < 0.2) and sign == "minus" and Decimal(ms_length) > 0):
+                                        # OrderDetail.complete_processing_on_del(smpl_no, width, length)
+                                        # CurrentStock.delete_record(cs_id)
+
+                                        cursor.execute("delete from current_stock where cs_id = %s", (cs_id,))
+
+                                        # This is done when the RM is over but for some reason the order could not be completed
+                                        # This could when the RM is thickness is more or wrong calc of material or processing mistake/change
+
+
+                                    else:
+                                        cursor.execute(
+                                            "update current_stock set weight = %s, numbers = %s where cs_id = %s",
+                                            (new_weight, new_numbers, cs_id))
+
+
+
+                            # if rm_status == "complete":
+                            # This is done when the RM is over but for some reason the order could not be completed
+                            # This could when the RM is thickness is more or wrong calc of material or processing mistake/change
+                            # OrderDetail.complete_processing_on_del(smpl_no, ms_width, ms_length)
+
+                            # Unit of the material is decided based on the machine used to process the material.
+                            # WARNING: This is bad programming
+                            if machine.startswith(
+                                    "CTL 2") or machine == "Slitting" or machine == "Mini_Slitting" or \
+                                    machine == "Reshearing 5" or machine == "Reshearing 6" or machine == "Reshearing 7" or \
+                                    machine == "NCTL 2" or machine == "NCTL 3":
+                                unit = '2'
+
+                            else:
+                                unit = '1'
+
+
+                            # Increase weight of cut material by processed weight. If cut material, doesn't already exist, the
+                            # function returns insert => a new record has to be inserted
+                            if (unit == '2' and fg_yes_no == "FG"):
+                                _packet_name = packet_name
+                            else:
+                                _packet_name = ""
+
+                            #cc_insert = CurrentStock.change_wt(smpl_no, output_width, output_length, processed_wt,
+                            #                                   actual_no_of_pieces, "plus", fg_yes_no,output_length2,
+                            #                                   _packet_name)
+
+
+                            ############################################################################################
+                            # Change weight or insert output of processing in to current_stock
+                            sign = 'plus'
+                            if packet_name == "":
+                                cursor.execute(
+                                    "select weight, numbers, unit, cs_id from current_stock where smpl_no = %s and width = %s "
+                                    "and length = %s and status = %s and length2 = %s",
+                                    (smpl_no, output_width, output_length, fg_yes_no, output_length2))
+                                user_data = cursor.fetchone()
+                            else:
+                                cursor.execute(
+                                    "select weight, numbers, unit, cs_id from current_stock where smpl_no = %s and width = %s "
+                                    "and length = %s and status = %s and packet_name = %s and length2 = %s",
+                                    (smpl_no, output_width, output_length, fg_yes_no, packet_name, output_length2))
+                                user_data = cursor.fetchone()
+                            if user_data:
+                                weight = Decimal(user_data[0])
+                                numbers = Decimal(user_data[1])
+                                cs_id = int(user_data[3])
+                                if sign == "minus":
+                                    new_weight = weight - Decimal(processed_wt)
+                                    new_weight = round(new_weight, 3)
+                                    if numbers > 1:
+                                        new_numbers = numbers - Decimal(actual_no_of_pieces)
+                                    else:
+                                        new_numbers = numbers
+                                if sign == "plus":
+                                    new_weight = weight + Decimal(processed_wt)
+                                    new_weight = round(new_weight, 3)
+                                    # if numbers > 1:
+                                    new_numbers = numbers + Decimal(actual_no_of_pieces)
+                                    # else:
+                                    #    new_numbers = numbers
+
+                                if (new_weight < 0.5 and sign == "minus" and Decimal(output_length) == 0) or (
+                                        (new_weight < 0.2) and sign == "minus" and Decimal(output_length) > 0):
+                                    # OrderDetail.complete_processing_on_del(smpl_no, width, length)
+                                    # CurrentStock.delete_record(cs_id)
+
+                                    cursor.execute("delete from current_stock where cs_id = %s", (cs_id,))
+
+                                else:
+                                    cursor.execute(
+                                        "update current_stock set weight = %s, numbers = %s where cs_id = %s",
+                                        (new_weight, new_numbers, cs_id))
+
+                            else:
+                                cs_cc = CurrentStock(smpl_no, customer, processed_wt, actual_no_of_pieces, thickness,
+                                                     output_width, output_length, fg_yes_no, grade, unit, packet_name,
+                                                     output_length2)
+                                cursor.execute(
+                                    "insert into current_stock (smpl_no,weight,numbers,width,length,status,customer,thickness"
+                                    ",grade, unit, packet_name, length2) values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+                                    (cs_cc.smpl_no, cs_cc.weight, cs_cc.numbers, cs_cc.width, cs_cc.length, cs_cc.status,
+                                     cs_cc.customer,
+                                     cs_cc.thickness, cs_cc.grade, cs_cc.unit, cs_cc.packet_name, cs_cc.length2))
+
+
+
+
+
+                            # The new material is inserted in to current stock
+                            '''if cc_insert == "insert":
+                                cs_cc = CurrentStock(smpl_no, customer, processed_wt, actual_no_of_pieces, thickness,
+                                                     output_width, output_length, fg_yes_no, grade, unit, packet_name,
+                                                     output_length2)
+                                cs_cc.save_to_db()'''
+
+                            # This checks if detail is complete by comparing the processed weight and order detail weight.
+                            # If the order detail is complete, it checks if all the order details in that stage are complete (check_stage_complete)
+                            # If all the order details in that stage are complete, it makes the order details of the next stage ready for production
+                            # If this is the last stage of the order, it marks the order as closed
+                            # OrderDetail.detail_complete(order_detail_id)
+                connection.commit()
+                print("Data inserted successfully!")
+
+            except (Exception, psycopg2.Error) as error:
+                # Rollback the transaction if an error occurred
+                connection.rollback()
+                print("Error inserting data:", error)
+
+                # Close the cursor
+            cursor.close()
+
+        except psycopg2.OperationalError as error:
+            # Handle network errors
+            print("Network error occurred:", error)
+            print("Rolling back the transaction...")
+            connection.rollback()
+            return render_template('/main_menu.html', message="Processing Entry not completed")
+        finally:
+            # Close the database connection
+            connection.close()
 
         return render_template('/main_menu.html', message="Processing for " + smpl_no + " entered.")
 
