@@ -1335,7 +1335,7 @@ def submit_processing():
                             ############################################################################################
                             # Change weight or insert output of processing in to current_stock
                             sign = 'plus'
-                            if packet_name == "":
+                            if _packet_name == "":
                                 cursor.execute(
                                     "select weight, numbers, unit, cs_id from current_stock where smpl_no = %s and width = %s "
                                     "and length = %s and status = %s and length2 = %s",
@@ -1345,7 +1345,7 @@ def submit_processing():
                                 cursor.execute(
                                     "select weight, numbers, unit, cs_id from current_stock where smpl_no = %s and width = %s "
                                     "and length = %s and status = %s and packet_name = %s and length2 = %s",
-                                    (smpl_no, output_width, output_length, fg_yes_no, packet_name, output_length2))
+                                    (smpl_no, output_width, output_length, fg_yes_no, _packet_name, output_length2))
                                 user_data = cursor.fetchone()
                             if user_data:
                                 weight = Decimal(user_data[0])
@@ -1380,7 +1380,7 @@ def submit_processing():
 
                             else:
                                 cs_cc = CurrentStock(smpl_no, customer, processed_wt, actual_no_of_pieces, thickness,
-                                                     output_width, output_length, fg_yes_no, grade, unit, packet_name,
+                                                     output_width, output_length, fg_yes_no, grade, unit, _packet_name,
                                                      output_length2)
                                 cursor.execute(
                                     "insert into current_stock (smpl_no,weight,numbers,width,length,status,customer,thickness"
@@ -2017,7 +2017,18 @@ def qr_dispatch_submit():
                 if 'COIL' in length:
                     length = '0'
             status = dispatch_string[6].replace('\r', '')
-            cs_qr_lst = CurrentStock.get_cs_for_qr_dispath(smpl_no, packet_name, width, length, status, customer, length2)
+
+            # Currently FG wise separate packets is only mentioned for unit 2, so picking the unit based on user
+            # to query for packet wise details or else no
+            user = current_user
+            if user.unit == 1:
+                unit = '1'
+
+            if user.unit == 2:
+                unit = '2'
+
+
+            cs_qr_lst = CurrentStock.get_cs_for_qr_dispath(smpl_no, packet_name, width, length, status, customer, length2, unit)
 
             if cs_qr_lst:
                 for cs_id, cs in cs_qr_lst:

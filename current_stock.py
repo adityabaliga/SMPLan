@@ -498,11 +498,11 @@ class CurrentStock:
                 return False
 
     @classmethod
-    def get_cs_for_qr_dispath(cls, smpl_no, packet_name, width, length, status, customer, length2):
+    def get_cs_for_qr_dispath(cls, smpl_no, packet_name, width, length, status, customer, length2, unit):
         cs_lst = []
         cs_id_lst = []
         with CursorFromConnectionFromPool() as cursor:
-            if "HONDA" in customer:
+            if unit == '2':
                 cursor.execute(
                     "select * from current_stock where smpl_no = %s and width = %s "
                     "and length = %s and status = %s and packet_name = %s and customer = %s and length2= %s",
