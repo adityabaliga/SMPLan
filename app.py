@@ -2017,7 +2017,18 @@ def qr_dispatch_submit():
                 if 'COIL' in length:
                     length = '0'
             status = dispatch_string[6].replace('\r', '')
-            cs_qr_lst = CurrentStock.get_cs_for_qr_dispath(smpl_no, packet_name, width, length, status, customer, length2)
+
+            # Currently FG wise separate packets is only mentioned for unit 2, so picking the unit based on user
+            # to query for packet wise details or else no
+            user = current_user
+            if user.unit == 1:
+                unit = '1'
+
+            if user.unit == 2:
+                unit = '2'
+
+
+            cs_qr_lst = CurrentStock.get_cs_for_qr_dispath(smpl_no, packet_name, width, length, status, customer, length2, unit)
 
             if cs_qr_lst:
                 for cs_id, cs in cs_qr_lst:
