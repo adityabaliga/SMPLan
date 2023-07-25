@@ -1495,7 +1495,7 @@ def submit_slitting_processing():
                 processed_numbers = 1
                 output_width = Decimal(output_width)
 
-                packet_name = width_name + part_name
+                packet_name = part_name + width_name
                 part_weight = Decimal(thickness * float(output_width) * float(part_length) * 0.00000785)
                 if "ALUMINIUM " in grade or "ALU " in grade:
                     part_weight = Decimal(thickness * float(output_width) * float(part_length) * 0.0000027)
