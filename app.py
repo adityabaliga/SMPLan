@@ -1325,7 +1325,7 @@ def submit_processing():
                             if (unit == '2' and fg_yes_no == "FG"):
                                 _packet_name = packet_name
                             else:
-                                _packet_name = ""
+                                _packet_name = "WIP"
 
                             #cc_insert = CurrentStock.change_wt(smpl_no, output_width, output_length, processed_wt,
                             #                                   actual_no_of_pieces, "plus", fg_yes_no,output_length2,
@@ -1516,7 +1516,7 @@ def submit_slitting_processing():
                 cs_rm = CurrentStock.csid_exists(cs_rm_id)
                 if cs_rm is not None:
                     rm_status = CurrentStock.change_wt(smpl_no, ms_width, ms_length, part_weight, processed_numbers,
-                                                       "minus", cs_rm.status, 0)
+                                                       "minus", cs_rm.status, 0, cs_rm.packet_name)
 
                 # The issue is during rewinding since mother coil and output width & length remain the same,
                 # The weight is getting added and subtracted from the same current_stock record.
@@ -1528,7 +1528,7 @@ def submit_slitting_processing():
                     # Increase weight of cut material by processed weight. If cut material, doesn't already exist, the
                     # function returns insert => a new record has to be inserted
                     cc_insert = CurrentStock.change_wt(smpl_no, output_width, output_length, part_weight,
-                                                       processed_numbers, "plus", fg_yes_no, 0)
+                                                       processed_numbers, "plus", fg_yes_no, 0, packet_name)
                 else:
                     cc_insert = "insert"
 
@@ -1545,7 +1545,7 @@ def submit_slitting_processing():
                                          output_length2)
                     if cs_cc.check_if_size_exists():
                         CurrentStock.change_wt(cs_cc.smpl_no, cs_cc.width, cs_cc.length, cs_cc.weight,
-                                               cs_cc.numbers, "plus", fg_yes_no, 0)
+                                               cs_cc.numbers, "plus", fg_yes_no, 0, packet_name)
                     else:
                         cs_cc.save_to_db()
         return render_template('/main_menu.html', message=Markup("Processing for " + smpl_no + " entered"))
