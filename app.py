@@ -1546,7 +1546,7 @@ def submit_slitting_processing():
                     if cs_cc.check_if_size_exists():
                         if fg_yes_no == "FG":
                             CurrentStock.change_wt(cs_cc.smpl_no, cs_cc.width, cs_cc.length, cs_cc.weight,
-                                               cs_cc.numbers, "plus", fg_yes_no, 0, packet_name)
+                                                   cs_cc.numbers, "plus", fg_yes_no, 0, packet_name)
                         if fg_yes_no == "WIP":
                             CurrentStock.change_wt(cs_cc.smpl_no, cs_cc.width, cs_cc.length, cs_cc.weight,
                                                    cs_cc.numbers, "plus", fg_yes_no, 0)
