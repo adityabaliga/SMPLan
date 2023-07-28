@@ -1544,8 +1544,12 @@ def submit_slitting_processing():
                                          output_width, output_length, fg_yes_no, grade, unit, packet_name,
                                          output_length2)
                     if cs_cc.check_if_size_exists():
-                        CurrentStock.change_wt(cs_cc.smpl_no, cs_cc.width, cs_cc.length, cs_cc.weight,
+                        if fg_yes_no == "FG":
+                            CurrentStock.change_wt(cs_cc.smpl_no, cs_cc.width, cs_cc.length, cs_cc.weight,
                                                cs_cc.numbers, "plus", fg_yes_no, 0, packet_name)
+                        if fg_yes_no == "WIP":
+                            CurrentStock.change_wt(cs_cc.smpl_no, cs_cc.width, cs_cc.length, cs_cc.weight,
+                                                   cs_cc.numbers, "plus", fg_yes_no, 0)
                     else:
                         cs_cc.save_to_db()
         return render_template('/main_menu.html', message=Markup("Processing for " + smpl_no + " entered"))
