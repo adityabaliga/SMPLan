@@ -484,7 +484,7 @@ class CurrentStock:
             cursor.execute("select * from current_stock where smpl_no = %s and thickness = %s and width = %s "
                            "and length = %s and status = %s and unit = %s and customer = %s",
                            (self.smpl_no, self.thickness, self.width, self.length, self.status, self.unit,
-                            self.customer))
+                            self.customer, self.packet_name))
             user_data = cursor.fetchone()
 
             if user_data:
