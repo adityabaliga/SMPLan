@@ -1,3 +1,4 @@
+from xml.dom import minidom
 from xml.dom.minidom import parse
 import xml.dom.minidom
 import os
@@ -38,8 +39,16 @@ class Incoming:
         # rel_path = filename + '.xml'
         abs_file_path = filename
 
+
+        # Converting xml to string and removing the string which was causing issues
+        # This issue was caused after Tally Prime 3.0 upgrade
+        file_contents = abs_file_path.read()
+        xml_content = file_contents.decode('utf-16')
+        xml_content = xml_content.replace('&#4;','')
+
+
         # Extracting the xml tree in to collection
-        DOMTree = xml.dom.minidom.parse(abs_file_path)
+        DOMTree = minidom.parseString(xml_content)
         collection = DOMTree.documentElement
 
         # Extract incoming date and convert it into a compatible date type
