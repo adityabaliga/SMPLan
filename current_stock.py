@@ -576,3 +576,21 @@ class CurrentStock:
                 return user_data
             else:
                 return None
+
+    @classmethod
+    def getHondaFGStock(cls):
+        with CursorFromConnectionFromPool() as cursor:
+            cursor.execute("select width, length, customer, sum(numbers) as numbers, round(sum(numbers)/300,2) as "
+                           "packets from current_stock cs where (customer like 'TT STEEL%' or customer like 'HONDA%') "
+                           "and ((width = 530 and length =765) or (width = 575 and length =640) or "
+                           "(width = 600 and length =820) or (width = 720 and length =745) or "
+                           "(width = 510 and length =785) or (width = 600 and length =660) or "
+                           "(width = 570 and length =830) or (width = 600 and length =715) or "
+                           "(width = 370 and length =415) or (width = 430 and length =455) or "
+                           "(width = 565 and length = 645) or (width = 655 and length = 740)) "
+                           "group by width, length, customer order by width, customer")
+            user_data = cursor.fetchall()
+        if user_data:
+            return user_data
+        else:
+            return None

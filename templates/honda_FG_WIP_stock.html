@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>SMPL MRP - Display HTID Stock</title>
+    <title>SMPL MRP - HONDA FG/WIP Stock</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
     <style>
     table {
@@ -42,7 +42,7 @@
 
     </style>
 </head>
-<form action="/submit_smpl_incoming" method="post">
+<form>
     <div class="topnav" id="myTopnav">
         <br>
         <table>
@@ -58,70 +58,21 @@
 
     <table class = "table table-sm" id="htid_stock">
     <tr>
-        <!--th>Sl No</th-->
-        <th>Mill</th>
-        <th>DC No</th>
-        <th>Incoming Date</th>
-        <th>SMPL No</th>
-        <th>Spec</th>
-        <th>Coating</th>
-
-
-
-        <th>Thickness</th>
-        <th> Width</th>
-        <th> Length</th>
-
+        <th>Width</th>
+        <th>Length</th>
+        <th>Customer</th>
         <th>Numbers</th>
-
-        <th>Net Weight</th>
-        <th>Mill ID</th>
-        <th>Part No</th>
-        <th>Status</th>
-
-
+        <th>No of Packets (approx)</th>
     </tr>
-
-    {% for cs_id, cs, part_no, wt_per_sheet, coating, packet_wt,mill, mill_id, incoming_date, dc_number, dc_date in cs_lst %}
-        {% if cs.packet_name != "W0P0" %}
+    {% for fg in honda_fg_stock %}
         <tr>
-
-            <!--td>{{loop.index}}</td-->
-            <td>{{mill}}</td>
-            <td>{{dc_number}}</td>
-            <td>{{dc_date}}</td>
-            {% if cs.packet_name == "MC"%}
-            <td>{{cs.smpl_no}}</td>
-            {% else %}
-            <td>{{cs.smpl_no}}{{cs.packet_name}}</td>
-            {% endif %}
-            <td>{{cs.grade}}</td>
-            <td>{{coating}} </td>
-
-
-            <td>{{cs.thickness}}</td>
-            <td>{{cs.width}}</td>
-            <td>{{cs.length}}</td>
-
-            <td>{{cs.numbers}} </td>
-
-
-            <td>{{packet_wt}} </td>
-            <td>{{mill_id}}</td>
-            <td>{{part_no}}</td>
-            <td class = "status">{{cs.status}} </td>
-        {% endif %}
-
-
-
+            <td>fg[0]</td>
+            <td>fg[1]</td>
+            <td>fg[2]</td>
+            <td>fg[3]</td>
+            <td>fg[4]</td>
         </tr>
-
     {% endfor %}
-
     </table>
-    <td><input type = "button" class="btn btn-default" value="Download" onclick="generateExcel()"></td>
-
 </form>
-<script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
-<script src = "{{ url_for('static', filename='js/stock.js') }}"></script>
 </html>

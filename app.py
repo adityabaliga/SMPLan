@@ -1240,7 +1240,7 @@ def submit_processing():
                                 rm_processed_wt = Decimal(processed_wt)
 
                             elif operation == "Narrow_CTL":
-                                no_of_ms_consumed = rm_wt / Decimal(processed_wt)
+                                no_of_ms_consumed = 0
                                 rm_processed_wt = processed_wt
 
                             elif operation == "CTL" or operation == "CTL 2":
@@ -1313,7 +1313,7 @@ def submit_processing():
                             if machine.startswith(
                                     "CTL 2") or machine == "Slitting" or machine == "Mini_Slitting" or \
                                     machine == "Reshearing 5" or machine == "Reshearing 6" or machine == "Reshearing 7" or \
-                                    machine == "NCTL 2" or machine == "NCTL 3":
+                                    machine == "NCTL 2" or machine == "NCTL 3" or machine == "NCTL 4" or machine == "NCTL 5":
                                 unit = '2'
 
                             else:
@@ -2577,6 +2577,14 @@ def get_monthly_report():
 @app.route('/daily_report_pick_month_year', methods=['GET', 'POST'])
 def daily_report_pick_month_year():
     return render_template('/daily_report_pick_month_year.html')
+
+
+@app.route('/honda_wip_fg_stock', methods=['GET', 'POST'])
+def honda_wip_fg_stock():
+    honda_fg_stock = CurrentStock.getHondaFGStock()
+    #honda_wip_stock = CurrentStock.getHondaFGStock()
+    render_template('/honda_FG_WIP_stock.html', honda_fg_stock = honda_fg_stock)
+
 
 def change_date_format(date):
 

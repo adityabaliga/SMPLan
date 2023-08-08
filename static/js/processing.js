@@ -421,8 +421,15 @@ function addRow(tableID)
                         index--;
                       }
 
-                    var firstPart = str.substring(0, index+1);
                     var secondPart = parseInt(str.substring(index+1)) +1;
+                    var firstPart;
+                    if (secondPart > 9){
+                        firstPart = str.substring(0, index+1);
+                    }else{
+                        firstPart = str.substring(0, index+2);
+                    }
+
+
 
                     console.log(firstPart);
                     console.log(secondPart);
