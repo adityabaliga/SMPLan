@@ -2581,9 +2581,15 @@ def daily_report_pick_month_year():
 
 @app.route('/honda_wip_fg_stock', methods=['GET', 'POST'])
 def honda_wip_fg_stock():
-    honda_fg_stock = CurrentStock.getHondaFGStock()
-    #honda_wip_stock = CurrentStock.getHondaFGStock()
-    render_template('/honda_FG_WIP_stock.html', honda_fg_stock = honda_fg_stock)
+    honda_fg_stock_lst = []
+    honda_wip_stock_lst = []
+
+    honda_fg_stock_lst = CurrentStock.getHondaFGStock()
+    honda_wip_stock_lst = CurrentStock.getHondaWIPStock()
+
+
+
+    return render_template('/honda_FG_WIP_stock.html', fg_lst = honda_fg_stock_lst, wip_lst = honda_wip_stock_lst)
 
 
 def change_date_format(date):

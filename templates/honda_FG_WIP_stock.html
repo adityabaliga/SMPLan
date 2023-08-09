@@ -55,8 +55,9 @@
     </div>
 
     <hr class ="style1">
+    <h2>FG List</h2>
+    <table class = "table table-sm" id="htid_fg_stock">
 
-    <table class = "table table-sm" id="htid_stock">
     <tr>
         <th>Width</th>
         <th>Length</th>
@@ -64,13 +65,34 @@
         <th>Numbers</th>
         <th>No of Packets (approx)</th>
     </tr>
-    {% for fg in honda_fg_stock %}
+    {% for fg in fg_lst %}
         <tr>
-            <td>fg[0]</td>
-            <td>fg[1]</td>
-            <td>fg[2]</td>
-            <td>fg[3]</td>
-            <td>fg[4]</td>
+            <td>{{fg[0]}}</td>
+            <td>{{fg[1]}}</td>
+            <td>{{fg[2]}}</td>
+            <td>{{fg[3]}}</td>
+            <td>{{fg[4]}}</td>
+        </tr>
+    {% endfor %}
+    </table>
+
+    <h2>WIP List</h2>
+    <table class = "table table-sm" id="htid_wip_stock">
+
+    <tr>
+        <th>Width</th>
+        <th>Weight</th>
+        <th>Numbers</th>
+        <th>Customer</th>
+
+    </tr>
+    {% for wip in wip_lst %}
+        <tr>
+            <td>{{wip[0]}}</td>
+            <td>{{wip[1]}}</td>
+            <td>{{wip[2]}}</td>
+            <td>{{wip[3]}}</td>
+
         </tr>
     {% endfor %}
     </table>

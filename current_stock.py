@@ -594,3 +594,22 @@ class CurrentStock:
             return user_data
         else:
             return None
+
+
+    @classmethod
+    def getHondaWIPStock(cls):
+        with CursorFromConnectionFromPool() as cursor:
+            cursor.execute("select cs.width, sum(cs.weight) as tot_wt, sum(cs.numbers) as tot_nos, "
+                           "cs.customer from current_stock cs where cs.length = 0 and cs.status ='WIP' "
+                           "and (cs.customer like 'TT STEEL%' or cs.customer like 'HONDA%') and ((cs.width = 530) or "
+                           "(cs.width = 575) or (cs.width = 600) or (cs.width = 720) or (cs.width = 510) or "
+                           "(cs.width = 600) or (cs.width = 570) or (cs.width = 600) or (cs.width = 370) or "
+                           "(cs.width = 430) or (cs.width = 565) or (cs.width = 655)) group by cs.width, cs.customer "
+                           "order by cs.width, cs.customer")
+            user_data = cursor.fetchall()
+        if user_data:
+            return user_data
+        else:
+            return None
+
+
