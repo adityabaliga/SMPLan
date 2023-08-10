@@ -61,17 +61,19 @@
     <tr>
         <th>Width</th>
         <th>Length</th>
-        <th>Customer</th>
+
         <th>Numbers</th>
         <th>No of Packets (approx)</th>
+        <th>Customer</th>
     </tr>
     {% for fg in fg_lst %}
         <tr>
             <td>{{fg[0]}}</td>
             <td>{{fg[1]}}</td>
-            <td>{{fg[2]}}</td>
+
             <td>{{fg[3]}}</td>
             <td>{{fg[4]}}</td>
+            <td>{{fg[2]}}</td>
         </tr>
     {% endfor %}
     </table>
