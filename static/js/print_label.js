@@ -21,6 +21,7 @@ var lbl_gross_wt_pos = 19;
 var lbl_top_comment_pos = 20;
 var lbl_format_size = 21;
 var lbl_mat_status = 22;
+var lbl_qc_name = 23;
 
 //function to reduce the font size when length of text is long
 //https://stackoverflow.com/questions/18229230/dynamically-change-the-size-of-the-font-size-based-on-text-length
@@ -69,6 +70,8 @@ function get_param_new(){
 
     document.getElementById("smpl_no").innerHTML = queries[lbl_smpl_no_pos] + " - " + queries[lbl_packet_name_pos] + " (" +queries[lbl_mat_type_pos] + ")";
     document.getElementById("size").innerHTML = queries[lbl_size_pos];
+
+    document.getElementById("qc_name").innerHTML = queries[lbl_qc_name];
 
 
      if(url.includes('print_label_tsl')){

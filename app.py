@@ -2419,6 +2419,7 @@ def print_label_smpl_pick():
     processing_detail_lst = []
     _processing_detail_lst = []
     processing_date_lst = []
+    processing_qc_lst=[]
 
     if request.method == 'POST':
         smpl_number = request.form['smpl_no']
@@ -2431,8 +2432,9 @@ def print_label_smpl_pick():
         for processing_detail in _processing_detail_lst:
             processing_detail_lst.append(processing_detail)
             processing_date_lst.append(processing.processing_date)
+            processing_qc_lst.append(processing.names_of_qc)
 
-    return render_template('/print_label_pick_processing.html', processing_detail_lst=zip(processing_detail_lst, processing_date_lst))
+    return render_template('/print_label_pick_processing.html', processing_detail_lst=zip(processing_detail_lst, processing_date_lst, processing_qc_lst))
 
 @app.route('/print_old_label_format', methods=['GET', 'POST'])
 def print_old_label_format():

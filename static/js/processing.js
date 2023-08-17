@@ -565,7 +565,8 @@ function print_label_slit_new(){
     data += fg_table.rows[rowId].cells[gross_wt_pos].lastChild.value + '&';
     data += fg_table.rows[rowId].cells[top_comment_pos].lastChild.value + '&';
     data += fg_table.rows[rowId].cells[label_size_pos].lastChild.value + '&';
-    data += fg_table.rows[rowId].cells[status_pos].lastChild.value;
+    data += fg_table.rows[rowId].cells[status_pos].lastChild.value + '&';
+    data += document.getElementById('lbl_qc_name').value;
 
     var new_page;
     if(document.getElementById('lbl_format').value == "TSL"){
@@ -603,6 +604,7 @@ function print_label_new(){
     data += document.getElementById('lbl_top_comment').value + '&';
     data += document.getElementById('lbl_format_size').value + '&';
     data += document.getElementById('lbl_mat_status').value + '&';
+    data += document.getElementById('lbl_qc_name').value + '&';
 
     var new_page;
     if(document.getElementById('lbl_format').value == "TSL"){
@@ -757,6 +759,13 @@ function cust_name_for_label(customer){
 
 //This is for label in new format for slitting
 function make_label_new_slit(th){
+
+    qc_name = document.getElementById("names_of_qc").value;
+    if(!qc_name){
+        window.alert("QC Name is not entered.");
+        return; // Exit the function
+    }
+
     var rowId = parseInt(event.target.parentNode.parentNode.id);
               //this gives id of tr whose button was clicked
     var row_id = th.parentNode.id;
@@ -893,6 +902,7 @@ function make_label_new_slit(th){
     document.getElementById('lbl_grade').value = grade.trimEnd();
     document.getElementById('lbl_mat_type').value = material_type.trimEnd();
     document.getElementById('lbl_scams_no').value = scams_no.trimEnd();
+    document.getElementById('lbl_qc_name').value = qc_name;
 
     //FG_Table population
     var html = '<tr id= %id%>' +
@@ -1318,6 +1328,12 @@ function honda_part_no(width,length){
 
 //Fill label details new version. This will allow for all formats and sizes
 function make_label_new(th){
+
+    qc_name = document.getElementById("names_of_qc").value;
+    if(!qc_name){
+        window.alert("QC Name is not entered.");
+        return; // Exit the function
+    }
     var rowId = parseInt(event.target.parentNode.parentNode.id);
               //this gives id of tr whose button was clicked
     var row_id = th.parentNode.id;
@@ -1525,6 +1541,8 @@ function make_label_new(th){
         document.getElementById('lbl_batch_no').value = tsl_no + 'P';
     }
     document.getElementById('lbl_mat_status').value = mat_status;
+    document.getElementById('lbl_qc_name').value = qc_name;
+
 
 
 }
@@ -1532,6 +1550,13 @@ function make_label_new(th){
 
 //Fill label details new version. This will allow for all formats and sizes
 function make_label_trap_new(th){
+
+    qc_name = document.getElementById("names_of_qc").value;
+    if(!qc_name){
+        window.alert("QC Name is not entered.");
+        return; // Exit the function
+    }
+
     var rowId = parseInt(event.target.parentNode.parentNode.id);
               //this gives id of tr whose button was clicked
     var row_id = th.parentNode.id;
@@ -1739,7 +1764,7 @@ function make_label_trap_new(th){
         document.getElementById('lbl_batch_no').value = tsl_no + 'P';
     }
     document.getElementById('lbl_mat_status').value = mat_status;
-
+    document.getElementById('lbl_qc_name').value = qc_name;
 
 }
 

@@ -32,6 +32,11 @@ function make_label_old(smpl_no, customer){
     document.getElementById('lbl_packet_name').value = queries[3];
     document.getElementById('lbl_mat_status').value = queries[6];
 
+    var qc_name = queries[8].replace('+', ' ');
+    qc_name = qc_name.replace('.', '');
+
+    document.getElementById('lbl_qc_name').value = qc_name;
+
     var grade_field = document.getElementById("lbl_grade").value;
     var grade_coating = "";
     //Grade. Check if grade exists
