@@ -584,9 +584,12 @@ class CurrentStock:
                            "packets from current_stock cs where (customer like 'TT STEEL%' or customer like 'HONDA%') "
                            "and ((width = 530 and length =765) or (width = 575 and length =640) or "
                            "(width = 600 and length =820) or (width = 720 and length =745) or "
-                           "(width = 510 and length =785) or (width = 600 and length =660) or "
-                           "(width = 570 and length =830) or (width = 600 and length =715) or "
                            "(width = 370 and length =415) or (width = 430 and length =455) or "
+                           "(width = 510 and length =785) or (width = 600 and length =660) or "
+                           "(width = 550 and length =790) or (width = 590 and length =705) or "
+                           "(width = 515 and length =715) or (width = 620 and length =675) or "
+                           "(width = 520 and length =765) or (width = 565 and length =645) or "
+                           "(width = 570 and length =830) or (width = 600 and length =715) or "
                            "(width = 565 and length = 645) or (width = 655 and length = 740)) "
                            "group by width, length, customer order by width, customer")
             user_data = cursor.fetchall()
@@ -603,7 +606,9 @@ class CurrentStock:
                            "cs.customer from current_stock cs where cs.length = 0 and cs.status ='WIP' "
                            "and (cs.customer like 'TT STEEL%' or cs.customer like 'HONDA%') and ((cs.width = 530) or "
                            "(cs.width = 575) or (cs.width = 600) or (cs.width = 720) or (cs.width = 510) or "
-                           "(cs.width = 600) or (cs.width = 570) or (cs.width = 600) or (cs.width = 370) or "
+                           "(cs.width = 600) or (cs.width = 550) or (cs.width = 590) or (cs.width = 570) or "
+                           "(cs.width = 515) or (cs.width = 620) or (cs.width = 520) or "
+                           "(cs.width = 565) or (cs.width = 600) or (cs.width = 370) or "
                            "(cs.width = 430) or (cs.width = 565) or (cs.width = 655)) group by cs.width, cs.customer "
                            "order by cs.width, cs.customer")
             user_data = cursor.fetchall()
