@@ -1,3 +1,184 @@
+//This function will manage the customer name for the label
+function cust_name_for_label(customer){
+    customer = customer.toLowerCase();
+    // Start by removing pvt ltd or PRIVATE LIMITED or LIMITED or LTD in the name. Also remove anything after [
+    customer = customer.replace("private",'');
+    customer = customer.replace("limited",'');
+    customer = customer.replace("pvt",'');
+    customer = customer.replace("ltd",'');
+    customer = customer.replaceAll(".",'');
+    customer = customer.replaceAll("&",' and ');
+
+    temp_customer = customer.split('[');
+    customer =  temp_customer[0];
+    var cust_name;
+    var cust_split;
+
+    if(customer.startsWith("veer o metal") || customer.startsWith("veer-o-metal")){
+        cust_name= "Veer O Metals";
+    }
+    else if(customer.startsWith("ttp technolgies")){
+        cust_name= "TTP Technologies";
+    }
+    else if(customer.startsWith("mpp technolgies")){
+        cust_name= "MPP Technologies";
+    }
+    else if(customer.startsWith("nash industries")){
+        cust_name= "Nash Industries";
+    }
+    else if(customer.startsWith("balmer lawrie")){
+        cust_name= "Balmer Lawrie";
+    }
+    else if(customer.startsWith("metal storage")){
+        cust_name= "Metal Storage";
+    }
+    else if(customer.startsWith("bharat metal")){
+        cust_name= "Bharat Metal";
+    }
+    else if(customer.startsWith("aditya auto")){
+        cust_name= "Aditya Auto";
+    }
+    else if(customer.startsWith("satrac eng")){
+        cust_name= "SATRAC";
+    }
+    else if(customer.startsWith("mallik eng")){
+        cust_name= "Mallik Engg";
+    }
+    else if(customer.startsWith("kanunga")){
+        cust_name= "Kanunga Extrusion";
+    }
+    else if(customer.startsWith("sun zone")){
+        cust_name= "SUN ZONE SOLAR";
+    }
+    else if(customer.startsWith("tata steel downstream products")){
+        cust_name= "TSDPL";
+    }
+    else if(customer.startsWith("honda")){
+        cust_name= "HONDA";
+    }
+    else if(customer.startsWith("tt steel")){
+        cust_name= "TTSSI";
+    }
+    else if(customer.startsWith("jr and ")){
+        cust_name= "J R AND COMPANY";
+    }
+    else{
+        cust_split = customer.split(' ');
+        if(cust_split.length >=2){
+            customer = cust_split[0] + ' ' + cust_split[1];
+        }
+        cust_name = customer.toUpperCase();
+    }
+
+    return cust_name;
+}
+
+
+function honda_part_no(width,length){
+    var part_no = "";
+    var coating = "";
+    var wt_per_sheet = "";
+
+            if (width == 720 && length == 745){
+            part_no = "KONA PLATE BOTTOM";
+            wt_per_sheet = 3.37;
+            coating = "20/0";
+        }
+    else if (width == 600 && length == 820){
+                part_no = "KONA OUTER R/L";
+                wt_per_sheet = 3.09;
+                coating = "0/20";
+            }
+    else if (width == 370 && length == 415){
+                part_no = "K0LA+K0PA+K0YA, Tank Upper";
+                wt_per_sheet = 0.97;
+                coating = "0/20";
+            }
+    else if (width == 430 && length == 455){
+                part_no = "K0LA+K0PA+K0YA, Tank Lower";
+                wt_per_sheet = 1.23;
+                coating = "0/20";
+            }
+    else if (width == 570 && length == 830){
+                part_no = "K1KA R/L";
+                wt_per_sheet = 2.97;
+                coating = "0/20";
+            }
+    else if (width == 600 && length == 715){
+                part_no = "K1KA PLATE BOTTOM";
+                wt_per_sheet = 2.69;
+                coating = "20/0";
+            }
+    else if (width == 550 && length == 790){
+                part_no = "K1CA TANK R/L";
+                wt_per_sheet = 2.73;
+                coating = "0/20";
+            }
+    else if (width == 590 && length == 705){
+                part_no = "K1CA TANK BOTTOM";
+                wt_per_sheet = 2.61;
+                coating = "20/0";
+            }
+    else if (width == 530 && length == 765){
+                part_no = "K67 OUTER R/L";
+                wt_per_sheet = 2.55;
+                coating = "0/20";
+            }
+    else if (width == 575 && length == 640){
+                part_no = "K67 PLATE BOTTOM";
+                wt_per_sheet = 2.31;
+                coating = "20/0";
+            }
+    else if (width == 510 && length == 785){
+                part_no = "K0VA OUTER R/L";
+                wt_per_sheet = 2.50;
+                coating = "0/20";
+            }
+    else if (width == 600 && length == 660){
+                part_no = "K0VA PLATE BOTTOM";
+                wt_per_sheet = 2.29;
+                coating = "20/0";
+            }
+    else if (width == 655 && length == 740){
+                part_no = "K3CA UPPER";
+                wt_per_sheet = 2.66;
+                coating = "0/30";
+            }
+    else if (width == 565 && length == 645){
+                part_no = "K3CA BTM";
+                wt_per_sheet = 2.29;
+                coating = "20/0";
+    }
+    else if (width == 520 && length == 765){
+                part_no = "KTE TANK R/L";
+                wt_per_sheet = 2.50;
+                coating = "0/20";
+            }
+    else if (width == 565 && length == 645){
+                part_no = "KTE TANK BOTTOM";
+                wt_per_sheet = 2.29;
+                coating = "20/0";
+            }
+    else if (width == 515 && length == 715){
+                part_no = "K1EA TANK R/L";
+                wt_per_sheet = 2.31;
+                coating = "0/20";
+            }
+    else if (width == 620 && length == 675){
+                part_no = "K1EA TANK BOTTOM";
+                wt_per_sheet = 2.63;
+                coating = "20/0";
+            }
+
+    else{
+        part_no = "";
+        wt_per_sheet = 0;
+        coating = "";
+    }
+    return (part_no + ";" + wt_per_sheet + ";" +coating);
+    //return part_no;
+}
+
 function make_label_old(smpl_no, customer){
     //var t = th;
     var queryString = decodeURIComponent(window.location.search);

@@ -1277,7 +1277,7 @@ function honda_part_no(width,length){
                 coating = "20/0";
             }
     else if (width == 510 && length == 785){
-                part_no = "K0VA OUTER R/L"";
+                part_no = "K0VA OUTER R/L";
                 wt_per_sheet = 2.50;
                 coating = "0/20";
             }
