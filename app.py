@@ -1732,7 +1732,7 @@ def check_stock_htid():
             wt_per_sheet = 3.37
             coating = "20/0"
         if cs.width == 600 and cs.length == 820:
-            part_no = "KONA HALF OTHER RL"
+            part_no = "KONA OUTER R/L"
             wt_per_sheet = 3.09
             coating = "0/20"
         if cs.width == 370 and cs.length == 415:
@@ -1744,7 +1744,7 @@ def check_stock_htid():
             wt_per_sheet = 1.23
             coating = "0/20"
         if cs.width == 570 and cs.length == 830:
-            part_no = "K1KA HALF OTHER RL"
+            part_no = "K1KA R/L"
             wt_per_sheet = 2.97
             coating = "0/20"
         if cs.width == 600 and cs.length == 715:
@@ -1752,23 +1752,23 @@ def check_stock_htid():
             wt_per_sheet = 2.69
             coating = "20/0"
         if cs.width == 550 and cs.length == 790:
-            part_no = "K1CA-BS-6 HALF OTHER RL"
+            part_no = "K1CA TANK R/L"
             wt_per_sheet = 2.73
             coating = "0/20"
         if cs.width == 590 and cs.length == 705:
-            part_no = "K1CA-BS-6 PLATE BOTTOM"
+            part_no = "K1CA TANK BOTTOM"
             wt_per_sheet = 2.61
             coating = "20/0"
         if cs.width == 530 and cs.length == 765:
-            part_no = "K67-BS4 HALF OTHER RL"
+            part_no = "K67 OUTER R/L"
             wt_per_sheet = 2.55
             coating = "0/20"
         if cs.width == 575 and cs.length == 640:
-            part_no = "K67-BS4 PLATE BOTTOM"
+            part_no = "K67 PLATE BOTTOM"
             wt_per_sheet = 2.31
             coating = "20/0"
         if cs.width == 510 and cs.length == 785:
-            part_no = "K0VA HALF OTHER RL"
+            part_no = "K0VA OUTER R/L"
             wt_per_sheet = 2.50
             coating = "0/20"
         if cs.width == 600 and cs.length == 660:
@@ -1776,19 +1776,19 @@ def check_stock_htid():
             wt_per_sheet = 2.29
             coating = "20/0"
         if cs.width == 520 and cs.length == 765:
-            part_no = "KTEM-BS4 HALF OTHER RL"
+            part_no = "KTE TANK R/L"
             wt_per_sheet = 2.50
             coating = "0/20"
         if cs.width == 565 and cs.length == 645:
-            part_no = "KTEM-BS4 PLATE BOTTOM"
+            part_no = "KTE TANK BOTTOM"
             wt_per_sheet = 2.29
             coating = "20/0"
         if cs.width == 515 and cs.length == 715:
-            part_no = "K1EA-BS6 HALF OTHER RL"
+            part_no = "K1EA TANK R/L"
             wt_per_sheet = 2.31
             coating = "0/20"
         if cs.width == 620 and cs.length == 675:
-            part_no = "K1EA-BS6 PLATE BOTTOM"
+            part_no = "K1EA TANK BOTTOM"
             wt_per_sheet = 2.63
             coating = "20/0"
         if cs.width == 655 and cs.length == 740:

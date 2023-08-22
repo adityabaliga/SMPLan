@@ -1232,7 +1232,7 @@ function honda_part_no(width,length){
             coating = "20/0";
         }
     else if (width == 600 && length == 820){
-                part_no = "KONA HALF OTHER RL";
+                part_no = "KONA OUTER R/L";
                 wt_per_sheet = 3.09;
                 coating = "0/20";
             }
@@ -1247,7 +1247,7 @@ function honda_part_no(width,length){
                 coating = "0/20";
             }
     else if (width == 570 && length == 830){
-                part_no = "K1KA HALF OTHER RL";
+                part_no = "K1KA R/L";
                 wt_per_sheet = 2.97;
                 coating = "0/20";
             }
@@ -1257,27 +1257,27 @@ function honda_part_no(width,length){
                 coating = "20/0";
             }
     else if (width == 550 && length == 790){
-                part_no = "K1CA-BS-6 HALF OTHER RL";
+                part_no = "K1CA TANK R/L";
                 wt_per_sheet = 2.73;
                 coating = "0/20";
             }
     else if (width == 590 && length == 705){
-                part_no = "K1CA-BS-6 PLATE BOTTOM";
+                part_no = "K1CA TANK BOTTOM";
                 wt_per_sheet = 2.61;
                 coating = "20/0";
             }
     else if (width == 530 && length == 765){
-                part_no = "K67-BS4 HALF OTHER RL";
+                part_no = "K67 OUTER R/L";
                 wt_per_sheet = 2.55;
                 coating = "0/20";
             }
     else if (width == 575 && length == 640){
-                part_no = "K67-BS4 PLATE BOTTOM";
+                part_no = "K67 PLATE BOTTOM";
                 wt_per_sheet = 2.31;
                 coating = "20/0";
             }
     else if (width == 510 && length == 785){
-                part_no = "K0VA HALF OTHER RL";
+                part_no = "K0VA OUTER R/L"";
                 wt_per_sheet = 2.50;
                 coating = "0/20";
             }
@@ -1297,22 +1297,22 @@ function honda_part_no(width,length){
                 coating = "20/0";
     }
     else if (width == 520 && length == 765){
-                part_no = "KTEM-BS4 HALF OTHER RL";
+                part_no = "KTE TANK R/L";
                 wt_per_sheet = 2.50;
                 coating = "0/20";
             }
     else if (width == 565 && length == 645){
-                part_no = "KTEM-BS4 PLATE BOTTOM";
+                part_no = "KTE TANK BOTTOM";
                 wt_per_sheet = 2.29;
                 coating = "20/0";
             }
     else if (width == 515 && length == 715){
-                part_no = "K1EA-BS6 HALF OTHER RL";
+                part_no = "K1EA TANK R/L";
                 wt_per_sheet = 2.31;
                 coating = "0/20";
             }
     else if (width == 620 && length == 675){
-                part_no = "K1EA-BS6 PLATE BOTTOM";
+                part_no = "K1EA TANK BOTTOM";
                 wt_per_sheet = 2.63;
                 coating = "20/0";
             }
