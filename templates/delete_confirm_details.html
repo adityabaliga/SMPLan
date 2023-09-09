@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SMPL MRP - Delete Confirm Details</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+    <style>
+        .mytable>tbody>tr>td, .mytable>tbody>tr>th, .mytable>tfoot>tr>td, .mytable>tfoot>tr>th, .mytable>thead>tr>td, .mytable>thead>tr>th {
+    padding: 6px;
+    }
+    input,select {
+    font-family: "Verdana";
+    }
+    hr.style1{
+	        border-top: 15px solid #4d0000;
+            }
+        .oe{
+            font-family: Mathematica6 Bold, Old English Text MT, Engravers Old English BT, Old English, Collins Old English, New Old English, serif;
+            font-size: 50px;
+            color: #4d0000;
+            text-align:center;
+            }
+        .topnav a:hover {
+            color: #4d0000;
+            text-decoration: none;
+        }
+        .nopad {
+                margin: 0;
+                padding: 0;
+                margin-top: 0em;
+                margin-bottom: 0em;
+            }
+
+
+    </style>
+</head>
+<form action="/delete_smpl_submit">
+
+    <div class="topnav" id="myTopnav">
+        <br>
+        <table>
+            <td><img src="/static/logo.jpg"  height="70" width="92" align = "left"></td>
+            <td width="1050px"><div align="center" class="nopad"> <a href="\main_menu"  class="oe">SMPL</a></div></td>
+            <td><div align="left" class="nopad">Hi {{current_user.username}}<br>
+            <a href="\change_password_form">Change Password</a><br>
+            <a href="\logout">Logout</a></div></td>
+        </table>
+    </div>
+
+    <hr class ="style1">
+    <div align="center" class="nopad"><h2>Details for {{incoming.smpl_no}}</h2></div>
+    <h3>Incoming Details Hist</h3>
+    <table class = "table table-sm">
+        <tr>
+            <td>SMPL No: <input type="text" id="smpl_no" name="smpl_no" value="{{incoming.smpl_no}}" readonly></td>
+            <td>Customer: {{incoming.customer}}</td>
+        </tr>
+        <tr>
+            <td>Incoming Date: {{incoming.incoming_date}}</td>
+            <td>Unit: {{incoming.unit}}</td>
+        </tr>
+        <tr>
+            <td>Thickness in mm: {{incoming.thickness}}</td>
+            <td>Width in mm: {{incoming.width}}</td>
+            <td>Length in mm: {{incoming.length}}</td>
+        </tr>
+        <tr>
+            <td>Grade: {{incoming.grade}}</td>
+            <td>Weight in MT: {{incoming.weight}}</td>
+            <td>Numbers: {{incoming.numbers}}</td>
+        </tr>
+        <tr>
+            <td>Material Type: {{incoming.material_type}}</td>
+            <td>SCAMS No: {{incoming.scams_no}}</td>
+            <td>Coating: {{incoming.coating}}</td>
+
+        </tr>
+        <tr>
+            <td>Mill: {{incoming.mill}}</td>
+            <td>Mill ID: {{incoming.mill_id}}</td>
+        </tr>
+        <tr>
+            <td>DC No: {{incoming.dc_number}}</td>
+            <td>DC Date: {{incoming.dc_date}}</td>
+        </tr>
+        <tr>
+            <td>Remarks: {{incoming.remarks}}</td>
+
+        </tr>
+    </table>
+    <!--h3>Uploaded Files</h3>
+    <table class = "table table-sm">
+        <tr>
+
+                {% for file in file_list %}
+
+                    <td><a href="../static/files/{{incoming.smpl_no}}/{{file}}" target="_blank">{{file}} </a></td>
+
+                {% endfor %}
+
+        </tr>
+
+
+
+    </table-->
+
+        <h3>Current Stock</h3>
+    {% if cs_lst %}
+        <table class = "table table-sm">
+            <tr>
+                <td>SMPL No</td>
+                <td>Size</td>
+                <td>Packet Name</td>
+                <td>Weight</td>
+                <td>Numbers</td>
+                <td>Status</td>
+                <td>Unit</td>
+            </tr>
+            {% for cs in cs_lst %}
+            <tr>
+                <td>{{cs.smpl_no}}</td>
+                {% if cs.length2 != 0 %}
+                    <td>{{cs.width}} x {{cs.length}} - {{cs.length2}}</td>
+                {% else %}
+                    <td>{{cs.width}} x {{cs.length}}</td>
+                {% endif %}
+                <td>{{cs.packet_name}}</td>
+                <td>{{cs.weight}}</td>
+                <td>{{cs.numbers}}</td>
+                <td>{{cs.status}}</td>
+                <td>{{cs.unit}}</td>
+            </tr>
+            {% endfor %}
+        {% else %}
+            <td>Current stock is 0</td>
+        {% endif %}
+
+    </table>
+    <br>
+    <input class="btn btn-default" type="submit" value="Submit">
+</form>
+</html>

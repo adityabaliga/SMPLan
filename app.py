@@ -492,11 +492,117 @@ def incoming_update_submit():
         dc_number = request.form['dc_number']
         dc_date = request.form['dc_date']
 
+        incoming_original = request.form['incoming']
+
     incoming = Incoming(smpl_no, customer, incoming_date, thickness, width, length, grade, weight, numbers, mill,
                         mill_id, remarks, unit, material_type, coating, scams_no, dc_number, dc_date)
 
     incoming.update_details()
+
+    cs_new = CurrentStock(smpl_no,customer,weight,numbers,thickness,width,length,"RM",grade,unit,"MC",0)
+    cs_original_lst = []
+    cs_original_lst = CurrentStock.load_smpl_by_smplno(smpl_no,unit)
+
+    for cs_original_id, cs_original in cs_original_lst:
+        i=0
+
     return render_template('/main_menu.html', message="")
+
+# pick smpl for deleting SMPL
+@app.route('/delete_pick_smpl', methods=['GET', 'POST'])
+def delete_pick_smpl(message=""):
+    return render_template('/delete_pick_smpl.html', message=message)
+
+#Confirm details before deleting
+@app.route('/delete_confirm_details', methods=['GET', 'POST'])
+def delete_confirm_details():
+    smpl_no = ""
+    unit = ""
+    if request.method == 'POST':
+        smpl_no = request.form['smpl_no']
+        unit = request.form['unit']
+    if request.method == 'GET':
+        smpl_no = request.args.get('smpl_no')
+        unit = request.args.get('unit')
+
+    smpl_no = smpl_no.replace(" ", "")
+    incoming = Incoming.load_smpl_by_smpl_no(smpl_no)
+
+    if incoming:
+        cs_lst = []
+        _cs_lst = []
+        cs_id_lst = []
+        _cs_lst = CurrentStock.load_smpl_by_smplno(smpl_no, unit)
+
+        if _cs_lst:
+            for cs_id, cs in _cs_lst:
+                cs_id_lst.append(cs_id)
+                cs_lst.append(cs)
+
+        if len(cs_lst) > 0:
+            return render_template('/delete_confirm_details.html', incoming=incoming, cs_lst=cs_lst)
+        else:
+            return render_template('/main_menu.html', message="SMPL No does not exist or not in stock")
+
+
+@app.route('/delete_smpl_submit', methods=['GET', 'POST'])
+def delete_smpl_submit():
+    smpl_no = ""
+    if request.method == 'POST':
+        smpl_no = request.form['smpl_no']
+    if request.method == 'GET':
+        smpl_no = request.args.get('smpl_no')
+
+        # Establish a database connection
+        connection = psycopg2.connect(
+            dbname='smpl_prodn',
+            user='postgres',
+            password='smpl@509',
+            host='localhost',
+            port=5432
+        )
+
+        try:
+            # Begin a transaction
+            connection.autocommit = False
+            cursor = connection.cursor()
+
+            try:
+                dispatch_detail = DispatchDetail.load_from_db(smpl_no)
+                if dispatch_detail:
+                    cursor.execute('delete from dispatch_detail where smpl_no = %s',(smpl_no,))
+                processing_lst = Processing.load_history(smpl_no)
+                if processing_lst:
+                    '''for processing in processing_lst:
+                        processing_detail = ProcessingDetail.load_history(processing.processing_id)
+                        if processing_detail:
+                            cursor.execute('delete from processing_detail where processing_id = %s',(smpl_no,))'''
+                    cursor.execute('delete from processing where smpl_no = %s',(smpl_no,))
+
+                cursor.execute('delete from current_stock where smpl_no = %s',(smpl_no,))
+                cursor.execute('delete from incoming where smpl_no = %s',(smpl_no,))
+
+                connection.commit()
+            except (Exception, psycopg2.Error) as error:
+                # Rollback the transaction if an error occurred
+                connection.rollback()
+                print("Error inserting data:", error)
+
+                # Close the cursor
+                cursor.close()
+
+        except psycopg2.OperationalError as error:
+            # Handle network errors
+            print("Network error occurred:", error)
+            print("Rolling back the transaction...")
+            connection.rollback()
+            return render_template('/main_menu.html', message="Not Deleted")
+        finally:
+            # Close the database connection
+            connection.close()
+
+        return render_template('/main_menu.html', message="SMPL No: " + smpl_no + " deleted.")
+
 
 
 # pick smpl for uploading documents
@@ -1477,81 +1583,264 @@ def submit_slitting_processing():
         total_length = int(request.form['total_length'])
         rm_wt = Decimal(request.form['input_weight'])
         cs_rm_id = request.form['cs_rm_id']
+        # Establish a database connection
+        connection = psycopg2.connect(
+            dbname='smpl_prodn',
+            user='postgres',
+            password='smpl@509',
+            host='localhost',
+            port=5432
+        )
 
-        # Processing object created and saved to db
-        processing = Processing(smpl_no, operation, processing_date, start_time, end_time, setting_start_time,
-                                setting_end_time, processing_time, setting_time, no_of_qc, no_of_helpers, names_of_qc,
-                                setting_date, total_processed_wt, total_length)
-        processing_id = processing.save_to_db()
+        try:
+            # Begin a transaction
+            connection.autocommit = False
+            cursor = connection.cursor()
 
-        ip_size = input_size.split('x')
-        ms_width = Decimal(ip_size[0])
-        ms_length = Decimal(ip_size[1])
+            try:
 
-        for output_width, width_name, fg_yes_no in zip(output_width_lst, width_name_lst, fg_yes_no_lst):
-            for part_length, part_name in zip(part_length_lst, part_name_lst):
-                output_length = 0
-                output_length2 = 0
-                processed_numbers = 1
-                output_width = Decimal(output_width)
+                # Processing object created and saved to db
+                processing = Processing(smpl_no, operation, processing_date, start_time, end_time, setting_start_time,
+                                        setting_end_time, processing_time, setting_time, no_of_qc, no_of_helpers, names_of_qc,
+                                        setting_date, total_processed_wt, total_length)
+                #processing_id = processing.save_to_db()
 
-                packet_name = part_name + width_name
-                part_weight = Decimal(thickness * float(output_width) * float(part_length) * 0.00000785)
-                if "ALUMINIUM " in grade or "ALU " in grade:
-                    part_weight = Decimal(thickness * float(output_width) * float(part_length) * 0.0000027)
-                part_weight = round(part_weight, 3)
+                cursor.execute("insert into processing (smpl_no, operation, processing_date, start_time, "
+                               "end_time, setting_start_time, setting_end_time, production_time, setting_time, no_of_qc, "
+                               "no_of_helpers, names_of_qc,setting_date, total_processed_wt,"
+                               "total_cuts) values (%s, %s,%s, %s, "
+                               "%s, %s, %s, %s, %s, %s,%s, %s, %s, %s, %s)",
+                               (processing.smpl_no, processing.operation, processing.processing_date,
+                                processing.start_time, processing.end_time, processing.setting_start_time,
+                                processing.setting_end_time, processing.processing_time, processing.setting_time,
+                                processing.no_of_qc, processing.no_of_helpers, processing.names_of_qc,
+                                processing.setting_date,
+                                processing.total_processed_wt, processing.total_cuts))
 
-                _remarks = "FG ID:" + fg_id + remarks
-                processing_detail = ProcessingDetail(smpl_no, operation, machine, processing_id, output_width,
-                                                     output_length, processed_numbers, packet_name, _remarks,
-                                                     part_weight,
-                                                     ms_width, ms_length, fg_yes_no, output_length2)
-                processing_detail.save_to_db()
+                cursor.execute("select processing_id from processing where oid= %s", (cursor.lastrowid,))
+                processing_id = cursor.fetchone()
 
-                _remarks = ''
+                ip_size = input_size.split('x')
+                ms_width = Decimal(ip_size[0])
+                ms_length = Decimal(ip_size[1])
 
-                # Reduce weight of mother material by the processed weight of cut material
-                # In case of rewinding, there is the RM and the FG which have the same size.
-                # This check has been added so that weight is deducted from the RM only
-                cs_rm = CurrentStock.csid_exists(cs_rm_id)
-                if cs_rm is not None:
-                    rm_status = CurrentStock.change_wt(smpl_no, ms_width, ms_length, part_weight, processed_numbers,
-                                                       "minus", cs_rm.status, 0, cs_rm.packet_name)
-
-                # The issue is during rewinding since mother coil and output width & length remain the same,
-                # The weight is getting added and subtracted from the same current_stock record.
-                # not equal. Else, it will directly jump to insert. This might cause multiple current_stock records
-                # To avoid this; the change wt "plus" for output will only happen if the output width and ms width are
-                # for the same size but till I come up with a better solution so be it.
-
-                if ms_width != output_width:
-                    # Increase weight of cut material by processed weight. If cut material, doesn't already exist, the
-                    # function returns insert => a new record has to be inserted
-                    cc_insert = CurrentStock.change_wt(smpl_no, output_width, output_length, part_weight,
-                                                       processed_numbers, "plus", fg_yes_no, 0, packet_name)
-                else:
-                    cc_insert = "insert"
-
-                # Unit of the material is decided based on the machine used to process the material.
-                # WARNING: This is bad programming
+                # For Slitting unit will be unit 2
                 unit = '2'
 
-                # The new material is added to current stock
-                # In case of new material one more check in case material already exists. THis is especially for
-                # rewinding when FG and RM have the same size
-                if cc_insert == "insert":
-                    cs_cc = CurrentStock(smpl_no, customer, part_weight, processed_numbers, thickness,
-                                         output_width, output_length, fg_yes_no, grade, unit, packet_name,
-                                         output_length2)
-                    if cs_cc.check_if_size_exists():
-                        if fg_yes_no == "FG":
-                            CurrentStock.change_wt(cs_cc.smpl_no, cs_cc.width, cs_cc.length, cs_cc.weight,
-                                                   cs_cc.numbers, "plus", fg_yes_no, 0, packet_name)
-                        if fg_yes_no == "WIP":
-                            CurrentStock.change_wt(cs_cc.smpl_no, cs_cc.width, cs_cc.length, cs_cc.weight,
-                                                   cs_cc.numbers, "plus", fg_yes_no, 0)
-                    else:
-                        cs_cc.save_to_db()
+                for output_width, width_name, fg_yes_no in zip(output_width_lst, width_name_lst, fg_yes_no_lst):
+                    for part_length, part_name in zip(part_length_lst, part_name_lst):
+                        output_length = 0
+                        output_length2 = 0
+                        processed_numbers = 1
+                        output_width = Decimal(output_width)
+
+                        packet_name = part_name + width_name
+                        part_weight = Decimal(thickness * float(output_width) * float(part_length) * 0.00000785)
+                        if "ALUMINIUM " in grade or "ALU " in grade:
+                            part_weight = Decimal(thickness * float(output_width) * float(part_length) * 0.0000027)
+                        part_weight = round(part_weight, 3)
+
+                        _remarks = "FG ID:" + fg_id + remarks
+                        processing_detail = ProcessingDetail(smpl_no, operation, machine, processing_id, output_width,
+                                                             output_length, processed_numbers, packet_name, _remarks,
+                                                             part_weight,
+                                                             ms_width, ms_length, fg_yes_no, output_length2)
+
+                        cursor.execute(
+                            "insert into processing_detail (smpl_no, operation, machine, processing_id, input_width,"
+                            "input_length, cut_width, cut_length, processed_numbers, packet_name, processed_wt, "
+                            "remarks, status, cut_length2) values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                            (processing_detail.smpl_no,
+                             processing_detail.operation,
+                             processing_detail.machine,
+                             processing_detail.processing_id,
+                             processing_detail.input_width,
+                             processing_detail.input_length,
+                             processing_detail.cut_width,
+                             processing_detail.cut_length,
+                             processing_detail.processed_numbers,
+                             processing_detail.packet_name,
+                             processing_detail.processed_wt,
+                             processing_detail.remarks,
+                             processing_detail.status,
+                             processing_detail.cut_length2))
+
+                        #processing_detail.save_to_db()
+
+                        _remarks = ''
+
+                        # Reduce weight of mother material by the processed weight of cut material
+                        # In case of rewinding, there is the RM and the FG which have the same size.
+                        # This check has been added so that weight is deducted from the RM only
+                        cs_rm = CurrentStock.csid_exists(cs_rm_id)
+                        if cs_rm is not None:
+                            # rm_status = CurrentStock.change_wt(smpl_no, ms_width, ms_length, part_weight, processed_numbers,
+                            #                                   "minus", cs_rm.status, 0, cs_rm.packet_name)
+
+                            ########################################################################################
+                            # Change wt of RM in current stock
+
+                            sign = 'minus'
+
+                            if packet_name == "":
+                                cursor.execute(
+                                    "select weight, numbers, unit, cs_id from current_stock where smpl_no = %s and width = %s "
+                                    "and length = %s and status = %s and length2 = %s",
+                                    (smpl_no, ms_width, ms_length, cs_rm.status, cs_rm.length2))
+                                user_data = cursor.fetchone()
+                            else:
+                                cursor.execute(
+                                    "select weight, numbers, unit, cs_id from current_stock where smpl_no = %s and width = %s "
+                                    "and length = %s and status = %s and packet_name = %s and length2 = %s",
+                                    (smpl_no, ms_width, ms_length, cs_rm.status, cs_rm.packet_name, cs_rm.length2))
+                                user_data = cursor.fetchone()
+                            if user_data:
+                                weight = Decimal(user_data[0])
+                                numbers = Decimal(user_data[1])
+                                cs_id = int(user_data[3])
+                                new_weight = weight - Decimal(part_weight)
+                                new_weight = round(new_weight, 3)
+                                if numbers > 1:
+                                    new_numbers = numbers - Decimal(part_weight)
+                                else:
+                                    new_numbers = numbers
+                                if (new_weight < 0.5 and sign == "minus" and Decimal(ms_length) == 0) or (
+                                        (new_weight < 0.2) and sign == "minus" and Decimal(ms_length) > 0):
+                                    # OrderDetail.complete_processing_on_del(smpl_no, width, length)
+                                    # CurrentStock.delete_record(cs_id)
+
+                                    cursor.execute("delete from current_stock where cs_id = %s", (cs_id,))
+
+                                    # This is done when the RM is over but for some reason the order could not be completed
+                                    # This could when the RM is thickness is more or wrong calc of material or processing mistake/change
+
+
+                                else:
+                                    cursor.execute(
+                                        "update current_stock set weight = %s, numbers = %s where cs_id = %s",
+                                        (new_weight, new_numbers, cs_id))
+
+
+                        # The issue is during rewinding since mother coil and output width & length remain the same,
+                        # The weight is getting added and subtracted from the same current_stock record.
+                        # not equal. Else, it will directly jump to insert. This might cause multiple current_stock records
+                        # To avoid this; the change wt "plus" for output will only happen if the output width and ms width are
+                        # for the same size but till I come up with a better solution so be it.
+
+                        if ms_width != output_width:
+                            # Increase weight of cut material by processed weight. If cut material, doesn't already exist, the
+                            # function returns insert => a new record has to be inserted
+
+                            if (unit == '2' and fg_yes_no == "FG"):
+                                _packet_name = packet_name
+                            else:
+                                _packet_name = "WIP"
+
+                            # cc_insert = CurrentStock.change_wt(smpl_no, output_width, output_length, part_weight,
+                            #                                   processed_numbers, "plus", fg_yes_no, 0, packet_name)
+
+                            ############################################################################################
+                            # Change weight or insert output of processing in to current_stock
+
+                            sign = 'plus'
+                            if _packet_name == "WIP":
+                                cursor.execute(
+                                    "select weight, numbers, unit, cs_id from current_stock where smpl_no = %s and width = %s "
+                                    "and length = %s and status = %s and length2 = %s",
+                                    (smpl_no, output_width, output_length, fg_yes_no, output_length2))
+                                user_data = cursor.fetchone()
+                            else:
+                                cursor.execute(
+                                    "select weight, numbers, unit, cs_id from current_stock where smpl_no = %s and width = %s "
+                                    "and length = %s and status = %s and packet_name = %s and length2 = %s",
+                                    (smpl_no, output_width, output_length, fg_yes_no, _packet_name, output_length2))
+
+                                user_data = cursor.fetchone()
+                            if user_data:
+                                weight = Decimal(user_data[0])
+                                numbers = Decimal(user_data[1])
+                                cs_id = int(user_data[3])
+                                if sign == "minus":
+                                    new_weight = weight - Decimal(part_weight)
+                                    new_weight = round(new_weight, 3)
+                                    if numbers > 1:
+                                        new_numbers = numbers - Decimal(processed_numbers)
+                                    else:
+                                        new_numbers = numbers
+                                if sign == "plus":
+                                    new_weight = weight + Decimal(part_weight)
+                                    new_weight = round(new_weight, 3)
+                                    # if numbers > 1:
+                                    new_numbers = numbers + Decimal(processed_numbers)
+                                    # else:
+                                    #    new_numbers = numbers
+
+                                if (new_weight < 0.5 and sign == "minus" and Decimal(output_length) == 0) or (
+                                        (new_weight < 0.2) and sign == "minus" and Decimal(output_length) > 0):
+                                    # OrderDetail.complete_processing_on_del(smpl_no, width, length)
+                                    # CurrentStock.delete_record(cs_id)
+
+                                    cursor.execute("delete from current_stock where cs_id = %s", (cs_id,))
+
+                                else:
+                                    cursor.execute(
+                                        "update current_stock set weight = %s, numbers = %s where cs_id = %s",
+                                        (new_weight, new_numbers, cs_id))
+
+                            else:
+                                #cc_insert = "insert"
+                                cs_cc = CurrentStock(smpl_no, customer, part_weight, processed_numbers, thickness,
+                                                     output_width, output_length, fg_yes_no, grade, unit, _packet_name,
+                                                     output_length2)
+                                cursor.execute(
+                                    "insert into current_stock (smpl_no,weight,numbers,width,length,status,customer,thickness"
+                                    ",grade, unit, packet_name, length2) values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+                                    (
+                                    cs_cc.smpl_no, cs_cc.weight, cs_cc.numbers, cs_cc.width, cs_cc.length, cs_cc.status,
+                                    cs_cc.customer,
+                                    cs_cc.thickness, cs_cc.grade, cs_cc.unit, cs_cc.packet_name, cs_cc.length2))
+
+                        # Unit of the material is decided based on the machine used to process the material.
+                        # WARNING: This is bad programming
+                        #unit = '2'
+
+                        # The new material is added to current stock
+                        # In case of new material one more check in case material already exists. THis is especially for
+                        # rewinding when FG and RM have the same size
+                        '''if cc_insert == "insert":
+                            cs_cc = CurrentStock(smpl_no, customer, part_weight, processed_numbers, thickness,
+                                                 output_width, output_length, fg_yes_no, grade, unit, packet_name,
+                                                 output_length2)
+                            if cs_cc.check_if_size_exists():
+                                if fg_yes_no == "FG":
+                                    CurrentStock.change_wt(cs_cc.smpl_no, cs_cc.width, cs_cc.length, cs_cc.weight,
+                                                           cs_cc.numbers, "plus", fg_yes_no, 0, packet_name)
+                                if fg_yes_no == "WIP":
+                                    CurrentStock.change_wt(cs_cc.smpl_no, cs_cc.width, cs_cc.length, cs_cc.weight,
+                                                           cs_cc.numbers, "plus", fg_yes_no, 0)
+                            else:
+                                cs_cc.save_to_db()'''
+                connection.commit()
+                print("Data inserted successfully!")
+
+            except (Exception, psycopg2.Error) as error:
+                # Rollback the transaction if an error occurred
+                connection.rollback()
+                print("Error inserting data:", error)
+
+                # Close the cursor
+            cursor.close()
+
+        except psycopg2.OperationalError as error:
+            # Handle network errors
+            print("Network error occurred:", error)
+            print("Rolling back the transaction...")
+            connection.rollback()
+            return render_template('/main_menu.html', message="Processing Entry not completed")
+        finally:
+            # Close the database connection
+            connection.close()
+
         return render_template('/main_menu.html', message=Markup("Processing for " + smpl_no + " entered"))
 
 

@@ -71,9 +71,18 @@
             <td><input type="text" id="smpl_no" name="smpl_no" value="{{incoming.smpl_no}}" readonly></td>
             <td><input type="text" id="customer" name="customer" value="{{incoming.customer}}"></td>
             <td><input type="text" id="incoming_date" name="incoming_date" value="{{incoming.incoming_date}}"></td>
-            <td><input type="text" id="thickness" name="thickness" value="{{incoming.thickness}}"></td>
-            <td><input type="text" id="width" name="width" value="{{incoming.width}}"></td>
-            <td><input type="text" id="length" name="length" value="{{incoming.length}}"></td>
+            <td><input type="text" id="thickness" name="thickness" value="{{incoming.thickness}}" onchange="on_edit(this)"></td>
+            <td><input type="text" id="width" name="width" value="{{incoming.width}}" onchange="on_edit(this)"></td>
+            <td><input type="text" id="length" name="length" value="{{incoming.length}}" onchange="on_edit(this)"></td>
+
+        </tr>
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td><input type="text" id="thickness_edit" name="thickness_edit" value="0" hidden></td>
+            <td><input type="text" id="width_edit" name="width_edit" value="0" hidden></td>
+            <td><input type="text" id="length_edit" name="length_edit" value="0" hidden></td>
         </tr>
         <tr>
             <th> Weight</th>
@@ -85,7 +94,9 @@
         </tr>
         <tr>
             <td><input type="text" id="weight" name="weight" value="{{incoming.weight}}"></td>
+            <td><input type="text" id="weight_edit" name="weight_edit" value="0"></td>
             <td><input type="text" id="numbers" name="numbers" value="{{incoming.numbers}}"></td>
+            <td><input type="text" id="numbers_edit" name="numbers_edit" value="0"></td>
             <td><input type="text" id="grade" name="grade" value="{{incoming.grade}}"></td>
             <td><input type="text" id="mill" name="mill" value="{{incoming.mill}}"></td>
             <td><input type="text" id="mill_id" name="mill_id" value="{{incoming.mill_id}}"></td>
@@ -118,10 +129,14 @@
 
 
         </tr>
+        <tr>
+
+        </tr>
 
 
     </table>
     <br><br>
     <p><input type="submit" class="btn btn-default" value="Submit"></p>
+    <script src = "{{ url_for('static', filename='js/incoming_update.js') }}"></script>
 </form>
 </html>
