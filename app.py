@@ -1388,7 +1388,7 @@ def submit_processing():
                                     new_weight = weight - Decimal(processed_wt)
                                     new_weight = round(new_weight, 3)
                                     if numbers > 1:
-                                        new_numbers = numbers - Decimal(actual_no_of_pieces)
+                                        new_numbers = numbers - Decimal(no_of_ms_consumed)
                                     else:
                                         new_numbers = numbers
                                     if (new_weight < 0.5 and sign == "minus" and Decimal(ms_length) == 0) or (
