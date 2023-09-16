@@ -54,7 +54,7 @@
 
     <hr class ="style1">
 
-    <table style="width:100%">
+    <table id="incoming_review">
     <tr>
         <th> SMPL No</th>
         <th> Customer</th>
@@ -76,23 +76,24 @@
     </tr>
     {% for incoming in incoming_lst %}
         <tr>
-            <td>{{incoming.smpl_no}}</td>
+            <td><input type = "checkbox" name = "select_smpl" id ="select_smpl" value ="{{incoming.smpl_no}};{{incoming.customer}};{{incoming.incoming_date}};{{incoming.thickness}};{{incoming.width}};{{incoming.length}};{{incoming.grade}};{{incoming.weight}};{{incoming.numbers}};{{incoming.mill}};{{incoming.mill_id}};{{incoming.remarks}};{{incoming.unit}};{{incoming.material_type}};{{incoming.coating}};{{incoming.scams_no}};{{incoming.dc_number}};{{incoming.dc_date}}" checked>{{incoming.smpl_no}}</td>
             <td>{{incoming.customer}}</td>
-            <td>{{incoming.incoming_date}}</td>
-            <td>{{incoming.thickness}}</td>
-            <td>{{incoming.width}}</td>
-            <td>{{incoming.length}}</td>
+            <td>{{incoming.incoming_date}} </td>
+            <td>{{incoming.thickness}} </td>
+            <td>{{incoming.width}} </td>
+            <td>{{incoming.length}} </td>
             <td>{{incoming.weight}} </td>
             <td>{{incoming.numbers}} </td>
             <td>{{incoming.grade}} </td>
             <td>{{incoming.mill}} </td>
-            <td>{{incoming.mill_id}}</td>
-            <td>{{incoming.unit}}</td>
-            <td>{{incoming.material_type}}</td>
-            <td>{{incoming.scams_no}}</td>
-            <td>{{incoming.coating}}</td>
-            <td><input type="text" id="remarks" name="remarks" value="{{incoming.remarks}}"></td>
-            <td><input type="hidden" name="smpl_nos" value="{{ incoming.smpl_no }}"/></td>
+            <td>{{incoming.mill_id}} </td>
+            <td>{{incoming.unit}} </td>
+            <td>{{incoming.material_type}} </td>
+            <td>{{incoming.scams_no}} </td>
+            <td>{{incoming.coating}} </td>
+
+            <td>{{incoming.remarks}}</td>
+
         </tr>
     {% endfor %}
 

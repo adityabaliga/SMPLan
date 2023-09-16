@@ -161,8 +161,8 @@ def smpl_incoming():
     incoming_lst = Incoming.fromfile(xml_filename, unit)
     # The details got from the XML file are updated to the database. The details are displayed for review and if any
     # remarks are to be entered
-    for incoming_coil in incoming_lst:
-        incoming_coil.savetodb()
+    #for incoming_coil in incoming_lst:
+    #    incoming_coil.savetodb()
     return render_template('incoming_review_after_upload_form.html', incoming_lst=incoming_lst)
 
 
@@ -170,13 +170,29 @@ def smpl_incoming():
 # This is then updated to the DB and then redirects to the main menu
 @app.route('/submit_smpl_incoming', methods=['GET', 'POST'])
 def submit_smpl_incoming():
-    incoming_remarks = []
-    smpl_nos = []
+
+    _smpl_nos_lst = []
     if request.method == 'POST':
-        incoming_remarks = request.form.getlist('remarks')
-        smpl_nos = request.form.getlist('smpl_nos')
-    for remark, smpl_no in zip(incoming_remarks, smpl_nos):
-        Incoming.update_remarks_by_smpl_no(remark, smpl_no)
+        _smpl_nos_lst = request.form.getlist('select_smpl')
+
+
+    # This fetches the list and removes the elements that are not selected
+    # The ones that are not selected are returned as None. The below list filters out the Nones
+    smpl_nos_lst = list(filter(None, _smpl_nos_lst))
+
+
+
+    for smpl_no_string in smpl_nos_lst:
+        incoming_str = smpl_no_string.split(';')
+        incoming = Incoming(incoming_str[0], incoming_str[1], incoming_str[2], Decimal(incoming_str[3]),
+                            Decimal(incoming_str[4]), Decimal(incoming_str[5]), incoming_str[6],
+                            Decimal(incoming_str[7]),Decimal(incoming_str[8]),incoming_str[9],incoming_str[10],
+                            incoming_str[11],
+                            incoming_str[12],incoming_str[13],incoming_str[14], incoming_str[15],incoming_str[16],
+                            incoming_str[17])
+        incoming.savetodb()
+
+        #Incoming.update_remarks_by_smpl_no(remark, smpl_no)
 
     if request.method == 'GET':
         pass
@@ -444,69 +460,6 @@ def transfer_submit():
         CurrentStock.transfer_material_cls(cs_id, unit)'''
     return render_template('/main_menu.html')
 
-#Pick SMPL No to update incoming details
-@app.route('/incoming_update_pick_smpl', methods=['GET', 'POST'])
-def incoming_update_pick_smpl(message=""):
-    return render_template('/incoming_update_pick_smpl.html')
-
-#Load SMPL No to update incoming details
-@app.route('/incoming_update_show_details', methods=['GET', 'POST'])
-def incoming_update_show_details():
-    smpl_no = ""
-    if request.method == 'POST':
-        smpl_no = request.form['smpl_no']
-    if request.method == 'GET':
-        smpl_no = request.args.get('smpl_no')
-
-    incoming = Incoming.load_smpl_by_smpl_no(smpl_no)
-    if incoming:
-        return render_template('/incoming_update_details.html', incoming=incoming)
-    else:
-        return render_template('/main_menu.html', message = "SMPL No. not found")
-
-
-#Sumbmit details for SMPL No to update incoming details
-@app.route('/incoming_update_submit', methods=['GET', 'POST'])
-def incoming_update_submit():
-    smpl_no, customer, incoming_date, thickness, width, length, material_type = '','','','','','',''
-    material_type, grade, scams_no, coating, weight, mill, mill_id, remarks, unit = '','','','','','','','',''
-
-    if request.method == 'POST':
-        smpl_no = request.form['smpl_no']
-        customer = request.form['customer']
-        incoming_date = request.form['incoming_date']
-        thickness = Decimal(request.form['thickness'])
-        width = Decimal(request.form['width'])
-        length = (request.form['length'])
-        material_type = request.form['material_type']
-        grade = request.form['grade']
-        scams_no = request.form['scams_no']
-        coating = request.form['coating']
-
-        weight = Decimal(request.form['weight'])
-        numbers = Decimal((request.form['numbers']))
-        mill = request.form['mill']
-        mill_id = request.form['mill_id']
-        remarks = request.form['remarks']
-        unit = request.form['unit']
-        dc_number = request.form['dc_number']
-        dc_date = request.form['dc_date']
-
-        incoming_original = request.form['incoming']
-
-    incoming = Incoming(smpl_no, customer, incoming_date, thickness, width, length, grade, weight, numbers, mill,
-                        mill_id, remarks, unit, material_type, coating, scams_no, dc_number, dc_date)
-
-    incoming.update_details()
-
-    cs_new = CurrentStock(smpl_no,customer,weight,numbers,thickness,width,length,"RM",grade,unit,"MC",0)
-    cs_original_lst = []
-    cs_original_lst = CurrentStock.load_smpl_by_smplno(smpl_no,unit)
-
-    for cs_original_id, cs_original in cs_original_lst:
-        i=0
-
-    return render_template('/main_menu.html', message="")
 
 # pick smpl for deleting SMPL
 @app.route('/delete_pick_smpl', methods=['GET', 'POST'])
