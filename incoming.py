@@ -76,8 +76,10 @@ class Incoming:
             stock_item = rm.getElementsByTagName("STOCKITEMNAME")[0]
             coil_dim = stock_item.firstChild.data
 
-            # In tally, sometimes RM is added when incoming is sheets or slit coils. This is to remove that
+            # In tally, sometimes RM or RMM is added when incoming is sheets or slit coils. This is to remove that
+            coil_dim = coil_dim.replace('RMM', '')
             coil_dim = coil_dim.replace('RM','')
+
             coil_dim = coil_dim.upper()
             coil_dimension = coil_dim.split('X')
 
