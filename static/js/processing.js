@@ -28,6 +28,18 @@ function setFocusToTextBox(operation){
     // Set the max attribute of the date picker input
     var processing_date = document.getElementById('processing_date');
     processing_date.setAttribute('max', formattedDate);
+
+    //if customer is TTSS, make mill, mill id, scams_no and material type readonly
+    var customer = document.getElementById("customer").value;
+    if (customer.startsWith("TT STEEL SERVICE INDIA"))
+    {
+        document.getElementById('mill_id').readOnly = true;
+        document.getElementById('mill').readOnly = true;
+        document.getElementById('grade').readOnly = true;
+        document.getElementById('mat_type').readOnly = true;
+        document.getElementById('scams_no').readOnly = true;
+        document.getElementById('coating').readOnly = true;
+    }
 }
 
 //This function reloads the page if the user uses back to come to the page
@@ -93,7 +105,17 @@ function setFocusToTextBox_Slit(operation){
     var setting_date = document.getElementById('setting_date');
     setting_date.setAttribute('max', formattedDate);
 
-
+    //if customer is TTSS, make mill, mill id, scams_no and material type readonly
+    var customer = document.getElementById("customer").value;
+    if (customer.startsWith("TT STEEL SERVICE INDIA"))
+    {
+        document.getElementById('mill_id').readOnly = true;
+        document.getElementById('mill').readOnly = true;
+        document.getElementById('grade').readOnly = true;
+        document.getElementById('mat_type').readOnly = true;
+        document.getElementById('scams_no').readOnly = true;
+        document.getElementById('coating').readOnly = true;
+    }
 
 }
 
@@ -904,6 +926,15 @@ function make_label_new_slit(th){
     document.getElementById('lbl_scams_no').value = scams_no.trimEnd();
     document.getElementById('lbl_qc_name').value = qc_name;
 
+    //If customer is TTSS grade, material type and scams no to be made read only
+    var customer = document.getElementById("customer").value;
+    if (customer.startsWith("TT STEEL SERVICE INDIA"))
+    {
+        document.getElementById('lbl_grade').readOnly = true;
+        document.getElementById('lbl_mat_type').readOnly = true;
+        document.getElementById('lbl_scams_no').readOnly = true;
+    }
+
     //FG_Table population
     var html = '<tr id= %id%>' +
             '<td><input type="text" style="width:100px;border: 0px none;" id="lbl_size" name="lbl_size" value="%size%"></td>' +
@@ -1534,6 +1565,15 @@ function make_label_new(th){
     document.getElementById('lbl_scams_no').value = scams_no.trimEnd();
     //document.getElementById('lbl_size').value = size;
 
+    //If customer is TTSS grade, material type and scams no to be made read only
+    var customer = document.getElementById("customer").value;
+    if (customer.startsWith("TT STEEL SERVICE INDIA"))
+    {
+        document.getElementById('lbl_grade').readOnly = true;
+        document.getElementById('lbl_mat_type').readOnly = true;
+        document.getElementById('lbl_scams_no').readOnly = true;
+    }
+
     var tsl_no;
     //Row 5
     if(document.getElementById('lbl_customer').value == "TATA STEEL"){
@@ -1756,6 +1796,15 @@ function make_label_trap_new(th){
     document.getElementById('lbl_mat_type').value = material_type.trimEnd();
     document.getElementById('lbl_scams_no').value = scams_no.trimEnd();
     //document.getElementById('lbl_size').value = size;
+
+    //If customer is TTSS grade, material type and scams no to be made read only
+    var customer = document.getElementById("customer").value;
+    if (customer.startsWith("TT STEEL SERVICE INDIA"))
+    {
+        document.getElementById('lbl_grade').readOnly = true;
+        document.getElementById('lbl_mat_type').readOnly = true;
+        document.getElementById('lbl_scams_no').readOnly = true;
+    }
 
     var tsl_no;
     //Row 5
