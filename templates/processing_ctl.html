@@ -244,7 +244,7 @@
                 </select>
             </td>
 
-            <td><input type = "text" name ="packet_name" style="width:100px;" id = "packet_name"></td>
+            <td><input type = "text" name ="packet_name" style="width:100px;" id = "packet_name" onchange="check_packet_name('numbers_pkts', this)"></td>
 
             <td><input type = "number" name = "actual_no_of_pieces" style="width:100px;" id = "actual_no_of_pieces" onfocusout="for_packets_and_weight('numbers_pkts', this, '{{operation}}')" required></td>
 
@@ -480,6 +480,22 @@
         <input type="submit" name = "submit" id = "submit" class="btn btn-default"  value="Submit">
 
     </p>
+    <table id="packet_names">
+        <tr>
+            <td>Width</td>
+            <td>Length</td>
+            <td>Packet Name</td>
+        </tr>
+        {% for processing_dtl in processing_details_lst %}
+        <tr>
+
+            <td>{{processing_dtl.cut_width}}</td>
+            <td>{{processing_dtl.cut_length}}</td>
+            <td>{{processing_dtl.packet_name}}</td>
+
+        </tr>
+    {% endfor %}
+    </table>
 
     <script src = "{{ url_for('static', filename='js/processing.js') }}"></script>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>

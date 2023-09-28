@@ -97,7 +97,13 @@ class Incoming:
             # Weight is extracted
             weight_coll = rm.getElementsByTagName("ACTUALQTY")[0]
             weight_list = weight_coll.firstChild.data.split(' ')
-            weight = Decimal(weight_list[1])
+            # if weight mentioned as kgs, then weight has to be divided by 1000
+            if "Kgs" in weight_list or "kgs" in weight_list:
+                weight = Decimal(weight_list[1])/1000
+            if "Nos" in weight_list or "nos" in weight_list or "NOS" in weight_list:
+                weight = round((thickness*width*length*0.00785),3)
+            else:
+                weight = Decimal(weight_list[1])
 
             # Grade is extracted
             # Changed of Material Receipt Voucher changed in Tally
