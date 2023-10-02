@@ -48,8 +48,8 @@ class ProcessingDetail:
     @classmethod
     def load_from_db(cls,smpl_no, operation):
         with CursorFromConnectionFromPool() as cursor:
-            cursor.execute("select * from processing_detail where smpl_no = %s and operation = %s ",
-                           (smpl_no, operation))
+            cursor.execute("select * from processing_detail where smpl_no = %s and operation like %s ",
+                           (smpl_no, operation + '%'))
             user_data = cursor.fetchall()
             processing_dtl_lst = []
             for lst in user_data:
