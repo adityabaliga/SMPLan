@@ -1839,7 +1839,7 @@ function make_label_trap_new(th){
     if (customer.startsWith("TT STEEL SERVICE INDIA"))
     {
         document.getElementById('lbl_grade').readOnly = true;
-        document.getElementById('lbl_mat_type').readOnly = true;
+        //document.getElementById('lbl_mat_type').readOnly = true;
         //document.getElementById('lbl_scams_no').readOnly = true;
     }
 
