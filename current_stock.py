@@ -172,7 +172,7 @@ class CurrentStock:
                 if customer_type == "tr":
                     cursor.execute(
                         "select * from current_stock where (status = 'RM' or status = 'HC' or status= 'WIP') and "
-                        "length = 0 and unit = %s  and smpl_no like 'TR%%' order by smpl_no asc", (str(unit),))
+                        "length = 0 and unit = %s  and (smpl_no like 'TR%%' or smpl_no like '2TR%%') order by smpl_no asc", (str(unit),))
 
                 user_data = cursor.fetchall()
 
@@ -186,7 +186,7 @@ class CurrentStock:
                 if customer_type == "tr":
                     cursor.execute(
                         "select * from current_stock where (status = 'RM' or status = 'HC' or status= 'WIP') and "
-                        "length = 0 and unit = %s  and customer like 'TSDPL' and width <=800 order by smpl_no asc"
+                        "length = 0 and unit = %s  and (smpl_no like 'TR%%' or smpl_no like '2TR%%') and width <=800 order by smpl_no asc"
                         , (str(unit),))
                 if customer_type == "tts":
                     cursor.execute(
@@ -205,7 +205,7 @@ class CurrentStock:
                 if customer_type == "tr":
                     cursor.execute(
                         "select * from current_stock where (status = 'RM' or status = 'HC' or status= 'WIP') and "
-                        "length = 0 and unit = %s  and customer like 'TSDPL' and width <=600 order by smpl_no asc"
+                        "length = 0 and unit = %s  and (smpl_no like 'TR%%' or smpl_no like '2TR%%') and width <=600 order by smpl_no asc"
                         , (str(unit),))
                 if customer_type == "tts":
                     cursor.execute(
@@ -221,7 +221,7 @@ class CurrentStock:
                                "length > 0  and unit = %s and customer not like 'TSDPL' order by smpl_no asc", (str(unit),))
                 if customer_type == "tr":
                     cursor.execute("select * from current_stock where (status = 'RM' or status = 'HC' or status= 'WIP') and "
-                               "length > 0  and unit = %s and customer like 'TSDPL' order by smpl_no asc", (str(unit),))
+                               "length > 0  and unit = %s and (smpl_no like 'TR%%' or smpl_no like '2TR%%') order by smpl_no asc", (str(unit),))
                 if customer_type == "tts":
                     cursor.execute("select * from current_stock where (status = 'RM' or status = 'HC' or status= 'WIP') and "
                                "length > 0  and unit = %s and smpl_no like 'TTS%%' order by smpl_no asc", (str(unit),))
