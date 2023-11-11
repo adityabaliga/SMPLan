@@ -72,6 +72,8 @@
         <th>Scams No</th>
         <th>Coating</th>
         <th> Remarks</th>
+        <th> DC No</th>
+        <th> DC Date</th>
 
     </tr>
     {% for incoming in incoming_lst %}
@@ -93,6 +95,8 @@
             <td>{{incoming.coating}} </td>
 
             <td>{{incoming.remarks}}</td>
+            <td>{{incoming.dc_number}}</td>
+            <td>{{incoming.dc_date}}</td>
 
         </tr>
     {% endfor %}
