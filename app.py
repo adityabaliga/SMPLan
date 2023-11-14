@@ -375,8 +375,18 @@ def transfer_pick_size():
         smpl = request.args.get('smpl_no')
         unit = request.args.get('unit')
 
+    cs_return_lst = []
+    cs_return_lst_unit4 = []
+
     cs_return_lst = CurrentStock.load_smpl_by_smplno(smpl, unit)
+    # This is done so that anyone can transfer in to or out of Unit 4 [501] currently
+    cs_return_lst_unit4 = CurrentStock.load_smpl_by_smplno(smpl, '4')
+
     for cs_id, cs in cs_return_lst:
+        cs_id_lst.append(cs_id)
+        cs_obj_lst.append(cs)
+
+    for cs_id, cs in cs_return_lst_unit4:
         cs_id_lst.append(cs_id)
         cs_obj_lst.append(cs)
 
@@ -1898,6 +1908,7 @@ def print_label_reshearing():
 
 @app.route('/check_stock', methods=['GET', 'POST'])
 def check_stock():
+
     return render_template('check_stock.html')
 
 @app.route('/check_stock_ttssi_fg', methods=['GET', 'POST'])
@@ -2095,29 +2106,26 @@ def check_stock_htid():
 @app.route('/stock', methods=['GET', 'POST'])
 def stock():
     stock_type = ""
+    unit = ""
     cs_lst = []
     _cs_lst = []
     cs_id_lst = []
     if request.method == 'POST':
         stock_type = request.form['stock_type']
+        unit = request.form['unit']
 
     if request.method == 'GET':
         stock_type = request.args.get('stock_type')
+        unit = request.args.get('unit')
 
-    if current_user.unit == 1 or current_user.unit == 2:
-        cs_lst = CurrentStock.get_stock(stock_type, current_user.unit)
-    else:
-        cs_lst_unit1 = CurrentStock.get_stock(stock_type, '1')
-        for cs_id, cs in cs_lst_unit1:
-            cs_id_lst.append(cs_id)
-            _cs_lst.append(cs)
-        cs_lst_unit2 = CurrentStock.get_stock(stock_type, '2')
-        for cs_id, cs in cs_lst_unit2:
-            cs_id_lst.append(cs_id)
-            _cs_lst.append(cs)
-        # cs_lst.append(cs_lst_unit1)
-        # cs_lst.append(cs_lst_unit2)
-        cs_lst = zip(cs_id_lst, _cs_lst)
+    cs_lst_unit = CurrentStock.get_stock(stock_type, unit)
+    for cs_id, cs in cs_lst_unit:
+        cs_id_lst.append(cs_id)
+        _cs_lst.append(cs)
+
+    # cs_lst.append(cs_lst_unit1)
+    # cs_lst.append(cs_lst_unit2)
+    cs_lst = zip(cs_id_lst, _cs_lst)
 
     return render_template('stock_display.html', cs_lst=cs_lst)
 
