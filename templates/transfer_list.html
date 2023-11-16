@@ -46,7 +46,7 @@
 
                 <th>SMPL No.</th>
                 <th>Packet No</th>
-                <th>Current Unit</th>
+
                 <th>Thickness</th>
                 <th>Width x Length</th>
                 <th>Numbers</th>
@@ -58,13 +58,14 @@
                 <th>Dispatch Qty (in MT)</th>
                 <th>No. of packets</th>
                 <th>Transfer to Unit</th>
+                <th>Current Unit</th>
 
             </tr>
         {% for cs_id, cs in cs_lst %}
             <tr>
                 <td><input type = "checkbox" name = "select_smpl" value ="{{cs_id}},{{cs.smpl_no}}" onchange="enable_dispatch(this, 'dispatch_list')">{{cs.smpl_no}}</td>
                 <td><input type = "text" id = "packet_name" name = "packet_name" style = "width:80px;" value ="{{cs.packet_name}}"  readonly></td>
-                <td><input type = "text" id = "current_unit" name = "current_unit" style = "width:50px;" value ="{{cs.unit}}"  readonly></td>
+
                 <td><input type = "text" id = "thickness" style = "width:60px;" value ="{{cs.thickness}}"  readonly></td>
                 <td><input type = "text" id = "widthxlength" value ="{{cs.width}} x  {{cs.length}}" style = "width:120px;" readonly></td>
                 <td><input type = "text" id = "numbers" value ="{{cs.numbers}}" style = "width:80px;" readonly></td>
@@ -87,6 +88,7 @@
 
                     </select>
                 </td>
+                <td><input type = "text" id = "current_unit" name = "current_unit" style = "width:50px;" value ="{{cs.unit}}"  readonly></td>
             </tr>
         {% endfor %}
 
