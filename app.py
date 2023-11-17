@@ -2055,7 +2055,7 @@ def check_stock_htid():
         if cs.width == 565 and cs.length == 645:
             part_no = "K3CA BTM"
             wt_per_sheet = 2.29
-            coating = "20/0"
+            coating = "0/20"
         if cs.length > 0:
             packet_wt = round((cs.numbers * wt_per_sheet)/1000, 3)
         else:
