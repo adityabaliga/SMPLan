@@ -46,10 +46,10 @@ class DispatchDetail:
 
 
     @classmethod
-    def load_from_db(cls,smpl_no):
+    def load_from_db(cls, smpl_no):
         dispatch_detail_lst = []
         with CursorFromConnectionFromPool() as cursor:
-            cursor.execute("select * from dispatch_detail where smpl_no = %s", (smpl_no,))
+            cursor.execute("select * from dispatch_detail where smpl_no = %s order by dispatch_detail_id", (smpl_no,))
             user_data = cursor.fetchall()
             for detail in user_data:
                 dispatch_detail = DispatchDetail(int(detail[1]), detail[2], float(detail[3]), float(detail[4]),

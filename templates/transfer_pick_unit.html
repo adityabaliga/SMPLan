@@ -40,11 +40,16 @@
     </div>
     <hr class ="style1">
     <!--select name ="select_smpl"-->
+    <h3>Transfer From</h3>
         <input type = "text" name = "stock_type" id="stock_type" value = "{{stock_type}}" hidden >
 
-        <td><input type = "radio" name = "select_unit" value = "1" required>  Unit 1</input></td><br>
-        <td><input type = "radio" name = "select_unit" value = "2">  Unit 2</input></td><br>
-        <td><input type = "radio" name = "select_unit" value = "4">  Unit 4 [501]</input></td>
+        {% if _unit == 1 or _unit == 0  %}
+            <td><input type = "radio" name = "select_unit" value = "1" >  Unit 1</input></td><br>
+        {% endif %}
+        {% if _unit == 2 or _unit == 0 %}
+            <td><input type = "radio" name = "select_unit" value = "2">  Unit 2</input></td><br>
+        {% endif %}
+        <td><input type = "radio" name = "select_unit" value = "4" required>  Unit 4 [501]</input></td>
     <td>
         <br><input class="btn btn-default" type="submit" value="Select">
     </td>

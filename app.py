@@ -313,12 +313,13 @@ def put_on_unhold():
 
 @app.route('/transfer_material', methods=['GET', 'POST'])
 def transfer_material():
-    if current_user.unit == 1 or current_user.unit == 2:
-        cs_return_lst = CurrentStock.get_stock('All', str(current_user.unit))
-    else:
-        return render_template('/transfer_pick_unit.html', stock_type='All')
+    #if current_user.unit == 1 or current_user.unit == 2:
+    #    cs_return_lst = CurrentStock.get_stock('All', str(current_user.unit))
+    #else:
 
-    return render_template('transfer_enter_smpl_no.html', _unit=current_user.unit)
+    return render_template('/transfer_pick_unit.html', stock_type='All', _unit=current_user.unit)
+
+    #return render_template('transfer_enter_smpl_no.html', _unit=current_user.unit)
     '''cs_obj_lst = []
     cs_id_lst = []
 
@@ -380,15 +381,15 @@ def transfer_pick_size():
 
     cs_return_lst = CurrentStock.load_smpl_by_smplno(smpl, unit)
     # This is done so that anyone can transfer in to or out of Unit 4 [501] currently
-    cs_return_lst_unit4 = CurrentStock.load_smpl_by_smplno(smpl, '4')
+    #cs_return_lst_unit4 = CurrentStock.load_smpl_by_smplno(smpl, '4')
 
     for cs_id, cs in cs_return_lst:
         cs_id_lst.append(cs_id)
         cs_obj_lst.append(cs)
 
-    for cs_id, cs in cs_return_lst_unit4:
+    '''for cs_id, cs in cs_return_lst_unit4:
         cs_id_lst.append(cs_id)
-        cs_obj_lst.append(cs)
+        cs_obj_lst.append(cs)'''
 
     if cs_obj_lst:
         return render_template('transfer_list.html', cs_lst=zip(cs_id_lst, cs_obj_lst), unit=unit)
@@ -413,7 +414,7 @@ def transfer_submit():
         transfer_date = request.form['dispatch_date']
         transfer_time = request.form['dispatch_time']
         transfer_pkts = request.form.getlist['dispatch_packets']
-        unit = request.form.getlist['unit']
+        unit = request.form.getlist['_unit']
         remarks = request.form['remarks']
 
     if request.method == 'GET':
@@ -428,6 +429,7 @@ def transfer_submit():
         transfer_time = request.args.get('dispatch_time')
         remarks = request.args.get('remarks')
         invoice_no = request.args.get('invoice_no')
+        current_unit = request.args.get('current_unit')
 
     # This fetches the list and removes the elements that are not selected
     # The ones that are not selected are returned as None. The below list filters out the Nones
@@ -435,9 +437,10 @@ def transfer_submit():
     transfer_quantity_lst = list(filter(None, transfer_quantity))
     unit_lst = list(filter(None, unit))
     transfer_pkts_lst = list(filter(None, transfer_pkts))
+    remarks = "TRANSFER TO UNIT " + unit[0]
 
-    # transfer_header = DispatchHeader(vehicle_no, customer, transfer_date, transfer_time, invoice_no, remarks)
-    # transfer_id = transfer_header.save_to_db()
+    transfer_header = DispatchHeader(vehicle_no, customer, transfer_date, transfer_time, invoice_no, remarks)
+    transfer_id = transfer_header.save_to_db()
 
     # Transfer Material has been changed for only partial material to be shifted.
     # Logic has been borrowed from Dispatch material
@@ -448,20 +451,21 @@ def transfer_submit():
         smpl_no = smpl_details[1]
         cs_id = int(smpl_details[0])
         cs = CurrentStock.load_smpl_by_id(cs_id)
-
+        dispatch_detail = DispatchDetail(transfer_id, cs.smpl_no, cs.thickness, cs.width, cs.length, int(transfer_nos),
+                                         Decimal(transfer_qty), '', int(no_of_packets), cs.length2)
+        dispatch_detail.save_to_db()
         if int(transfer_nos) == cs.numbers:
             CurrentStock.transfer_material_cls(cs_id, unit)
         else:
             cs_new = CurrentStock(smpl_no, cs.customer, transfer_qty, transfer_nos, cs.thickness, cs.width,
-                                  cs.length, cs.status, cs.grade, unit, cs.packet_name)
+                                  cs.length, cs.status, cs.grade, unit, cs.packet_name, cs.length2)
             cs.change_wt(smpl_no, cs.width, cs.length, transfer_qty, transfer_nos, 'minus', cs.status, cs.length2)
             if cs_new.check_if_size_exists():
                 cs_new.change_wt(cs_new.smpl_no, cs_new.width, cs_new.length, transfer_qty, transfer_nos,
                                  "plus", cs_new.status, cs_new.length2)
             else:
                 cs_new.save_to_db()
-        transfer_remarks = "Transferred to Unit " + unit + " for " + transfer_remarks + " on " + time.strftime(
-            "%d/%m/%Y")
+        #transfer_remarks = "Transferred to Unit " + unit + " from " + current_unit
         #Incoming.update_remarks(transfer_remarks, smpl_no)
 
     '''smpl_details = smpl.split(',')

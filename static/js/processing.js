@@ -1362,7 +1362,7 @@ function honda_part_no(width,length){
     else if (width == 565 && length == 645){
                 part_no = "K3CA BTM";
                 wt_per_sheet = 2.29;
-                coating = "20/0";
+                coating = "0/20";
     }
     else if (width == 520 && length == 765){
                 part_no = "KTE TANK R/L";
