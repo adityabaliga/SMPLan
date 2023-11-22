@@ -386,13 +386,14 @@ def transfer_pick_size():
     for cs_id, cs in cs_return_lst:
         cs_id_lst.append(cs_id)
         cs_obj_lst.append(cs)
+        customer = cs.customer
 
     '''for cs_id, cs in cs_return_lst_unit4:
         cs_id_lst.append(cs_id)
         cs_obj_lst.append(cs)'''
 
     if cs_obj_lst:
-        return render_template('transfer_list.html', cs_lst=zip(cs_id_lst, cs_obj_lst), unit=unit)
+        return render_template('transfer_list.html', cs_lst=zip(cs_id_lst, cs_obj_lst), unit=unit, customer = customer)
 
     else:
         return render_template('/main_menu.html', message="No Raw material to transfer")
@@ -438,6 +439,7 @@ def transfer_submit():
     unit_lst = list(filter(None, unit))
     transfer_pkts_lst = list(filter(None, transfer_pkts))
     remarks = "TRANSFER TO UNIT " + unit[0]
+    invoice_no = 'TRANSFER'
 
     transfer_header = DispatchHeader(vehicle_no, customer, transfer_date, transfer_time, invoice_no, remarks)
     transfer_id = transfer_header.save_to_db()
