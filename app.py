@@ -26,6 +26,9 @@ app = Flask(__name__)
 login_manager = LoginManager()
 login_manager.init_app(app)
 
+handler = logging.FileHandler('E:\\SMPLan\\app.log')
+handler.setLevel(logging.ERROR)
+app.logger.addHandler(handler)
 
 # Clicking on http://127.0.0.1:5000/ (the home page), this will redirect you to login page
 @app.route('/')
@@ -2900,6 +2903,14 @@ def fg_to_wip_submit():
     CurrentStock.update_status_cls(cs_id, "WIP")
 
     return render_template('/main_menu.html')
+
+@app.errorhandler(Exception)
+def handle_error(e):
+    # Log the error
+    app.logger.error(f"An error occurred: {str(e)}")
+
+    # Display a custom error page with the error details
+    return render_template('error.html', error=str(e)), 500
 
 
 if __name__ == '__main__':
