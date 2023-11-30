@@ -147,7 +147,7 @@ function honda_part_no(width,length){
     else if (width == 565 && length == 645){
                 part_no = "K3CA BTM";
                 wt_per_sheet = 2.29;
-                coating = "20/0";
+                coating = "0/20";
     }
     else if (width == 520 && length == 765){
                 part_no = "KTE TANK R/L";
@@ -206,12 +206,34 @@ function make_label_old(smpl_no, customer){
     var smpl_no = queries[0].split('=');
     document.getElementById('lbl_smpl_no').value = smpl_no[1];
     document.getElementById('lbl_prod_date').value = queries[5];
-    document.getElementById('lbl_machine').value = queries[1].replace('+',' ');
+
     document.getElementById('lbl_size').value += size;
     document.getElementById('lbl_customer').value = cust_name_for_label(document.getElementById('lbl_customer').value);
     document.getElementById('lbl_numbers').value = numbers_for_lbl;
     document.getElementById('lbl_packet_name').value = queries[3];
     document.getElementById('lbl_mat_status').value = queries[6];
+
+    document.getElementById('lbl_machine').value = queries[1].replaceAll('+',' ');
+    //Need to remove Lami type from machine and add it to Lami field
+    machine = queries[1];
+    if(queries[1].includes("Both")){
+
+        machine = machine.split("Both");
+        lbl_machine = machine[0];
+        lami = "Both " + machine[1];
+
+        document.getElementById('lbl_lamination').value = lami.replaceAll('+',' ');
+        document.getElementById('lbl_machine').value = lbl_machine.replaceAll('+',' ');
+    }
+    if(queries[1].includes("Single")){
+
+        machine = machine.split("Single");
+        lbl_machine = machine[0];
+        lami = "Single " + machine[1];
+
+        document.getElementById('lbl_lamination').value = lami.replaceAll('+',' ');
+        document.getElementById('lbl_machine').value = lbl_machine.replaceAll('+',' ');
+    }
 
     var qc_name = queries[8].replace('+', ' ');
     qc_name = qc_name.replace('.', '');

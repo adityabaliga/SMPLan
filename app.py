@@ -26,7 +26,7 @@ app = Flask(__name__)
 login_manager = LoginManager()
 login_manager.init_app(app)
 
-handler = logging.FileHandler('E:\\SMPLan\\app.log')
+handler = logging.FileHandler('D:\\SMPLan\\app.log')
 handler.setLevel(logging.ERROR)
 app.logger.addHandler(handler)
 
