@@ -1539,10 +1539,10 @@ def submit_slitting_processing():
         no_of_qc = request.form['no_of_qc']
         no_of_helpers = request.form['no_of_helpers']
         fg_id = request.form['fg_id']
-        # names_of_qc = request.form['names_of_qc']
+        names_of_qc = request.form['names_of_qc']
         # names_of_helpers = request.form['names_of_helpers']
         # name_of_packer = request.form['name_of_packer']
-        names_of_qc = ''
+        # names_of_qc = ''
 
         setting_date = request.form['setting_date']
         setting_start_time = request.form['setting_start_time']
