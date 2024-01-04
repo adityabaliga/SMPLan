@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SMPL MRP - Display Stock</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+    <style>
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    td, th {
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 8px;
+    }
+
+    tr:nth-child(even) {
+        background-color: #dddddd;
+    }
+
+    hr.style1{
+	        border-top: 15px solid #4d0000;
+            }
+    .oe{
+            font-family: Mathematica6 Bold, Old English Text MT, Engravers Old English BT, Old English, Collins Old English, New Old English, serif;
+            font-size: 50px;
+            color: #4d0000;
+            text-align:center;
+    }
+    .topnav a:hover {
+            color: #4d0000;
+            text-decoration: none;
+    }
+    .nopad {
+                margin: 0;
+                padding: 0;
+                margin-top: 0em;
+                margin-bottom: 0em;
+    }
+
+    </style>
+</head>
+<form action="/get_stock_full_by_customer" method="post">
+    <div class="topnav" id="myTopnav">
+        <br>
+        <table>
+            <td><img src="/static/logo.jpg"  height="70" width="92" align = "left"></td>
+            <td width="1050px"><div align="center" class="nopad"> <a href="\main_menu"  class="oe">SMPL</a></div></td>
+            <td><div align="left" class="nopad">Hi {{current_user.username}}<br>
+            <a href="\change_password_form">Change Password</a><br>
+            <a href="\logout">Logout</a></div></td>
+        </table>
+    </div>
+
+    <hr class ="style1">
+    <table class = "table table-sm">
+    <tr>
+        <th> Customer</th>
+        <th> RM (in MT)</th>
+        <th> WIP (in MT)</th>
+        <th> FG (in MT)</th>
+
+
+
+    </tr>
+    {% for cs in cs_lst %}
+        <tr>
+
+            <td><input type = "radio" name = "customer" id= "customer" value ="{{cs[0]}}">{{cs[0]}}</td>
+            <td>{{cs[1]}}</td>
+            <td>{{cs[2]}}</td>
+            <td>{{cs[3]}}</td>
+
+      </tr>
+    {% endfor %}
+
+    </table>
+    <td>
+        <input class="btn btn-default" type="submit" value="Select">
+    </td>
+    <script src = "{{ url_for('static', filename='js/stock.js') }}"></script>
+
+</form>
+</html>

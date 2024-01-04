@@ -447,6 +447,24 @@ class CurrentStock:
             customer_lst.append(lst[0])
         return customer_lst
 
+    @classmethod
+    def customer_list_for_stock(cls):
+        customer_lst = []
+        user_data = []
+        with CursorFromConnectionFromPool() as cursor:
+            cursor.execute("select distinct customer, SUM(CASE WHEN status = 'RM' THEN weight ELSE 0 END) "
+                           "AS RM_quantity, "
+                           "SUM(CASE WHEN status = 'WIP' THEN weight ELSE 0 END) AS WIP_quantity,"
+                           "SUM(CASE WHEN status = 'FG' THEN weight ELSE 0 END) AS FG_quantity "
+                           "from current_stock "
+                           "group by customer "
+                           "order by customer asc ")
+            user_data = cursor.fetchall()
+        if user_data:
+            return user_data
+        else:
+            return 0
+
 
     @classmethod
     def get_stock_by_customer(cls, customer, display_type):

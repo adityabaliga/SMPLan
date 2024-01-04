@@ -5,7 +5,8 @@ from werkzeug.middleware.profiler import ProfilerMiddleware
 from decimal import Decimal
 from flask_login import LoginManager, login_user, current_user, logout_user
 from file_uploader import FileUploader
-from flask import Flask, render_template, request, Markup, jsonify
+from flask import Flask, render_template, request, jsonify
+from markupsafe import Markup
 from csv import writer
 
 from user import User
@@ -21,6 +22,7 @@ from dispatch_detail import DispatchDetail
 from slitter_batch import SlitterBatch
 import time
 import psycopg2
+from urllib.parse import unquote
 
 app = Flask(__name__)
 login_manager = LoginManager()
@@ -1919,6 +1921,39 @@ def print_label_reshearing():
 def check_stock():
 
     return render_template('check_stock.html')
+
+@app.route('/check_stock_by_customer', methods=['GET', 'POST'])
+def check_stock_by_customer():
+
+    customer_lst = []
+    customer_lst = CurrentStock.customer_list_for_stock()
+
+    return render_template('stock_summary_by_customer.html', cs_lst = customer_lst)
+
+@app.route('/get_stock_full_by_customer', methods=['GET', 'POST'])
+def get_stock_full_by_customer():
+
+    if request.method == 'POST':
+        customer_input = request.form['customer']
+    if request.method == 'GET':
+        customer_input = request.args.get('customer').lstrip(' ')
+
+
+    customer = unquote(customer_input)
+    customer = customer.strip()
+    cs_lst = []
+    _cs_lst = []
+    cs_lst = CurrentStock.get_stock_by_customer(customer, 'All')
+    cs_id_lst = []
+
+    for cs_id, cs in cs_lst:
+        cs_id_lst.append(cs_id)
+        _cs_lst.append(cs)
+
+
+    return render_template('stock_display.html', cs_lst = zip(cs_id_lst, _cs_lst))
+
+
 
 @app.route('/check_stock_ttssi_fg', methods=['GET', 'POST'])
 def check_stock_ttssi_fg():
