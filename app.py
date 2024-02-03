@@ -1197,6 +1197,7 @@ def submit_processing():
         customer = request.form['customer']
         thickness = float(request.form['thickness'])
         grade = request.form['grade']
+        mat_type = request.form['mat_type']
 
         no_of_qc = request.form['no_of_qc']
         no_of_helpers = request.form['no_of_helpers']
@@ -1538,6 +1539,7 @@ def submit_slitting_processing():
         customer = request.form['customer']
         thickness = float(request.form['thickness'])
         grade = request.form['grade']
+        mat_type = request.form['mat_type']
 
         no_of_qc = request.form['no_of_qc']
         no_of_helpers = request.form['no_of_helpers']
@@ -1616,7 +1618,7 @@ def submit_slitting_processing():
 
                             packet_name = part_name + width_name
                             part_weight = Decimal(thickness * float(output_width) * float(part_length) * 0.00000785)
-                            if "ALUMINIUM " in grade or "ALU " in grade:
+                            if "ALUMINIUM " in mat_type or "ALU " in mat_type:
                                 part_weight = Decimal(thickness * float(output_width) * float(part_length) * 0.0000027)
                             part_weight = round(part_weight, 3)
 
