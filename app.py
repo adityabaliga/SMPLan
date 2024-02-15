@@ -1655,7 +1655,7 @@ def submit_slitting_processing():
                             # In case of rewinding, there is the RM and the FG which have the same size.
                             # This check has been added so that weight is deducted from the RM only
 
-                            if new_rm_weight > 0:
+                            if Decimal(new_rm_weight) > Decimal(-0.03)*Decimal(cs_rm.weight):
                                 # rm_status = CurrentStock.change_wt(smpl_no, ms_width, ms_length, part_weight, processed_numbers,
                                 #                                   "minus", cs_rm.status, 0, cs_rm.packet_name)
 
@@ -1686,20 +1686,20 @@ def submit_slitting_processing():
                                     new_rm_numbers = new_rm_numbers - Decimal(part_weight)
                                 else:
                                     new_rm_numbers = new_rm_numbers
-                                if (new_rm_weight < 0.5 and sign == "minus" and Decimal(ms_length) == 0):
+                                #if (new_rm_weight < 0.5 and sign == "minus" and Decimal(ms_length) == 0):
                                     # OrderDetail.complete_processing_on_del(smpl_no, width, length)
                                     # CurrentStock.delete_record(cs_id)
 
-                                    cursor.execute("delete from current_stock where cs_id = %s", (cs_rm_id,))
-                                    new_rm_weight = 0
+                                    '''cursor.execute("delete from current_stock where cs_id = %s", (cs_rm_id,))
+                                    new_rm_weight = 0'''
                                     # This is done when the RM is over but for some reason the order could not be completed
                                     # This could when the RM is thickness is more or wrong calc of material or processing mistake/change
 
 
-                                else:
-                                    cursor.execute(
-                                        "update current_stock set weight = %s, numbers = %s where cs_id = %s",
-                                        (new_rm_weight, new_rm_numbers, cs_rm_id))
+                                #else:
+                                cursor.execute(
+                                    "update current_stock set weight = %s, numbers = %s where cs_id = %s",
+                                    (new_rm_weight, new_rm_numbers, cs_rm_id))
 
 
                                 # The issue is during rewinding since mother coil and output width & length remain the same,
@@ -1773,6 +1773,22 @@ def submit_slitting_processing():
                                             cs_cc.customer,
                                             cs_cc.thickness, cs_cc.grade, cs_cc.unit, cs_cc.packet_name, cs_cc.length2))
 
+                                # If rewinding insert FG as new stock
+                                else:
+                                    # cc_insert = "insert"
+                                    cs_cc = CurrentStock(smpl_no, customer, part_weight, processed_numbers, thickness,
+                                                         output_width, output_length, fg_yes_no, grade, unit,
+                                                         packet_name,
+                                                         output_length2)
+                                    cursor.execute(
+                                        "insert into current_stock (smpl_no,weight,numbers,width,length,status,customer,thickness"
+                                        ",grade, unit, packet_name, length2) values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+                                        (
+                                            cs_cc.smpl_no, cs_cc.weight, cs_cc.numbers, cs_cc.width, cs_cc.length,
+                                            cs_cc.status,
+                                            cs_cc.customer,
+                                            cs_cc.thickness, cs_cc.grade, cs_cc.unit, cs_cc.packet_name, cs_cc.length2))
+
                                 # Unit of the material is decided based on the machine used to process the material.
                                 # WARNING: This is bad programming
                                 #unit = '2'
@@ -1797,6 +1813,12 @@ def submit_slitting_processing():
                             else:
                                 return render_template('/main_menu.html',
                                                        message=Markup("Entry Failed. Please check RM weight"))
+                            if (new_rm_weight < 0.5):
+                                # OrderDetail.complete_processing_on_del(smpl_no, width, length)
+                                # CurrentStock.delete_record(cs_id)
+
+                                cursor.execute("delete from current_stock where cs_id = %s", (cs_rm_id,))
+
                     connection.commit()
                     print("Data inserted successfully!")
 
