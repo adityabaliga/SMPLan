@@ -100,8 +100,9 @@ class Incoming:
             # if weight mentioned as kgs, then weight has to be divided by 1000
             if "Kgs" in weight_list or "kgs" in weight_list:
                 weight = Decimal(weight_list[1])/1000
-            if "Nos" in weight_list or "nos" in weight_list or "NOS" in weight_list:
-                weight = round((thickness*width*length*0.00785),3)
+            elif "Nos" in weight_list or "nos" in weight_list or "NOS" in weight_list:
+                nos = Decimal(weight_list[1])
+                weight = round((thickness * width * length * Decimal(0.00000785) * nos / Decimal(1000)), 3)
             else:
                 weight = Decimal(weight_list[1])
 
@@ -127,6 +128,8 @@ class Incoming:
             if(numbers_coll.length >=1):
                 numbers_list = numbers_coll[0].firstChild.data.split(' ')
                 numbers = Decimal(numbers_list[1])
+            if "Nos" in weight_list or "nos" in weight_list or "NOS" in weight_list:
+                numbers = Decimal(weight_list[1])
             else:
                 numbers =0
 
