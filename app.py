@@ -1399,10 +1399,10 @@ def submit_processing():
                                 if machine.startswith(
                                         "CTL 2") or machine == "Slitting" or machine == "Mini_Slitting" or \
                                         machine == "Reshearing 5" or machine == "Reshearing 6" or machine == "Reshearing 7" or \
-                                        machine == "NCTL 2" or machine == "NCTL 3" or machine == "NCTL 4" or machine == "NCTL 5":
+                                        machine == "NCTL 2" or machine == "NCTL 3" or machine == "NCTL 4" or \
+                                        machine == "NCTL 5" or machine == "NCTL 1":
                                     unit = '2'
-                                elif machine == "NCTL 1":
-                                    unit = '4'
+
                                 else:
                                     unit = '1'
 
