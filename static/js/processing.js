@@ -359,6 +359,18 @@ function change_width(table_id){
         total_width += Number(row.cells[0].lastChild.value);
     }
     document.getElementById("total_width").value = total_width;
+
+    var rm_size = document.getElementById('input_material').value;
+    rm_size = rm_size.split(' x ');
+    var rm_width = rm_size[0];
+
+    if(total_width > rm_width){
+        alert('Processed width is greater than Input material width. Please check');
+        document.getElementById('submit').disabled = true;
+    }
+    else{
+        document.getElementById('submit').disabled = false;
+    }
    if(document.getElementById("total_length").value){
     get_part_weight();
    }
@@ -403,7 +415,14 @@ function get_part_weight(){
         document.getElementById("total_processed_wt").value = total_processed_wt.toFixed(3);
     }
 
-
+    var allowance = 1.01;
+    if((total_processed_wt ) > allowance*rm_wt){
+        alert('Processed wt is greater than Input material weight. Please check');
+        document.getElementById('submit').disabled = true;
+    }
+    else{
+        document.getElementById('submit').disabled = false;
+    }
 
     //var total_order_wt = Number(document.getElementById("order_wt").value);
     //var completed_proc_wt = Number(document.getElementById("tot_proc_wt").value);
@@ -651,7 +670,7 @@ function print_label_new(){
     data += document.getElementById('lbl_comment').value + '&';
     data += document.getElementById('lbl_2nd_customer').value + '&';
     data += document.getElementById('lbl_mat_type').value + '&';
-    data += document.getElementById('lbl_scams_no').value + '&';
+    data += document.getElementById('lbl_scams_no').value + document.getElementById('lbl_scams_pkt').value + '&';
     data += document.getElementById('lbl_coating').value + '&';
     data += document.getElementById('lbl_part_no').value + '&';
     data += document.getElementById('lbl_batch_no').value + '&';
