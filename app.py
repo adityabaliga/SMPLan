@@ -459,7 +459,7 @@ def transfer_submit():
         cs_id = int(smpl_details[0])
         cs = CurrentStock.load_smpl_by_id(cs_id)
         dispatch_detail = DispatchDetail(transfer_id, cs.smpl_no, cs.thickness, cs.width, cs.length, int(transfer_nos),
-                                         Decimal(transfer_qty), '', int(no_of_packets), cs.length2)
+                                         Decimal(transfer_qty), '', int(no_of_packets), cs.length2, cs.packet_name)
         dispatch_detail.save_to_db()
         if int(transfer_nos) == cs.numbers:
             CurrentStock.transfer_material_cls(cs_id, unit)
@@ -2243,7 +2243,7 @@ def dispatch_list():
 def dispatch():
     if request.method == 'POST':
         dispatch_lst = request.form.getlist['select_smpl']
-        pkt_name_lst = request.form.getlist['packet_name']
+        pkt_name = request.form.getlist['packet_name']
         dispatch_nos = request.form.getlist['dispatch_numbers']
         dispatch_quantity = request.form.getlist['dispatch_quantity']
         vehicle_no = request.form['vehicle_no']
@@ -2255,7 +2255,7 @@ def dispatch():
 
     if request.method == 'GET':
         dispatch_lst = request.args.getlist('select_smpl')
-        pkt_name_lst = request.args.getlist('packet_name')
+        pkt_name = request.args.getlist('packet_name')
         dispatch_nos = request.args.getlist('dispatch_numbers')
         dispatch_quantity = request.args.getlist('dispatch_quantity')
         dispatch_pkts = request.args.getlist('dispatch_packets')
@@ -2273,6 +2273,7 @@ def dispatch():
     dispatch_quantity_lst = list(filter(None, dispatch_quantity))
     defectives_lst = list(filter(None, defectives))
     dispatch_pkts_lst = list(filter(None, dispatch_pkts))
+    #pkt_name_lst = list(filter(None, pkt_name))
 
     dispatch_header = DispatchHeader(vehicle_no, customer, dispatch_date, dispatch_time, invoice_no, remarks)
     dispatch_id = dispatch_header.save_to_db()
@@ -2286,7 +2287,8 @@ def dispatch():
         cs_id = smpl_details[0]
         cs = CurrentStock.load_smpl_by_id(cs_id)
         dispatch_detail = DispatchDetail(dispatch_id, cs.smpl_no, cs.thickness, cs.width, cs.length, int(dispatch_nos),
-                                         Decimal(dispatch_qty), defective, int(no_of_packets), cs.length2)
+                                         Decimal(dispatch_qty), defective, int(no_of_packets), cs.length2,
+                                         cs.packet_name)
         dispatch_detail.save_to_db()
         if int(dispatch_nos) == cs.numbers:
             CurrentStock.delete_record(cs_id)
