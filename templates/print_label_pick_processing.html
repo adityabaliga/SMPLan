@@ -61,10 +61,14 @@
 
         {% for processing_detail, processing_date, qc_name in processing_detail_lst %}
             <tr>
-                <td><input type = "radio" name = "select_processing_id" value = "{{processing_detail.smpl_no}};{{processing_detail.machine}};{{processing_detail.cut_width}}x{{processing_detail.cut_length}};{{processing_detail.packet_name}};{{processing_detail.processed_numbers}};{{processing_date}};{{processing_detail.status}};{{processing_detail.processed_wt}};{{qc_name}}" required>  {{processing_detail.smpl_no}}</input></td>
+                <td><input type = "radio" name = "select_processing_id" value = "{{processing_detail.smpl_no}};{{processing_detail.machine}};{{processing_detail.cut_width}}x{{processing_detail.cut_length}}-{{processing_detail.cut_length2}};{{processing_detail.packet_name}};{{processing_detail.processed_numbers}};{{processing_date}};{{processing_detail.status}};{{processing_detail.processed_wt}};{{qc_name}}" required>  {{processing_detail.smpl_no}}</input></td>
 
                 <td>{{processing_detail.machine}}</td>
+                {% if processing_detail.cut_length2 != 0 %}
+                <td>{{processing_detail.cut_width}} x {{processing_detail.cut_length}} - {{processing_detail.cut_length2}}</td>
+                {% else %}
                 <td>{{processing_detail.cut_width}} x {{processing_detail.cut_length}}</td>
+                {% endif %}
                 <td>{{processing_detail.processed_numbers}} </td>
                 <td>{{processing_detail.packet_name}} </td>
 

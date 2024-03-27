@@ -193,6 +193,14 @@ function make_label_old(smpl_no, customer){
     var thickness = document.getElementById('lbl_size').value;
     var numbers_for_lbl = queries[4];
 
+    // This is to check if output length2 is non zero and represent trap size
+    var trap_check = width_length[1].split('-')
+    if (trap_check[1] == '0'){
+        width_length[1] = trap_check[0]
+    }else{
+        width_length[1] = width_length[1].replace('-', ' - ');
+    }
+
     if(width_length[1].trim() == '0'){
         width_length[1] = 'Coil';
         //if material is coil, numbers should show length
