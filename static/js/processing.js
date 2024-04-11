@@ -415,7 +415,7 @@ function get_part_weight(){
         document.getElementById("total_processed_wt").value = total_processed_wt.toFixed(3);
     }
 
-    var allowance = 1.01;
+    var allowance = 1.022;
     if((total_processed_wt ) > allowance*rm_wt){
         alert('Processed wt is greater than Input material weight. Please check');
         document.getElementById('submit').disabled = true;
