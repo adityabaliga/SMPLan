@@ -681,12 +681,12 @@ function print_label_new(){
     data += document.getElementById('lbl_mat_status').value + '&';
     data += document.getElementById('lbl_qc_name').value + '&';
 
-    var sticker_text = document.getElementById('stickers').value;
+    /*var sticker_text = document.getElementById('stickers').value;
 
     sticker_text += document.getElementById('lbl_smpl_no').value + ';;';
     sticker_text   += document.getElementById('lbl_packet_name').value + ';;';
     sticker_text += data.replaceAll('&',',') + '|;|';
-    document.getElementById('stickers').value = sticker_text;
+    document.getElementById('stickers').value = sticker_text;*/
 
 
     var new_page;
