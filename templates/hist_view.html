@@ -275,6 +275,54 @@
             </table>
         {% endfor %}
 
+        <h3>Stickers</h3>
+        <table>
+            <tr>
+                <th>Prod Date</th>
+                <th>Machine</th>
+                <th>Size</th>
+                <th>No.s</th>
+                <th>Pkt Name</th>
+                <th>Lami</th>
+                <th>Mill ID</th>
+                <th>Grade</th>
+                <th>Mill</th>
+                <th>Comment</th>
+                <th>2nd Cust</th>
+                <th>Mat Type</th>
+                <th>Scams No</th>
+                <th>Coating</th>
+                <th>Part No</th>
+                <th>Net Wt</th>
+                <th>Gross Wt</th>
+                <th>Top Comment</th>
+            </tr>
+            {% for sticker in sticker_lst %}
+            <tr>
+                <td>{{sticker[2]}}</td>
+                <td>{{sticker[4]}}</td>
+                <td>{{sticker[5]}}</td>
+                <td>{{sticker[6]}}</td>
+                <td>{{sticker[7]}}</td>
+                <td>{{sticker[8]}}</td>
+                <td>{{sticker[9]}}</td>
+
+                <td>{{sticker[10]}}</td>
+                <td>{{sticker[11]}}</td>
+                <td>{{sticker[12]}}</td>
+                <td>{{sticker[13]}}</td>
+                <td>{{sticker[14]}}</td>
+                <td>{{sticker[15]}}</td>
+                <td>{{sticker[16]}}</td>
+                <td>{{sticker[18]}}</td>
+                <td>{{sticker[19]}}</td>
+                <td>{{sticker[20]}}</td>
+            </tr>
+
+
+        {% endfor %}
+        </table>
+
 
 </body>
 

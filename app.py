@@ -1855,40 +1855,62 @@ def submit_slitting_processing():
         return render_template('/main_menu.html', message=Markup("Processing for " + smpl_no + " entered"))
 
 
-# background process happening without any refreshing
-@app.route('/background_process_test', methods=['GET', 'POST'])
-def background_process_test():
-    print("Hello ")
-    data = str(request.get_data())
-    data = data.split('=')
+@app.route('/process_data', methods=['POST'])
+def process_sticker_background():
+    # Get data sent from the client
+    data = request.json
 
-    #Cleaning up the input array
-    data[1] = data[1].replace('+', ' ')
-    data[1] = data[1].replace('%2F','/')
-    data[1]=data[1].rstrip(data[1][-1])
-    data_array = data[1].split('%3B')
+    sticker_txt = data['fieldName']
+    sticker_txt = sticker_txt.split(';;')
 
-    #Adding packet name to the SMPL no.
-    data_array[0] = data_array[0] + '-' + data_array[6]
+    # Establish a database connection
+    connection = psycopg2.connect(
+        dbname='smpl_prodn',
+        user='postgres',
+        password='smpl@509',
+        host='localhost',
+        port=5432
+    )
 
-    print(data[1])
-    print(data_array)
+    try:
+        # Begin a transaction
+        connection.autocommit = False
+        cursor = connection.cursor()
 
-    # Writing in to csv file
-    # https://www.geeksforgeeks.org/how-to-append-a-new-row-to-an-existing-csv-file/
-    with open('E:\\Export_Sticker.csv', 'a') as f_object:
-        # Pass this file object to csv.writer()
-        # and get a writer object
-        writer_object = writer(f_object)
+        try:
+            cursor.execute('insert into sticker (smpl_no, prod_date, customer, machine, size, numbers, packet_name, '
+                           'lamination, mill_id, grade, mill, comment, second_customer, material_type, scams_no, coating, '
+                           'part_no, batch_no, net_wt, gross_wt, top_comment, format_size, mat_status, qc_name) values'
+                           ' (%s, %s,%s, %s, %s, %s,%s, %s, %s, %s,%s, %s, %s, %s,%s, %s, %s, %s,%s, %s, %s, %s,%s, %s)',
+                           (sticker_txt[0], sticker_txt[1], sticker_txt[2], sticker_txt[3], sticker_txt[4], sticker_txt[5],
+                                  sticker_txt[6], sticker_txt[7], sticker_txt[8], sticker_txt[9], sticker_txt[10],
+                                  sticker_txt[11],sticker_txt[12], sticker_txt[13], sticker_txt[14], sticker_txt[15],
+                                  sticker_txt[16], sticker_txt[17], sticker_txt[18], sticker_txt[19], sticker_txt[20],
+                                  sticker_txt[21], sticker_txt[22], sticker_txt[23]))
 
-        # Pass the list as an argument into
-        # the writerow()
-        writer_object.writerow(data_array)
+        except (Exception, psycopg2.Error) as error:
+            # Rollback the transaction if an error occurred
+            connection.rollback()
+            print("Error inserting data:", error)
 
-        # Close the file object
-        f_object.close()
+        # Close the cursor
+        connection.commit()
+        cursor.close()
 
-    return jsonify("nothing")
+    except psycopg2.OperationalError as error:
+        # Handle network errors
+        print("Network error occurred:", error)
+        print("Rolling back the transaction...")
+        connection.rollback()
+
+
+    finally:
+        # Close the database connection
+        connection.close()
+
+
+    # Return a response to the client
+    return jsonify('')
 
 
 @app.route('/make_label_hist', methods=['GET', 'POST'])
@@ -2550,6 +2572,9 @@ def history_show_details():
             dispatch_lst.append(dispatch_hdr_lst[i][0])
             i += 1
 
+        sticker_lst = []
+        sticker_lst = CurrentStock.getStickerList(smpl_no)
+
         return render_template('/hist_view.html', incoming=incoming, file_list=file_list,
                                smpl_no_lst=smpl_no_lst,
                                order_lst_by_smpl=zip(order_lst, order_id_lst),
@@ -2561,7 +2586,7 @@ def history_show_details():
                                processing_hdr_lst=zip(processing_hdr_lst, processing_hdr_id_lst),
                                dispatch_hdr_lst=zip(dispatch_lst, dispatch_id_lst),
                                dispatch_dtl_lst=dispatch_dtl_lst,
-                               cs_lst=cs_lst)
+                               cs_lst=cs_lst, sticker_lst = sticker_lst)
 
     else:
         return render_template('/main_menu.html', message=smpl_number + " not found.")

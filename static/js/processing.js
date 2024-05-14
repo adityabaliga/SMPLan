@@ -643,12 +643,50 @@ function print_label_slit_new(){
     data += fg_table.rows[rowId].cells[status_pos].lastChild.value + '&';
     data += document.getElementById('lbl_qc_name').value;
 
+    var sticker_text = '';
+
+    //sticker_text += document.getElementById('lbl_smpl_no').value + ';;';
+    //sticker_text   += document.getElementById('lbl_packet_name').value + ';;';
+    sticker_text += data.replaceAll('&',';;') ;
+    document.getElementById('stickers').value = sticker_text;
+
+
     var new_page;
     if(document.getElementById('lbl_format').value == "TSL"){
         new_page = window.open('print_label_tsl?' + data);
     }else{
         new_page = window.open('print_label?' + data);
     }
+
+    // Create a new FormData object from the form
+    var fieldValue = document.getElementById('stickers').value;
+
+    // Create an object with the field data
+    var data = {
+        fieldName: fieldValue // Replace 'fieldName' with the key you want to use for the field in the JSON
+    };
+
+    // Convert the object to a JSON string
+    var json = JSON.stringify(data);
+
+     // Use fetch to send the data to the Flask server
+    fetch('/process_data', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: json
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Success:', data);
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+    });
+
+    document.getElementById('stickers').value = '';
+
 }
 
 function print_label_new(){
@@ -681,12 +719,13 @@ function print_label_new(){
     data += document.getElementById('lbl_mat_status').value + '&';
     data += document.getElementById('lbl_qc_name').value + '&';
 
-    /*var sticker_text = document.getElementById('stickers').value;
+    var sticker_text = '';
 
-    sticker_text += document.getElementById('lbl_smpl_no').value + ';;';
-    sticker_text   += document.getElementById('lbl_packet_name').value + ';;';
-    sticker_text += data.replaceAll('&',',') + '|;|';
-    document.getElementById('stickers').value = sticker_text;*/
+    //sticker_text += document.getElementById('lbl_smpl_no').value + ';;';
+    //sticker_text   += document.getElementById('lbl_packet_name').value + ';;';
+    sticker_text += data.replaceAll('&',';;') ;
+    document.getElementById('stickers').value = sticker_text;
+
 
 
     var new_page;
@@ -696,6 +735,34 @@ function print_label_new(){
         new_page = window.open('print_label?' + data);
     }
 
+    // Create a new FormData object from the form
+    var fieldValue = document.getElementById('stickers').value;
+
+    // Create an object with the field data
+    var data = {
+        fieldName: fieldValue // Replace 'fieldName' with the key you want to use for the field in the JSON
+    };
+
+    // Convert the object to a JSON string
+    var json = JSON.stringify(data);
+
+     // Use fetch to send the data to the Flask server
+    fetch('/process_data', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: json
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Success:', data);
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+    });
+
+    document.getElementById('stickers').value = '';
 }
 
 function print_label_big(){
@@ -1289,32 +1356,7 @@ function make__part_label_ctl(th){
 
 }
 
-/*function export_to_xls(e, th){
-    e.preventDefault();
-    var rowId = parseInt(event.target.parentNode.parentNode.id);
-              //this gives id of tr whose button was clicked
-    var row_id = th.parentNode.id;
-    var export_row = "";
-    var fg_table = document.getElementById('fg_table');
 
-    for(i=0;i<fg_table.rows[rowId].cells.length-2;i++){
-            export_row += fg_table.rows[rowId].cells[i].lastChild.value + ';';
-    }
-
-    // This is an AJAX request to asynchronously send a request to Python
-    // This helps us send a request but remain on the same page
-    // https://stackoverflow.com/questions/41323679/how-to-send-data-to-flask-via-ajax
-    $.ajax({
-        url: '/background_process_test',
-        type: 'POST',
-        data: {
-                 'new_freq': export_row  //  to the GET parameters
-                },
-        success: function (response) {
-            alert(response);
-        }
-        });
-}*/
 
 function honda_part_no(width,length){
     var part_no = "";

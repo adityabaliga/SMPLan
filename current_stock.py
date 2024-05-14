@@ -635,4 +635,14 @@ class CurrentStock:
         else:
             return None
 
+    @classmethod
+    def getStickerList(cls, smpl_no):
+        with CursorFromConnectionFromPool() as cursor:
+            cursor.execute(" select * from sticker where smpl_no = %s",(smpl_no,))
+
+            user_data = cursor.fetchall()
+        if user_data:
+            return user_data
+        else:
+            return None
 
