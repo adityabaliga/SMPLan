@@ -276,7 +276,7 @@
         {% endfor %}
 
         <h3>Stickers</h3>
-        <table>
+        <table class = "table table-sm">
             <tr>
                 <th>Prod Date</th>
                 <th>Machine</th>
@@ -297,7 +297,9 @@
                 <th>Gross Wt</th>
                 <th>Top Comment</th>
             </tr>
+            {% if sticker_lst != None %}
             {% for sticker in sticker_lst %}
+
             <tr>
                 <td>{{sticker[2]}}</td>
                 <td>{{sticker[4]}}</td>
@@ -321,6 +323,7 @@
 
 
         {% endfor %}
+        {% endif %}
         </table>
 
 
