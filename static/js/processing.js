@@ -982,6 +982,11 @@ function make_label_new_slit(th){
         window.alert("QC Name is not entered.");
         return; // Exit the function
     }
+    var prod_date = document.getElementById("processing_date").value;
+    if(prod_date == ""){
+        window.alert("Date is not entered.");
+        return; // Exit the function
+    }
 
     var rowId = parseInt(event.target.parentNode.parentNode.id);
               //this gives id of tr whose button was clicked
@@ -994,7 +999,7 @@ function make_label_new_slit(th){
     //Get values for the rows
     //Row 1
     var smpl_no = document.getElementById("smpl_no").value;
-    var prod_date = document.getElementById("processing_date").value;
+
     prod_date = change_date_format(prod_date);
     var machine = document.getElementById("operation").value;
 
@@ -1535,6 +1540,12 @@ function make_label_new(th){
         window.alert("QC Name is not entered.");
         return; // Exit the function
     }
+
+    var prod_date = document.getElementById("processing_date").value;
+    if(prod_date == ""){
+        window.alert("Date is not entered.");
+        return; // Exit the function
+    }
     var rowId = parseInt(event.target.parentNode.parentNode.id);
               //this gives id of tr whose button was clicked
     var row_id = th.parentNode.id;
@@ -1559,7 +1570,7 @@ function make_label_new(th){
     // Get values for the fields one by one
     //Row 1
     var smpl_no = document.getElementById("smpl_no").value;
-    var prod_date = document.getElementById("processing_date").value;
+
     prod_date = change_date_format(prod_date);
     var machine = document.getElementById("machine").value;
     var width = numbers_table.rows[rowId].cells[0].lastChild.value;
