@@ -1,4 +1,7 @@
 const pkt_name_arr=[];
+const width_name_arr=[];
+const part_name_arr=[];
+
 
 // This function is to set the focus when the page loads for CTL, NCTL and Reshearing operations
 function setFocusToTextBox(operation){
@@ -127,6 +130,22 @@ function setFocusToTextBox_Slit(operation){
         document.getElementById('coating').readOnly = true;
     }
 
+    var table = document.getElementById('packet_names');
+    var packet_name;
+    var part_name;
+    var part;
+    for (let i = 1; i < table.rows.length; i++) {
+            const row = table.rows[i];
+            packet_name = row.cells[2].lastChild.data.split('W');
+
+            // Traverse the cells in the current row
+            if(part_name_arr.includes(packet_name[0])){
+
+            }else{
+                part_name_arr.push(packet_name[0]);
+            }
+    }
+
 }
 
 //https://stackoverflow.com/questions/5629805/disabling-enter-key-for-form
@@ -162,6 +181,51 @@ function check_packet_name(table_id, table_row){
 
 
 }
+
+//This is a function to check if width name has been repeated
+function check_width_name(table_id, table_row){
+    // Get the row where the change was made and calculate the weight of the processed material
+	var rowCount = table_row.offsetParent.parentElement.rowIndex;
+	var last_row = document.getElementById(table_id).rows[rowCount];
+
+    var width_name =  (last_row.cells[1].lastChild.value);
+
+    //packet_key = width + 'X' + length + '-' + packet_name;
+
+    if(width_name_arr.includes(width_name)){
+        window.alert('Packet name is already used');
+        last_row.cells[1].lastChild.value = '';
+        last_row.cells[1].lastChild.focus();
+
+    }else{
+        width_name_arr.push(width_name);
+    }
+
+
+}
+
+//This is a function to check if part name has been repeated
+function check_part_name(table_id, table_row){
+    // Get the row where the change was made and calculate the weight of the processed material
+	var rowCount = table_row.offsetParent.parentElement.rowIndex;
+	var last_row = document.getElementById(table_id).rows[rowCount];
+
+    var part_name =  (last_row.cells[1].lastChild.value);
+
+    //packet_key = width + 'X' + length + '-' + packet_name;
+
+    if(part_name_arr.includes(part_name)){
+        window.alert('Packet name is already used');
+        last_row.cells[1].lastChild.value = '';
+        last_row.cells[1].lastChild.focus();
+
+    }else{
+        part_name_arr.push(part_name);
+    }
+
+
+}
+
 
 // This function calculates the weight for CTL, NCTL and Reshearing functions
 function for_packets_and_weight(table_id,table_row,operation){

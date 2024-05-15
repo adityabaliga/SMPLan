@@ -186,6 +186,7 @@
     <table class="table table-sm">
 
         <tr>
+            <th></th>
             <th>SMPL No</th>
             <th>Operation</th>
             <th>Start Time</th>
@@ -199,6 +200,17 @@
         {% for processing_hdr_dtl in processing_hdr_detail %}
             {% if processing_hdr_dtl[2] == 'Slitting' or processing_hdr_dtl[2] == 'Mini_Slitting' %}
                 <tr>
+                    <td><button type="button"  onclick="toggleChildRows(this)">+</button>
+                        <table>
+                        {% for processing_dtl in processing_detail_lst %}
+                            {% if processing_hdr_dtl[0] == processing_dtl.processing_id %}
+                            <tr>
+                                    <td class = "child-row" style="display: none;">O/p Size: {{processing_dtl.cut_width}} x {{processing_dtl.cut_length}}</td>
+
+                            </tr>
+                            {% endif %}
+                        {% endfor %}
+                    </table></td>
                     <td><a href="/history_show_details?smpl_no={{processing_hdr_dtl[1]}}">{{processing_hdr_dtl[1]}}</a></td>
                     <td>{{processing_hdr_dtl[2]}}</td>
                     <td>{{processing_hdr_dtl[4]}}</td>
@@ -216,6 +228,7 @@
             <tr>
                 <th></th>
                 <th><b>Slitting</b></th>
+                <th></th>
                 <th></th>
 
                 <th><b>TOTAL</b></th>

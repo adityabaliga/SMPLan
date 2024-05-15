@@ -228,7 +228,7 @@
 
         <tr>
             <td><input type = "number" name = "output_width" step = "0.01"  id = "output_width" required onchange="change_width('numbers_pkts1')"></td>
-            <td><input type = "text" name = "width_name" id = "width_name"></td>
+            <td><input type = "text" name = "width_name" id = "width_name" onchange="check_width_name('numbers_pkts1', this)"></td>
             <!--td>
                 <select name="fg_yes_no" id="fgyesno">
                     <option value="FG">FG</option>
@@ -265,7 +265,7 @@
         </tr>
         <tr id = 1>
             <td><input type="number" name="part_length" id="part_length" onchange="change_part_length('part_tbl')"></td>
-            <td><input type = "text" name = "part_name" id = "part_name"></td>
+            <td><input type = "text" name = "part_name" id = "part_name" onchange="check_part_name('part_tbl', this)"></td>
             <td><input type = "button" value="Make Label" onclick="make_label_new_slit(this)"></td>
             <td><input type="button" name="add_part" id="add_part" value="Add Part" onclick="addRow('part_tbl')"></td>
         </tr>
@@ -498,6 +498,22 @@
 
 
     </p>
+    <table id="packet_names">
+        <tr>
+            <td>Width</td>
+            <td>Length</td>
+            <td>Packet Name</td>
+        </tr>
+        {% for processing_dtl in processing_details_lst %}
+        <tr>
+
+            <td>{{processing_dtl.cut_width}}</td>
+            <td>{{processing_dtl.cut_length}}</td>
+            <td>{{processing_dtl.packet_name}}</td>
+
+        </tr>
+    {% endfor %}
+    </table>
     <input type = "text" id="stickers" name = 'stickers' value="" hidden>
 
     <script src = "{{ url_for('static', filename='js/processing.js') }}"></script>
