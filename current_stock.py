@@ -382,9 +382,14 @@ class CurrentStock:
         cs_id_lst =[]
 
         if stock_type == 'All':
-            with CursorFromConnectionFromPool() as cursor:
-                cursor.execute("select * from current_stock where unit = %s order by smpl_no asc",(unit,))
-                user_data = cursor.fetchall()
+            if unit == 'All':
+                with CursorFromConnectionFromPool() as cursor:
+                    cursor.execute("select * from current_stock order by unit, smpl_no asc")
+                    user_data = cursor.fetchall()
+            else:
+                with CursorFromConnectionFromPool() as cursor:
+                    cursor.execute("select * from current_stock where unit = %s order by smpl_no asc", (unit,))
+                    user_data = cursor.fetchall()
         else:
             with CursorFromConnectionFromPool() as cursor:
                 cursor.execute("select * from current_stock where status = %s and unit = %s order by smpl_no asc",(stock_type,unit))
