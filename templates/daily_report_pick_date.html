@@ -27,6 +27,7 @@
     </style>
 
 </head>
+<body onload="setDate()">
 <form action="/get_daily_report">
     <div class="topnav" id="myTopnav">
         <br>
@@ -40,8 +41,17 @@
     </div>
 
     <hr class ="style1">
-        <p>Enter Date <input type="date" name="report_date"></p>
+        <p>Enter Date <input type="date" name="report_date" id ="report_date"></p>
         <br>
         <input class="btn btn-default" type="submit" value="Submit">
 </form>
+</body>
+<script>
+    function setDate(){
+        //function to pre populate the field with yesterday's date
+        var date = new Date(Date.now() - 864e5).toISOString().substring(0, 10),
+        field = document.querySelector('#report_date');
+        field.value = date;
+    }
+</script>
 </html>
