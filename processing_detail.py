@@ -96,3 +96,11 @@ class ProcessingDetail:
                                                   packet_name = lst[12], status = lst[13], cut_length2=lst[14])
                 processing_dtl_lst.append(processing_dtl)
             return processing_dtl_lst
+
+    @classmethod
+    def change_status(cls, smpl_no, cut_width, cut_length, cut_length2, packet_name, status):
+        with CursorFromConnectionFromPool() as cursor:
+            cursor.execute("update processing_detail set status = %s where smpl_no = %s and cut_width = %s and "
+                           "cut_length = %s and cut_length2 = %s and packet_name = %s",(status, smpl_no, cut_width,
+                                                                                        cut_length, cut_length2,
+                                                                                        packet_name))

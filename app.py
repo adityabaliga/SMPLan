@@ -3007,7 +3007,16 @@ def fg_to_wip_submit():
     smpl_details = smpl.split(',')
     # smpl_no = smpl_details[1]
     cs_id = smpl_details[0]
-    CurrentStock.update_status_cls(cs_id, "WIP")
+    #CurrentStock.update_status_cls(cs_id, "WIP")
+    cs = CurrentStock.load_smpl_by_id(cs_id)
+    ProcessingDetail.change_status(cs.smpl_no, cs.width, cs.length, cs.length2, cs.packet_name, 'WIP')
+    status = CurrentStock.change_wt(cs.smpl_no, cs.width, cs.length, cs.weight,cs.numbers, 'plus', 'WIP', cs.length2)
+
+    if status == 'insert':
+        CurrentStock.update_status_cls(cs_id, "WIP")
+    elif status == 'continue':
+        CurrentStock.delete_record(cs_id)
+
 
     return render_template('/main_menu.html')
 
