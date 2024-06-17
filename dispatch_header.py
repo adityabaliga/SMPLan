@@ -40,8 +40,9 @@ class DispatchHeader:
             cursor.execute(
                 "select sum(weight), customer from dispatch_header, dispatch_detail "
                 "where dispatch_date = %s and dispatch_header.dispatch_id = dispatch_detail.dispatch_id "
+                "and remarks NOT LIKE %s"
                 "group by dispatch_header.customer",
-                (date,))
+                (date, '%TRANSFER%'))
             user_data = cursor.fetchall()
             return user_data
 
