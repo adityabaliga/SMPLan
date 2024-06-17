@@ -578,6 +578,64 @@ def delete_smpl_submit():
         return render_template('/main_menu.html', message="SMPL No: " + smpl_no + " deleted.")
 
 
+#Pick SMPL for adding weight to current stock
+@app.route('/add_weight', methods=['GET', 'POST'])
+def add_weight():
+    return render_template('/add_weight_pick_smpl.html')
+
+@app.route('/add_weight_list', methods=['GET', 'POST'])
+def add_weight_list():
+
+    smpl_no = ""
+    unit = ""
+    _cs_lst = []
+    cs_lst = []
+    cs_id_lst = []
+    if request.method == 'POST':
+        smpl_no = request.form['smpl_no']
+        unit = request.form['unit']
+
+    if request.method == 'GET':
+        smpl_no = request.args.get('smpl_no')
+        unit = request.args.get('unit')
+
+
+    _cs_lst = (CurrentStock.load_smpl_by_smplno(smpl_no, unit))
+
+    if _cs_lst:
+        for cs_id, cs in _cs_lst:
+            cs_lst.append(cs)
+            cs_id_lst.append(cs_id)
+        return render_template('/add_weight_display_list.html', cs_lst=zip(cs_id_lst, cs_lst))
+    else:
+        return render_template('/main_menu.html', message=smpl_no + " not found.")
+
+
+@app.route('/add_weight_submit', methods=['GET', 'POST'])
+def add_weight_submit():
+    smpl_no = ''
+    if request.method == 'POST':
+        smpl_no_lst = request.form.get['select_smpl']
+        #current_wt = request.form.get['current_wt']
+        _add_weight_lst = request.form.getlist['add_weight']
+    if request.method == 'GET':
+        smpl_no_lst = request.args.get('select_smpl')
+        #current_wt = request.args.get('current_wt')
+        _add_weight_lst = request.args.getlist('add_weight')
+
+    add_weight_lst = list(filter(None, _add_weight_lst))
+
+    smpl_details = smpl_no_lst.split(',')
+    smpl_no = smpl_details[1]
+    cs_id = smpl_details[0]
+    current_wt = smpl_details[2]
+
+    for add_wt in add_weight_lst:
+        new_weight = Decimal(current_wt) + Decimal(add_wt)
+
+        CurrentStock.add_weight(int(cs_id), new_weight)
+
+    return render_template('/main_menu.html', message="Weight Changed.")
 
 # pick smpl for uploading documents
 @app.route('/upload_pick_smpl', methods=['GET', 'POST'])

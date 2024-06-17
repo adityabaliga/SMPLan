@@ -27,7 +27,7 @@
     </style>
 
 </head>
-<form action="/fg_to_wip_submit">
+<form action="/add_weight_submit">
     <div class="topnav" id="myTopnav">
         <br>
         <table>
@@ -47,6 +47,7 @@
                 <th>SMPL no.</th>
                 <th>Customer</th>
                 <th>Weight in MT</th>
+                <th>Add Weight in MT</th>
                 <th>Size</th>
                 <th>Status</th>
                 <th>Unit</th>
@@ -54,9 +55,10 @@
             </tr>
         {% for cs_id, cs in cs_lst %}
             <tr>
-                <td><input type = "radio" name = "select_smpl" value = "{{cs_id}},{{cs.smpl_no}}">  {{cs.smpl_no}}</td>
+                <td><input type = "radio" name = "select_smpl" value = "{{cs_id}},{{cs.smpl_no}},{{cs.weight}}">  {{cs.smpl_no}}</td>
                 <td>{{cs.customer}}</td>
-                <td>{{cs.weight}}</td>
+                <td><input type ='number' step='0.001' name="current_wt" id="current_wt" value="{{cs.weight}}" readonly</td>
+                <td><input type = 'number' step='0.01' name = 'add_weight' id='add_weight' ></td>
                 <td>{{cs.thickness}} x {{cs.width}} x {{cs.length}}</td>
                 <td>{{cs.status}}</td>
                 <td>{{cs.unit}}</td>
@@ -66,22 +68,7 @@
     </table>
 
 
-    <!--td>Change  </td>
-        <td>
-            <select name="unit">
-                {% if unit == "2" %}
-                    <option value="1">1</option>
-                {% endif %}
-                {% if unit == "1" %}
-                    <option value="2">2</option>
-                {% endif %}
 
-            </select>
-        </td>
-    </table>
-
-    <br>
-    Remarks<input name ="remarks"-->
 
     <p><input type="submit" class="btn btn-default" value="Submit"></p>
 

@@ -651,3 +651,8 @@ class CurrentStock:
         else:
             return None
 
+
+    @classmethod
+    def add_weight(cls, cs_id, new_wt):
+        with CursorFromConnectionFromPool() as cursor:
+            cursor.execute("update current_stock set weight = %s where cs_id = %s",(new_wt, cs_id))

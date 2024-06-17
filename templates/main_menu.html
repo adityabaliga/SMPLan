@@ -97,8 +97,14 @@
                     <br>
                 {% if current_user.user_type == "all" or current_user.user_type == "plan_head" %}
                 <!--a href ="\incoming_update_pick_smpl">Update Incoming Details</a-->
+
                 <a href ="\delete_pick_smpl">Delete All SMPL Details</a>
+                    <br>
                 {% endif %}
+                {% if current_user.user_type == "all" %}
+                <a href ="\add_weight">Add Weight</a>
+                {% endif %}
+                <br>
             </td>
             {% endif %}
             <td>

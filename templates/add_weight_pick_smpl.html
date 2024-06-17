@@ -2,9 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>SMPL - Transfer Material</title>
+    <title>SMPL MRP - Add Weight</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
-<style>
+    <style>
         hr.style1{
 	        border-top: 15px solid #4d0000;
             }
@@ -27,7 +27,7 @@
     </style>
 
 </head>
-<form action="/fg_to_wip_submit">
+<form action="/add_weight_list">
     <div class="topnav" id="myTopnav">
         <br>
         <table>
@@ -40,50 +40,13 @@
     </div>
 
     <hr class ="style1">
+        <p>Enter SMPL No. <input type="text" name="smpl_no"></p>
+        <br>
+        <div>Pick Unit</div>
+        <input type="radio" name="unit" value="1" required> 1<br>
+          <input type="radio" name="unit" value="2"> 2<br>
+          <input type="radio" name="unit" value="4"> 4<br>
 
-
-    <table class = "table table-sm">
-            <tr>
-                <th>SMPL no.</th>
-                <th>Customer</th>
-                <th>Weight in MT</th>
-                <th>Size</th>
-                <th>Status</th>
-                <th>Unit</th>
-
-            </tr>
-        {% for cs_id, cs in cs_lst %}
-            <tr>
-                <td><input type = "radio" name = "select_smpl" value = "{{cs_id}},{{cs.smpl_no}}">  {{cs.smpl_no}}</td>
-                <td>{{cs.customer}}</td>
-                <td>{{cs.weight}}</td>
-                <td>{{cs.thickness}} x {{cs.width}} x {{cs.length}}</td>
-                <td>{{cs.status}}</td>
-                <td>{{cs.unit}}</td>
-            </tr>
-        {% endfor %}
-    <!--/select-->
-    </table>
-
-
-    <!--td>Change  </td>
-        <td>
-            <select name="unit">
-                {% if unit == "2" %}
-                    <option value="1">1</option>
-                {% endif %}
-                {% if unit == "1" %}
-                    <option value="2">2</option>
-                {% endif %}
-
-            </select>
-        </td>
-    </table>
-
-    <br>
-    Remarks<input name ="remarks"-->
-
-    <p><input type="submit" class="btn btn-default" value="Submit"></p>
-
+        <input class="btn btn-default" type="submit" value="Submit">
 </form>
 </html>
