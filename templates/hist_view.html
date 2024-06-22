@@ -228,6 +228,7 @@
                 <th>Customer</th>
                 <th>Dispatch Date</th>
                 <th>Dispatch Time</th>
+                <th>Invoice No</th>
                 <th>Remarks</th>
         </tr>
          <tr>
@@ -235,6 +236,7 @@
                 <td>{{dispatch_hdr.customer}}</td>
                 <td>{{dispatch_hdr.dispatch_date}}</td>
                 <td>{{dispatch_hdr.dispatch_time}}</td>
+                <td>{{dispatch_hdr.invoice_no}}</td>
                 <td>{{dispatch_hdr.remarks}}</td>
 
         </tr>
@@ -276,7 +278,7 @@
         {% endfor %}
 
         <h3>Stickers</h3>
-        <table class = "table table-sm">
+        <table 2SMPL12756C>
             <tr>
                 <th>Prod Date</th>
                 <th>Machine</th>
@@ -296,6 +298,8 @@
                 <th>Net Wt</th>
                 <th>Gross Wt</th>
                 <th>Top Comment</th>
+                <th>QC</th>
+                <th>Time</th>
             </tr>
             {% if sticker_lst != None %}
             {% for sticker in sticker_lst %}
@@ -316,9 +320,12 @@
                 <td>{{sticker[14]}}</td>
                 <td>{{sticker[15]}}</td>
                 <td>{{sticker[16]}}</td>
-                <td>{{sticker[18]}}</td>
+                <td>{{sticker[17]}}</td>
                 <td>{{sticker[19]}}</td>
                 <td>{{sticker[20]}}</td>
+                <td>{{sticker[21]}}</td>
+                <td>{{sticker[24]}}</td>
+                <td>{{sticker[25]}}</td>
             </tr>
 
 
