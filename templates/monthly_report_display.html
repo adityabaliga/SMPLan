@@ -50,7 +50,7 @@
     <hr class ="style1">
     <h2>Monthly report for {{report_month}}/{{report_year}}</h2>
 
-    <h3>Processing</h3>
+    <h3>Machine Wise Processing</h3>
     <table class="table table-bordered">
         <tr>
             <th></th>
@@ -108,6 +108,24 @@
     </table>
 
     <hr>
+
+    <h3>Customer Wise Processing</h3>
+    <table class="table table-bordered">
+
+        <tr>
+            <th>Customer Group</th>
+            <th>Total Weight (in MT)</th>
+
+        </tr>
+        {% for customer  in cust_month_lst %}
+        <tr>
+
+                <td>{{customer[0]}}</td>
+                <td>{{customer[1]}}</td>
+
+        {% endfor %}
+        </tr>
+    </table>
 
 </body>
 

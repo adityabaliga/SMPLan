@@ -601,6 +601,22 @@ class CurrentStock:
                 return None
 
     @classmethod
+    def customer_wise_month_data(cls, month, year):
+        with CursorFromConnectionFromPool() as cursor:
+            cursor.execute("select 	SUBSTRING(i.customer FROM 1 FOR 20) AS customer_group, "
+                           "sum(p.total_processed_wt) as processed_wt FROM processing p "
+                           "left JOIN incoming i ON i.smpl_no = p.smpl_no where "
+                           "(extract(month from p.processing_date) = %s and extract (year from p.processing_date) = %s)"
+                           "group by customer_group order by processed_wt desc",
+                           (month, year))
+            user_data = cursor.fetchall()
+            if user_data:
+                return user_data
+            else:
+                return None
+
+
+    @classmethod
     def getHondaFGStock(cls):
         with CursorFromConnectionFromPool() as cursor:
             cursor.execute("select width, length, customer, sum(numbers) as numbers, round(sum(numbers)/300,2) as "

@@ -2938,22 +2938,34 @@ def get_monthly_report():
         report_year = int(request.args.get('report_year'))
 
     month_data = CurrentStock.monthly_report_hdr((report_month), (report_year))
+
+    customer_wise_month_data = CurrentStock.customer_wise_month_data((report_month), (report_year))
     prev_month_data = []
     prev_prev_month_data = []
     if report_month != 1 or report_month != 2:
         prev_month_data = CurrentStock.monthly_report_hdr((report_month- 1), (report_year))
         prev_prev_month_data = CurrentStock.monthly_report_hdr((report_month- 2), (report_year))
+        #customer_wise_prev_month_data = CurrentStock.customer_wise_month_data((report_month - 1), (report_year))
+        #customer_wise_prev_prev_month_data = CurrentStock.customer_wise_month_data((report_month - 2), (report_year))
+
     if report_month == 1:
        prev_month_data = CurrentStock.monthly_report_hdr((12), (report_year -1))
        prev_prev_month_data = CurrentStock.monthly_report_hdr((11), (report_year -1))
+       #customer_wise_prev_month_data = CurrentStock.customer_wise_month_data((12), (report_year - 1))
+       #customer_wise_prev_prev_month_data = CurrentStock.customer_wise_month_data((11), (report_year - 1))
+
     if report_month == 2:
        prev_month_data = CurrentStock.monthly_report_hdr((report_month- 1), (report_year))
        prev_prev_month_data = CurrentStock.monthly_report_hdr((12), (report_year -1))
+       #customer_wise_prev_month_data = CurrentStock.customer_wise_month_data((report_month - 1), (report_year))
+       #customer_wise_prev_prev_month_data = CurrentStock.customer_wise_month_data((12), (report_year - 1))
+
 
     machine_lst = ['CTL 1', 'CTL 2', 'NCTL 1', 'NCTL 2', 'NCTL 3', 'NCTL 4', 'NCTL 5','Reshearing 1',
                    'Reshearing 2', 'Reshearing 3', 'Reshearing 4', 'Reshearing 5', 'Reshearing 6',
                    'Reshearing 7', 'Reshearing 8', 'Slitting', 'Mini_Slitting']
 
+    # As there are 17 machines, arrays are made for each row with 17 elements assigned to 0
     month_wt_lst_arr = [0]*17
     month_cuts_lst_arr = [0]*17
     month_time_lst_arr = [0]*17
@@ -2997,7 +3009,7 @@ def get_monthly_report():
                                            prev_month_wt_lst_arr, prev_month_cuts_lst_arr, prev_month_time_lst_arr,
                                            prev_prev_month_wt_lst_arr, prev_prev_month_cuts_lst_arr, prev_prev_month_time_lst_arr),
                                             month_total_wt = month_total_wt, prev_prev_month_total_wt = prev_prev_month_total_wt,
-                                            prev_month_total_wt = prev_month_total_wt)
+                                            prev_month_total_wt = prev_month_total_wt, cust_month_lst = customer_wise_month_data)
 
 
 @app.route('/daily_report_pick_month_year', methods=['GET', 'POST'])

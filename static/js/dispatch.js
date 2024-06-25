@@ -81,12 +81,14 @@ function full_dispatch(th, tableID)
     {
         last_row.cells[dispatch_nos_pos].lastElementChild.value = last_row.cells[numbers_pos].lastElementChild.value;
         last_row.cells[dispatch_qty_pos].lastElementChild.value = last_row.cells[weight_pos].lastElementChild.value;
+        last_row.cells[no_of_pkts_pos].lastElementChild.value = '1';
 
     }
     else
     {
         last_row.cells[dispatch_nos_pos].lastElementChild.value = '';
         last_row.cells[dispatch_qty_pos].lastElementChild.value = '';
+        last_row.cells[no_of_pkts_pos].lastElementChild.value = '';
     }
     total_dispatch_wt(tableID);
 }

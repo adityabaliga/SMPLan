@@ -126,13 +126,14 @@
         <tr>
             <th></th>
             <th>SMPL No</th>
-            <th>Operation</th>
+
             <th>Start Time</th>
             <th>End Time</th>
             <th>Production Time</th>
             <th>Weight (in MT)</th>
             <th>No of cuts</th>
             <th>No of cuts/minute</th>
+            <th>kgs/min</th>
         </tr>
         {% for processing_hdr_dtl in processing_hdr_detail %}
             {% if processing_hdr_dtl[2] == machine %}
@@ -150,13 +151,14 @@
                     </table></td>
 
                     <td><a href="/history_show_details?smpl_no={{processing_hdr_dtl[1]}}">{{processing_hdr_dtl[1]}}</a></td>
-                    <td>{{processing_hdr_dtl[2]}}</td>
+
                     <td>{{processing_hdr_dtl[4]}}</td>
                     <td>{{processing_hdr_dtl[5]}}</td>
                     <td>{{processing_hdr_dtl[6]}}</td>
                     <td>{{processing_hdr_dtl[14]}}</td>
                     <td>{{processing_hdr_dtl[15]}}</td>
                     <td>{{(processing_hdr_dtl[15]/processing_hdr_dtl[6])|round(1,'floor')}}</td>
+                    <td>{{(processing_hdr_dtl[14]*1000/(processing_hdr_dtl[6]))|round(1,'floor')}}</td>
                 </tr>
             {% endif %}
         {% endfor %}
@@ -166,7 +168,7 @@
                 <th></th>
                 <th></th>
                 <th></th>
-                <th></th>
+
                 <th><b>TOTAL</b></th>
                 <th><b>{{processing[3]}}</b></th>
                 <th><b>{{processing[2]}}</b></th>
