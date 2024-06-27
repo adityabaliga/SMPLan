@@ -2866,7 +2866,8 @@ def print_old_label_format():
     packet_wt = smpl_no[7]
     _packet_wt = 0
 
-    if size[1] == '0':
+    # Since size contains length1 and length2. Coil is represented as 0-0
+    if size[1] == '0-0':
         _packet_wt = packet_wt
 
 
