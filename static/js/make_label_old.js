@@ -341,10 +341,11 @@ function make_label_old(smpl_no, customer){
     var customer = document.getElementById('lbl_customer').value;
     var size = queries[2].split('X');
     var width = size[0];
-    var output_length = size[1];
+    var output_length = size[1].split('-');
+
 
     if (customer.startsWith("HONDA") || customer.startsWith("TTSSI")){
-        var honda_part_num = honda_part_no(Number(width), Number(output_length));
+        var honda_part_num = honda_part_no(Number(width), Number(output_length[0]));
         honda_part_num = honda_part_num.split(';');
         document.getElementById('lbl_part_no').value = honda_part_num[0];
         if(honda_part_num[1] != 0){
