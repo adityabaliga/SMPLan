@@ -2893,6 +2893,7 @@ def get_daily_report():
     incoming_lst = []
     dispatch_hdr_lst = []
     total_incoming = 0
+    total_dispatch_hdr = 0
 
     incoming_lst = Incoming.get_daily_report(report_date)
     for incoming in incoming_lst:
@@ -2903,6 +2904,8 @@ def get_daily_report():
     processing_hdr_detail = Processing.get_daily_report_detail(report_date)
 
     dispatch_hdr_lst = DispatchHeader.get_daily_report(report_date)
+    for dispatch_hdr in dispatch_hdr_lst:
+        total_dispatch_hdr += (dispatch_hdr[0])
 
     machine_lst  = []
     processing_detail_lst = []
@@ -2925,7 +2928,8 @@ def get_daily_report():
     return render_template('/daily_report.html', date=change_date_format(report_date), incoming_lst=incoming_lst,
                            total_incoming=total_incoming, processing_hdr_lst=processing_hdr_lst,
                            dispatch_hdr_lst=dispatch_hdr_lst, processing_hdr_detail=processing_hdr_detail,
-                           machine_lst = machine_lst, processing_detail_lst = processing_detail_lst)
+                           machine_lst = machine_lst, processing_detail_lst = processing_detail_lst,
+                           total_dispatch_hdr= total_dispatch_hdr)
 
 @app.route('/get_monthly_report', methods=['GET', 'POST'])
 def get_monthly_report():
