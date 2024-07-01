@@ -243,6 +243,25 @@ function make_label_old(smpl_no, customer){
         document.getElementById('lbl_machine').value = lbl_machine.replaceAll('+',' ');
     }
 
+    var mill_name = document.getElementById("lbl_mill").value;
+    mill_name = mill_name.split(' ');
+    var mill;
+    if(mill_name[0] == ''){
+        mill = "MILL"
+    }else{
+        mill = mill_name[0];
+    }
+
+    var mill_id = document.getElementById("lbl_mill_id").value;
+
+    if(mill_id == ''){
+     mill_id = 'N/A';
+    }
+
+    document.getElementById("lbl_mill").value = mill;
+    document.getElementById("lbl_mill_id").value = mill_id;
+
+
     var qc_name = queries[8].replace('+', ' ');
     qc_name = qc_name.replace('.', '');
 

@@ -2502,11 +2502,13 @@ def dispatch_view_invoice_no_update():
     if request.method == 'POST':
         invoice_no = request.form['invoice_no']
         dispatch_hdr_id = request.form['dispatch_hdr_id']
+        dispatch_date = request.form['dispatch_date']
     if request.method == 'GET':
         invoice_no = request.args.get('invoice_no')
         dispatch_hdr_id = request.args.get('dispatch_hdr_id')
+        dispatch_date = request.args.get('dispatch_date')
 
-    DispatchHeader.update_invoice_no(dispatch_hdr_id, invoice_no)
+    DispatchHeader.update_invoice_no(dispatch_hdr_id, invoice_no, dispatch_date)
     return render_template('main_menu.html')
 
 @app.route('/pick_slitting_batch', methods=['GET', 'POST'])

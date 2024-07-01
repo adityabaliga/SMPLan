@@ -67,9 +67,9 @@ class DispatchHeader:
         return dispatch_lst
 
     @classmethod
-    def update_invoice_no(cls, dispatch_id, invoice_no):
+    def update_invoice_no(cls, dispatch_id, invoice_no, dispatch_date):
         with CursorFromConnectionFromPool() as cursor:
-            cursor.execute("update dispatch_header set invoice_no = %s where dispatch_id = %s",
-                           (invoice_no, dispatch_id))
+            cursor.execute("update dispatch_header set invoice_no = %s, dispatch_date = %s where dispatch_id = %s",
+                           (invoice_no, dispatch_date, dispatch_id))
 
 
