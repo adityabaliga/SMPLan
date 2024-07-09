@@ -963,6 +963,9 @@ function cust_name_for_label(customer){
     else if(customer.startsWith("vns ")){
         cust_name= "VNS";
     }
+    else if(customer.startsWith("ets - lindgren ")){
+        cust_name= "ETS - LINDGREN ENG";
+    }
     else{
         cust_split = customer.split(' ');
         if(cust_split.length >=2){
