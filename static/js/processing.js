@@ -227,6 +227,44 @@ function check_part_name(table_id, table_row){
 }
 
 
+//This function will enable Lami Co if lamination is selected
+function enable_lami_co(table_id, table_row){
+    var rowCount = table_row.offsetParent.parentElement.rowIndex;
+	var last_row = document.getElementById(table_id).rows[rowCount];
+
+	var selectedOption = last_row.cells[2].firstElementChild.selectedIndex;
+	var lami_type = last_row.cells[2].firstElementChild[selectedOption].innerText;
+
+
+	if(lami_type.includes("Single Side")){
+	    //console.log(last_row.cells[7].firstElementChild[0].innerText);
+	    //last_row.cells[7].disabled = false;
+	    last_row.cells[7].innerHTML ='<select id="lami_co_top" name="lami_co_top"><option value="">Select</option><option value="Futura">Futura</option><option value="SVS">SVS Pack</option><option value="Paragon">Paragon</option><option value="Other">Other</option></select>';
+        last_row.cells[8].innerHTML ='<td><select id = "lami_co_top" name= "lami_co_top" ><option value = "No Lami">No Lami</option></select></td>';
+        //last_row.cells[7].required = true;
+        //last_row.cells[8].required = false;
+	}
+	else if(lami_type.includes("Both Side")){
+	    //console.log(last_row.cells[7].firstElementChild[0].innerText);
+	    //last_row.cells[7].disabled = false;
+	    last_row.cells[7].innerHTML ='<select id="lami_co_top" name="lami_co_top"><option value="">Select</option><option value="Futura">Futura</option><option value="SVS">SVS Pack</option><option value="Paragon">Paragon</option><option value="Other">Other</option></select>';
+	    last_row.cells[8].innerHTML ='<select id="lami_co_top" name="lami_co_top"><option value="">Select</option><option value="Futura">Futura</option><option value="SVS">SVS Pack</option><option value="Paragon">Paragon</option><option value="Other">Other</option></select>';
+        //last_row.cells[7].required = true;
+        //last_row.cells[8].required = true;
+	}
+	else if(lami_type.includes("No Lami")){
+	    //console.log(last_row.cells[7].firstElementChild[0].innerText);
+	    //last_row.cells[7].disabled = false;
+	    last_row.cells[7].innerHTML ='<td><select id = "lami_co_top" name= "lami_co_top" ><option value = "No Lami">No Lami</option></select></td>'
+	    last_row.cells[8].innerHTML ='<td><select id = "lami_co_top" name= "lami_co_top" ><option value = "No Lami">No Lami</option></select></td>'
+        //last_row.cells[7].required = false;
+        //last_row.cells[8].required = false;
+	}
+
+
+}
+
+
 // This function calculates the weight for CTL, NCTL and Reshearing functions
 function for_packets_and_weight(table_id,table_row,operation){
 
@@ -1587,7 +1625,6 @@ function make_label_new(th){
 
 
 
-
     //Row 2
     var customer = document.getElementById("customer").value;
     customer = cust_name_for_label(customer);
@@ -1620,12 +1657,34 @@ function make_label_new(th){
 
     var lami_type;
 
+    var remarks = numbers_table.rows[rowId].cells[9].lastChild.value;
+
     if(lamination == "No Lamination"){
         lami_type = " ";
     }else{
         lamination = lamination.split('-');
         lami_type = lamination[0].toUpperCase() + "LAMINATION";
+        var top_lami_co = numbers_table.rows[rowId].cells[7].lastElementChild.selectedOptions[0].innerHTML;
+        var bottom_lami_co = numbers_table.rows[rowId].cells[8].lastElementChild.selectedOptions[0].innerHTML;
+        if(lami_type.includes('SINGLE SIDE')){
+            if(top_lami_co == 'Select'){
+                window.alert("Please Enter Lami Company");
+                return;
+            }else{
+                remarks = remarks + "|TOPLAMI:" + top_lami_co + "|";
+            }
+        }
+        if(lami_type.includes('BOTH SIDE')){
+            if(top_lami_co == 'Select' || bottom_lami_co == 'Select'){
+                window.alert("Please Enter Lami Company");
+                return;
+            }else{
+                remarks = remarks + "|TOPLAMI:" + top_lami_co + "|BOTMLAMI:" + bottom_lami_co + "|" ;
+            }
+        }
     }
+
+    numbers_table.rows[rowId].cells[9].lastChild.value = remarks;
 
     //Row 4
     var grade_field = document.getElementById("grade").value;
