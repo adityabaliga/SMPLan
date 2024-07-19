@@ -230,7 +230,7 @@
             <td><input type = "number" name = "output_length" id = "output_length" step = "0.1" style="width:110px;" value = {{cs_rm.length}}></td>
 
             <td>
-                <select name="lamination" id="lamination">
+                <select name="lamination" id="lamination" onchange="enable_lami_co('numbers_pkts', this)">
                     <option value = "No Lamination">No Lamination</option>
                     <option value = "Single Side - White">Single Side - White</option>
                     <option value = "Single Side - Blue">Single Side - Blue</option>
@@ -253,6 +253,17 @@
             <td><select id = "fg_yes_no" name= "fg_yes_no" >
                 <option value = "FG">FG</option>
                 <option value = "WIP">WIP</option>
+            </select>
+            </td>
+            </td>
+            <td><select id = "lami_co_top" name= "lami_co_top" >
+                <option value = "">No Lami</option>
+
+            </select>
+            </td>
+            <td><select id = "lami_co_bot" name= "lami_co_bot" >
+                <option value = "">No Lami</option>
+
             </select>
             </td>
             <td><input type = "text" name ="remarks" style="width:150px;" id = "remarks"></td>
