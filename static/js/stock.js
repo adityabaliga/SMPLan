@@ -92,3 +92,23 @@ function generateExcel() {
   a.download = file_name;
   a.click();
 }
+
+function generateInvoiceCheckExcel() {
+  // Get the table element by its ID
+   var table = document.getElementById('invoice_check');
+
+  var workbook = XLSX.utils.table_to_book(table, { sheet: 'Sheet1' });
+
+   var currentDate = new Date();
+  var year = currentDate.getFullYear();
+  var month = String(currentDate.getMonth() + 1).padStart(2, '0');
+  var day = String(currentDate.getDate()).padStart(2, '0');
+  var formattedDate = day + '-' + month + '-' + year;
+
+  var file_name = 'Inv_check_' + formattedDate + '.xlsx';
+
+  XLSX.writeFile(workbook, file_name);
+
+
+
+}

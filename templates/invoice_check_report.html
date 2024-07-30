@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SMPL MRP - Invoice Check</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+    <style>
+        hr.style1{
+	        border-top: 15px solid #4d0000;
+            }
+        .oe{
+            font-family: Mathematica6 Bold, Old English Text MT, Engravers Old English BT, Old English, Collins Old English, New Old English, serif;
+            font-size: 50px;
+            color: #4d0000;
+            text-align:center;
+            }
+        .topnav a:hover {
+            color: #4d0000;
+            text-decoration: none;
+        }
+        .nopad {
+                margin: 0;
+                padding: 0;
+                margin-top: 0em;
+                margin-bottom: 0em;
+            }
+    </style>
+
+</head>
+<form>
+    <div class="topnav" id="myTopnav">
+        <br>
+        <table>
+            <td><img src="/static/logo.jpg"  height="70" width="92" align = "left"></td>
+            <td width="1050px"><div align="center" class="nopad"> <a href="\main_menu"  class="oe">SMPL</a></div></td>
+            <td><div align="left" class="nopad">Hi {{current_user.username}}<br>
+            <a href="\change_password_form">Change Password</a><br>
+            <a href="\logout">Logout</a></div></td>
+        </table>
+    </div>
+
+    <hr class ="style1">
+
+    <td><input type = "button" class="btn btn-default" value="Download" onclick="generateInvoiceCheckExcel()"></td>
+
+    <table class = "table table-sm" id="invoice_check">
+            <tr>
+                <th>Processing ID</th>
+                <th>SMPL No</th>
+                <th>Operation</th>
+                <th>Prod Date</th>
+                <th>Start Time</th>
+                <th>End Time</th>
+                <th>Prod Time</th>
+                <th>Setting Start</th>
+                <th>Setting End</th>
+                <th>Setting Time</th>
+                <th>No of QC</th>
+                <th>No of Help</th>
+                <th>QC Name</th>
+                <th>Setting Date</th>
+                <th>Prod Wt</th>
+                <th>Total Cuts</th>
+                <th>Thickness</th>
+                <th>Customer</th>
+                <th>Total Members</th>
+                <th>Total Time</th>
+                <th>Machine Cost</th>
+                <th>Labour Cost</th>
+                <th>Total Cost</th>
+            </tr>
+            <tr>
+            {% for processing in processing_lst %}
+            <tr>
+                    <td>{{processing[0]}}</td>
+                    <td>{{processing[2]}}</td>
+                    <td>{{processing[3]}}</td>
+                    <td>{{processing[4]}}</td>
+                    <td>{{processing[5]}}</td>
+                    <td>{{processing[6]}}</td>
+                    <td>{{processing[7]}}</td>
+                    <td>{{processing[8]}}</td>
+                    <td>{{processing[9]}}</td>
+                    <td>{{processing[10]}}</td>
+                    <td>{{processing[11]}}</td>
+                    <td>{{processing[12]}}</td>
+                    <td>{{processing[13]}}</td>
+                    <td>{{processing[14]}}</td>
+                    <td>{{processing[15]}}</td>
+                    <td>{{processing[16]}}</td>
+                    <td>{{processing[17]}}</td>
+                    <td>{{processing[18]}}</td>
+                    <td>{{processing[19]}}</td>
+                    <td>{{processing[20]}}</td>
+                    <td>{{processing[21]}}</td>
+                    <td>{{processing[22]}}</td>
+                    <td>{{processing[23]}}</td>
+            </tr>
+            {% endfor %}
+    </table>
+
+</form>
+
+<script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+<script src = "{{ url_for('static', filename='js/stock.js') }}"></script>
+
+</html>

@@ -713,12 +713,19 @@ def tr_for_order():
 def order():
     smpl_no = ""
     if request.method == 'POST':
-        smpl_no = request.form['select_smpl']
+        _smpl_no = request.form['select_smpl']
 
     if request.method == 'GET':
-        smpl_no = request.args.get('select_smpl')
+        _smpl_no = request.args.get('select_smpl')
+
+    _smpl_no = _smpl_no.split(',')
+    smpl_no = _smpl_no[0]
+    unit = _smpl_no[1]
+
     incoming = Incoming.load_smpl_by_smpl_no(smpl_no)
-    current_stock = CurrentStock.load_smpl_by_smplno(smpl_no, incoming.length, incoming.width)
+
+
+    current_stock = CurrentStock.load_smpl_by_smplno(smpl_no, unit)
     for cs_id, _current_stock in current_stock:
         cs = _current_stock
 
@@ -3096,6 +3103,38 @@ def fg_to_wip_submit():
 
 
     return render_template('/main_menu.html')
+
+@app.route('/invoice_check_report', methods=['GET', 'POST'])
+def invoice_check_report():
+    processing_lst = Processing.list_for_invoice_check()
+    processing_pass_lst = []
+
+    machine_name_value = [("Slitting",6800), ("CTL 1", 4598), ("CTL 2", 4598), ("NCTL 1", 1325), ("NCTL 2", 805),
+                          ("NCTL 3", 1325), ("NCTL 4", 650), ("NCTL 5", 1325), ("Reshearing 1", 605),
+                          ("Reshearing 2", 605), ("Reshearing 3", 605), ("Reshearing 4", 605), ("Reshearing 5", 605),
+                          ("Reshearing 6", 605), ("Reshearing 7", 605), ("Reshearing 8", 605), ("Mini_Slitting", 800),
+                          ("Lamination", 300)]
+    labour_rate = 190
+
+    for processing_tup in processing_lst:
+        processing = list(processing_tup)
+        machine_cost = 0
+        for machine in machine_name_value:
+            if processing[3] == machine[0]:
+                machine_rate = machine[1]
+                machine_cost = round(machine_rate * (processing[20]/60),2)
+                processing.append(machine_cost)
+        labour_cost = round(labour_rate * processing[19] * (processing[20]/60),2)
+        processing.append(labour_cost)
+        total_cost = labour_cost + machine_cost
+        processing.append(total_cost)
+
+        processing_pass_lst.append(processing)
+
+    return render_template('/invoice_check_report.html', processing_lst = processing_pass_lst)
+
+
+
 
 @app.errorhandler(Exception)
 def handle_error(e):
