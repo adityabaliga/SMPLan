@@ -3109,10 +3109,12 @@ def invoice_check_report():
     processing_lst = Processing.list_for_invoice_check()
     processing_pass_lst = []
 
-    machine_name_value = [("Slitting",6800), ("CTL 1", 4598), ("CTL 2", 4598), ("NCTL 1", 1325), ("NCTL 2", 805),
-                          ("NCTL 3", 1325), ("NCTL 4", 650), ("NCTL 5", 1325), ("Reshearing 1", 605),
-                          ("Reshearing 2", 605), ("Reshearing 3", 605), ("Reshearing 4", 605), ("Reshearing 5", 605),
-                          ("Reshearing 6", 605), ("Reshearing 7", 605), ("Reshearing 8", 605), ("Mini_Slitting", 800),
+    # The rates machine cost - direct labour cost
+    # in the pricing sheet, delete the direct labour row, the total cost you get is the cost mentioned here
+    machine_name_value = [("Slitting",7200), ("CTL 1", 5165), ("CTL 2", 5165), ("NCTL 1", 1550), ("NCTL 2", 1030),
+                          ("NCTL 3", 1550), ("NCTL 4", 800), ("NCTL 5", 1550), ("Reshearing 1", 1055),
+                          ("Reshearing 2", 1055), ("Reshearing 3", 1055), ("Reshearing 4", 1055), ("Reshearing 5", 1055),
+                          ("Reshearing 6", 1055), ("Reshearing 7", 1055), ("Reshearing 8", 1055), ("Mini_Slitting", 800),
                           ("Lamination", 300)]
     labour_rate = 190
 
