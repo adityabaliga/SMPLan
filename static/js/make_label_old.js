@@ -16,6 +16,17 @@ function cust_name_for_label(customer){
 
     if(customer.startsWith("veer o metal") || customer.startsWith("veer-o-metal")){
         cust_name= "Veer O Metals";
+        if(_customer.includes("mkl")){
+            cust_name= "Veer O Metals [MKL]";
+        }
+        if(_customer.includes("bel")){
+            cust_name= "Veer O Metals [BEL]";
+        }
+        if(_customer.includes("jigani")){
+            cust_name= "Veer O Metals [JIG]";
+        }if(_customer.includes("haro")){
+            cust_name= "Veer O Metals [HRL]";
+        }
     }
     else if(customer.startsWith("ttp technolgies")){
         cust_name= "TTP Technologies";
@@ -25,6 +36,24 @@ function cust_name_for_label(customer){
     }
     else if(customer.startsWith("nash industries")){
         cust_name= "Nash Industries";
+        if(_customer.includes("38/1")){
+            cust_name= "Nash Industries [NGR]";
+        }
+        if(_customer.includes("70 & 104")){
+            cust_name= "Nash Industries [DBS]";
+        }
+        if(_customer.includes("70 & 104")){
+            cust_name= "Nash Industries [DBS]";
+        }
+        if(_customer.includes("102") || _customer.includes("236") || _customer.includes("247")){
+            cust_name= "Nash Industries [PNY]";
+        }
+        if(_customer.includes("PLOT-2")){
+            cust_name= "Nash Industries [JGN]";
+        }
+        if(_customer.includes("30/1,31/3")){
+            cust_name= "Nash Industries [JGN]";
+        }
     }
     else if(customer.startsWith("balmer lawrie")){
         cust_name= "Balmer Lawrie";
