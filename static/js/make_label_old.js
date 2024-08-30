@@ -8,6 +8,8 @@ function cust_name_for_label(customer){
     customer = customer.replace("ltd",'');
     customer = customer.replaceAll(".",'');
     customer = customer.replaceAll("&",' and ');
+     var _customer;
+    _customer = customer;
 
     temp_customer = customer.split('[');
     customer =  temp_customer[0];
