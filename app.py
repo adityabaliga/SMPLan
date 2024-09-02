@@ -3111,12 +3111,18 @@ def invoice_check_report():
 
     # The rates machine cost - direct labour cost
     # in the pricing sheet, delete the direct labour row, the total cost you get is the cost mentioned here
-    machine_name_value = [("Slitting",7200), ("CTL 1", 5165), ("CTL 2", 5165), ("NCTL 1", 1550), ("NCTL 2", 1030),
-                          ("NCTL 3", 1550), ("NCTL 4", 800), ("NCTL 5", 1550), ("Reshearing 1", 1055),
-                          ("Reshearing 2", 1055), ("Reshearing 3", 1055), ("Reshearing 4", 1055), ("Reshearing 5", 1055),
-                          ("Reshearing 6", 1055), ("Reshearing 7", 1055), ("Reshearing 8", 1055), ("Mini_Slitting", 800),
+    machine_name_value = [("Slitting",7155), ("CTL 1", 4598), ("CTL 2", 4598), ("NCTL 1", 1325), ("NCTL 2", 805),
+                          ("NCTL 3", 1325), ("NCTL 4", 500), ("NCTL 5", 1325), ("Reshearing 1", 605),
+                          ("Reshearing 2", 605), ("Reshearing 3", 605), ("Reshearing 4", 605), ("Reshearing 5", 605),
+                          ("Reshearing 6", 605), ("Reshearing 7", 605), ("Reshearing 8", 605), ("Mini_Slitting", 500),
                           ("Lamination", 300)]
     labour_rate = 190
+    indirect_labour = 0
+    indirect_labour_value = [("Slitting",2.5), ("CTL 1", 2.5), ("CTL 2", 2.5), ("NCTL 1", 1), ("NCTL 2", 1),
+                          ("NCTL 3", 1), ("NCTL 4", 0.75), ("NCTL 5", 1), ("Reshearing 1", 1),
+                          ("Reshearing 2", 1), ("Reshearing 3", 1), ("Reshearing 4", 1), ("Reshearing 5", 1),
+                          ("Reshearing 6", 1), ("Reshearing 7", 1), ("Reshearing 8", 1), ("Mini_Slitting", 0.75),
+                          ("Lamination", 0.5)]
 
     for processing_tup in processing_lst:
         processing = list(processing_tup)
@@ -3126,8 +3132,11 @@ def invoice_check_report():
                 machine_rate = machine[1]
                 machine_cost = round(machine_rate * (processing[20]/60),2)
                 processing.append(machine_cost)
-        labour_cost = round(labour_rate * processing[19] * (processing[20]/60),2)
-        processing.append(labour_cost)
+        for _indirect_labour in indirect_labour_value:
+            if processing[3] == _indirect_labour[0]:
+                indirect_labour = _indirect_labour[1]
+                labour_cost = round(labour_rate * (processing[19] + indirect_labour)  * (processing[20]/60),2)
+                processing.append(labour_cost)
         total_cost = labour_cost + machine_cost
         processing.append(total_cost)
 
