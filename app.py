@@ -1513,8 +1513,8 @@ def submit_processing():
                                         # else:
                                         #    new_numbers = numbers
 
-                                    if (new_weight < (0.02 * rm_wt) and sign == "minus" and Decimal(output_length) == 0) or (
-                                            (new_weight < (0.02 * rm_wt)) and sign == "minus" and Decimal(output_length) > 0):
+                                    if (new_weight < (Decimal('0.02') * rm_wt) and sign == "minus" and Decimal(output_length) == 0) or (
+                                            (new_weight < (Decimal('0.02') * rm_wt)) and sign == "minus" and Decimal(output_length) > 0):
                                         # OrderDetail.complete_processing_on_del(smpl_no, width, length)
                                         # CurrentStock.delete_record(cs_id)
 
@@ -1552,8 +1552,8 @@ def submit_processing():
                                 # If all the order details in that stage are complete, it makes the order details of the next stage ready for production
                                 # If this is the last stage of the order, it marks the order as closed
                                 # OrderDetail.detail_complete(order_detail_id)
-                    if (new_rm_weight < (0.02 * rm_wt) and Decimal(ms_length) == 0) or (
-                            (new_rm_weight < (0.02 * rm_wt)) and Decimal(ms_length) > 0):
+                    if (new_rm_weight < (Decimal('0.02') * rm_wt) and Decimal(ms_length) == 0) or (
+                            (new_rm_weight < (Decimal('0.02') * rm_wt)) and Decimal(ms_length) > 0):
                         # OrderDetail.complete_processing_on_del(smpl_no, width, length)
                         # CurrentStock.delete_record(cs_id)
 
@@ -1824,7 +1824,7 @@ def submit_slitting_processing():
                                             # else:
                                             #    new_numbers = numbers
 
-                                        if (new_weight < (0.02 * rm_wt) and sign == "minus" and Decimal(output_length) == 0):
+                                        if (new_weight < ((Decimal('0.02') * rm_wt)) and sign == "minus" and Decimal(output_length) == 0):
                                             # OrderDetail.complete_processing_on_del(smpl_no, width, length)
                                             # CurrentStock.delete_record(cs_id)
 
@@ -1888,7 +1888,7 @@ def submit_slitting_processing():
                             else:
                                 return render_template('/main_menu.html',
                                                        message=Markup("Entry Failed. Please check RM weight"))
-                            if (new_rm_weight < (0.02 * rm_wt)):
+                            if (new_rm_weight < ((Decimal('0.02') * rm_wt))):
                                 # OrderDetail.complete_processing_on_del(smpl_no, width, length)
                                 # CurrentStock.delete_record(cs_id)
 
