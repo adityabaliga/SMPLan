@@ -1571,6 +1571,7 @@ def submit_processing():
                 print("Error inserting data:", error)
 
                 # Close the cursor
+                return render_template('/main_menu.html', message="Processing Entry not completed")
             cursor.close()
 
         except psycopg2.OperationalError as error:
@@ -1903,7 +1904,7 @@ def submit_slitting_processing():
                 # Rollback the transaction if an error occurred
                 connection.rollback()
                 print("Entry Failed:", error)
-
+                return render_template('/main_menu.html', message="Processing Entry not completed")
                 # Close the cursor
             cursor.close()
 
