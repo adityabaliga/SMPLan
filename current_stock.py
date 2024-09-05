@@ -4,7 +4,8 @@ from order_detail import OrderDetail
 
 
 class CurrentStock:
-    def __init__(self, smpl_no, customer, weight, numbers, thickness, width, length, status, grade, unit, packet_name, length2):
+    def __init__(self, smpl_no, customer, weight, numbers, thickness, width, length, status, grade, unit, packet_name,
+                 length2, date, processing_id, second_customer):
         self.smpl_no = smpl_no
         self.customer = customer
         self.weight = weight
@@ -17,13 +18,18 @@ class CurrentStock:
         self.unit = unit
         self.packet_name = packet_name
         self.length2 = length2
+        self.date = date
+        self.processing_id = processing_id
+        self.second_customer = second_customer
 
     def save_to_db(self):
         with CursorFromConnectionFromPool() as cursor:
             cursor.execute("insert into current_stock (smpl_no,weight,numbers,width,length,status,customer,thickness"
-                           ",grade, unit, packet_name, length2) values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+                           ",grade, unit, packet_name, length2, date, processing_id, second_customer) "
+                           "values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
                            (self.smpl_no, self.weight, self.numbers, self.width, self.length, self.status, self.customer,
-                           self.thickness, self.grade, self.unit, self.packet_name, self.length2))
+                           self.thickness, self.grade, self.unit, self.packet_name, self.length2, self.date,
+                            self.processing_id, self.second_customer))
 
     def update_status(self, status):
         with CursorFromConnectionFromPool() as cursor:
@@ -49,7 +55,8 @@ class CurrentStock:
                     cs = CurrentStock(smpl_no=lst[1], weight=Decimal(lst[2]), numbers=int(lst[3]),
                                       width=Decimal(lst[4]),
                                       length=Decimal(lst[5]), status=lst[6], customer=lst[7], thickness=Decimal(lst[8]),
-                                      grade=lst[9], unit=lst[10], packet_name = lst [11], length2 = lst[12])
+                                      grade=lst[9], unit=lst[10], packet_name = lst [11], length2 = lst[12],
+                                      date = lst[13], processing_id= lst[14], second_customer= lst[15])
                     cs_lst.append(cs)
 
                 return cs_lst
@@ -72,7 +79,8 @@ class CurrentStock:
             for lst in user_data:
                 cs = CurrentStock(smpl_no=lst[1], weight=Decimal(lst[2]), numbers=int(lst[3]), width=Decimal(lst[4]),
                                   length=Decimal(lst[5]), status=lst[6], customer=lst[7], thickness=Decimal(lst[8]),
-                                  grade=lst[9], unit=lst[10], packet_name = lst [11], length2 = lst[12])
+                                  grade=lst[9], unit=lst[10], packet_name = lst [11], length2 = lst[12],
+                                  date = lst[13], processing_id= lst[14], second_customer= lst[15])
                 cs_lst.append(cs)
 
             return cs_lst
@@ -146,7 +154,8 @@ class CurrentStock:
             for lst in user_data:
                 cs = CurrentStock(smpl_no=lst[1], weight=Decimal(lst[2]), numbers=int(lst[3]), width=Decimal(lst[4]),
                                   length=Decimal(lst[5]), status=lst[6], customer=lst[7], thickness=Decimal(lst[8]),
-                                  grade=lst[9], unit=lst[10], packet_name = lst [11], length2 = lst[12])
+                                  grade=lst[9], unit=lst[10], packet_name = lst [11], length2 = lst[12],
+                                  date = lst[13], processing_id= lst[14], second_customer= lst[15])
                 cs_lst.append(cs)
 
                 cs_id_lst.append(lst[0])
@@ -231,7 +240,8 @@ class CurrentStock:
             for lst in user_data:
                 cs = CurrentStock(smpl_no=lst[1], weight=Decimal(lst[2]), numbers=int(lst[3]), width=Decimal(lst[4]),
                                   length=Decimal(lst[5]), status=lst[6], customer=lst[7], thickness=Decimal(lst[8]),
-                                  grade=lst[9], unit=lst[10], packet_name = lst [11], length2 = lst[12])
+                                  grade=lst[9], unit=lst[10], packet_name = lst [11], length2 = lst[12],
+                                  date = lst[13], processing_id= lst[14], second_customer= lst[15])
                 cs_lst.append(cs)
 
                 cs_id_lst.append(lst[0])
@@ -251,7 +261,8 @@ class CurrentStock:
                 for lst in user_data:
                     cs = CurrentStock(smpl_no=lst[1], weight=Decimal(lst[2]), numbers=int(lst[3]), width=Decimal(lst[4]),
                                       length=Decimal(lst[5]), status=lst[6], customer=lst[7], thickness=Decimal(lst[8]),
-                                      grade=lst[9], unit=lst[10], packet_name = lst [11], length2 = lst[12])
+                                      grade=lst[9], unit=lst[10], packet_name = lst [11], length2 = lst[12],
+                                      date = lst[13], processing_id= lst[14], second_customer= lst[15])
                     cs_lst.append(cs)
                     cs_id_lst.append(lst[0])
 
@@ -270,7 +281,8 @@ class CurrentStock:
                 for lst in user_data:
                     cs = CurrentStock(smpl_no=lst[1], weight=Decimal(lst[2]), numbers=int(lst[3]), width=Decimal(lst[4]),
                                       length=Decimal(lst[5]), status=lst[6], customer=lst[7], thickness=Decimal(lst[8]),
-                                      grade=lst[9], unit=lst[10], packet_name=lst[11], length2 = lst[12])
+                                      grade=lst[9], unit=lst[10], packet_name=lst[11], length2 = lst[12],
+                                      date = lst[13], processing_id= lst[14], second_customer= lst[15])
                     cs_lst.append(cs)
                     cs_id_lst.append(lst[0])
 
@@ -291,7 +303,8 @@ class CurrentStock:
                     cs = CurrentStock(smpl_no=lst[1], weight=Decimal(lst[2]), numbers=int(lst[3]),
                                       width=Decimal(lst[4]),
                                       length=Decimal(lst[5]), status=lst[6], customer=lst[7], thickness=Decimal(lst[8]),
-                                      grade=lst[9], unit=lst[10], packet_name = lst [11], length2 = lst[12])
+                                      grade=lst[9], unit=lst[10], packet_name = lst [11], length2 = lst[12],
+                                      date = lst[13], processing_id= lst[14], second_customer= lst[15])
                     cs_lst.append(cs)
 
 
@@ -311,7 +324,8 @@ class CurrentStock:
                 cs = CurrentStock(smpl_no=user_data[1], weight=Decimal(user_data[2]), numbers=int(user_data[3]),
                                   width=Decimal(user_data[4]), length=Decimal(user_data[5]), status=user_data[6],
                                   customer=user_data[7], thickness=Decimal(user_data[8]), grade=user_data[9],
-                                  unit=user_data[10], packet_name = user_data[11], length2 = user_data[12])
+                                  unit=user_data[10], packet_name = user_data[11], length2 = user_data[12],
+                                  date = user_data[13], processing_id= user_data[14], second_customer= user_data[15])
 
                 return cs
             else:
@@ -398,7 +412,8 @@ class CurrentStock:
         for lst in user_data:
             cs = CurrentStock(smpl_no=lst[1],weight = Decimal(lst[2]),numbers=int(lst[3]),width=Decimal(lst[4]),
                               length=Decimal(lst[5]),status=lst[6],customer=lst[7], thickness=Decimal(lst[8]),
-                              grade=lst[9],unit=lst[10], packet_name = lst [11], length2 = lst[12])
+                              grade=lst[9],unit=lst[10], packet_name = lst [11], length2 = lst[12],
+                              date = lst[13], processing_id= lst[14], second_customer= lst[15])
             cs_lst.append(cs)
             cs_id_lst.append(lst[0])
         return zip(cs_id_lst,cs_lst)
@@ -414,7 +429,8 @@ class CurrentStock:
         for lst in user_data:
             cs = CurrentStock(smpl_no=lst[1],weight = Decimal(lst[2]),numbers=int(lst[3]),width=Decimal(lst[4]),
                               length=Decimal(lst[5]),status=lst[6],customer=lst[7], thickness=Decimal(lst[8]),
-                              grade=lst[9],unit=lst[10], packet_name = lst [11], length2 = lst[12])
+                              grade=lst[9],unit=lst[10], packet_name = lst [11], length2 = lst[12],
+                              date = lst[13], processing_id= lst[14], second_customer= lst[15])
             cs_lst.append(cs)
             cs_id_lst.append(lst[0])
         return zip(cs_id_lst,cs_lst)
@@ -430,7 +446,8 @@ class CurrentStock:
         for lst in user_data:
             cs = CurrentStock(smpl_no=lst[1], weight=Decimal(lst[2]), numbers=int(lst[3]), width=Decimal(lst[4]),
                               length=Decimal(lst[5]), status=lst[6], customer=lst[7], thickness=Decimal(lst[8]),
-                              grade=lst[9], unit=lst[10], packet_name = lst [11], length2 = lst[12])
+                              grade=lst[9], unit=lst[10], packet_name = lst [11], length2 = lst[12],
+                              date = lst[13], processing_id= lst[14], second_customer= lst[15])
             cs_lst.append(cs)
             cs_id_lst.append(lst[0])
         return zip(cs_id_lst,cs_lst)
@@ -495,7 +512,8 @@ class CurrentStock:
         for lst in user_data:
             cs = CurrentStock(smpl_no=lst[1],weight = Decimal(lst[2]),numbers=int(lst[3]),width=Decimal(lst[4]),
                               length=Decimal(lst[5]),status=lst[6],customer=lst[7], thickness=Decimal(lst[8]),
-                              grade=lst[9],unit=lst[10], packet_name = lst [11], length2 = lst[12])
+                              grade=lst[9],unit=lst[10], packet_name = lst [11], length2 = lst[12],
+                              date = lst[13], processing_id= lst[14], second_customer= lst[15])
             cs_lst.append(cs)
             cs_id_lst.append(lst[0])
 
@@ -548,7 +566,8 @@ class CurrentStock:
                                   width=Decimal(user_data[4]), length=Decimal(user_data[5]),
                                   status=user_data[6], customer=user_data[7],
                                   thickness=Decimal(user_data[8]), grade=user_data[9],
-                                  unit=user_data[10], packet_name=user_data[11], length2 = user_data[12])
+                                  unit=user_data[10], packet_name=user_data[11], length2 = user_data[12],
+                                  date = user_data[13], processing_id= user_data[14], second_customer= user_data[15])
                 cs_lst.append(cs)
                 cs_id_lst.append(user_data[0])
                 return zip(cs_id_lst, cs_lst)
@@ -567,7 +586,8 @@ class CurrentStock:
                 cs = CurrentStock(smpl_no=user_data[1], weight=Decimal(user_data[2]), numbers=int(user_data[3]),
                                   width=Decimal(user_data[4]), length=Decimal(user_data[5]), status=user_data[6],
                                   customer=user_data[7], thickness=Decimal(user_data[8]), grade=user_data[9],
-                                  unit=user_data[10], packet_name = user_data[11], length2 = user_data[12])
+                                  unit=user_data[10], packet_name = user_data[11], length2 = user_data[12],
+                                  date = user_data[13], processing_id= user_data[14], second_customer= user_data[15])
 
                 return cs
             else:

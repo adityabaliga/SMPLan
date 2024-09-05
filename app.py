@@ -465,7 +465,8 @@ def transfer_submit():
             CurrentStock.transfer_material_cls(cs_id, unit)
         else:
             cs_new = CurrentStock(smpl_no, cs.customer, transfer_qty, transfer_nos, cs.thickness, cs.width,
-                                  cs.length, cs.status, cs.grade, unit, cs.packet_name, cs.length2)
+                                  cs.length, cs.status, cs.grade, unit, cs.packet_name, cs.length2, cs.date,
+                                  cs.processing_id, '')
             cs.change_wt(smpl_no, cs.width, cs.length, transfer_qty, transfer_nos, 'minus', cs.status, cs.length2)
             if cs_new.check_if_size_exists():
                 cs_new.change_wt(cs_new.smpl_no, cs_new.width, cs_new.length, transfer_qty, transfer_nos,
@@ -1500,7 +1501,7 @@ def submit_processing():
                                         "and length = %s and status = %s and packet_name = %s and length2 = %s",
                                         (smpl_no, output_width, output_length, fg_yes_no, _packet_name, output_length2))
                                     user_data = cursor.fetchone()
-                                if user_data:
+                                if user_data and fg_yes_no != 'FG':
                                     weight = Decimal(user_data[0])
                                     numbers = Decimal(user_data[1])
                                     cs_id = int(user_data[3])
@@ -1528,13 +1529,15 @@ def submit_processing():
                                 else:
                                     cs_cc = CurrentStock(smpl_no, customer, processed_wt, actual_no_of_pieces, thickness,
                                                          output_width, output_length, fg_yes_no, grade, unit, _packet_name,
-                                                         output_length2)
+                                                         output_length2, processing_date, processing_id[0], '')
                                     cursor.execute(
                                         "insert into current_stock (smpl_no,weight,numbers,width,length,status,customer,thickness"
-                                        ",grade, unit, packet_name, length2) values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+                                        ",grade, unit, packet_name, length2, date, processing_id, second_customer) "
+                                        "values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
                                         (cs_cc.smpl_no, cs_cc.weight, cs_cc.numbers, cs_cc.width, cs_cc.length, cs_cc.status,
                                          cs_cc.customer,
-                                         cs_cc.thickness, cs_cc.grade, cs_cc.unit, cs_cc.packet_name, cs_cc.length2))
+                                         cs_cc.thickness, cs_cc.grade, cs_cc.unit, cs_cc.packet_name, cs_cc.length2,
+                                         cs_cc.date,cs_cc.processing_id,cs_cc.second_customer))
 
 
 
@@ -1840,14 +1843,16 @@ def submit_slitting_processing():
                                         #cc_insert = "insert"
                                         cs_cc = CurrentStock(smpl_no, customer, part_weight, processed_numbers, thickness,
                                                              output_width, output_length, fg_yes_no, grade, unit, _packet_name,
-                                                             output_length2)
+                                                             output_length2, processing_date, processing_id[0], '')
                                         cursor.execute(
                                             "insert into current_stock (smpl_no,weight,numbers,width,length,status,customer,thickness"
-                                            ",grade, unit, packet_name, length2) values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+                                            ",grade, unit, packet_name, length2, date, processing_id, second_customer) "
+                                            "values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
                                             (
                                             cs_cc.smpl_no, cs_cc.weight, cs_cc.numbers, cs_cc.width, cs_cc.length, cs_cc.status,
                                             cs_cc.customer,
-                                            cs_cc.thickness, cs_cc.grade, cs_cc.unit, cs_cc.packet_name, cs_cc.length2))
+                                            cs_cc.thickness, cs_cc.grade, cs_cc.unit, cs_cc.packet_name, cs_cc.length2,
+                                            cs_cc.date, cs_cc.processing_id, cs_cc.second_customer))
 
                                 # If rewinding insert FG as new stock
                                 else:
