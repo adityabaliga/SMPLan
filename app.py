@@ -1847,7 +1847,7 @@ def submit_slitting_processing():
                                         cursor.execute(
                                             "insert into current_stock (smpl_no,weight,numbers,width,length,status,customer,thickness"
                                             ",grade, unit, packet_name, length2, date, processing_id, second_customer) "
-                                            "values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+                                            "values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
                                             (
                                             cs_cc.smpl_no, cs_cc.weight, cs_cc.numbers, cs_cc.width, cs_cc.length, cs_cc.status,
                                             cs_cc.customer,
