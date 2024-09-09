@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>SMPL MRP - Display HTID Stock</title>
+    <title>SMPL MRP - Display TSDPL Stock</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
     <style>
     table {
@@ -42,7 +42,7 @@
 
     </style>
 </head>
-<form action="/submit_smpl_incoming" method="post">
+<form action="" method="post">
     <div class="topnav" id="myTopnav">
         <br>
         <table>
@@ -56,60 +56,68 @@
 
     <hr class ="style1">
 
-    <table class = "table table-sm" id="htid_stock">
+    <table class = "table table-sm" id="tsdpl_stock">
     <tr>
         <!--th>Sl No</th-->
-        <th>Mill</th>
-        <th>DC No</th>
-        <th>Incoming Date</th>
-        <th>SMPL No</th>
-        <th>Spec</th>
-        <th>Coating</th>
+        <th>Current Date</th>
+        <th>Finishing Date</th>
+        <th>EPA</th>
+        <th>EPA Location</th>
+        <th>Mtrl. Age(Days)</th>
+        <th>RM/FG/WIP</th>
 
 
 
+        <th>Customer Name</th>
+        <th>Material Desc</th>
+        <th>Parent Batch (TSL)</th>
+
+        <th>EPA Input Batch</th>
+
+        <th>Child Packet Id</th>
+        <th>MaterialGrade</th>
+        <th>TDC</th>
         <th>Thickness</th>
-        <th> Width</th>
-        <th> Length</th>
 
-        <th>Numbers</th>
-
-        <th>Net Weight</th>
-        <th>Mill ID</th>
-        <th>Part No</th>
+        <th>Width</th>
+        <th>Length</th>
         <th>Status</th>
+        <th>Wt Theoretical(MT)</th>
+        <th>Quality Remarks</th>
+        <th>Clubbed bundle No.</th>
 
 
     </tr>
 
-    {% for cs_id, cs, part_no, wt_per_sheet, coating, packet_wt,mill, mill_id, incoming_date, dc_number, dc_date in cs_lst %}
+    {% for cs_id, cs, today_date, no_of_days,finishing_date, incoming in cs_lst %}
         {% if cs.packet_name != "W0P0" %}
         <tr>
 
             <!--td>{{loop.index}}</td-->
-            <td>{{mill}}</td>
-            <td>{{dc_number}}</td>
-            <td>{{dc_date}}</td>
-            {% if cs.packet_name == "MC" or cs.packet_name == "WIP" %}
+            <td>{{today_date}}</td>
+            <td>{{finishing_date}}</td>
+
+            <td>SMPL</td>
+            <td>Peenya</td>
+            <td>{{no_of_days}}</td>
+            <td>{{cs.status}}</td>
+            <td></td>
+            <td>{{incoming.material_type}}</td>
+            <td>{{incoming.mill_id}}</td>
             <td>{{cs.smpl_no}}</td>
-            {% else %}
-            <td>{{cs.smpl_no}}{{cs.packet_name}}</td>
-            {% endif %}
+            <td>{{cs.packet_name}}</td>
             <td>{{cs.grade}}</td>
-            <td>{{coating}} </td>
-
-
+            <td></td>
             <td>{{cs.thickness}}</td>
             <td>{{cs.width}}</td>
             <td>{{cs.length}}</td>
+            <td></td>
+            <td>{{cs.weight}}</td>
+            <td></td>
+            <td></td>
 
-            <td>{{cs.numbers}} </td>
 
 
-            <td>{{packet_wt}} </td>
-            <td>{{mill_id}}</td>
-            <td>{{part_no}}</td>
-            <td class = "status">{{cs.status}} </td>
         {% endif %}
 
 
@@ -119,7 +127,7 @@
     {% endfor %}
 
     </table>
-    <td><input type = "button" class="btn btn-default" value="Download" onclick="generateExcel('htid_stock')"></td>
+    <td><input type = "button" class="btn btn-default" value="Download" onclick="generateExcelTSDPL('tsdpl_stock')"></td>
 
 </form>
 <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>

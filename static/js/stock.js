@@ -1,6 +1,6 @@
-function generateExcel() {
+function generateExcel(tablename) {
   // Get the table element by its ID
-  var table = document.getElementById('htid_stock');
+  var table = document.getElementById(tablename);
 
   // Create a workbook
   var wb = XLSX.utils.book_new();
@@ -106,6 +106,26 @@ function generateInvoiceCheckExcel() {
   var formattedDate = day + '-' + month + '-' + year;
 
   var file_name = 'Inv_check_' + formattedDate + '.xlsx';
+
+  XLSX.writeFile(workbook, file_name);
+
+
+
+}
+
+function generateExcelTSDPL(tablename) {
+  // Get the table element by its ID
+   var table = document.getElementById(tablename);
+
+  var workbook = XLSX.utils.table_to_book(table, { sheet: 'Sheet1' });
+
+  var currentDate = new Date();
+  var year = currentDate.getFullYear();
+  var month = String(currentDate.getMonth() + 1).padStart(2, '0');
+  var day = String(currentDate.getDate()).padStart(2, '0');
+  var formattedDate = day + '-' + month + '-' + year;
+
+  var file_name = 'TSDPL_stock_' + formattedDate + '.xlsx';
 
   XLSX.writeFile(workbook, file_name);
 

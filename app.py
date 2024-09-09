@@ -8,6 +8,7 @@ from file_uploader import FileUploader
 from flask import Flask, render_template, request, jsonify
 from markupsafe import Markup
 from csv import writer
+from datetime import datetime
 
 from user import User
 from current_stock import CurrentStock
@@ -2274,6 +2275,49 @@ def check_stock_htid():
     cs_lst = zip(_cs_id_lst, _cs_lst, part_no_lst, wt_per_sheet_lst, coating_lst, packet_wt_lst, mill_lst, mill_id_lst,
                  incoming_date_lst, dc_number_lst, dc_date_lst)
     return render_template('stock_display_htid.html', cs_lst=cs_lst)
+
+@app.route('/check_stock_tsdpl', methods=['GET', 'POST'])
+def check_stock_tsdpl():
+    _cs_lst = []
+    _cs_id_lst = []
+    cs_lst = []
+    today_date_lst = []
+    no_of_days_lst = []
+    incoming_lst = []
+    finishing_date_lst = []
+
+
+    part_no = ""
+    coating = ""
+    wt_per_sheet = 0
+    packet_wt = 0
+
+    cs_lst = CurrentStock.get_stock_by_customer('TATA STEEL DOWNSTREAM PRODUCTS LTD%', 'All')
+
+    for cs_id, cs in cs_lst:
+        _cs_id_lst.append(cs_id)
+        _cs_lst.append(cs)
+
+        today_date = datetime.today().strftime('%Y-%m-%d')
+        change_date_format(today_date)
+        today_date_lst.append(change_date_format(today_date))
+
+        no_of_days = (datetime.today().date() - cs.date).days
+        no_of_days_lst.append(no_of_days)
+
+        finishing_date = cs.date.strftime('%Y-%m-%d')
+        finishing_date_lst.append(change_date_format(finishing_date))
+
+        incoming = Incoming.load_smpl_by_smpl_no(cs.smpl_no)
+        incoming_lst.append(incoming)
+
+        grade = (cs.grade.split("GRADE:"))
+        if len(grade) > 1:
+            grade = grade[1].split(';')
+            cs.grade = grade[0]
+
+    cs_lst = zip(_cs_id_lst, _cs_lst, today_date_lst, no_of_days_lst, finishing_date_lst,  incoming_lst)
+    return render_template('stock_display_tsdpl.html', cs_lst=cs_lst)
 
 
 # Function displays stock based on stock type selected
