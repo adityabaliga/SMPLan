@@ -9,6 +9,8 @@ from flask import Flask, render_template, request, jsonify
 from markupsafe import Markup
 from csv import writer
 from datetime import datetime
+import pandas as pd
+import openpyxl
 
 from user import User
 from current_stock import CurrentStock
@@ -2308,8 +2310,16 @@ def check_stock_tsdpl():
         finishing_date = cs.date.strftime('%Y-%m-%d')
         finishing_date_lst.append(change_date_format(finishing_date))
 
-        incoming = Incoming.load_smpl_by_smpl_no(cs.smpl_no)
-        incoming_lst.append(incoming)
+        incoming_flag = 0
+        for incoming in incoming_lst:
+            if cs.smpl_no == incoming.smpl_no:
+                incoming_lst.append(incoming)
+                incoming_flag = 1
+                break
+
+        if incoming_flag == 0:
+            incoming_db = Incoming.load_smpl_by_smpl_no(cs.smpl_no)
+            incoming_lst.append(incoming_db)
 
         grade = (cs.grade.split("GRADE:"))
         if len(grade) > 1:
@@ -3194,7 +3204,57 @@ def invoice_check_report():
 
     return render_template('/invoice_check_report.html', processing_lst = processing_pass_lst)
 
+@app.route('/tally_stock_check_upload', methods=['GET', 'POST'])
+def tally_stock_check_upload():
+    return render_template('/tally_stock_check_upload.html')
 
+
+@app.route('/tally_stock_check', methods=['GET', 'POST'])
+def tally_stock_check():
+    db_data = []
+    _cs_lst = []
+    if request.method == 'POST':
+        # Save uploaded file
+        file = request.files['xlsx_filename']
+
+    else:
+        file = request.args.get('xlsx_filename')
+
+    if file and file.filename.endswith('.xlsx'):
+        # Read the Excel file into a DataFrame
+        excel_data = pd.read_excel(file)
+        # Now call a function to compare the data
+        _cs_lst = CurrentStock.get_stock('All','All')
+
+        for cs_id, cs in _cs_lst:
+            db_data_obj = [cs.smpl_no, str(cs.weight), str(cs.numbers), str(cs.width), str(cs.length),
+                           str(cs.status), cs.customer,
+                           str(cs.thickness), cs. grade, cs.unit, cs.packet_name, str(cs.length2),
+                           str(cs.date), str(cs.processing_id), cs.second_customer]
+            db_data.append(db_data_obj)
+            db_data_obj = []
+
+        cs_dataframe = pd.DataFrame(db_data, columns=["smpl_no","weight","numbers","width","length","status",
+                                                      "customer","thickness","grade","unit","packet_name","length2",
+                                                      "date","processing_id","second_customer"])
+
+        missing_in_db = excel_data[~excel_data['smpl_no'].isin(cs_dataframe['smpl_no'])]
+        missing_in_excel = cs_dataframe[~cs_dataframe['smpl_no'].isin(excel_data['smpl_no'])]
+
+        missing_in_db_html = missing_in_db.to_html(classes='table table-striped', index=False)
+        missing_in_excel_html = missing_in_excel.to_html(classes='table table-striped', index=False)
+
+        if missing_in_db.empty and missing_in_excel.empty:
+            print("All items match!")
+        else:
+            print("Items missing in DB:")
+            print(missing_in_db)
+            print("Items missing in Excel:")
+            print(missing_in_excel)
+
+
+        return render_template('/tally_stock_check_result.html', missing_in_db_html = missing_in_db_html,
+                               missing_in_excel_html = missing_in_excel_html)
 
 
 @app.errorhandler(Exception)
