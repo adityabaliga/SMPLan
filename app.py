@@ -1863,15 +1863,17 @@ def submit_slitting_processing():
                                     cs_cc = CurrentStock(smpl_no, customer, part_weight, processed_numbers, thickness,
                                                          output_width, output_length, fg_yes_no, grade, unit,
                                                          packet_name,
-                                                         output_length2)
+                                                         output_length2, processing_date, processing_id[0],'')
                                     cursor.execute(
                                         "insert into current_stock (smpl_no,weight,numbers,width,length,status,customer,thickness"
-                                        ",grade, unit, packet_name, length2) values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+                                        ",grade, unit, packet_name, length2, date, processing_id, second_customer) "
+                                        "values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
                                         (
                                             cs_cc.smpl_no, cs_cc.weight, cs_cc.numbers, cs_cc.width, cs_cc.length,
                                             cs_cc.status,
                                             cs_cc.customer,
-                                            cs_cc.thickness, cs_cc.grade, cs_cc.unit, cs_cc.packet_name, cs_cc.length2))
+                                            cs_cc.thickness, cs_cc.grade, cs_cc.unit, cs_cc.packet_name, cs_cc.length2,
+                                            cs_cc.date, cs_cc.processing_id, cs_cc.second_customer))
 
                                 # Unit of the material is decided based on the machine used to process the material.
                                 # WARNING: This is bad programming
