@@ -165,12 +165,12 @@ function honda_part_no(width,length){
             }
     else if (width == 510 && length == 785){
                 part_no = "K0VA OUTER R/L";
-                wt_per_sheet = 2.50;
+                wt_per_sheet = 2.53;
                 coating = "0/20";
             }
     else if (width == 600 && length == 660){
                 part_no = "K0VA PLATE BOTTOM";
-                wt_per_sheet = 2.29;
+                wt_per_sheet = 2.49;
                 coating = "20/0";
             }
     else if (width == 655 && length == 740){
