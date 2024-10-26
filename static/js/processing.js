@@ -977,12 +977,10 @@ function cust_name_for_label(customer){
         if(_customer.includes("38/1")){
             cust_name= "Nash Industries [NGR]";
         }
-        if(_customer.includes("70 & 104")){
+        if(_customer.includes("70  and  104")){
             cust_name= "Nash Industries [DBS]";
         }
-        if(_customer.includes("70 & 104")){
-            cust_name= "Nash Industries [DBS]";
-        }
+
         if(_customer.includes("102") || _customer.includes("236") || _customer.includes("247")){
             cust_name= "Nash Industries [PNY]";
         }

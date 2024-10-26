@@ -177,3 +177,23 @@ function total_dispatch_wt(tableID){
         document.getElementById("total_disp_wt").value = total_disp_wt.toFixed(3);
         document.getElementById("total_packets").value = total_packets;
 }
+
+function display_honda_pkts(){
+    var selectedSize = document.getElementById('selected_size').value;
+    var packets = document.querySelectorAll(".packet-list");
+
+    packets.forEach(row => {
+                const rowSize = row.getAttribute("data-size");
+                if (selectedSize === "all" || rowSize === selectedSize) {
+                    row.style.display = "table-row";
+                } else {
+                    row.style.display = "none";
+                }
+            });
+
+
+}
+
+function addPackets(table){
+
+}

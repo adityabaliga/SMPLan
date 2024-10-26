@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>SMPL MRP - Dispatch</title>
+    <title>SMPL MRP - Honda Dispatch</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
     <style>
         hr.style1{
@@ -27,6 +27,7 @@
     </style>
 
 </head>
+<body>
 <form action="/dispatch">
     <div class="topnav" id="myTopnav">
         <br>
@@ -41,7 +42,54 @@
 
     <hr class ="style1">
     <h2><input type = "text"  name = "customer" value ="{{customer}}" style = "width:750px;border: none;border-color: transparent;" readonly></h2>
+    <h3>Pick Size</h3>
+    <div>
+    <select name="selected_size" id="selected_size" onchange="display_honda_pkts()">
+                    <option value = "all">All</option>
+                    {% for size in unique_sizes %}
+                        <option value="{{ size }}">{{ size }}</option>
+                    {% endfor %}
+
+    </select>
+    </div>
     <table class = "table table-sm" id = 'dispatch_list'>
+            <tr>
+
+                <th>SMPL No.</th>
+
+                <th>Thickness</th>
+                <th>Width x Length</th>
+                <th>Numbers</th>
+                <th>Weight (in MT)</th>
+                <th>Grade</th>
+
+
+            </tr>
+        {% for cs_id, cs in cs_lst %}
+
+            <tr class = 'packet-list' data-size="{{cs.width}} x {{cs.length}}">
+                <td><input type = "checkbox" name = "select_packet" value ="{{cs_id}},{{cs.smpl_no}},{{cs.packet_name}}">{{cs.smpl_no}}{{cs.packet_name}}</td>
+
+
+
+                <td><input type = "text" id = "thickness" style = "width:80px;" value ="{{cs.thickness}}"  readonly></td>
+                {% if cs.length2 != 0 %}
+                <td><input type = "text" id = "widthxlength" value ="{{cs.width}} x {{cs.length}} - {{cs.length2}}" style = "width:150px;" readonly></td>
+                {% else %}
+                <td><input type = "text" id = "widthxlength" value ="{{cs.width}} x {{cs.length}}" style = "width:150px;" readonly></td>
+                {% endif %}
+                <td><input type = "text" id = "numbers" value ="{{cs.numbers}}" style = "width:80px;" readonly></td>
+                <td><input type = "text" name = "dispatch_wt" value ="{{cs.weight}}" style = "width:80px;" readonly></td>
+                <td><input type = "text" name = "grade" value ="{{cs.grade}}" style = "width:80px;" readonly></td>
+
+            </tr>
+        {% endfor %}
+
+        </table>
+
+        <input type="button" name="add_packets" id="add_packets" value="Add Packets" onclick="addPackets('dispatch_list')">
+
+        <table class = "table table-sm" id = 'dispatch_list_selected'>
             <tr>
 
                 <th>SMPL No.</th>
@@ -59,32 +107,7 @@
                 <th>Defective</th>
 
             </tr>
-        {% for cs_id, cs in cs_lst %}
-            <tr>
-                <td><input type = "checkbox" name = "select_smpl" value ="{{cs_id}},{{cs.smpl_no}}" onchange="enable_dispatch(this, 'dispatch_list')">{{cs.smpl_no}}</td>
-
-                <td><input type = "text" id = "packet_name" name = "packet_name" style = "width:80px;" value ="{{cs.packet_name}}"  readonly></td>
-
-                <td><input type = "text" id = "thickness" style = "width:80px;" value ="{{cs.thickness}}"  readonly></td>
-                {% if cs.length2 != 0 %}
-                <td><input type = "text" id = "widthxlength" value ="{{cs.width}} x {{cs.length}} - {{cs.length2}}" style = "width:150px;" readonly></td>
-                {% else %}
-                <td><input type = "text" id = "widthxlength" value ="{{cs.width}} x {{cs.length}}" style = "width:150px;" readonly></td>
-                {% endif %}
-                <td><input type = "text" id = "numbers" value ="{{cs.numbers}}" style = "width:80px;" readonly></td>
-                <td><input type = "text" name = "dispatch_wt" value ="{{cs.weight}}" style = "width:80px;" readonly></td>
-                <td><input type = "text" name = "grade" value ="{{cs.grade}}" style = "width:80px;" readonly></td>
-                <td><input type = "text" value ="{{cs.status}}" style = "width:80px;" readonly></td>
-                <td><input type ="checkbox" name = "full_quantity" style = "width:80px;" onchange="full_dispatch(this, 'dispatch_list')" disabled></td>
-                <td><input type ="text" name = "dispatch_numbers" style = "width:80px;" onchange="check_numbers(this, 'dispatch_list')" readonly></td>
-                <td><input type ="text" name = "dispatch_quantity" style = "width:80px;" onchange="total_dispatch_wt()"tabindex="-1" readonly></td>
-                <td><input type ="text" name = "dispatch_packets" style = "width:80px;" readonly></td>
-                <td><input type ="text" name = "defective" style = "width:80px;" readonly></td>
-            </tr>
-        {% endfor %}
-
         </table>
-
         <p>Total Dispatch Wt (in MT) <input type = "number" step = "3" id = "total_disp_wt" value = "0.0" readonly> </p>
         <p>Total Packets <input type = "number" step = "0" id = "total_packets" value = "0" readonly> </p>
         <p>Vehicle Number <input type = "text" name = "vehicle_no" required> </p>
@@ -98,4 +121,5 @@
 
     <script src = "{{ url_for('static', filename='js/dispatch.js') }}"></script>
     </form>
+</body>
 </html>

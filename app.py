@@ -2553,6 +2553,31 @@ def qr_dispatch_submit():
     _cs_lst = zip(cs_id_lst, cs_lst, dispatch_numbers_lst, dispatch_wt_lst, packet_name_lst)
     return render_template('qr_dispatch_list.html', _cs_lst = _cs_lst, customer = customer)
 
+@app.route('/honda_dispatch_list', methods=['GET', 'POST'])
+def honda_dispatch_list():
+    customer = 'HONDA TRADING CORPORATION INDIA PVT LTD'
+    display_type = 'FG'
+    cs_lst = CurrentStock.get_stock_by_customer(customer, display_type)
+    _cs_lst = []
+    _cs_id_lst = []
+    sizes = []
+
+    for cs_id, cs in cs_lst:
+        size = str(cs.width) + " x " + str(cs.length)
+        _cs_id_lst.append(cs_id)
+        _cs_lst.append(cs)
+        sizes.append(size)
+
+    # Extract unique sizes
+    unique_sizes = []
+    unique_sizes = list(set(sizes))
+    unique_sizes.sort()
+
+
+
+    return render_template('honda_dispatch_list.html', cs_lst=zip(_cs_id_lst,_cs_lst),
+                           customer=customer, unique_sizes = unique_sizes)
+
 
 @app.route('/display_dispatch_pick_day', methods=['GET', 'POST'])
 def display_dispatch_pick_day():
