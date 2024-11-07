@@ -2564,9 +2564,10 @@ def honda_dispatch_list():
 
     for cs_id, cs in cs_lst:
         size = str(cs.width) + " x " + str(cs.length)
-        _cs_id_lst.append(cs_id)
-        _cs_lst.append(cs)
-        sizes.append(size)
+        if not ('W0P0') in cs.packet_name:
+            _cs_id_lst.append(cs_id)
+            _cs_lst.append(cs)
+            sizes.append(size)
 
     # Extract unique sizes
     unique_sizes = []
@@ -2577,6 +2578,41 @@ def honda_dispatch_list():
 
     return render_template('honda_dispatch_list.html', cs_lst=zip(_cs_id_lst,_cs_lst),
                            customer=customer, unique_sizes = unique_sizes)
+
+@app.route("/honda_sizes")
+def honda_sizes():
+    with open("honda_sizes.json", "r") as file:
+        data = json.load(file)
+    return jsonify(data)
+
+@app.route('/generate_honda_disp_list', methods=['GET', 'POST'])
+def generate_honda_disp_list():
+    cs_ids = ''
+    if request.method == 'POST':
+        cs_ids = request.form['cs_id_list']
+    if request.method == 'GET':
+        cs_ids = request.args.get('cs_id_list')
+
+    cs_id_lst = []
+    cs_id_lst= cs_ids.split(',')
+    cs_id_lst= cs_id_lst[:-1]
+
+    cs_lst = []
+    incoming_lst = []
+
+    for cs_id in cs_id_lst:
+        cs = CurrentStock.load_smpl_by_id(cs_id)
+
+        cs_lst.append(cs)
+
+    cs_lst_sorted = sorted(cs_lst, key= lambda cs:(cs.width, cs.length, cs.smpl_no, cs.packet_name, cs.processing_id))
+
+    for cs in cs_lst_sorted:
+        incoming = Incoming.load_smpl_by_smpl_no(cs.smpl_no)
+        incoming_lst.append(incoming)
+
+    return render_template('honda_dispatch_list_ready.html', cs_incoming_lst = zip(cs_lst_sorted,incoming_lst))
+
 
 
 @app.route('/display_dispatch_pick_day', methods=['GET', 'POST'])

@@ -28,9 +28,9 @@ var defective_pos=12;
 
 
 //Disable Submit button once submit is pressed
-window.addEventListener('beforeunload', function (e) {
+/*window.addEventListener('beforeunload', function (e) {
   document.getElementById("submit").disabled = true;
-});
+});*/
 
 //This function reloads the page if the user uses back to come to the page
 //https://stackoverflow.com/questions/43043113/how-to-force-reloading-a-page-when-using-browser-back-button
@@ -194,6 +194,89 @@ function display_honda_pkts(){
 
 }
 
-function addPackets(table){
+//This function adds the selected packets to the table below.
+function addPackets(){
+    const selectedTable = document.getElementById("dispatch_list_selected").getElementsByTagName("tbody")[0];
+    const selectedItems = document.querySelectorAll(".select_packet:checked");
+    let currentSerialNumber = selectedTable.getElementsByTagName("tr").length + 1;
 
+    selectedItems.forEach(item => {
+                const cs_id = item.getAttribute("data-csid");
+                const smpl_no = item.getAttribute("data-smpl_no");
+                const pkt_no = item.getAttribute("data-pkt_no");
+                const size1 = item.getAttribute("data-size1");
+                const numbers = item.getAttribute("data-numbers");
+
+                // Check if the item is already in the selected table to avoid duplicates
+                if (!isDuplicate(cs_id)) {
+                    const newRow = selectedTable.insertRow();
+
+                    // Add Serial Number cell
+                    const serialCell = newRow.insertCell(0);
+                    serialCell.textContent = currentSerialNumber++;
+
+                    newRow.insertCell(1).textContent = cs_id;
+                    newRow.insertCell(2).textContent = smpl_no;
+
+                    newRow.insertCell(3).textContent = pkt_no;
+                    newRow.insertCell(4).textContent = size1;
+                    newRow.insertCell(5).textContent = numbers;
+                }
+
+                // Uncheck the item after adding
+                item.checked = false;
+            });
+
+}
+
+function isDuplicate(cs_id) {
+            const selectedTable = document.getElementById("dispatch_list_selected").getElementsByTagName("tbody")[0];
+            const rows = selectedTable.getElementsByTagName("tr");
+
+            for (let i = 0; i < rows.length; i++) {
+                const cells = rows[i].getElementsByTagName("td");
+                if (cells[1].textContent === cs_id) {
+                    return true;  // Duplicate found
+                }
+            }
+            return false;  // No duplicate found
+}
+
+//This function generates a list of cs IDs to be passed on the python
+function get_cs_id_list(){
+         const selectedTable = document.getElementById("dispatch_list_selected").getElementsByTagName("tbody")[0];
+         const rows = selectedTable.getElementsByTagName("tr");
+         cs_id_list = '';
+
+        for (let i = 0; i < rows.length; i++) {
+            const cells = rows[i].getElementsByTagName("td");
+            cs_id_list += cells[1].textContent;
+            cs_id_list += ',';
+        }
+
+        document.getElementById('cs_id_list').value = cs_id_list;
+
+
+ }
+
+function get_size_details(){
+    const table = document.getElementById('dispatch_list');
+    const rows = table.getElementsByTagName("tbody")[0].getElementsByTagName("tr");
+
+    for(let i=0;i<rows.length;i++){
+        const cells = rows[i].getElementsByTagName("td");
+        const size = cells[6].textContent + ' x ' + cells[7].textContent;
+        fetch("/static/honda_sizes.json")
+            .then(response => response.json())
+            .then(data => {
+                if(data[size]){
+                    cells[0].textContent = i+1;
+                    cells[2].textContent = data[size].part_name;
+                    cells[9].textContent = data[size].wt_per_sheet;
+                    cells[13].textContent = data[size].coating;
+                    cells[17].textContent = data[size].pallet;
+                }
+        });
+
+    }
 }

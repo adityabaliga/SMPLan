@@ -1,0 +1,26 @@
+{
+  "720 x 745":{
+  "wt_per_sheet":3.37,
+  "part_name": "KONA PLATE BOTTOM",
+  "coating": "20/0",
+  "pallet": "F"
+  },
+  "600 x 820":{
+  "wt_per_sheet":3.09,
+  "part_name": "KONA OUTER R/L",
+  "coating": "0/20",
+  "pallet": "E"
+  },
+  "370 x 415":{
+  "wt_per_sheet":0.97,
+  "part_name": "K0LA+K0PA+K0YA, Tank Upper",
+  "coating": "0/20",
+  "pallet": "D"
+  },
+  "430 x 455":{
+  "wt_per_sheet":1.23,
+  "part_name": "K0LA+K0PA+K0YA, Tank Lower",
+  "coating": "0/20",
+  "pallet": "D"
+  }
+}

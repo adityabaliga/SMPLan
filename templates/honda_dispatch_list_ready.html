@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SMPL MRP - Dispatch</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+    <style>
+        hr.style1{
+	        border-top: 15px solid #4d0000;
+            }
+        .oe{
+            font-family: Mathematica6 Bold, Old English Text MT, Engravers Old English BT, Old English, Collins Old English, New Old English, serif;
+            font-size: 50px;
+            color: #4d0000;
+            text-align:center;
+            }
+        .topnav a:hover {
+            color: #4d0000;
+            text-decoration: none;
+        }
+        .nopad {
+                margin: 0;
+                padding: 0;
+                margin-top: 0em;
+                margin-bottom: 0em;
+            }
+    </style>
+
+</head>
+<body onload="get_size_details()">
+<form>
+    <div class="topnav" id="myTopnav">
+        <br>
+        <table>
+            <td><img src="/static/logo.jpg"  height="70" width="92" align = "left"></td>
+            <td width="1050px"><div align="center" class="nopad"> <a href="\main_menu"  class="oe">SMPL</a></div></td>
+            <td><div align="left" class="nopad">Hi {{current_user.username}}<br>
+            <a href="\change_password_form">Change Password</a><br>
+            <a href="\logout">Logout</a></div></td>
+        </table>
+    </div>
+
+    <hr class ="style1">
+    <h2><input type = "text"  name = "customer" value ="{{customer}}" style = "width:750px;border: none;border-color: transparent;" readonly></h2>
+    <table class = "table table-sm" id = 'dispatch_list'>
+            <thead>
+            <tr>
+
+                <th>Sl No.</th>
+                <th>Packet Name</th>
+                <th>Part Name</th>
+                <th>Mill</th>
+                <th>Coil No</th>
+                <th>Thickness</th>
+                <th>Width</th>
+                <th>Length</th>
+                <th>Numbers</th>
+                <th>Per Sheet Weight</th>
+                <th>Net Wt</th>
+                <th>G Wt</th>
+                <th>Grade</th>
+                <th>Coating</th>
+                <th>Import Invoice no</th>
+                <th>Coil Size</th>
+                <th>No of Pkts</th>
+                <th>Pallet Type</th>
+                <th>Remarks</th>
+                <th>SMPL No</th>
+
+            </tr>
+            </thead>
+            <tbody>
+            {% for cs, incoming in cs_incoming_lst %}
+            <tr>
+                <td>Sl No.</td>
+                <td>{{cs.smpl_no}}{{cs.packet_name}}</td>
+                <td>Part Name</td>
+                <td>{{incoming.mill}}</td>
+                <td>{{incoming.mill_id}}</td>
+                <td>{{cs.thickness}}</td>
+                <td>{{cs.width}}</td>
+                <td>{{cs.length}}</td>
+                <td>{{cs.numbers}}</td>
+                <td>Per Sheet Weight</td>
+                <td>{{cs.weight}}</td>
+                <td>G Wt</td>
+                <td>{{incoming.grade}}</td>
+                <td>Coating</td>
+                <td>IIN</td>
+                <td>{{incoming.width}}</td>
+                <td>1</td>
+                <td>Pallet Type</td>
+                <td>MS</td>
+                <td>{{cs.smpl_no}}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+    </table>
+    <script src = "{{ url_for('static', filename='js/dispatch.js') }}"></script>
+</form>
+
+</body>
+</html>

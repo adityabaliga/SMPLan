@@ -28,7 +28,7 @@
 
 </head>
 <body>
-<form action="/dispatch">
+<form action="/generate_honda_disp_list">
     <div class="topnav" id="myTopnav">
         <br>
         <table>
@@ -68,55 +68,58 @@
         {% for cs_id, cs in cs_lst %}
 
             <tr class = 'packet-list' data-size="{{cs.width}} x {{cs.length}}">
-                <td><input type = "checkbox" name = "select_packet" value ="{{cs_id}},{{cs.smpl_no}},{{cs.packet_name}}">{{cs.smpl_no}}{{cs.packet_name}}</td>
+                <td><input type = "checkbox" name = "select_packet" class="select_packet"
+                           value ="{{cs_id}},{{cs.smpl_no}},{{cs.packet_name}}"
+                        data-csid="{{ cs_id }}" data-smpl_no = "{{cs.smpl_no}}" data-pkt_no ="{{cs.packet_name}}"
+                        data-size1 = "{{cs.thickness}} x {{cs.width}} x {{cs.length}}" data-numbers = "{{cs.numbers}}"
+                >{{cs.smpl_no}}{{cs.packet_name}}</td>
 
 
 
-                <td><input type = "text" id = "thickness" style = "width:80px;" value ="{{cs.thickness}}"  readonly></td>
+                <td>{{cs.thickness}}</td>
                 {% if cs.length2 != 0 %}
-                <td><input type = "text" id = "widthxlength" value ="{{cs.width}} x {{cs.length}} - {{cs.length2}}" style = "width:150px;" readonly></td>
+                <td>{{cs.width}} x {{cs.length}} - {{cs.length2}}</td>
                 {% else %}
-                <td><input type = "text" id = "widthxlength" value ="{{cs.width}} x {{cs.length}}" style = "width:150px;" readonly></td>
+                <td>{{cs.width}} x {{cs.length}}</td>
                 {% endif %}
-                <td><input type = "text" id = "numbers" value ="{{cs.numbers}}" style = "width:80px;" readonly></td>
-                <td><input type = "text" name = "dispatch_wt" value ="{{cs.weight}}" style = "width:80px;" readonly></td>
-                <td><input type = "text" name = "grade" value ="{{cs.grade}}" style = "width:80px;" readonly></td>
+                <td>{{cs.numbers}}</td>
+                <td>{{cs.weight}}</td>
+                <td>{{cs.grade}}</td>
 
             </tr>
         {% endfor %}
 
         </table>
 
-        <input type="button" name="add_packets" id="add_packets" value="Add Packets" onclick="addPackets('dispatch_list')">
+        <input type="button" name="add_packets" id="add_packets" value="Add Packets" onclick="addPackets()">
 
         <table class = "table table-sm" id = 'dispatch_list_selected'>
+            <thead>
             <tr>
 
+                <th>Sl No.</th>
+                <th>CS ID</th>
                 <th>SMPL No.</th>
                 <th>Packet Name</th>
-                <th>Thickness</th>
-                <th>Width x Length</th>
+                <th>Size</th>
                 <th>Numbers</th>
-                <th>Weight (in MT)</th>
-                <th>Grade</th>
-                <th>Status</th>
-                <th>Full Dispatch</th>
-                <th>Dispatch Numbers</th>
-                <th>Dispatch Qty (in MT)</th>
-                <th>No. of packets</th>
-                <th>Defective</th>
+
 
             </tr>
+            </thead>
+            <tbody>
+
+            </tbody>
         </table>
-        <p>Total Dispatch Wt (in MT) <input type = "number" step = "3" id = "total_disp_wt" value = "0.0" readonly> </p>
-        <p>Total Packets <input type = "number" step = "0" id = "total_packets" value = "0" readonly> </p>
+        <!--p>Total Dispatch Wt (in MT) <input type = "number" step = "3" id = "total_disp_wt" value = "0.0" readonly> </p>
+        <p>Total Packets <input type = "number" step = "0" id = "total_packets" value = "0" readonly> </p-->
         <p>Vehicle Number <input type = "text" name = "vehicle_no" required> </p>
         <p>Dispatch Date <input type = "date" name = "dispatch_date" required></p>
-        <p>Dispatch Time <input type ="time" name = "dispatch_time" required></p>
+        <!--p>Dispatch Time <input type ="time" name = "dispatch_time" required></p>
         <p>Invoice No <input type ="text" name = "invoice_no"></p>
-        <p>Remarks <input type ="text" style = "width:200px;"  name = "remarks"></p>
-
-        <input class="btn btn-default" type="submit" value="Submit">
+        <p>Remarks <input type ="text" style = "width:200px;"  name = "remarks"></p-->
+        <p>CS IDs List <input type = "text" name = "cs_id_list" id = "cs_id_list"></p>
+        <input class="btn btn-default" type="submit" value="Submit" onclick="get_cs_id_list()">
 
 
     <script src = "{{ url_for('static', filename='js/dispatch.js') }}"></script>
