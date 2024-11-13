@@ -409,7 +409,15 @@ function generateExcelHondaDispatch() {
   var veh_no = document.getElementById('veh_no').value;
   var file_name = 'Honda_dispatch_' + dispatch_date + veh_no + '.xlsx';
 
+    header = "DISPATCH LIST - " + dispatch_date + "  VEHICLE NO: " + veh_no;
 
+    var ws = workbook.Sheets[workbook.SheetNames[0]];
+
+    // Define the new row to add at the top
+    var newRow = [[header]]; // You can customize this as needed
+
+    // Add the new row at the top (cell A1) of the existing sheet
+    XLSX.utils.sheet_add_aoa(ws, newRow, { origin: 0 });
 
 
   XLSX.writeFile(workbook, file_name);
