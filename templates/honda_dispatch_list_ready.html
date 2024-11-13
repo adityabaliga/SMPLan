@@ -41,7 +41,10 @@
     </div>
 
     <hr class ="style1">
-    <h2><input type = "text"  name = "customer" value ="{{customer}}" style = "width:750px;border: none;border-color: transparent;" readonly></h2>
+    <input type = "button" class="btn btn-default" value="Download" onclick="generateExcelHondaDispatch()">
+    <h2>DISPATCH LIST - {{dispatch_date}} VEHICLE NO: {{veh_no}}</h2>
+    <p><input id="dispatch_date" value = {{dispatch_date}} hidden></p>
+    <p><input id="veh_no" value = {{veh_no}} hidden></p>
     <table class = "table table-sm" id = 'dispatch_list'>
             <thead>
             <tr>
@@ -86,7 +89,7 @@
                 <td>G Wt</td>
                 <td>{{incoming.grade}}</td>
                 <td>Coating</td>
-                <td>IIN</td>
+                <td></td>
                 <td>{{incoming.width}}</td>
                 <td>1</td>
                 <td>Pallet Type</td>
@@ -97,6 +100,7 @@
             </tbody>
     </table>
     <script src = "{{ url_for('static', filename='js/dispatch.js') }}"></script>
+    <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
 </form>
 
 </body>

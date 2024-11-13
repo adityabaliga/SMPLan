@@ -259,9 +259,11 @@ function get_cs_id_list(){
 
  }
 
+//This function checks the size of the table loads details of the sizes from the json and populates the table
 function get_size_details(){
     const table = document.getElementById('dispatch_list');
     const rows = table.getElementsByTagName("tbody")[0].getElementsByTagName("tr");
+
 
     for(let i=0;i<rows.length;i++){
         const cells = rows[i].getElementsByTagName("td");
@@ -270,13 +272,129 @@ function get_size_details(){
             .then(response => response.json())
             .then(data => {
                 if(data[size]){
-                    cells[0].textContent = i+1;
+                    //cells[0].textContent = i+1;
                     cells[2].textContent = data[size].part_name;
                     cells[9].textContent = data[size].wt_per_sheet;
+
                     cells[13].textContent = data[size].coating;
                     cells[17].textContent = data[size].pallet;
+
+                    //This function runs after addTotalRow, so this check is added to keep Gross Wt empty
+                    // for merged packets
+
+                    if(cells[0].textContent != ''){
+                        cells[11].textContent = data[size].gross_wt;
+                    }else{
+                        cells[11].textContent = '';
+                    }
                 }
         });
 
     }
+    addTotalRow();
+
+}
+
+//This function checks if size has changed in the table, if yes it will add a row and add the total for the size
+function addTotalRow(){
+    const table = document.getElementById('dispatch_list');
+    const rows = table.getElementsByTagName("tbody")[0].getElementsByTagName("tr");
+    const firstRow = rows[0].getElementsByTagName("td");
+    let currentSize = firstRow[6].textContent + ' x ' + firstRow[7].textContent;
+    var serialNumber = 0;
+    let currentSizeTotal  = 0;
+    var prevPktNumbers = 0;
+
+    for(let i=0;i<rows.length;i++){
+        var cells = rows[i].getElementsByTagName("td");
+        const size = cells[6].textContent + ' x ' + cells[7].textContent;
+
+        // This part is to add a row and total at the end of the size list
+        if (size != currentSize){
+             currentSizeTotal = Math.round(currentSizeTotal*1000)/1000;
+             insertTotalRow(table, i+1, currentSizeTotal, cells.length)
+             currentSizeTotal = 0;
+             serialNumber = -1;
+            currentSize = size;
+
+            prevPktNumbers = 0;
+        }
+        var currentWt= Number(cells[10].textContent.trim());
+
+        currentSizeTotal += currentWt;
+
+
+        // This part is for merge packets, to skip serial number and gross wt for next row
+        // if total of 2 consecutive rows = lotQty (300 or 450)
+        var numbers = parseInt(cells[8].textContent);
+        const lotQty = 300;
+
+
+        //If K3CA then change lot quantity to 450
+        if(firstRow[2].textContent.includes("K3CA")){
+            lotQty = 450;
+        }
+
+        if(numbers < lotQty  && prevPktNumbers != 0){
+
+            const nextRow = rows[i+1].getElementsByTagName("td");
+            const nextPktNumbers = parseInt(nextRow[8].textContent);
+
+            const nextSize = nextRow[6].textContent + ' x ' + nextRow[7].textContent;
+
+            if (numbers + nextPktNumbers == lotQty){
+                nextRow[0].textContent = '';
+                nextRow[16].textContent = '';
+
+                serialNumber += 1;
+                cells[0].textContent = serialNumber;
+
+
+            }else if(size != nextSize){
+                serialNumber += 1;
+                cells[0].textContent = serialNumber;
+            }
+
+        }else{
+                serialNumber += 1;
+                cells[0].textContent = serialNumber;
+            }
+        prevPktNumbers = numbers;
+
+        }
+        // Insert total row after the last row, this is for the last size listed
+        insertTotalRow(table, rows.length + 1, currentSizeTotal, cells.length)
+
+
+}
+
+function insertTotalRow(table, index, total, no_of_cells){
+    const newRow = table.insertRow(index);
+
+
+
+    for (let i=0;i<no_of_cells; i++){
+    const cell = newRow.insertCell(0);
+    cell.textContent = "";
+    }
+    newRow.cells[10].textContent = (total);
+}
+
+function generateExcelHondaDispatch() {
+  // Get the table element by its ID
+   var table = document.getElementById('dispatch_list');
+
+  var workbook = XLSX.utils.table_to_book(table, { sheet: 'Sheet1' });
+
+  var dispatch_date = document.getElementById('dispatch_date').value;
+  var veh_no = document.getElementById('veh_no').value;
+  var file_name = 'Honda_dispatch_' + dispatch_date + veh_no + '.xlsx';
+
+
+
+
+  XLSX.writeFile(workbook, file_name);
+
+
+
 }

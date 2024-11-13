@@ -2590,8 +2590,14 @@ def generate_honda_disp_list():
     cs_ids = ''
     if request.method == 'POST':
         cs_ids = request.form['cs_id_list']
+        veh_no = request.form['vehicle_no']
+        dispatch_date = request.form['dispatch_date']
     if request.method == 'GET':
         cs_ids = request.args.get('cs_id_list')
+        veh_no = request.args.get('vehicle_no')
+        dispatch_date = request.args.get('dispatch_date')
+
+    dispatch_date = change_date_format(dispatch_date)
 
     cs_id_lst = []
     cs_id_lst= cs_ids.split(',')
@@ -2611,7 +2617,8 @@ def generate_honda_disp_list():
         incoming = Incoming.load_smpl_by_smpl_no(cs.smpl_no)
         incoming_lst.append(incoming)
 
-    return render_template('honda_dispatch_list_ready.html', cs_incoming_lst = zip(cs_lst_sorted,incoming_lst))
+    return render_template('honda_dispatch_list_ready.html',
+                           cs_incoming_lst = zip(cs_lst_sorted,incoming_lst), veh_no = veh_no, dispatch_date = dispatch_date)
 
 
 
