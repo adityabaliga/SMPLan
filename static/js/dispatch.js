@@ -246,7 +246,7 @@ function isDuplicate(cs_id) {
 function get_cs_id_list(){
          const selectedTable = document.getElementById("dispatch_list_selected").getElementsByTagName("tbody")[0];
          const rows = selectedTable.getElementsByTagName("tr");
-         cs_id_list = '';
+         var cs_id_list = '';
 
         for (let i = 0; i < rows.length; i++) {
             const cells = rows[i].getElementsByTagName("td");
@@ -268,6 +268,10 @@ function get_size_details(){
     for(let i=0;i<rows.length;i++){
         const cells = rows[i].getElementsByTagName("td");
         const size = cells[6].textContent + ' x ' + cells[7].textContent;
+
+        cells[10].textContent = Number(cells[10].textContent) * 1000;
+
+        // This part loads the json and populates the table based on the size
         fetch("/static/honda_sizes.json")
             .then(response => response.json())
             .then(data => {
@@ -304,6 +308,10 @@ function addTotalRow(){
     var serialNumber = 0;
     let currentSizeTotal  = 0;
     var prevPktNumbers = 0;
+    var currentWt = 0;
+    var currentNos = 0;
+    let currentNosTotal = 0;
+
 
     for(let i=0;i<rows.length;i++){
         var cells = rows[i].getElementsByTagName("td");
@@ -312,16 +320,25 @@ function addTotalRow(){
         // This part is to add a row and total at the end of the size list
         if (size != currentSize){
              currentSizeTotal = Math.round(currentSizeTotal*1000)/1000;
-             insertTotalRow(table, i+1, currentSizeTotal, cells.length)
+
+             insertTotalRow(table, i+1, currentSizeTotal, currentNosTotal, cells.length)
              currentSizeTotal = 0;
+             currentNosTotal = 0;
+
              serialNumber = -1;
-            currentSize = size;
+             currentSize = size;
 
             prevPktNumbers = 0;
-        }
-        var currentWt= Number(cells[10].textContent.trim());
+        }else{
+         currentWt= Number(cells[10].textContent.trim());
+         currentNos = Number(cells[8].textContent.trim());
+
+
 
         currentSizeTotal += currentWt;
+        currentNosTotal += currentNos;
+
+        }
 
 
         // This part is for merge packets, to skip serial number and gross wt for next row
@@ -363,12 +380,12 @@ function addTotalRow(){
 
         }
         // Insert total row after the last row, this is for the last size listed
-        insertTotalRow(table, rows.length + 1, currentSizeTotal, cells.length)
+        insertTotalRow(table, rows.length + 1, currentSizeTotal, currentNosTotal, cells.length)
 
 
 }
 
-function insertTotalRow(table, index, total, no_of_cells){
+function insertTotalRow(table, index, total_wt, total_nos,  no_of_cells){
     const newRow = table.insertRow(index);
 
 
@@ -377,7 +394,9 @@ function insertTotalRow(table, index, total, no_of_cells){
     const cell = newRow.insertCell(0);
     cell.textContent = "";
     }
-    newRow.cells[10].textContent = (total);
+    newRow.cells[10].textContent = (total_wt);
+    newRow.cells[8].textContent = (total_nos);
+
 }
 
 function generateExcelHondaDispatch() {
