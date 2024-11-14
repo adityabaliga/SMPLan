@@ -279,6 +279,9 @@ function get_size_details(){
                     //cells[0].textContent = i+1;
                     cells[2].textContent = data[size].part_name;
                     cells[9].textContent = data[size].wt_per_sheet;
+                    cells[10].textContent = (Number(data[size].wt_per_sheet) * Number(cells[8].textContent));
+                    cells[10].textContent = Math.round(cells[10].textContent);
+
 
                     cells[13].textContent = data[size].coating;
                     cells[17].textContent = data[size].pallet;
