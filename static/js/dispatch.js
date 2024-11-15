@@ -324,7 +324,7 @@ function addTotalRow(){
         if (size != currentSize){
              currentSizeTotal = Math.round(currentSizeTotal*1000)/1000;
 
-             insertTotalRow(table, i+1, currentSizeTotal, currentNosTotal, cells.length)
+             insertTotalRow(table, i+2, currentSizeTotal, currentNosTotal, cells.length)
              currentSizeTotal = 0;
              currentNosTotal = 0;
 
@@ -356,25 +356,25 @@ function addTotalRow(){
         }
 
         if(numbers < lotQty  && prevPktNumbers != 0){
+            if ( i< rows.length -1){
+                const nextRow = rows[i+1].getElementsByTagName("td");
+                const nextPktNumbers = parseInt(nextRow[8].textContent);
 
-            const nextRow = rows[i+1].getElementsByTagName("td");
-            const nextPktNumbers = parseInt(nextRow[8].textContent);
+                const nextSize = nextRow[6].textContent + ' x ' + nextRow[7].textContent;
 
-            const nextSize = nextRow[6].textContent + ' x ' + nextRow[7].textContent;
+                if (numbers + nextPktNumbers == lotQty){
+                    nextRow[0].textContent = '';
+                    nextRow[16].textContent = '';
 
-            if (numbers + nextPktNumbers == lotQty){
-                nextRow[0].textContent = '';
-                nextRow[16].textContent = '';
-
-                serialNumber += 1;
-                cells[0].textContent = serialNumber;
+                    serialNumber += 1;
+                    cells[0].textContent = serialNumber;
 
 
-            }else if(size != nextSize){
-                serialNumber += 1;
-                cells[0].textContent = serialNumber;
+                }else if(size != nextSize){
+                    serialNumber += 1;
+                    cells[0].textContent = serialNumber;
+                }
             }
-
         }else{
                 serialNumber += 1;
                 cells[0].textContent = serialNumber;
@@ -383,15 +383,13 @@ function addTotalRow(){
 
         }
         // Insert total row after the last row, this is for the last size listed
-        insertTotalRow(table, rows.length + 1, currentSizeTotal, currentNosTotal, cells.length)
+        insertTotalRow(table, rows.length + 2, currentSizeTotal, currentNosTotal, cells.length)
 
 
 }
 
 function insertTotalRow(table, index, total_wt, total_nos,  no_of_cells){
     const newRow = table.insertRow(index);
-
-
 
     for (let i=0;i<no_of_cells; i++){
     const cell = newRow.insertCell(0);

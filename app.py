@@ -2317,8 +2317,9 @@ def check_stock_tsdpl():
     cs_lst = CurrentStock.get_stock_by_customer('TATA STEEL DOWNSTREAM PRODUCTS LTD%', 'All')
 
     for cs_id, cs in cs_lst:
-        _cs_id_lst.append(cs_id)
-        _cs_lst.append(cs)
+        if not any(substring in cs.packet_name for substring in ['W0P0', 'D0', 'M0']):
+            _cs_id_lst.append(cs_id)
+            _cs_lst.append(cs)
 
         today_date = datetime.today().strftime('%Y-%m-%d')
         change_date_format(today_date)
@@ -2564,7 +2565,7 @@ def honda_dispatch_list():
 
     for cs_id, cs in cs_lst:
         size = str(cs.width) + " x " + str(cs.length)
-        if not ('W0P0') in cs.packet_name:
+        if not any(substring in cs.packet_name for substring in ['W0P0', 'D0', 'M0']):
             _cs_id_lst.append(cs_id)
             _cs_lst.append(cs)
             sizes.append(size)
