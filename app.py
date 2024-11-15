@@ -2175,8 +2175,9 @@ def check_stock_htid():
     cs_lst = CurrentStock.get_stock_by_customer('HONDA TRADING CORPORATION INDIA PVT LTD', 'All')
 
     for cs_id, cs in cs_lst:
-        _cs_id_lst.append(cs_id)
-        _cs_lst.append(cs)
+        if not any(substring in cs.packet_name for substring in ['W0P0', 'D0', 'M0']):
+            _cs_id_lst.append(cs_id)
+            _cs_lst.append(cs)
         if cs.width == 720 and cs.length == 745:
             part_no = "KONA PLATE BOTTOM"
             wt_per_sheet = 3.37
