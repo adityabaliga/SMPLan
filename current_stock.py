@@ -497,6 +497,11 @@ class CurrentStock:
             with CursorFromConnectionFromPool() as cursor:
                 cursor.execute("select * from current_stock where customer like %s and status = 'FG' order by smpl_no, packet_name asc",(customer,))
                 user_data = cursor.fetchall()
+        if display_type == 'FGHonda':
+            with CursorFromConnectionFromPool() as cursor:
+                cursor.execute("select * from current_stock where customer like %s and status = 'FG' order by cs_id, smpl_no, packet_name asc",(customer,))
+                user_data = cursor.fetchall()
+
         if display_type == 'FGandRM':
             with CursorFromConnectionFromPool() as cursor:
                 cursor.execute("select * from current_stock where customer like %s and (status = 'FG' or status = 'RM') order by status, smpl_no, packet_name  asc", (customer,))

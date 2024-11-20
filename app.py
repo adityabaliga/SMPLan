@@ -2321,6 +2321,9 @@ def check_stock_tsdpl():
         if not any(substring in cs.packet_name for substring in ['W0P0', 'D0', 'M0']):
             _cs_id_lst.append(cs_id)
             _cs_lst.append(cs)
+            incoming = Incoming.load_smpl_by_smpl_no(cs.smpl_no)
+            incoming_lst.append(incoming)
+
 
         today_date = datetime.today().strftime('%Y-%m-%d')
         change_date_format(today_date)
@@ -2330,9 +2333,12 @@ def check_stock_tsdpl():
         no_of_days_lst.append(no_of_days)
 
         finishing_date = cs.date.strftime('%Y-%m-%d')
-        finishing_date_lst.append(change_date_format(finishing_date))
 
-        incoming_flag = 0
+        finishing_date = (change_date_format(finishing_date))
+
+        finishing_date_lst.append(finishing_date)
+
+        '''incoming_flag = 0
         for incoming in incoming_lst:
             if cs.smpl_no == incoming.smpl_no:
                 incoming_lst.append(incoming)
@@ -2346,7 +2352,7 @@ def check_stock_tsdpl():
         grade = (cs.grade.split("GRADE:"))
         if len(grade) > 1:
             grade = grade[1].split(';')
-            cs.grade = grade[0]
+            cs.grade = grade[0]'''
 
     cs_lst = zip(_cs_id_lst, _cs_lst, today_date_lst, no_of_days_lst, finishing_date_lst,  incoming_lst)
     return render_template('stock_display_tsdpl.html', cs_lst=cs_lst)
@@ -2558,7 +2564,7 @@ def qr_dispatch_submit():
 @app.route('/honda_dispatch_list', methods=['GET', 'POST'])
 def honda_dispatch_list():
     customer = 'HONDA TRADING CORPORATION INDIA PVT LTD'
-    display_type = 'FG'
+    display_type = 'FGHonda'
     cs_lst = CurrentStock.get_stock_by_customer(customer, display_type)
     _cs_lst = []
     _cs_id_lst = []

@@ -117,7 +117,57 @@ function generateExcelTSDPL(tablename) {
   // Get the table element by its ID
    var table = document.getElementById(tablename);
 
-  var workbook = XLSX.utils.table_to_book(table, { sheet: 'Sheet1' });
+   /****
+        This complicated bit is done because when the excel was downloaded excel was messing with some of the dates
+        This caused some dates to be displayed as General formatting and some as Date format.
+        This function does the following
+        1. Storing the original date value in a data attribute
+        2. Converting dates to Excel serial numbers during export
+        3. Setting the proper date format in the Excel worksheet
+    ****/
+
+   // Create a copy of the table to modify for Excel export
+  const tableCopy = table.cloneNode(true);
+
+  // Modify the date cells in the copy
+  const dateColumnIndex = 1;
+  const rows = tableCopy.getElementsByTagName('tr');
+
+  for (let i = 1; i < rows.length; i++) {
+    const cell = rows[i].cells[dateColumnIndex];
+    const dateStr = cell.getAttribute('data-value');
+
+    if (dateStr) {
+      // Convert to Excel serial number format
+      const day = parseInt(dateStr.substring(0, 2));
+      const month = parseInt(dateStr.substring(3, 5)) - 1; // Month is 0-based
+      const year = parseInt(dateStr.substring(7, 10));
+
+      const date = new Date(year, month, day);
+      // Excel date serial number (days since 1900)
+      const excelDate = 25569 + Math.floor((date.getTime() / (1000 * 60 * 60 * 24)));
+
+      // Set the cell value to the Excel serial number
+      cell.textContent = excelDate;
+    }
+  }
+
+
+  var workbook = XLSX.utils.table_to_book(tableCopy, { raw: true });
+
+   // Set date format for the column
+  const ws = workbook.Sheets[workbook.SheetNames[0]];
+  const range = XLSX.utils.decode_range(ws['!ref']);
+
+  for (let R = range.s.r + 1; R <= range.e.r; R++) {
+    const cell_address = XLSX.utils.encode_cell({ r: R, c: dateColumnIndex });
+    if (!ws[cell_address]) continue;
+
+    // Set number format to date
+    if (!ws[cell_address].z) {
+      ws[cell_address].z = 'dd/mm/yyyy';
+    }
+  }
 
   var currentDate = new Date();
   var year = currentDate.getFullYear();
