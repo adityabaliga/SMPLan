@@ -2178,122 +2178,122 @@ def check_stock_htid():
         if not any(substring in cs.packet_name for substring in ['W0P0', 'D0', 'M0']):
             _cs_id_lst.append(cs_id)
             _cs_lst.append(cs)
-        if cs.width == 720 and cs.length == 745:
-            part_no = "KONA PLATE BOTTOM"
-            wt_per_sheet = 3.37
-            coating = "20/0"
-        if cs.width == 600 and cs.length == 820:
-            part_no = "KONA OUTER R/L"
-            wt_per_sheet = 3.09
-            coating = "0/20"
-        if cs.width == 370 and cs.length == 415:
-            part_no = "K0LA+K0PA+K0YA, Tank Upper"
-            wt_per_sheet = 0.97
-            coating = "0/20"
-        if cs.width == 430 and cs.length == 455:
-            part_no = "K0LA+K0PA+K0YA, Tank Lower"
-            wt_per_sheet = 1.23
-            coating = "0/20"
-        if cs.width == 570 and cs.length == 830:
-            part_no = "K1KA R/L"
-            wt_per_sheet = 2.97
-            coating = "0/20"
-        if cs.width == 600 and cs.length == 715:
-            part_no = "K1KA PLATE BOTTOM"
-            wt_per_sheet = 2.69
-            coating = "20/0"
-        if cs.width == 550 and cs.length == 790:
-            part_no = "K1CA TANK R/L"
-            wt_per_sheet = 2.73
-            coating = "0/20"
-        if cs.width == 590 and cs.length == 705:
-            part_no = "K1CA TANK BOTTOM"
-            wt_per_sheet = 2.61
-            coating = "20/0"
-        if cs.width == 530 and cs.length == 765:
-            part_no = "K67 OUTER R/L"
-            wt_per_sheet = 2.55
-            coating = "0/20"
-        if cs.width == 575 and cs.length == 640:
-            part_no = "K67 PLATE BOTTOM"
-            wt_per_sheet = 2.31
-            coating = "20/0"
-        if cs.width == 510 and cs.length == 785:
-            part_no = "K0VA OUTER R/L"
-            wt_per_sheet = 2.50
-            coating = "0/20"
-        if cs.width == 600 and cs.length == 660:
-            part_no = "K0VA PLATE BOTTOM"
-            wt_per_sheet = 2.29
-            coating = "20/0"
-        if cs.width == 520 and cs.length == 765:
-            part_no = "KTE TANK R/L"
-            wt_per_sheet = 2.50
-            coating = "0/20"
-        if cs.width == 565 and cs.length == 645:
-            part_no = "KTE TANK BOTTOM"
-            wt_per_sheet = 2.29
-            coating = "20/0"
-        if cs.width == 515 and cs.length == 715:
-            part_no = "K1EA TANK R/L"
-            wt_per_sheet = 2.31
-            coating = "0/20"
-        if cs.width == 620 and cs.length == 675:
-            part_no = "K1EA TANK BOTTOM"
-            wt_per_sheet = 2.63
-            coating = "20/0"
-        if cs.width == 655 and cs.length == 740:
-            part_no = "K3CA Upper"
-            wt_per_sheet = 2.66
-            coating = "0/30"
-        if cs.width == 565 and cs.length == 645:
-            part_no = "K3CA BTM"
-            wt_per_sheet = 2.29
-            coating = "0/20"
-        if cs.length > 0:
-            packet_wt = round((cs.numbers * wt_per_sheet)/1000, 3)
-        else:
-            part_no = ''
-            packet_wt = cs.weight
+            if cs.width == 720 and cs.length == 745:
+                part_no = "KONA PLATE BOTTOM"
+                wt_per_sheet = 3.37
+                coating = "20/0"
+            if cs.width == 600 and cs.length == 820:
+                part_no = "KONA OUTER R/L"
+                wt_per_sheet = 3.09
+                coating = "0/20"
+            if cs.width == 370 and cs.length == 415:
+                part_no = "K0LA+K0PA+K0YA, Tank Upper"
+                wt_per_sheet = 0.97
+                coating = "0/20"
+            if cs.width == 430 and cs.length == 455:
+                part_no = "K0LA+K0PA+K0YA, Tank Lower"
+                wt_per_sheet = 1.23
+                coating = "0/20"
+            if cs.width == 570 and cs.length == 830:
+                part_no = "K1KA R/L"
+                wt_per_sheet = 2.97
+                coating = "0/20"
+            if cs.width == 600 and cs.length == 715:
+                part_no = "K1KA PLATE BOTTOM"
+                wt_per_sheet = 2.69
+                coating = "20/0"
+            if cs.width == 550 and cs.length == 790:
+                part_no = "K1CA TANK R/L"
+                wt_per_sheet = 2.73
+                coating = "0/20"
+            if cs.width == 590 and cs.length == 705:
+                part_no = "K1CA TANK BOTTOM"
+                wt_per_sheet = 2.61
+                coating = "20/0"
+            if cs.width == 530 and cs.length == 765:
+                part_no = "K67 OUTER R/L"
+                wt_per_sheet = 2.55
+                coating = "0/20"
+            if cs.width == 575 and cs.length == 640:
+                part_no = "K67 PLATE BOTTOM"
+                wt_per_sheet = 2.31
+                coating = "20/0"
+            if cs.width == 510 and cs.length == 785:
+                part_no = "K0VA OUTER R/L"
+                wt_per_sheet = 2.50
+                coating = "0/20"
+            if cs.width == 600 and cs.length == 660:
+                part_no = "K0VA PLATE BOTTOM"
+                wt_per_sheet = 2.29
+                coating = "20/0"
+            if cs.width == 520 and cs.length == 765:
+                part_no = "KTE TANK R/L"
+                wt_per_sheet = 2.50
+                coating = "0/20"
+            if cs.width == 565 and cs.length == 645:
+                part_no = "KTE TANK BOTTOM"
+                wt_per_sheet = 2.29
+                coating = "20/0"
+            if cs.width == 515 and cs.length == 715:
+                part_no = "K1EA TANK R/L"
+                wt_per_sheet = 2.31
+                coating = "0/20"
+            if cs.width == 620 and cs.length == 675:
+                part_no = "K1EA TANK BOTTOM"
+                wt_per_sheet = 2.63
+                coating = "20/0"
+            if cs.width == 655 and cs.length == 740:
+                part_no = "K3CA Upper"
+                wt_per_sheet = 2.66
+                coating = "0/30"
+            if cs.width == 565 and cs.length == 645:
+                part_no = "K3CA BTM"
+                wt_per_sheet = 2.29
+                coating = "0/20"
+            if cs.length > 0:
+                packet_wt = round((cs.numbers * wt_per_sheet)/1000, 3)
+            else:
+                part_no = ''
+                packet_wt = cs.weight
 
-        incoming = Incoming.load_smpl_by_smpl_no(cs.smpl_no)
-        mill_lst.append(incoming.mill)
-        mill_id_lst.append(incoming.mill_id)
-        incoming_date = incoming.incoming_date.replace('/', '-')
-        incoming_date_lst.append(incoming_date)
-        part_no_lst.append(part_no)
-        wt_per_sheet_lst.append(wt_per_sheet)
-        coating_lst.append(coating)
-        packet_wt_lst.append(packet_wt)
-        dc_number_lst.append(incoming.dc_number)
+            incoming = Incoming.load_smpl_by_smpl_no(cs.smpl_no)
+            mill_lst.append(incoming.mill)
+            mill_id_lst.append(incoming.mill_id)
+            incoming_date = incoming.incoming_date.replace('/', '-')
+            incoming_date_lst.append(incoming_date)
+            part_no_lst.append(part_no)
+            wt_per_sheet_lst.append(wt_per_sheet)
+            coating_lst.append(coating)
+            packet_wt_lst.append(packet_wt)
+            dc_number_lst.append(incoming.dc_number)
 
 
-        dc_date_year = ''
-        dc_date_month = ''
-        dc_date = ''
-        if incoming.dc_date:
-            #if len(incoming.dc_date) > 7:
-            dc_date = incoming.dc_date.strftime('%d-%m-%Y')
-            '''dc_date = incoming.dc_date.replace('/', '-')
-            i=0
-            while i<4:
-                dc_date_year= dc_date_year + (dc_date[i])
-                i=i+1
-            while i<6:
-                dc_date_month = dc_date_month + (dc_date[i])
-                i=i+1
-            while i<8:
-                dc_date_date = dc_date_date + (dc_date[i])
-                i=i+1
-            dc_date = dc_date_date + '-' + dc_date_month + '-' + dc_date_year'''
+            dc_date_year = ''
+            dc_date_month = ''
+            dc_date = ''
+            if incoming.dc_date:
+                #if len(incoming.dc_date) > 7:
+                dc_date = incoming.dc_date.strftime('%d-%m-%Y')
+                '''dc_date = incoming.dc_date.replace('/', '-')
+                i=0
+                while i<4:
+                    dc_date_year= dc_date_year + (dc_date[i])
+                    i=i+1
+                while i<6:
+                    dc_date_month = dc_date_month + (dc_date[i])
+                    i=i+1
+                while i<8:
+                    dc_date_date = dc_date_date + (dc_date[i])
+                    i=i+1
+                dc_date = dc_date_date + '-' + dc_date_month + '-' + dc_date_year'''
 
-        #else:
-        #    dc_date = change_date_format(incoming.incoming_date)
-        dc_date_lst.append(dc_date)
-        grade = (cs.grade.split("GRADE:"))
-        if len(grade) > 1:
-            grade = grade[1].split(';')
-            cs.grade = grade[0]
+            #else:
+            #    dc_date = change_date_format(incoming.incoming_date)
+            dc_date_lst.append(dc_date)
+            grade = (cs.grade.split("GRADE:"))
+            if len(grade) > 1:
+                grade = grade[1].split(';')
+                cs.grade = grade[0]
 
     cs_lst = zip(_cs_id_lst, _cs_lst, part_no_lst, wt_per_sheet_lst, coating_lst, packet_wt_lst, mill_lst, mill_id_lst,
                  incoming_date_lst, dc_number_lst, dc_date_lst)
