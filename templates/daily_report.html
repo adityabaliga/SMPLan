@@ -273,6 +273,17 @@
 
     </table>
 
+    <h3>Entry Not Done</h3>
+    <table class="table table-sm">
+        {% for sticker in sticker_lst %}
+        <tr>
+            <td>{{sticker[0]}}</td>
+            <td>{{sticker[1]}}</td>
+            <td>{{sticker[2]}}</td>
+            <td>{{sticker[3]}}</td>
+        </tr>
+        {% endfor %}
+    </table>
 </body>
 <script>
 function toggleChildRows(button) {

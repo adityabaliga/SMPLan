@@ -104,3 +104,17 @@ class ProcessingDetail:
                            "cut_length = %s and cut_length2 = %s and packet_name = %s",(status, smpl_no, cut_width,
                                                                                         cut_length, cut_length2,
                                                                                         packet_name))
+
+    @classmethod
+    def no_entry_done(cls, date):
+        with CursorFromConnectionFromPool() as cursor:
+            cursor.execute("SELECT s.smpl_no, s.packet_name, s.created_at , s.machine, s.qc_name "
+                           "FROM sticker s LEFT JOIN processing_detail p ON s.smpl_no = p.smpl_no "
+                           "AND s.packet_name = p.packet_name WHERE p.smpl_no IS NULL AND s.packet_name != '' "
+                           "AND DATE(s.created_at) = %s",
+                           (date,))
+            user_data = cursor.fetchall()
+            if user_data:
+                return user_data
+            else:
+                return ''

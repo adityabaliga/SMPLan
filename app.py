@@ -3087,6 +3087,11 @@ def get_daily_report():
              processing_detail_lst.append(processing_detail)
 
 
+    #Sticker taken but entry not done
+    sticker_lst = []
+    sticker_lst = ProcessingDetail.no_entry_done(report_date)
+
+
     #machine_lst = ['CTL 1', 'CTL 2', 'NCTL 1', 'NCTL 2', 'NCTL 3', 'NCTL 4', 'Reshearing 1', 'Reshearing 2', 'Reshearing 3',
     #                'Reshearing 4', 'Reshearing 5', 'Reshearing 6', 'Reshearing 7', 'Reshearing 8']
 
@@ -3094,7 +3099,7 @@ def get_daily_report():
                            total_incoming=total_incoming, processing_hdr_lst=processing_hdr_lst,
                            dispatch_hdr_lst=dispatch_hdr_lst, processing_hdr_detail=processing_hdr_detail,
                            machine_lst = machine_lst, processing_detail_lst = processing_detail_lst,
-                           total_dispatch_hdr= total_dispatch_hdr)
+                           total_dispatch_hdr= total_dispatch_hdr, sticker_lst = sticker_lst)
 
 @app.route('/get_monthly_report', methods=['GET', 'POST'])
 def get_monthly_report():
