@@ -76,6 +76,13 @@
   "pallet": "K3CA UPPER",
   "gross_wt": 1210
   },
+  "565 x 645":{
+  "wt_per_sheet":2.29,
+  "part_name": "K3CA LOWER",
+  "coating": "0/20",
+  "pallet": "K3CA LOWER",
+  "gross_wt": 1041
+  },
   "515 x 715":{
   "wt_per_sheet":2.31,
   "part_name": "K1EA TANK R/L",
@@ -103,5 +110,12 @@
   "coating": "20/0",
   "pallet": "",
   "gross_wt": 1
+  },
+  "810 x 1010":{
+  "wt_per_sheet":4.81,
+  "part_name": "K0NA RL",
+  "coating": "0/20",
+  "pallet": "K0N RL",
+  "gross_wt": 1460
   }
 }
