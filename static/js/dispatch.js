@@ -24,7 +24,7 @@ var full_dispatch_pos = 8;
 var dispatch_nos_pos = 9;
 var dispatch_qty_pos = 10;
 var no_of_pkts_pos = 11;
-var defective_pos=12;
+var defective_pos=8;
 
 
 //Disable Submit button once submit is pressed
@@ -105,30 +105,32 @@ function enable_dispatch(th, tableID)
 
 	if(dispatch_on == true)
 	{
-        last_row.cells[full_dispatch_pos].lastChild.disabled = false;
+        /*last_row.cells[full_dispatch_pos].lastChild.disabled = false;
         last_row.cells[dispatch_nos_pos].lastChild.readOnly = false;
         last_row.cells[dispatch_qty_pos].lastChild.readOnly = false;
-        last_row.cells[no_of_pkts_pos].lastChild.readOnly = false;
+        last_row.cells[no_of_pkts_pos].lastChild.readOnly = false;*/
         last_row.cells[defective_pos].lastChild.readOnly = false;
 
-        last_row.cells[dispatch_nos_pos].lastChild.required = true;
+        /*last_row.cells[dispatch_nos_pos].lastChild.required = true;
         last_row.cells[dispatch_qty_pos].lastChild.required = true;
-        last_row.cells[no_of_pkts_pos].lastChild.required = true;
+        last_row.cells[no_of_pkts_pos].lastChild.required = true;*/
         last_row.cells[defective_pos].lastChild.value = ' ';
 	}
 	else
 	{
-	    last_row.cells[full_dispatch_pos].lastChild.disabled = true;
+	    /*last_row.cells[full_dispatch_pos].lastChild.disabled = true;
 	    last_row.cells[full_dispatch_pos].lastChild.checked = false;
 	    last_row.cells[dispatch_nos_pos].lastChild.readOnly = true;
 	    last_row.cells[dispatch_nos_pos].lastChild.value = '';
         last_row.cells[dispatch_qty_pos].lastChild.readOnly = true;
         last_row.cells[dispatch_qty_pos].lastChild.value = '';
-        total_dispatch_wt(tableID);
-        last_row.cells[no_of_pkts_pos].lastChild.readOnly = true;
+
+        last_row.cells[no_of_pkts_pos].lastChild.readOnly = true;*/
         last_row.cells[defective_pos].lastChild.readOnly = true;
 
+
 	}
+	total_dispatch_wt(tableID);
 }
 
 function check_numbers(th, tableID)
@@ -166,13 +168,22 @@ function total_dispatch_wt(tableID){
         total_packets = 0;
         var table = document.getElementById(tableID);
 
-        var rowCount = table.rows.length;
+        var selected_rows = document.querySelectorAll('.select_smpl:checked')
 
-        for(i=1;i<rowCount;i++){
-            row = table.rows[i];
-            total_disp_wt = total_disp_wt + Number(row.cells[dispatch_qty_pos].lastElementChild.value);
-            total_packets = total_packets + Number(row.cells[no_of_pkts_pos].lastElementChild.value);
-        }
+        selected_rows.forEach(checkbox => {
+                // Find the parent row
+                const row = checkbox.closest('tr');
+
+                // Find the weight cell in the same row
+                const weightCell = row.querySelector('.dispatch_wt');
+
+                // Parse the weight and add to total
+                total_disp_wt += parseFloat(weightCell.value);
+            });
+
+
+        total_packets = document.querySelectorAll('.select_smpl:checked').length;
+
 
         document.getElementById("total_disp_wt").value = total_disp_wt.toFixed(3);
         document.getElementById("total_packets").value = total_packets;
