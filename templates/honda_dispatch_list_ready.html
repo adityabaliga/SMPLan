@@ -28,7 +28,7 @@
 
 </head>
 <body onload="get_size_details()">
-<form>
+<form action="/dispatch">
     <div class="topnav" id="myTopnav">
         <br>
         <table>
@@ -43,8 +43,9 @@
     <hr class ="style1">
     <input type = "button" class="btn btn-default" value="Download" onclick="generateExcelHondaDispatch()">
     <h2>DISPATCH LIST - {{dispatch_date}} VEHICLE NO: {{veh_no}}</h2>
-    <p><input id="dispatch_date" value = {{dispatch_date}} hidden></p>
-    <p><input id="veh_no" value = {{veh_no}} hidden></p>
+    <p><input id="dispatch_date" name="dispatch_date" value = {{dispatch_date}} hidden></p>
+    <p><input id="vehicle_no" name="vehicle_no" value = {{veh_no}} hidden></p>
+    <p><input id="customer" name="customer" value = 'HONDA TRADING CORPORATION INDIA PVT LTD' hidden></p>
     <table class = "table table-sm" id = 'dispatch_list'>
             <thead>
             <tr rowspan = 19>DISPATCH LIST - {{dispatch_date}} VEHICLE NO: {{veh_no}}</tr>
@@ -99,6 +100,22 @@
             </tr>
             {% endfor %}
             </tbody>
+    </table>
+    <p>Dispatch Time <input type ="time" name = "dispatch_time" required></p>
+    <p>Invoice No <input type ="text" name = "invoice_no"></p>
+    <p>Remarks <input type ="text" style = "width:200px;"  name = "remarks"></p>
+    <input class="btn btn-default" type="submit" value="Submit">
+
+    <table id = 'dispatch_list_submit'>
+
+    {% for cs_id, cs in cs_lst %}
+    <tr>
+        <td><input type = "text" name = "select_smpl" class = "select_smpl" value ="{{cs_id}},{{cs.smpl_no}}">{{cs.smpl_no}}</td>
+        <td><input type ="text" name = "defective" style = "width:80px;" value = ' ' readonly></td>
+
+    </tr>
+    {% endfor %}
+
     </table>
     <script src = "{{ url_for('static', filename='js/dispatch.js') }}"></script>
     <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>

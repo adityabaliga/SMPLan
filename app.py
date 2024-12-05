@@ -2614,14 +2614,26 @@ def generate_honda_disp_list():
 
         cs_lst.append(cs)
 
-    cs_lst_sorted = sorted(cs_lst, key= lambda cs:(cs.width, cs.length, cs.smpl_no, cs.packet_name, cs.processing_id))
+    zipped_cs_lst = []
+    zipped_cs_lst_sorted = []
+    cs_id_lst_sorted = []
+    # Zip the IDs and objects together
+    zipped_cs_lst = list(zip(cs_id_lst,cs_lst))
+
+
+    zipped_cs_lst_sorted = sorted(zipped_cs_lst, key= lambda cs:(cs[1].width, cs[1].length, cs[1].smpl_no, cs[1].packet_name, cs[1].processing_id))
+
+    # Unzip back into separate lists
+    cs_id_lst_sorted, cs_lst_sorted = zip(*zipped_cs_lst_sorted)
+
 
     for cs in cs_lst_sorted:
         incoming = Incoming.load_smpl_by_smpl_no(cs.smpl_no)
         incoming_lst.append(incoming)
 
     return render_template('honda_dispatch_list_ready.html',
-                           cs_incoming_lst = zip(cs_lst_sorted,incoming_lst), veh_no = veh_no, dispatch_date = dispatch_date)
+                           cs_incoming_lst = zip(cs_lst_sorted,incoming_lst), veh_no = veh_no,
+                           dispatch_date = dispatch_date, cs_lst = zip(cs_id_lst_sorted, cs_lst_sorted))
 
 
 
