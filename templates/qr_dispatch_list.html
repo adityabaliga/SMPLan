@@ -85,6 +85,14 @@
 
         </table>
 
+    <h3>Unmatched List</h3>
+        <table class = "table table-sm" id = "unmatched_lst">
+            {% for unmatched in unmatched_lst %}
+                <tr>{{unmatched}}</tr>
+            {% endfor %}
+
+        </table>
+
         <p>Total Dispatch Wt (in MT) <input type = "number" step = "3" id = "total_disp_wt" value = "0.0" readonly> </p>
         <p>Total Packets <input type = "number" step = "0" id = "total_packets" value = "0" readonly> </p>
         <p>Vehicle Number <input type = "text" name = "vehicle_no" required> </p>

@@ -554,17 +554,14 @@ class CurrentStock:
         cs_lst = []
         cs_id_lst = []
         with CursorFromConnectionFromPool() as cursor:
-            if unit == '2':
-                cursor.execute(
-                    "select * from current_stock where smpl_no = %s and width = %s "
-                    "and length = %s and status = %s and packet_name = %s and customer = %s and length2= %s",
-                    (smpl_no, width, length, status, packet_name, customer, length2))
-                user_data = cursor.fetchone()
-            else:
-                cursor.execute("select * from current_stock where smpl_no = %s and width = %s "
-                               "and length = %s and status = %s and customer = %s",
-                               (smpl_no, width, length, status, customer))
-                user_data = cursor.fetchone()
+
+            cursor.execute(
+                "select * from current_stock where smpl_no = %s and width = %s "
+                "and length = %s and status = %s and packet_name = %s and customer = %s and length2= %s",
+                (smpl_no, width, length, status, packet_name, customer, length2))
+            user_data = cursor.fetchone()
+
+
             if user_data:
 
                 cs = CurrentStock(smpl_no=user_data[1], weight=Decimal(user_data[2]), numbers=int(user_data[3]),

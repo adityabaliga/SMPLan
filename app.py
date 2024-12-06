@@ -2534,6 +2534,8 @@ def qr_dispatch_submit():
             if user.unit == 2:
                 unit = '2'
 
+            unmatched_lst = []
+
 
             cs_qr_lst = CurrentStock.get_cs_for_qr_dispath(smpl_no, packet_name, width, length, status, customer, length2, unit)
 
@@ -2552,9 +2554,12 @@ def qr_dispatch_submit():
                         dispatch_weight = '0'
                     dispatch_wt_lst.append(dispatch_weight)
                     packet_name_lst.append(dispatch_string[1])
+            else:
+                unmatched_lst.append(dispatch_string)
 
     _cs_lst = zip(cs_id_lst, cs_lst, dispatch_numbers_lst, dispatch_wt_lst, packet_name_lst)
-    return render_template('qr_dispatch_list.html', _cs_lst = _cs_lst, customer = customer)
+    return render_template('qr_dispatch_list.html', _cs_lst = _cs_lst, customer = customer,
+                            unmatched_lst = unmatched_lst)
 
 @app.route('/honda_dispatch_list', methods=['GET', 'POST'])
 def honda_dispatch_list():
