@@ -418,7 +418,7 @@ function generateExcelHondaDispatch() {
   var workbook = XLSX.utils.table_to_book(table, { sheet: 'Sheet1' });
 
   var dispatch_date = document.getElementById('dispatch_date').value;
-  var veh_no = document.getElementById('veh_no').value;
+  var veh_no = document.getElementById('vehicle_no').value;
   var file_name = 'Honda_dispatch_' + dispatch_date + veh_no + '.xlsx';
 
     header = "DISPATCH LIST - " + dispatch_date + "  VEHICLE NO: " + veh_no;
