@@ -108,7 +108,31 @@
     </table>
 
     <hr>
+    <h3>Incoming and Dispatch</h3>
+    <table class="table table-bordered">
+        <tr>
+            <th></th>
+            <th>Total Weight (in MT)</th>
+        </tr>
 
+         {% for incoming in month_incoming_total %}
+        <tr>
+            <td>Unit {{incoming[1]}}</td>
+            <td>{{incoming[0]}}</td>
+        </tr>
+        {% endfor %}
+
+
+        <tr>
+            <td>Dispatch</td>
+            <td>{{month_dispatch_total[0][0]}}</td>
+        </tr>
+    </table>
+
+
+
+
+    <hr>
     <h3>Customer Wise Processing</h3>
     <table class="table table-bordered">
 
