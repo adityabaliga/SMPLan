@@ -72,4 +72,15 @@ class DispatchHeader:
             cursor.execute("update dispatch_header set invoice_no = %s, dispatch_date = %s where dispatch_id = %s",
                            (invoice_no, dispatch_date, dispatch_id))
 
+    @classmethod
+    def get_monthly_report(cls, month, year):
+        with CursorFromConnectionFromPool() as cursor:
+            cursor.execute(
+                "select sum(weight) from dispatch_header, dispatch_detail "
+                "where extract(month from dispatch_date) = %s  and extract(year from dispatch_date) = %s and "
+                "dispatch_header.dispatch_id = dispatch_detail.dispatch_id and remarks NOT LIKE  %s",
+                (month, year, '%TRANSFER%'))
+            user_data = cursor.fetchall()
+            return user_data
+
 

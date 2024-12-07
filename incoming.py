@@ -304,6 +304,16 @@ class Incoming:
 
         return user_data
 
+    @classmethod
+    def get_monthly_total(cls, month, year):
+        with CursorFromConnectionFromPool() as cursor:
+            cursor.execute("select sum(weight), unit from incoming where "
+                           "extract(month from incoming_date) = %s  and extract(year from incoming_date) = %s group by "
+                           "unit",(month, year))
+            user_data=cursor.fetchall()
+
+        return user_data
+
 def change_date_format(date):
     # split_date = date.split('-')
     # new_date = split_date[2] + '-' + split_date[1] + '-' + split_date[0]
