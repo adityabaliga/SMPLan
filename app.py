@@ -2501,6 +2501,7 @@ def qr_dispatch_submit():
             dispatch_string = dispatch_string.split(',')
             smpl_no = dispatch_string[0]
             packet_name = dispatch_string[1]
+            numbers = dispatch_string[3]
             size = dispatch_string[2].upper().split('X')
             if len(size) == 3:
                 thickness = size[0]
@@ -2537,7 +2538,7 @@ def qr_dispatch_submit():
             unmatched_lst = []
 
 
-            cs_qr_lst = CurrentStock.get_cs_for_qr_dispath(smpl_no, packet_name, width, length, status, customer, length2, unit)
+            cs_qr_lst = CurrentStock.get_cs_for_qr_dispath(smpl_no, packet_name, width, length, status, customer, length2, unit, numbers)
 
             if cs_qr_lst:
                 for cs_id, cs in cs_qr_lst:
