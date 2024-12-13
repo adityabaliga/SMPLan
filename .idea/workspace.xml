@@ -1,0 +1,700 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="43196d60-29a1-4da5-972f-f5ed5d18f5ea" name="Changes" comment="The numbers and weight column were not in number format in the downloaded excel sheet for TSDPL and HTID &#10;Incoming coils numbers should be 1 if not mentioned otherwise">
+      <change afterPath="$PROJECT_DIR$/.idea/SMPLan.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_30-11-2023_12_13_[Changes]/shelved.patch" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_30-11-2023_12_13__Changes_.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_30-11-2023_12_17_[Changes]/shelved.patch" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_30-11-2023_12_17__Changes_.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/js/stock.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/js/stock.js" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="HTML File" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <favorite-branches>
+      <branch-storage>
+        <map>
+          <entry type="REMOTE">
+            <value>
+              <list>
+                <branch-info repo="$PROJECT_DIR$" source="origin/main" />
+              </list>
+            </value>
+          </entry>
+        </map>
+      </branch-storage>
+    </favorite-branches>
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="6f40c881948030e467ef232486eb79ca7ff14dcc" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/app.py" root0="SKIP_INSPECTION" />
+    <setting file="file://$PROJECT_DIR$/current_stock.py" root0="SKIP_INSPECTION" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 5
+}</component>
+  <component name="ProjectId" id="2AE4MpzidkXZoNfruVhfJ3e9ms9" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
+    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
+    &quot;Python.SMPLan.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;E:/SMPLan/static/js&quot;,
+    &quot;run.code.analysis.last.selected.profile&quot;: &quot;pProject Default&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;
+  },
+  &quot;keyToStringList&quot;: {
+    &quot;ChangesTree.GroupingKeys&quot;: [
+      &quot;directory&quot;
+    ]
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="E:\SMPLan\static\js" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration name="SMPLan" type="PythonConfigurationType" factoryName="Python">
+      <module name="SMPLan" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="E:\SMPLan\venv\Scripts\python.exe" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/app.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-python-sdk-0509580d9d50-746f403e7f0c-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-241.14494.241" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="43196d60-29a1-4da5-972f-f5ed5d18f5ea" name="Changes" comment="" />
+      <created>1654561365141</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1654561365141</updated>
+    </task>
+    <task id="LOCAL-00050" summary="BUG Fix: TSL sticker for slitting enabled">
+      <created>1684215947376</created>
+      <option name="number" value="00050" />
+      <option name="presentableId" value="LOCAL-00050" />
+      <option name="project" value="LOCAL" />
+      <updated>1684215947376</updated>
+    </task>
+    <task id="LOCAL-00051" summary="BUG Fix: TR Coils not appearing in TR list">
+      <created>1684302802254</created>
+      <option name="number" value="00051" />
+      <option name="presentableId" value="LOCAL-00051" />
+      <option name="project" value="LOCAL" />
+      <updated>1684302802254</updated>
+    </task>
+    <task id="LOCAL-00052" summary="BUG Fix: Display stock sorted by SMPL and packet name">
+      <created>1684816397027</created>
+      <option name="number" value="00052" />
+      <option name="presentableId" value="LOCAL-00052" />
+      <option name="project" value="LOCAL" />
+      <updated>1684816397027</updated>
+    </task>
+    <task id="LOCAL-00053" summary="Update Incoming details feature&#10;Updated HTID stock report to get DC No. and DC date">
+      <created>1685356490537</created>
+      <option name="number" value="00053" />
+      <option name="presentableId" value="LOCAL-00053" />
+      <option name="project" value="LOCAL" />
+      <updated>1685356490537</updated>
+    </task>
+    <task id="LOCAL-00054" summary="Bug Fix: in HTID stock report&#10;Trial in processing where some details from previous line are copied in add size line">
+      <created>1685700462119</created>
+      <option name="number" value="00054" />
+      <option name="presentableId" value="LOCAL-00054" />
+      <option name="project" value="LOCAL" />
+      <updated>1685700462119</updated>
+    </task>
+    <task id="LOCAL-00055" summary="Monthly Report implemented">
+      <created>1687516222190</created>
+      <option name="number" value="00055" />
+      <option name="presentableId" value="LOCAL-00055" />
+      <option name="project" value="LOCAL" />
+      <updated>1687516222190</updated>
+    </task>
+    <task id="LOCAL-00056" summary="HTID Stock report improved to get proper DC date and download to Excel&#10;Processing date future dates disabled">
+      <created>1688701492233</created>
+      <option name="number" value="00056" />
+      <option name="presentableId" value="LOCAL-00056" />
+      <option name="project" value="LOCAL" />
+      <updated>1688701492234</updated>
+    </task>
+    <task id="LOCAL-00057" summary="HTID Stock report bug fixes">
+      <created>1688706220196</created>
+      <option name="number" value="00057" />
+      <option name="presentableId" value="LOCAL-00057" />
+      <option name="project" value="LOCAL" />
+      <updated>1688706220196</updated>
+    </task>
+    <task id="LOCAL-00058" summary="Column added for Trap sizes.&#10;Minor bug fix in HTID report">
+      <created>1689304063366</created>
+      <option name="number" value="00058" />
+      <option name="presentableId" value="LOCAL-00058" />
+      <option name="project" value="LOCAL" />
+      <updated>1689304063366</updated>
+    </task>
+    <task id="LOCAL-00059" summary="HTID stock added date to filename&#10;TTSSI stock to get TTSS direct and Honda stock">
+      <created>1689419918158</created>
+      <option name="number" value="00059" />
+      <option name="presentableId" value="LOCAL-00059" />
+      <option name="project" value="LOCAL" />
+      <updated>1689419918158</updated>
+    </task>
+    <task id="LOCAL-00060" summary="For submit_processing in app.py. Make insert and update stmts from app.py so they can be rollbacked if any of the stmts fail&#10;Insert FG by packet name in current stock for unit 2&#10;View packet name for FG in history view">
+      <created>1689675634643</created>
+      <option name="number" value="00060" />
+      <option name="presentableId" value="LOCAL-00060" />
+      <option name="project" value="LOCAL" />
+      <updated>1689675634643</updated>
+    </task>
+    <task id="LOCAL-00061" summary="Bug fix to get packetwise details for unit 2">
+      <created>1690276118840</created>
+      <option name="number" value="00061" />
+      <option name="presentableId" value="LOCAL-00061" />
+      <option name="project" value="LOCAL" />
+      <updated>1690276118840</updated>
+    </task>
+    <task id="LOCAL-00062" summary="Bug fix for updating invoice number in dispatch view&#10;Bug fix for output_length2 field in processing_levelling.html">
+      <created>1690277601532</created>
+      <option name="number" value="00062" />
+      <option name="presentableId" value="LOCAL-00062" />
+      <option name="project" value="LOCAL" />
+      <updated>1690277601532</updated>
+    </task>
+    <task id="LOCAL-00063" summary="Slitting packetname changed to Part + width">
+      <created>1690285451771</created>
+      <option name="number" value="00063" />
+      <option name="presentableId" value="LOCAL-00063" />
+      <option name="project" value="LOCAL" />
+      <updated>1690285451771</updated>
+    </task>
+    <task id="LOCAL-00064" summary="Bug Fix: Slitting part name">
+      <created>1690554458844</created>
+      <option name="number" value="00064" />
+      <option name="presentableId" value="LOCAL-00064" />
+      <option name="project" value="LOCAL" />
+      <updated>1690554458844</updated>
+    </task>
+    <task id="LOCAL-00065" summary="Converting xml to string and removing the string which was causing issues&#10;This issue was caused after Tally Prime 3.0 upgrade">
+      <created>1691488937492</created>
+      <option name="number" value="00065" />
+      <option name="presentableId" value="LOCAL-00065" />
+      <option name="project" value="LOCAL" />
+      <updated>1691488937492</updated>
+    </task>
+    <task id="LOCAL-00066" summary="Adding functionality to view Honda stock consolidated FG and WIP&#10;Bug fix to add 0 before packet no.if packet no. &lt;10&#10;Bug fix to not reduce numbers of coils for NCTL">
+      <created>1691497480636</created>
+      <option name="number" value="00066" />
+      <option name="presentableId" value="LOCAL-00066" />
+      <option name="project" value="LOCAL" />
+      <updated>1691497480636</updated>
+    </task>
+    <task id="LOCAL-00067" summary="Adding functionality to view Honda stock consolidated FG and WIP">
+      <created>1691578835785</created>
+      <option name="number" value="00067" />
+      <option name="presentableId" value="LOCAL-00067" />
+      <option name="project" value="LOCAL" />
+      <updated>1691578835785</updated>
+    </task>
+    <task id="LOCAL-00068" summary="Added QC and PDI sign on Big labels">
+      <created>1691669344145</created>
+      <option name="number" value="00068" />
+      <option name="presentableId" value="LOCAL-00068" />
+      <option name="project" value="LOCAL" />
+      <updated>1691669344145</updated>
+    </task>
+    <task id="LOCAL-00069" summary="Added QC Name on QC Sign in sticker">
+      <created>1692267451753</created>
+      <option name="number" value="00069" />
+      <option name="presentableId" value="LOCAL-00069" />
+      <option name="project" value="LOCAL" />
+      <updated>1692267451753</updated>
+    </task>
+    <task id="LOCAL-00070" summary="Changed HMSI Model Names">
+      <created>1692693152917</created>
+      <option name="number" value="00070" />
+      <option name="presentableId" value="LOCAL-00070" />
+      <option name="project" value="LOCAL" />
+      <updated>1692693152917</updated>
+    </task>
+    <task id="LOCAL-00071" summary="Bug Fix in Levelling">
+      <created>1692869913437</created>
+      <option name="number" value="00071" />
+      <option name="presentableId" value="LOCAL-00071" />
+      <option name="project" value="LOCAL" />
+      <updated>1692869913437</updated>
+    </task>
+    <task id="LOCAL-00072" summary="Delete SMPL details added&#10;For submit_slitting_processing in app.py. Make insert and update stmts from app.py so they can be rollbacked if any of the stmts fail&#10;Insert FG by packet name in current stock for unit 2">
+      <created>1694243372632</created>
+      <option name="number" value="00072" />
+      <option name="presentableId" value="LOCAL-00072" />
+      <option name="project" value="LOCAL" />
+      <updated>1694243372632</updated>
+    </task>
+    <task id="LOCAL-00073" summary="Bug Fix: No of mother coil/sheet used was coming negative. Fixed">
+      <created>1694409400767</created>
+      <option name="number" value="00073" />
+      <option name="presentableId" value="LOCAL-00073" />
+      <option name="project" value="LOCAL" />
+      <updated>1694409400767</updated>
+    </task>
+    <task id="LOCAL-00074" summary="Incoming via xml changed to pick which SMPLs to upload.&#10;Update SMPL removed">
+      <created>1694857544448</created>
+      <option name="number" value="00074" />
+      <option name="presentableId" value="LOCAL-00074" />
+      <option name="project" value="LOCAL" />
+      <updated>1694857544448</updated>
+    </task>
+    <task id="LOCAL-00075" summary="Bug Fix in Honda Stock Display&#10;Made Mill, Mill ID, Scams no and Material type readOnly for TTSS">
+      <created>1695117056206</created>
+      <option name="number" value="00075" />
+      <option name="presentableId" value="LOCAL-00075" />
+      <option name="project" value="LOCAL" />
+      <updated>1695117056206</updated>
+    </task>
+    <task id="LOCAL-00076" summary="Bug Fix: Sometimes RMM is added to incoming material. This needs to be removed to process the xml">
+      <created>1695129046557</created>
+      <option name="number" value="00076" />
+      <option name="presentableId" value="LOCAL-00076" />
+      <option name="project" value="LOCAL" />
+      <updated>1695129046557</updated>
+    </task>
+    <task id="LOCAL-00077" summary="Bug Fix: Check unit and add weight of incoming material. For kgs, divide by 1000. For nos, check theoretical weight&#10;Processing - check if packet name is repeated. Old packet names are displayed below submit and current page packet numbers also checked for repitition in case of same size">
+      <created>1695901705557</created>
+      <option name="number" value="00077" />
+      <option name="presentableId" value="LOCAL-00077" />
+      <option name="project" value="LOCAL" />
+      <updated>1695901705557</updated>
+    </task>
+    <task id="LOCAL-00078" summary="Bug fix to get previous packet names for CTL packets">
+      <created>1696243565885</created>
+      <option name="number" value="00078" />
+      <option name="presentableId" value="LOCAL-00078" />
+      <option name="project" value="LOCAL" />
+      <updated>1696243565885</updated>
+    </task>
+    <task id="LOCAL-00079" summary="Bug Fix: TSDPL coils were not appearing TSDPL section">
+      <created>1696414166898</created>
+      <option name="number" value="00079" />
+      <option name="presentableId" value="LOCAL-00079" />
+      <option name="project" value="LOCAL" />
+      <updated>1696414166898</updated>
+    </task>
+    <task id="LOCAL-00080" summary="Added 501 - Unit 4 for incoming and transfering material">
+      <created>1699702549692</created>
+      <option name="number" value="00080" />
+      <option name="presentableId" value="LOCAL-00080" />
+      <option name="project" value="LOCAL" />
+      <updated>1699702549692</updated>
+    </task>
+    <task id="LOCAL-00081" summary="Changed order of display of items in Honda FG/WIP list">
+      <created>1699868893238</created>
+      <option name="number" value="00081" />
+      <option name="presentableId" value="LOCAL-00081" />
+      <option name="project" value="LOCAL" />
+      <updated>1699868893238</updated>
+    </task>
+    <task id="LOCAL-00082" summary="CHanged Check Stock to get stock by unit and stock type&#10;Changed Transfer so anyone can transfer from Unit 4">
+      <created>1699943872349</created>
+      <option name="number" value="00082" />
+      <option name="presentableId" value="LOCAL-00082" />
+      <option name="project" value="LOCAL" />
+      <updated>1699943872349</updated>
+    </task>
+    <task id="LOCAL-00083" summary="Transfer changed to pick unit, so everyone can transfer from Unit 4&#10;Transfer added to DB in dispatch to keep track&#10;BUG FIX: Wrong coating for K3CA 565 size">
+      <created>1700216569480</created>
+      <option name="number" value="00083" />
+      <option name="presentableId" value="LOCAL-00083" />
+      <option name="project" value="LOCAL" />
+      <updated>1700216569480</updated>
+    </task>
+    <task id="LOCAL-00084" summary="BUG FIX: Wrong coating for K3CA 565 size">
+      <created>1700216714637</created>
+      <option name="number" value="00084" />
+      <option name="presentableId" value="LOCAL-00084" />
+      <option name="project" value="LOCAL" />
+      <updated>1700216714637</updated>
+    </task>
+    <task id="LOCAL-00085" summary="Errors to be displayed on browser and server to be logged">
+      <created>1700653977161</created>
+      <option name="number" value="00085" />
+      <option name="presentableId" value="LOCAL-00085" />
+      <option name="project" value="LOCAL" />
+      <updated>1700653977171</updated>
+    </task>
+    <task id="LOCAL-00086" summary="BUG FIX: Lamination was not showing correctly in print old label">
+      <created>1701326574946</created>
+      <option name="number" value="00086" />
+      <option name="presentableId" value="LOCAL-00086" />
+      <option name="project" value="LOCAL" />
+      <updated>1701326574946</updated>
+    </task>
+    <task id="LOCAL-00087" summary="BUG FIX: K3CA Coating not showing correctly in old label">
+      <created>1701327947003</created>
+      <option name="number" value="00087" />
+      <option name="presentableId" value="LOCAL-00087" />
+      <option name="project" value="LOCAL" />
+      <updated>1701327947003</updated>
+    </task>
+    <task id="LOCAL-00088" summary="BUG FIX: QC name was not being updated to DB">
+      <created>1703237505362</created>
+      <option name="number" value="00088" />
+      <option name="presentableId" value="LOCAL-00088" />
+      <option name="project" value="LOCAL" />
+      <updated>1703237505362</updated>
+    </task>
+    <task id="LOCAL-00089" summary="Added Customerwise stock view&#10;Updated all import packages">
+      <created>1704361558330</created>
+      <option name="number" value="00089" />
+      <option name="presentableId" value="LOCAL-00089" />
+      <option name="project" value="LOCAL" />
+      <updated>1704361558330</updated>
+    </task>
+    <task id="LOCAL-00090" summary="Added Unit 4 for delete smpl">
+      <created>1705464929148</created>
+      <option name="number" value="00090" />
+      <option name="presentableId" value="LOCAL-00090" />
+      <option name="project" value="LOCAL" />
+      <updated>1705464929148</updated>
+    </task>
+    <task id="LOCAL-00091" summary="Changed submit slitting to avoid double entries&#10;Changed NCTL processing to unit 4">
+      <created>1706540585988</created>
+      <option name="number" value="00091" />
+      <option name="presentableId" value="LOCAL-00091" />
+      <option name="project" value="LOCAL" />
+      <updated>1706540585988</updated>
+    </task>
+    <task id="LOCAL-00092" summary="Alu coil slitting updated to take Alu from material type not grade">
+      <created>1706944003043</created>
+      <option name="number" value="00092" />
+      <option name="presentableId" value="LOCAL-00092" />
+      <option name="project" value="LOCAL" />
+      <updated>1706944003043</updated>
+    </task>
+    <task id="LOCAL-00093" summary="Bug fix with slitting &#10;- deleting scrap bit&#10;- rewinding coils">
+      <created>1707971552938</created>
+      <option name="number" value="00093" />
+      <option name="presentableId" value="LOCAL-00093" />
+      <option name="project" value="LOCAL" />
+      <updated>1707971552941</updated>
+    </task>
+    <task id="LOCAL-00094" summary="Bug fix with CTL, reshearing &amp; NCTL for deleting scrap bits">
+      <created>1709200657383</created>
+      <option name="number" value="00094" />
+      <option name="presentableId" value="LOCAL-00094" />
+      <option name="project" value="LOCAL" />
+      <updated>1709200657384</updated>
+    </task>
+    <task id="LOCAL-00095" summary="Bug Fix for uploading incoming sheets">
+      <created>1710833079566</created>
+      <option name="number" value="00095" />
+      <option name="presentableId" value="LOCAL-00095" />
+      <option name="project" value="LOCAL" />
+      <updated>1710833079566</updated>
+    </task>
+    <task id="LOCAL-00096" summary="Bug Fix &#10;1. Made Scams No. readonly, can add packet no. to it&#10;2. Add validation for total width and total weight for slitting">
+      <created>1711361426101</created>
+      <option name="number" value="00096" />
+      <option name="presentableId" value="LOCAL-00096" />
+      <option name="project" value="LOCAL" />
+      <updated>1711361426102</updated>
+    </task>
+    <task id="LOCAL-00097" summary="Bug Fix &#10;1. Made Scams No. readonly, in processing page&#10;2. Packet Name added in dispatch detail table and class">
+      <created>1711424933874</created>
+      <option name="number" value="00097" />
+      <option name="presentableId" value="LOCAL-00097" />
+      <option name="project" value="LOCAL" />
+      <updated>1711424933875</updated>
+    </task>
+    <task id="LOCAL-00098" summary="Temporary Fix because I'm on vacation">
+      <created>1712825420285</created>
+      <option name="number" value="00098" />
+      <option name="presentableId" value="LOCAL-00098" />
+      <option name="project" value="LOCAL" />
+      <updated>1712825420285</updated>
+    </task>
+    <option name="localTasksCounter" value="145" />
+    <servers />
+  </component>
+  <component name="Vcs.Log.History.Properties">
+    <option name="COLUMN_ID_ORDER">
+      <list>
+        <option value="Default.Root" />
+        <option value="Default.Author" />
+        <option value="Default.Date" />
+        <option value="Default.Subject" />
+        <option value="Space.CommitStatus" />
+      </list>
+    </option>
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="OPEN_GENERIC_TABS">
+      <map>
+        <entry key="095b4227-37dd-4041-9c77-38c7b46fd940" value="TOOL_WINDOW" />
+      </map>
+    </option>
+    <option name="RECENT_FILTERS">
+      <map>
+        <entry key="Branch">
+          <value>
+            <list>
+              <RecentGroup>
+                <option name="FILTER_VALUES">
+                  <option value="HEAD" />
+                </option>
+              </RecentGroup>
+              <RecentGroup>
+                <option name="FILTER_VALUES">
+                  <option value="origin/main" />
+                </option>
+              </RecentGroup>
+            </list>
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="TAB_STATES">
+      <map>
+        <entry key="095b4227-37dd-4041-9c77-38c7b46fd940">
+          <value>
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="HEAD" />
+                      </list>
+                    </value>
+                  </entry>
+                  <entry key="roots">
+                    <value>
+                      <list>
+                        <option value="$PROJECT_DIR$" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+              <option name="SHOW_ONLY_AFFECTED_CHANGES" value="true" />
+            </State>
+          </value>
+        </entry>
+        <entry key="64ff7717-9b3c-4c1a-be62-d81dbcb78416">
+          <value>
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="roots">
+                    <value>
+                      <list>
+                        <option value="$PROJECT_DIR$" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+              <option name="SHOW_ONLY_AFFECTED_CHANGES" value="true" />
+            </State>
+          </value>
+        </entry>
+        <entry key="80f9a045-6747-4ad2-a867-e37c2e729b18">
+          <value>
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="origin/main" />
+                      </list>
+                    </value>
+                  </entry>
+                  <entry key="roots">
+                    <value>
+                      <list>
+                        <option value="$PROJECT_DIR$" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+              <option name="SHOW_ONLY_AFFECTED_CHANGES" value="true" />
+            </State>
+          </value>
+        </entry>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="v3" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+        <entry key="c6394c7e-41e3-4b6e-b375-e91be405bdaa">
+          <value>
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="roots">
+                    <value>
+                      <list>
+                        <option value="$PROJECT_DIR$" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+              <option name="SHOW_ONLY_AFFECTED_CHANGES" value="true" />
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Changed calculation for deleting balance RM. It was &lt; 0.5MT earlier. Now, changed to 2% of RM wt" />
+    <MESSAGE value="Bug Fix : Changed calculation for deleting balance RM. It was &lt; 0.5MT earlier. Now, changed to 2% of RM wt" />
+    <MESSAGE value="Return stmt added in case of error during processing submit" />
+    <MESSAGE value="Added date, processing_id and second customer fields in current_stock.py&#10;If FG in packets, always insert new field in current_stock" />
+    <MESSAGE value="TSDPL Stock format" />
+    <MESSAGE value="Comparing DB stock and Tally stock" />
+    <MESSAGE value="Bug Fix for slitting entry" />
+    <MESSAGE value="Changed percentage of RM based on which RM is deleted" />
+    <MESSAGE value="Bug fix while printing Nash DBS sticker. DBS was not appearing&#10;Started implementation of Honda dispatch list" />
+    <MESSAGE value="Implementation of Honda dispatch list" />
+    <MESSAGE value="Implementation of Honda dispatch list - Final" />
+    <MESSAGE value="Bug fixes in Honda dispatch list" />
+    <MESSAGE value="Changed order of display in difference between Tally and DB" />
+    <MESSAGE value="Wt/per sheet and weight for packet calculation changed" />
+    <MESSAGE value="Wt/per sheet changed in json&#10;Bug fixes in total row fixed in Honda dispatch list&#10;No displaying defective packets in TSDPL and Honda stock stmts" />
+    <MESSAGE value="No displaying defective packets in TSDPL and Honda stock stmts" />
+    <MESSAGE value="1. Honda Dispatch List the order of packets displayed is changed to as per CS ID&#10;2. TSDPL Stock Report - Bug Fixes&#10;a. the corresponding incoming details for the packets fixed&#10;b. Date format in downloaded excel sheet fixed" />
+    <MESSAGE value="Added extra table in Daily report to check if sticker is taken but entry is not done" />
+    <MESSAGE value="Bug fix in Honda Stock report" />
+    <MESSAGE value="Improvement in dispatch as all packets are listed separately and dispatched in full" />
+    <MESSAGE value="Adding dispatch from Honda Dispatch List page" />
+    <MESSAGE value="QR dispatch to display items that are not matched" />
+    <MESSAGE value="Monthly report shows Incoming and dispatch summary" />
+    <MESSAGE value="Bug Fix for transfer material" />
+    <MESSAGE value="The numbers and weight column were not in number format in the downloaded excel sheet for TSDPL and HTID &#10;Incoming coils numbers should be 1 if not mentioned otherwise" />
+    <option name="LAST_COMMIT_MESSAGE" value="The numbers and weight column were not in number format in the downloaded excel sheet for TSDPL and HTID &#10;Incoming coils numbers should be 1 if not mentioned otherwise" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/current_stock.py</url>
+          <line>656</line>
+          <option name="timeStamp" value="112" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/incoming.py</url>
+          <line>54</line>
+          <option name="timeStamp" value="151" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/incoming.py</url>
+          <line>100</line>
+          <option name="timeStamp" value="152" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/incoming.py</url>
+          <line>154</line>
+          <option name="timeStamp" value="161" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/app.py</url>
+          <line>1919</line>
+          <option name="timeStamp" value="164" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/app.py</url>
+          <line>1560</line>
+          <option name="timeStamp" value="165" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/app.py</url>
+          <line>1419</line>
+          <option name="timeStamp" value="166" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/app.py</url>
+          <line>3128</line>
+          <option name="timeStamp" value="173" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+</project>

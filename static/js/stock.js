@@ -119,7 +119,7 @@ function generateInvoiceCheckExcel() {
 
 }
 
-function generateExcelTSDPL(tablename) {
+function _generateExcelTSDPL(tablename) {
   // Get the table element by its ID
    var table = document.getElementById(tablename);
 
@@ -145,6 +145,9 @@ function generateExcelTSDPL(tablename) {
     const cell = rows[i].cells[dateColumnIndex];
     const dateStr = cell.getAttribute('data-value');
 
+    const wt_cell = rows[i].cells[weightColumnIndex];
+    const wt_str = wt_cell.firstChild.data;
+
     if (dateStr) {
       // Convert to Excel serial number format
       const day = parseInt(dateStr.substring(0, 2));
@@ -158,10 +161,13 @@ function generateExcelTSDPL(tablename) {
       // Set the cell value to the Excel serial number
       cell.textContent = excelDate;
     }
+
+    wt_cell.dataset.value = parseFloat(wt_str);
+
   }
 
 
-  var workbook = XLSX.utils.table_to_book(tableCopy, { raw: false, cellNF: true });
+  var workbook = XLSX.utils.table_to_book(tableCopy, {raw: true});
 
    // Set date format for the column
   const ws = workbook.Sheets[workbook.SheetNames[0]];
@@ -197,4 +203,80 @@ function generateExcelTSDPL(tablename) {
 
 
 
+}
+
+function generateExcelTSDPL(tablename) {
+  // Get the table element by its ID
+  var table = document.getElementById(tablename);
+
+  // Create a workbook
+  var wb = XLSX.utils.book_new();
+
+  // Get the rows from the table
+  var rows = table.getElementsByTagName('tr');
+
+  // Create a dictionary to hold worksheets
+  var sheets = [];
+
+
+  // Iterate over each row and extract the data
+  for (var i = 0; i < rows.length; i++) {
+    var row = rows[i];
+
+
+
+    // Extract row data and add it to the corresponding worksheet
+    var rowData = [];
+    var cells = row.cells;
+    for (var j = 0; j < cells.length; j++) {
+        if (j === 17 & i>0) {
+                // Remove any currency symbols, commas, and convert to number
+                let cellValue = cells[j].textContent.replace(/[^\d.-]/g, '');
+
+                 // Parse the number to ensure proper formatting
+                let numValue = parseFloat(cellValue);
+
+                // If it's a valid number, use it directly
+                rowData.push(isNaN(numValue) ? cellValue : numValue);
+
+            }else{
+            rowData.push(cells[j].innerText);
+        }
+    }
+    sheets.push(rowData);
+  }
+
+
+
+   // Add worksheets to the workbook
+
+    var ws = XLSX.utils.aoa_to_sheet(sheets);
+
+    XLSX.utils.book_append_sheet(wb, ws, 'Stock');
+
+
+
+
+
+  // Generate the binary data of the Excel file
+  var wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+
+  // Convert the binary data to a Blob
+  var blob = new Blob([wbout], { type: 'application/octet-stream' });
+
+  // Create a download link and trigger the download
+  // Get the current date
+    var currentDate = new Date();
+
+    // Format the date to yyyy-mm-dd
+    var year = currentDate.getFullYear();
+    var month = String(currentDate.getMonth() + 1).padStart(2, '0');
+    var day = String(currentDate.getDate()).padStart(2, '0');
+    var formattedDate = day + '-' + month + '-' + year;
+
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  var file_name = 'TSDPL_Stock_' + formattedDate + '.xlsx';
+  a.download = file_name;
+  a.click();
 }
