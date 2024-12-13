@@ -131,7 +131,7 @@ class Incoming:
             if "Nos" in weight_list or "nos" in weight_list or "NOS" in weight_list:
                 numbers = Decimal(weight_list[1])
             else:
-                numbers =0
+                numbers = 1
 
             # Mill and Mill ID are extracted
             mill_id = rm.getElementsByTagName("UDF:RNMFDID")

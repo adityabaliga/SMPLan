@@ -38,31 +38,37 @@ function generateExcel(tablename) {
     var rowData = [];
     var cells = row.cells;
     for (var j = 0; j < cells.length; j++) {
-      rowData.push(cells[j].innerText);
+        if (j === 10) {
+                // Remove any currency symbols, commas, and convert to number
+                let cellValue = cells[j].textContent.replace(/[^\d.-]/g, '');
+
+                 // Parse the number to ensure proper formatting
+                let numValue = parseFloat(cellValue);
+
+                // If it's a valid number, use it directly
+                rowData.push(isNaN(numValue) ? cellValue : numValue);
+            }else if (j === 9) {
+                // Remove any currency symbols, commas, and convert to number
+                let cellValue = cells[j].textContent.replace(/[^\d.-]/g, '');
+
+                 // Parse the number to ensure proper formatting
+                let numValue = parseInt(cellValue);
+
+                // If it's a valid number, use it directly
+                rowData.push(isNaN(numValue) ? cellValue : numValue);
+            }
+            else{
+            rowData.push(cells[j].innerText);
+        }
     }
     sheets[fieldValue].push(rowData);
   }
 
-      // Get the column indexes that need number formatting
-  var numberFormatColumns  = [9, 10]; // Example: columns 2 and 4
+
 
    // Add worksheets to the workbook
   for (var sheetName in sheets) {
     var ws = XLSX.utils.aoa_to_sheet(sheets[sheetName]);
-    // Set number formatting for the specified columns
-    /*var range = XLSX.utils.decode_range(ws['!ref']);
-    for (var row = range.s.r + 1; row <= range.e.r; row++) {
-    for (var col = range.s.c; col <= range.e.c; col++) {
-      var cellAddress = XLSX.utils.encode_cell({ r: row, c: col });
-      if (numberFormatColumns.includes(col)) {
-        var cellValue = ws[cellAddress].v;
-
-        ws[cellAddress].z = '#,##0.000'; // Set number formatting for the column
-        var trimmedValue = parseFloat(cellValue);
-        ws[cellAddress].v = trimmedValue.toFixed(3);
-      }
-    }
-  }*/
 
     XLSX.utils.book_append_sheet(wb, ws, sheetName);
 
@@ -133,6 +139,8 @@ function generateExcelTSDPL(tablename) {
   const dateColumnIndex = 1;
   const rows = tableCopy.getElementsByTagName('tr');
 
+  const weightColumnIndex = 17;
+
   for (let i = 1; i < rows.length; i++) {
     const cell = rows[i].cells[dateColumnIndex];
     const dateStr = cell.getAttribute('data-value');
@@ -153,7 +161,7 @@ function generateExcelTSDPL(tablename) {
   }
 
 
-  var workbook = XLSX.utils.table_to_book(tableCopy, { raw: true });
+  var workbook = XLSX.utils.table_to_book(tableCopy, { raw: false, cellNF: true });
 
    // Set date format for the column
   const ws = workbook.Sheets[workbook.SheetNames[0]];
@@ -161,12 +169,20 @@ function generateExcelTSDPL(tablename) {
 
   for (let R = range.s.r + 1; R <= range.e.r; R++) {
     const cell_address = XLSX.utils.encode_cell({ r: R, c: dateColumnIndex });
+    const wt_cell_address = XLSX.utils.encode_cell({ r: R, c: weightColumnIndex });
+
     if (!ws[cell_address]) continue;
 
     // Set number format to date
     if (!ws[cell_address].z) {
       ws[cell_address].z = 'dd/mm/yyyy';
     }
+
+  if (!ws[wt_cell_address]) continue;
+  if (!ws[wt_cell_address].z) {
+    // Example number formats:
+    ws[wt_cell_address].z = '#,##0.000';
+  }
   }
 
   var currentDate = new Date();
