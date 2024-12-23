@@ -694,3 +694,20 @@ class CurrentStock:
     def add_weight(cls, cs_id, new_wt):
         with CursorFromConnectionFromPool() as cursor:
             cursor.execute("update current_stock set weight = %s where cs_id = %s",(new_wt, cs_id))
+
+
+    @classmethod
+    def get_sticker(cls, smpl_no, packet_name, thickness, width, length):
+        if length == 0:
+            length = ' Coil'
+        size = str(thickness) + '0 X ' + str(width) + ' X ' + str(length)
+
+        with CursorFromConnectionFromPool() as cursor:
+            cursor.execute("select * from sticker where smpl_no = %s and packet_name = %s and size = %s"
+                           " order by sticker_id",
+                           (smpl_no, packet_name, size))
+            user_data = cursor.fetchall()
+        if user_data:
+            return user_data[0]
+        else:
+            return None

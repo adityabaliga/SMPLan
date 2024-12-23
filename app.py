@@ -2311,6 +2311,7 @@ def check_stock_tsdpl():
     today_date_lst = []
     no_of_days_lst = []
     incoming_lst = []
+    sticker_lst = []
     finishing_date_lst = []
 
 
@@ -2327,6 +2328,8 @@ def check_stock_tsdpl():
             _cs_lst.append(cs)
             incoming = Incoming.load_smpl_by_smpl_no(cs.smpl_no)
             incoming_lst.append(incoming)
+            sticker = CurrentStock.get_sticker(cs.smpl_no, cs.packet_name, cs.thickness, cs.width, cs.length)
+            sticker_lst.append(sticker)
 
 
         today_date = datetime.today().strftime('%Y-%m-%d')
@@ -2358,7 +2361,7 @@ def check_stock_tsdpl():
             grade = grade[1].split(';')
             cs.grade = grade[0]'''
 
-    cs_lst = zip(_cs_id_lst, _cs_lst, today_date_lst, no_of_days_lst, finishing_date_lst,  incoming_lst)
+    cs_lst = zip(_cs_id_lst, _cs_lst, today_date_lst, no_of_days_lst, finishing_date_lst, incoming_lst, sticker_lst)
     return render_template('stock_display_tsdpl.html', cs_lst=cs_lst)
 
 
