@@ -2179,11 +2179,11 @@ def check_stock_htid():
             _cs_id_lst.append(cs_id)
             _cs_lst.append(cs)
             if cs.width == 720 and cs.length == 745:
-                part_no = "KONA PLATE BOTTOM"
+                part_no = "K0NA PLATE BOTTOM"
                 wt_per_sheet = 3.37
                 coating = "20/0"
             if cs.width == 600 and cs.length == 820:
-                part_no = "KONA OUTER R/L"
+                part_no = "K0NA OUTER R/L"
                 wt_per_sheet = 3.09
                 coating = "0/20"
             if cs.width == 370 and cs.length == 415:
@@ -2252,7 +2252,7 @@ def check_stock_htid():
                 coating = "0/20"
             if cs.width == 810 and cs.length == 1010:
                 part_no = "K0NA RL"
-                wt_per_sheet = 4.81
+                wt_per_sheet = 4.79
                 coating = "0/20"
             if cs.length > 0:
                 packet_wt = round((cs.numbers * wt_per_sheet)/1000, 3)
