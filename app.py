@@ -3350,6 +3350,29 @@ def tally_stock_check():
     if file and file.filename.endswith('.xlsx'):
         # Read the Excel file into a DataFrame
         excel_data = pd.read_excel(file)
+
+        # Get the header row (4th row, index 3) and remaining data
+        header_row = excel_data.iloc[2]
+        excel_data = excel_data.iloc[3:]
+
+        # Set the header
+        excel_data.columns = header_row
+
+        # Reset index after removing rows
+        excel_data = excel_data.reset_index(drop=True)
+
+        # Remove rows with blank values in third column
+        excel_data = excel_data.dropna(subset=[excel_data.columns[2]])
+
+        # Remove rows containing 'Lami' in second column
+        excel_data = excel_data[~excel_data[excel_data.columns[1]].str.contains('Lami', na=False, case=False)]
+
+        # Keep only rows with 'FG' or 'RM' in fourth column
+        excel_data = excel_data[excel_data[excel_data.columns[3]].isin(['FG', 'RM'])]
+
+        # Reset index after all filtering
+        excel_data = excel_data.reset_index(drop=True)
+
         # Now call a function to compare the data
         _cs_lst = CurrentStock.get_stock('All','All')
 
@@ -3365,8 +3388,8 @@ def tally_stock_check():
                                                       "customer","thickness","grade","unit","packet_name","length2",
                                                       "date","processing_id","second_customer"])
 
-        missing_in_db = excel_data[~excel_data['smpl_no'].isin(cs_dataframe['smpl_no'])]
-        missing_in_excel = cs_dataframe[~cs_dataframe['smpl_no'].isin(excel_data['smpl_no'])]
+        missing_in_db = excel_data[~excel_data['SMPL No.'].isin(cs_dataframe['smpl_no'])]
+        missing_in_excel = cs_dataframe[~cs_dataframe['smpl_no'].isin(excel_data['SMPL No.'])]
 
         missing_in_db_html = missing_in_db.to_html(classes='table table-striped', index=False)
         missing_in_excel_html = missing_in_excel.to_html(classes='table table-striped', index=False)
