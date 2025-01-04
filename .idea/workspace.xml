@@ -4,18 +4,15 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="43196d60-29a1-4da5-972f-f5ed5d18f5ea" name="Changes" comment="The numbers and weight column were not in number format in the downloaded excel sheet for TSDPL and HTID &#10;Incoming coils numbers should be 1 if not mentioned otherwise">
-      <change afterPath="$PROJECT_DIR$/.idea/SMPLan.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_30-11-2023_12_13_[Changes]/shelved.patch" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_30-11-2023_12_13__Changes_.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_30-11-2023_12_17_[Changes]/shelved.patch" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_30-11-2023_12_17__Changes_.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/js/stock.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/js/stock.js" afterDir="false" />
+    <list default="true" id="43196d60-29a1-4da5-972f-f5ed5d18f5ea" name="Changes" comment="Improved Tally Stock Check">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dispatch_header.py" beforeDir="false" afterPath="$PROJECT_DIR$/dispatch_header.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/js/dispatch.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/js/dispatch.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/dispatch_list.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/dispatch_list.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/dispatch_view.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/dispatch_view.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/hist_view.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/hist_view.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/transfer_list.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/transfer_list.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -69,24 +66,24 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
-    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
-    &quot;Python.SMPLan.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;E:/SMPLan/static/js&quot;,
-    &quot;run.code.analysis.last.selected.profile&quot;: &quot;pProject Default&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_ADD_EXTERNAL_FILES": "true",
+    "DefaultHtmlFileTemplate": "HTML File",
+    "Python.SMPLan.executor": "Run",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "ignore.virus.scanning.warn.message": "true",
+    "last_opened_file_path": "E:/SMPLan/static/js",
+    "run.code.analysis.last.selected.profile": "pProject Default",
+    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable"
   },
-  &quot;keyToStringList&quot;: {
-    &quot;ChangesTree.GroupingKeys&quot;: [
-      &quot;directory&quot;
+  "keyToStringList": {
+    "ChangesTree.GroupingKeys": [
+      "directory"
     ]
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="E:\SMPLan\static\js" />
@@ -475,7 +472,7 @@
       <option name="project" value="LOCAL" />
       <updated>1712825420285</updated>
     </task>
-    <option name="localTasksCounter" value="145" />
+    <option name="localTasksCounter" value="150" />
     <servers />
   </component>
   <component name="Vcs.Log.History.Properties">
@@ -624,11 +621,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Changed calculation for deleting balance RM. It was &lt; 0.5MT earlier. Now, changed to 2% of RM wt" />
-    <MESSAGE value="Bug Fix : Changed calculation for deleting balance RM. It was &lt; 0.5MT earlier. Now, changed to 2% of RM wt" />
-    <MESSAGE value="Return stmt added in case of error during processing submit" />
-    <MESSAGE value="Added date, processing_id and second customer fields in current_stock.py&#10;If FG in packets, always insert new field in current_stock" />
-    <MESSAGE value="TSDPL Stock format" />
     <MESSAGE value="Comparing DB stock and Tally stock" />
     <MESSAGE value="Bug Fix for slitting entry" />
     <MESSAGE value="Changed percentage of RM based on which RM is deleted" />
@@ -649,7 +641,12 @@
     <MESSAGE value="Monthly report shows Incoming and dispatch summary" />
     <MESSAGE value="Bug Fix for transfer material" />
     <MESSAGE value="The numbers and weight column were not in number format in the downloaded excel sheet for TSDPL and HTID &#10;Incoming coils numbers should be 1 if not mentioned otherwise" />
-    <option name="LAST_COMMIT_MESSAGE" value="The numbers and weight column were not in number format in the downloaded excel sheet for TSDPL and HTID &#10;Incoming coils numbers should be 1 if not mentioned otherwise" />
+    <MESSAGE value="Bug fix : The numbers and weight column were not in number format in the downloaded excel sheet for TSDPL and HTID" />
+    <MESSAGE value="Added new K0N size tHTID stock report" />
+    <MESSAGE value="TSDPL stock report get second customer and sticker wt" />
+    <MESSAGE value="Bug Fix: Levelling sticker was not working" />
+    <MESSAGE value="Improved Tally Stock Check" />
+    <option name="LAST_COMMIT_MESSAGE" value="Improved Tally Stock Check" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -676,23 +673,43 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app.py</url>
-          <line>1919</line>
+          <line>1921</line>
           <option name="timeStamp" value="164" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app.py</url>
-          <line>1560</line>
+          <line>1562</line>
           <option name="timeStamp" value="165" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app.py</url>
-          <line>1419</line>
+          <line>1421</line>
           <option name="timeStamp" value="166" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app.py</url>
-          <line>3128</line>
+          <line>3139</line>
           <option name="timeStamp" value="173" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/app.py</url>
+          <line>3355</line>
+          <option name="timeStamp" value="174" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/app.py</url>
+          <line>3394</line>
+          <option name="timeStamp" value="175" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/app.py</url>
+          <line>2460</line>
+          <option name="timeStamp" value="177" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/app.py</url>
+          <line>2680</line>
+          <option name="timeStamp" value="178" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

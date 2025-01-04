@@ -48,6 +48,7 @@
                 <th>Dispatch Date</th>
                 <th>Dispatch Time</th>
                 <th>Invoice No.</th>
+                <th>Entry By</th>
                 <th>Remarks</th>
         </tr>
          <tr>
@@ -56,6 +57,7 @@
                 <td><input type="date" name="dispatch_date" id="dispatch_date" value="{{dispatch_hdr.dispatch_date}}"></td>
                 <td>{{dispatch_hdr.dispatch_time}}</td>
                 <td><input type ="text" name = "invoice_no" id = "invoice_no" value = {{dispatch_hdr.invoice_no}}></td>
+                <td>{{dispatch_hdr.entry_by}}</td>
                 <td>{{dispatch_hdr.remarks}}</td>
                 <td><input type ="text" name = "dispatch_hdr_id" id = "dispatch_hdr_id" value = {{dispatch_hdr_id}} hidden></td>
         </tr>

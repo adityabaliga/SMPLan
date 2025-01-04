@@ -425,6 +425,7 @@ def transfer_submit():
         transfer_pkts = request.form.getlist['dispatch_packets']
         unit = request.form.getlist['_unit']
         remarks = request.form['remarks']
+        entry_by = request.form['entry_by']
 
     if request.method == 'GET':
         transfer_lst = request.args.getlist('select_smpl')
@@ -439,6 +440,7 @@ def transfer_submit():
         remarks = request.args.get('remarks')
         invoice_no = request.args.get('invoice_no')
         current_unit = request.args.get('current_unit')
+        entry_by = request.args.get('entry_by')
 
     # This fetches the list and removes the elements that are not selected
     # The ones that are not selected are returned as None. The below list filters out the Nones
@@ -449,7 +451,7 @@ def transfer_submit():
     remarks = "TRANSFER TO UNIT " + unit[0]
     invoice_no = 'TRANSFER'
 
-    transfer_header = DispatchHeader(vehicle_no, customer, transfer_date, transfer_time, invoice_no, remarks)
+    transfer_header = DispatchHeader(vehicle_no, customer, transfer_date, transfer_time, invoice_no, remarks, entry_by)
     transfer_id = transfer_header.save_to_db()
 
     # Transfer Material has been changed for only partial material to be shifted.
@@ -2435,6 +2437,7 @@ def dispatch():
         dispatch_time = request.form['dispatch_time']
         dispatch_pkts = request.form.getlist['dispatch_packets']
         remarks = request.form['remarks']
+        entry_by = request.form['entry_by']
 
     if request.method == 'GET':
         dispatch_lst = request.args.getlist('select_smpl')
@@ -2449,6 +2452,7 @@ def dispatch():
         dispatch_time = request.args.get('dispatch_time')
         remarks = request.args.get('remarks')
         invoice_no = request.args.get('invoice_no')
+        entry_by = request.args.get('entry_by')
 
     # This fetches the list and removes the elements that are not selected
     # The ones that are not selected are returned as None. The below list filters out the Nones
@@ -2458,7 +2462,7 @@ def dispatch():
     #dispatch_pkts_lst = list(filter(None, dispatch_pkts))
     #pkt_name_lst = list(filter(None, pkt_name))
 
-    dispatch_header = DispatchHeader(vehicle_no, customer, dispatch_date, dispatch_time, invoice_no, remarks)
+    dispatch_header = DispatchHeader(vehicle_no, customer, dispatch_date, dispatch_time, invoice_no, remarks, entry_by)
     dispatch_id = dispatch_header.save_to_db()
 
     # For the items to be dispatched, dispatch detail is created and the current stock quantity is deleted or reduced

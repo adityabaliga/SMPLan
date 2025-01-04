@@ -3,18 +3,20 @@ from decimal import *
 import time
 
 class DispatchHeader:
-    def __init__(self, vehicle_no, customer, dispatch_date, dispatch_time, invoice_no, remarks):
+    def __init__(self, vehicle_no, customer, dispatch_date, dispatch_time, invoice_no, remarks, entry_by):
         self.vehicle_no = vehicle_no
         self.customer = customer
         self.dispatch_date = dispatch_date
         self.dispatch_time = dispatch_time
         self.invoice_no = invoice_no
         self.remarks = remarks
+        self.entry_by = entry_by
 
     def save_to_db(self):
         with CursorFromConnectionFromPool() as cursor:
-            cursor.execute("insert into dispatch_header (vehicle_no, dispatch_date, dispatch_time, customer, invoice_no, remarks) values"
-                           "(%s, %s, %s, %s, %s, %s)",(self.vehicle_no, self.dispatch_date, self.dispatch_time, self.customer, self.invoice_no, self.remarks))
+            cursor.execute("insert into dispatch_header (vehicle_no, dispatch_date, dispatch_time, customer, invoice_no, remarks, entry_by) values"
+                           "(%s, %s, %s, %s, %s, %s, %s)",(self.vehicle_no, self.dispatch_date, self.dispatch_time,
+                                                       self.customer, self.invoice_no, self.remarks, self.entry_by))
 
             cursor.execute("select dispatch_id from dispatch_header where oid= %s", (cursor.lastrowid,))
             data = cursor.fetchone()
@@ -51,7 +53,8 @@ class DispatchHeader:
         with CursorFromConnectionFromPool() as cursor:
             cursor.execute('select * from dispatch_header where dispatch_id = %s',(select_dispatch_hdr_id,))
             user_data = cursor.fetchone()
-        dispatch_hdr = DispatchHeader(user_data[1], user_data[6], user_data[2], user_data[3], user_data[4], user_data[5])
+        dispatch_hdr = DispatchHeader(user_data[1], user_data[6], user_data[2], user_data[3], user_data[4],
+                                      user_data[5], user_data[7])
         return dispatch_hdr
 
     @classmethod
@@ -62,7 +65,7 @@ class DispatchHeader:
             cursor.execute("select * from dispatch_header where dispatch_id = %s order by dispatch_time asc", (dispatch_id,))
             user_data = cursor.fetchall()
         for lst in user_data:
-            dispatch_lst.append(DispatchHeader(lst[1], lst[6], lst[2], lst[3], lst[4], lst[5]))
+            dispatch_lst.append(DispatchHeader(lst[1], lst[6], lst[2], lst[3], lst[4], lst[5], lst[7]))
 
         return dispatch_lst
 

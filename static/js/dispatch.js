@@ -477,3 +477,56 @@ function generateExcelHondaDispatch() {
 
 
 }
+
+const userPins = {
+            Manju: "1234",
+            Kartik: "5678",
+            Ravi: "9019",
+            Govardhan: "9010",
+            Jeevan: "9015",
+            Chandu: "9001",
+            Aditya: "0509"
+};
+
+ function validatePin(event) {
+            const selectedUser = document.getElementById("entry_by").value;
+            const enteredPin = document.getElementById("pinInput").value;
+            const errorMessage = document.getElementById("errorMessage");
+            const successMessage = document.getElementById("successMessage");
+
+            // Reset messages
+            errorMessage.style.display = "none";
+            successMessage.style.display = "none";
+
+            // Validate user selection
+            if (!selectedUser) {
+                errorMessage.textContent = "Please select a user!";
+                errorMessage.style.display = "block";
+                return false;
+                //document.getElementById('submit').disabled = true;
+            }
+
+            // Validate PIN format
+            if (!/^\d{4}$/.test(enteredPin)) {
+                errorMessage.textContent = "PIN must be 4 digits!";
+                errorMessage.style.display = "block";
+                //document.getElementById('submit').disabled = true;
+                return false;
+            }
+
+            // Check if PIN matches
+            if (userPins[selectedUser] === enteredPin) {
+                successMessage.style.display = "block";
+                //document.getElementById("pinInput").value = ""; // Clear PIN input
+                // Here you can add code to allow access to the page content
+            } else {
+                //message.alert("Invalid PIN!");
+                errorMessage.textContent = "Invalid PIN!";
+                errorMessage.style.display = "block";
+                event.preventDefault();
+                return false;
+
+            }
+            return true;
+        }
+

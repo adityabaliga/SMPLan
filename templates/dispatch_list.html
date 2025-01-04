@@ -24,6 +24,14 @@
                 margin-top: 0em;
                 margin-bottom: 0em;
             }
+        .error {
+            color: red;
+            display: none;
+        }
+        .success {
+            color: green;
+            display: none;
+        }
     </style>
 
 </head>
@@ -91,9 +99,23 @@
         <p>Dispatch Date <input type = "date" name = "dispatch_date" required></p>
         <p>Dispatch Time <input type ="time" name = "dispatch_time" required></p>
         <p>Invoice No <input type ="text" name = "invoice_no"></p>
+        <p>Entry By <select name="entry_by" id="entry_by" required>
+                    <option value="">Select User</option>
+                    <option value="Manjappa">Manjappa</option>
+                    <option value="Kartik">Kartik</option>
+                    <option value="Ravi">Ravi</option>
+                    <option value="Govardhan">Govardhan</option>
+                    <option value="Jeevan">Jeevan</option>
+                    <option value="Chandu">Chandu</option>
+                    <option value="Aditya">Aditya</option>
+
+                </select>
+        <p>Enter Pin <input type ="password" maxlength="4" placeholder="Enter PIN" style = "width:200px;"  name = "pinInput" id = "pinInput" required></p>
+        <p id="errorMessage" class="error">Invalid PIN!</p>
+        <p id="successMessage" class="success">PIN verified successfully!</p>
         <p>Remarks <input type ="text" style = "width:200px;"  name = "remarks"></p>
 
-        <input class="btn btn-default" type="submit" value="Submit">
+        <input class="btn btn-default" id="submit" type="submit" value="Submit" onclick="validatePin(event)">
 
 
     <script src = "{{ url_for('static', filename='js/dispatch.js') }}"></script>
