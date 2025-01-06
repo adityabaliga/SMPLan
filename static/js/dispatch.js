@@ -479,12 +479,12 @@ function generateExcelHondaDispatch() {
 }
 
 const userPins = {
-            Manju: "1234",
-            Kartik: "5678",
+            Manju: "2305",
+            Kartik: "8751",
             Ravi: "9019",
-            Govardhan: "9010",
-            Jeevan: "9015",
-            Chandu: "9001",
+            Govardhan: "7259",
+            Jeevan: "5213",
+            Chandu: "1999",
             Aditya: "0509"
 };
 
