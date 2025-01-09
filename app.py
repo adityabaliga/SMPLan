@@ -2253,7 +2253,7 @@ def check_stock_htid():
                 wt_per_sheet = 2.29
                 coating = "0/20"
             if cs.width == 810 and cs.length == 1010:
-                part_no = "K0NA RL"
+                part_no = "K0NH RL"
                 wt_per_sheet = 4.79
                 coating = "0/20"
             if cs.length > 0:

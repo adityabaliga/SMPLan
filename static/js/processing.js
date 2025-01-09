@@ -1513,7 +1513,7 @@ function honda_part_no(width,length){
                 coating = "0/20";
             }
     else if (width == 810 && length == 1010){
-                part_no = "KONA R/L";
+                part_no = "K0NH R/L";
                 wt_per_sheet = 4.79;
                 coating = "0/20";
             }
