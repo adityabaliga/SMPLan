@@ -3365,6 +3365,9 @@ def tally_stock_check():
         # Reset index after removing rows
         excel_data = excel_data.reset_index(drop=True)
 
+        # Remove all spaces from the first column
+        excel_data[excel_data.columns[0]] = excel_data[excel_data.columns[0]].astype(str).str.replace(' ', '')
+
         # Remove rows with blank values in third column
         excel_data = excel_data.dropna(subset=[excel_data.columns[2]])
 
@@ -3372,7 +3375,7 @@ def tally_stock_check():
         excel_data = excel_data[~excel_data[excel_data.columns[1]].str.contains('Lami', na=False, case=False)]
 
         # Keep only rows with 'FG' or 'RM' in fourth column
-        excel_data = excel_data[excel_data[excel_data.columns[3]].isin(['FG', 'RM'])]
+        excel_data = excel_data[excel_data[excel_data.columns[2]].isin(['Finished Goods', 'Raw Materials'])]
 
         # Reset index after all filtering
         excel_data = excel_data.reset_index(drop=True)
