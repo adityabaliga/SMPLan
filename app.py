@@ -2418,10 +2418,26 @@ def dispatch_list():
         dispatch_type = request.args.get('dispatch_type')
 
     cs_lst = CurrentStock.get_stock_by_customer(customer, display_type)
+    smpl_no_lst = []
+    _cs_lst = []
+    _cs_id_lst = []
+
+    for cs_id, cs in cs_lst:
+        smpl_no_lst.append(cs.smpl_no)
+        _cs_id_lst.append(cs_id)
+        _cs_lst.append(cs)
+
+
+        # Extract unique sizes
+    unique_smpl_no_lst = []
+    unique_smpl_no_lst = list(set(smpl_no_lst))
+    unique_smpl_no_lst.sort()
+
     if dispatch_type == 'qr':
         return render_template('qr_dispatch.html', customer=customer)
     else:
-        return render_template('dispatch_list.html', cs_lst=cs_lst, customer=customer)
+        return render_template('dispatch_list.html', cs_lst=zip(_cs_id_lst, _cs_lst), customer=customer,
+                               unique_smpl_no_lst = unique_smpl_no_lst)
 
 
 @app.route('/dispatch', methods=['GET', 'POST'])

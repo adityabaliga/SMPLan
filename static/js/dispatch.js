@@ -245,6 +245,22 @@ function display_honda_pkts(){
 
 }
 
+function display_smpl_no(){
+    var selectedSMPL = document.getElementById('selected_smpl_no').value;
+    var packets = document.querySelectorAll(".packet-list");
+
+    packets.forEach(row => {
+                const rowSize = row.getAttribute("data-smpl_no");
+                if (selectedSMPL === "all" || rowSize === selectedSMPL) {
+                    row.style.display = "table-row";
+                } else {
+                    row.style.display = "none";
+                }
+            });
+
+
+}
+
 //This function adds the selected packets to the table below.
 function addPackets(){
     const selectedTable = document.getElementById("dispatch_list_selected").getElementsByTagName("tbody")[0];

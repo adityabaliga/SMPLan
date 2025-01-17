@@ -49,6 +49,13 @@
 
     <hr class ="style1">
     <h2><input type = "text"  name = "customer" value ="{{customer}}" style = "width:750px;border: none;border-color: transparent;" readonly></h2>
+    <select name="selected_smpl_no" id="selected_smpl_no" onchange="display_smpl_no()">
+                    <option value = "all">All</option>
+                    {% for smpl_no in unique_smpl_no_lst %}
+                        <option value="{{ smpl_no }}">{{ smpl_no }}</option>
+                    {% endfor %}
+
+    </select>
     <table class = "table table-sm" id = 'dispatch_list'>
             <tr>
 
@@ -68,8 +75,8 @@
 
             </tr>
         {% for cs_id, cs in cs_lst %}
-            <tr>
-                <td><input type = "checkbox" name = "select_smpl" class = "select_smpl" value ="{{cs_id}},{{cs.smpl_no}}" onchange="enable_dispatch(this, 'dispatch_list')">{{cs.smpl_no}}</td>
+            <tr class = 'packet-list' data-smpl_no = "{{cs.smpl_no}}">
+                <td><input type = "checkbox" name = "select_smpl" class = "select_smpl" value ="{{cs_id}},{{cs.smpl_no}}"  onchange="enable_dispatch(this, 'dispatch_list')">{{cs.smpl_no}}</td>
 
                 <td><input type = "text" id = "packet_name" name = "packet_name" style = "width:80px;" value ="{{cs.packet_name}}"  readonly></td>
 
