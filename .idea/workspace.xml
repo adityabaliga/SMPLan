@@ -4,9 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="43196d60-29a1-4da5-972f-f5ed5d18f5ea" name="Changes" comment="Entry_by in DispatchHeader and identification of entry done by PIN">
+    <list default="true" id="43196d60-29a1-4da5-972f-f5ed5d18f5ea" name="Changes" comment="Dropdown box to select SMPL No provided in dispatch_list">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/incoming_for_tr.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/incoming_for_tr.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -466,7 +467,7 @@
       <option name="project" value="LOCAL" />
       <updated>1712825420285</updated>
     </task>
-    <option name="localTasksCounter" value="151" />
+    <option name="localTasksCounter" value="153" />
     <servers />
   </component>
   <component name="Vcs.Log.History.Properties">
@@ -615,8 +616,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Bug Fix for slitting entry" />
-    <MESSAGE value="Changed percentage of RM based on which RM is deleted" />
     <MESSAGE value="Bug fix while printing Nash DBS sticker. DBS was not appearing&#10;Started implementation of Honda dispatch list" />
     <MESSAGE value="Implementation of Honda dispatch list" />
     <MESSAGE value="Implementation of Honda dispatch list - Final" />
@@ -640,7 +639,9 @@
     <MESSAGE value="Bug Fix: Levelling sticker was not working" />
     <MESSAGE value="Improved Tally Stock Check" />
     <MESSAGE value="Entry_by in DispatchHeader and identification of entry done by PIN" />
-    <option name="LAST_COMMIT_MESSAGE" value="Entry_by in DispatchHeader and identification of entry done by PIN" />
+    <MESSAGE value="Bug Fix in tally stock check" />
+    <MESSAGE value="Dropdown box to select SMPL No provided in dispatch_list" />
+    <option name="LAST_COMMIT_MESSAGE" value="Dropdown box to select SMPL No provided in dispatch_list" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -667,43 +668,38 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app.py</url>
-          <line>1921</line>
+          <line>1925</line>
           <option name="timeStamp" value="164" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app.py</url>
-          <line>1562</line>
+          <line>1566</line>
           <option name="timeStamp" value="165" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app.py</url>
-          <line>1421</line>
+          <line>1425</line>
           <option name="timeStamp" value="166" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app.py</url>
-          <line>3139</line>
+          <line>3159</line>
           <option name="timeStamp" value="173" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app.py</url>
-          <line>3397</line>
+          <line>3417</line>
           <option name="timeStamp" value="175" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app.py</url>
-          <line>2460</line>
+          <line>2480</line>
           <option name="timeStamp" value="177" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app.py</url>
-          <line>2680</line>
+          <line>2700</line>
           <option name="timeStamp" value="178" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/app.py</url>
-          <line>3377</line>
-          <option name="timeStamp" value="179" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

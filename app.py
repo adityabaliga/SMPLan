@@ -223,16 +223,20 @@ def tr_incoming_commit():
         material_type = request.form['material_type']
         interal_dia = request.form['internal_dia']
         grade = request.form['grade']
-        final_grade = material_type + '; ID:' + interal_dia + '; GRADE: ' + grade
+
         weight = Decimal(request.form['weight'])
         numbers = int((request.form['numbers']))
         mill = request.form['mill']
         mill_id = request.form['mill_id']
         incoming_remarks = request.form['remarks']
         unit = request.form['unit']
-        _incoming = Incoming(smpl_no, customer, incoming_date, thickness, width, length, final_grade, weight, numbers,
-                             mill,
-                             mill_id, incoming_remarks, unit)
+        dc_number = request.form['dc_number']
+        dc_date = request.form['dc_date']
+
+
+        _incoming = Incoming(smpl_no, customer, incoming_date, thickness, width, length, grade, weight, numbers,
+                             mill, mill_id, incoming_remarks, unit, material_type, '', '',
+                             dc_number, dc_date)
         _incoming.savetodb()
 
     return render_template('/main_menu.html', message="Incoming details for " + smpl_no + " entered.")
