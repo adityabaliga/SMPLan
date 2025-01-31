@@ -115,6 +115,7 @@ function enable_dispatch(th, tableID)
         last_row.cells[dispatch_qty_pos].lastChild.required = true;
         last_row.cells[no_of_pkts_pos].lastChild.required = true;*/
         last_row.cells[defective_pos].lastChild.value = ' ';
+        last_row.style.backgroundColor = "lightgreen";
 	}
 	else
 	{
@@ -127,7 +128,7 @@ function enable_dispatch(th, tableID)
 
         last_row.cells[no_of_pkts_pos].lastChild.readOnly = true;*/
         last_row.cells[defective_pos].lastChild.readOnly = true;
-
+        last_row.style.backgroundColor = "transparent";
 
 	}
 	total_dispatch_wt(tableID);
