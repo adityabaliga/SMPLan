@@ -2326,7 +2326,7 @@ def check_stock_tsdpl():
     wt_per_sheet = 0
     packet_wt = 0
 
-    cs_lst = CurrentStock.get_stock_by_customer('TATA STEEL DOWNSTREAM PRODUCTS LTD%', 'All')
+    cs_lst = CurrentStock.get_stock_by_customer('TATA STEEL DOWNSTREAM PRODUCTS LTD%', 'AllminusScrap')
 
     for cs_id, cs in cs_lst:
         if not any(substring in cs.packet_name for substring in ['W0P0', 'D0', 'M0']):
@@ -2398,6 +2398,49 @@ def stock():
 
     return render_template('stock_display.html', cs_lst=cs_lst)
 
+
+@app.route('/mark_as_scrap_tr', methods=['GET', 'POST'])
+def mark_as_scrap_tr():
+    stock_type = ""
+    unit = ""
+    cs_lst = []
+    _cs_lst = []
+    cs_id_lst = []
+
+    cs_lst = CurrentStock.get_stock_by_customer('TATA STEEL DOWNSTREAM PRODUCTS LTD%', 'RMFGForScrap')
+
+
+    for cs_id, cs in cs_lst:
+        cs_id_lst.append(cs_id)
+        _cs_lst.append(cs)
+
+    # cs_lst.append(cs_lst_unit1)
+    # cs_lst.append(cs_lst_unit2)
+    cs_lst = zip(cs_id_lst, _cs_lst)
+
+    return render_template('mark_scrap.html', cs_lst=cs_lst)
+
+@app.route('/scrap_marked', methods=['GET', 'POST'])
+def scrap_marked():
+    if request.method == 'POST':
+        scrap_marked_lst = request.form.getlist['select_smpl']
+
+
+    if request.method == 'GET':
+        scrap_marked_lst = request.args.getlist('select_smpl')
+
+    cs_id_lst = []
+
+    # For the items to be dispatched, dispatch detail is created and the current stock quantity is deleted or reduced
+    for smpl in zip(scrap_marked_lst):
+        smpl_details = smpl[0].split(',')
+        smpl_no = smpl_details[1]
+        cs_id = smpl_details[0]
+        cs_id_lst.append(cs_id)
+
+    message = CurrentStock.mark_for_scrap(cs_id_lst)
+
+    return render_template('main_menu.html', message = message)
 
 # Choose from list of customer for whose FG/RM is present for dispatch
 @app.route('/dispatch_pick_customer', methods=['GET', 'POST'])

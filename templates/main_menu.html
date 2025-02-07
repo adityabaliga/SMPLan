@@ -202,6 +202,12 @@
                 <a href="\stock?unit=All&stock_type=All">Consolidated</a><br>
                 <a href="\check_stock_htid">Honda</a><br>
                 <a href="\check_stock_tsdpl">TSDPL</a><br>
+                 {% if current_user.user_type == "all" or current_user.user_type == "plan_head" %}
+                <!--a href ="\incoming_update_pick_smpl">Update Incoming Details</a-->
+
+                <a href ="\mark_as_scrap_tr">Mark As Scrap for TR</a>
+                    <br>
+                {% endif %}
             </td>
             {% endif %}
             {% if current_user.user_type == "all" or current_user.user_type == "incoming_head" or current_user.user_type == "plan_head" or current_user.user_type == "incoming_unit1" or current_user.user_type == "incoming_unit2" %}
@@ -210,6 +216,7 @@
                 <!--a href="/qr_dispatch">QR Dispatch</a><br-->
                 <a href="/display_dispatch_pick_day">Dispatch View</a><br>
                 <a href="/honda_dispatch_list">Honda Dispatch List</a><br>
+
 
             </td>
             {% endif %}

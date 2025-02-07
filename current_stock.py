@@ -1,6 +1,7 @@
 from database import CursorFromConnectionFromPool
 from decimal import *
 from order_detail import OrderDetail
+from psycopg2.extras import execute_values
 
 
 class CurrentStock:
@@ -514,6 +515,18 @@ class CurrentStock:
             with CursorFromConnectionFromPool() as cursor:
                 cursor.execute("select * from current_stock where customer like %s order by status, smpl_no, packet_name asc", (customer,))
                 user_data = cursor.fetchall()
+        if display_type == 'AllminusScrap':
+            with CursorFromConnectionFromPool() as cursor:
+                cursor.execute("select * from current_stock where customer like %s and status != 'SCRAP' order by status, smpl_no, packet_name asc", (customer,))
+                user_data = cursor.fetchall()
+        if display_type == 'Scrap':
+            with CursorFromConnectionFromPool() as cursor:
+                cursor.execute("select * from current_stock where customer like %s and status = 'SCRAP' order by status, smpl_no, packet_name asc", (customer,))
+                user_data = cursor.fetchall()
+        if display_type == 'RMFGForScrap':
+            with CursorFromConnectionFromPool() as cursor:
+                cursor.execute("select * from current_stock where customer like %s and (status = 'RM' or status = 'WIP') order by weight, smpl_no, status, smpl_no asc", (customer,))
+                user_data = cursor.fetchall()
         for lst in user_data:
             cs = CurrentStock(smpl_no=lst[1],weight = Decimal(lst[2]),numbers=int(lst[3]),width=Decimal(lst[4]),
                               length=Decimal(lst[5]),status=lst[6],customer=lst[7], thickness=Decimal(lst[8]),
@@ -711,3 +724,28 @@ class CurrentStock:
             return user_data[0]
         else:
             return None
+
+
+    @classmethod
+    def mark_for_scrap(cls, cs_id_lst):
+        try:
+            with CursorFromConnectionFromPool() as cursor:
+                cursor.execute("CREATE TEMP TABLE temp_ids (id INTEGER PRIMARY KEY) ON COMMIT DROP")
+
+                execute_values(
+                    cursor,
+                    "INSERT INTO temp_ids (id) VALUES %s",
+                    [(id,) for id in cs_id_lst],
+                    page_size=1000
+                )
+
+                cursor.execute("update current_stock set status = 'SCRAP' from temp_ids where "
+                               "current_stock.cs_id = temp_ids.id")
+            return 'Status updated'
+
+
+
+        except Exception as e:
+            error_message = f"Unexpected error: {str(e)}"
+            logging.error(error_message)
+            return error_message
