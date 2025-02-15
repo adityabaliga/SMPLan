@@ -2705,14 +2705,19 @@ def generate_honda_disp_list():
 
     # Unzip back into separate lists
     cs_id_lst_sorted, cs_lst_sorted = zip(*zipped_cs_lst_sorted)
-
+    import_invoice_number_lst = []
 
     for cs in cs_lst_sorted:
         incoming = Incoming.load_smpl_by_smpl_no(cs.smpl_no)
         incoming_lst.append(incoming)
+        import_invoice_number = incoming.remarks.split('IIN :')
+        if len(import_invoice_number) > 1:
+            import_invoice_number_lst.append(import_invoice_number[1])
+        else:
+            import_invoice_number_lst.append('')
 
     return render_template('honda_dispatch_list_ready.html',
-                           cs_incoming_lst = zip(cs_lst_sorted,incoming_lst), veh_no = veh_no,
+                           cs_incoming_lst = zip(cs_lst_sorted, incoming_lst, import_invoice_number_lst), veh_no = veh_no,
                            dispatch_date = dispatch_date, cs_lst = zip(cs_id_lst_sorted, cs_lst_sorted))
 
 

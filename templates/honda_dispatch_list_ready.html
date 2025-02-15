@@ -75,7 +75,7 @@
             </tr>
             </thead>
             <tbody>
-            {% for cs, incoming in cs_incoming_lst %}
+            {% for cs, incoming, import_invoice_number in cs_incoming_lst %}
             <tr>
                 <td></td>
                 <td>{{cs.smpl_no}}{{cs.packet_name}}</td>
@@ -91,7 +91,7 @@
                 <td>G Wt</td>
                 <td>{{incoming.grade}}</td>
                 <td>Coating</td>
-                <td></td>
+                <td>{{import_invoice_number}}</td>
                 <td>{{incoming.width}}</td>
                 <td>1</td>
                 <td>Pallet Type</td>
