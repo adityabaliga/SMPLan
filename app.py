@@ -3208,6 +3208,8 @@ def get_monthly_report():
     month_dispatch_total = (DispatchHeader.get_monthly_report((report_month), (report_year)))
     month_incoming_total = Incoming.get_monthly_total((report_month), (report_year))
 
+    customer_wise_machine_wise_data = CurrentStock.customer_wise_machine_wise_month_data((report_month), (report_year))
+
     customer_wise_month_data = CurrentStock.customer_wise_month_data((report_month), (report_year))
     prev_month_data = []
     prev_prev_month_data = []
@@ -3282,7 +3284,8 @@ def get_monthly_report():
                                            prev_prev_month_wt_lst_arr, prev_prev_month_cuts_lst_arr, prev_prev_month_time_lst_arr),
                                             month_total_wt = month_total_wt, prev_prev_month_total_wt = prev_prev_month_total_wt,
                                             prev_month_total_wt = prev_month_total_wt, cust_month_lst = customer_wise_month_data,
-                                            month_dispatch_total = month_dispatch_total, month_incoming_total = month_incoming_total)
+                                            month_dispatch_total = month_dispatch_total, month_incoming_total = month_incoming_total,
+                                            customer_wise_machine_wise_data = customer_wise_machine_wise_data)
 
 
 @app.route('/daily_report_pick_month_year', methods=['GET', 'POST'])

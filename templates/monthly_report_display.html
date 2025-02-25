@@ -151,6 +151,26 @@
         </tr>
     </table>
 
+    <h3>Customer Wise Machine Wise Processing</h3>
+    <table class="table table-bordered">
+
+        <tr>
+            <th>Customer</th>
+            <th>Operation</th>
+            <th>Total Weight (in MT)</th>
+
+        </tr>
+        {% for customer  in customer_wise_machine_wise_data %}
+        <tr>
+
+                <td>{{customer[0]}}</td>
+                <td>{{customer[1]}}</td>
+                <td>{{customer[2]}}</td>
+
+        {% endfor %}
+        </tr>
+    </table>
+
 </body>
 
 

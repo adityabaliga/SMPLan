@@ -650,6 +650,22 @@ class CurrentStock:
             else:
                 return None
 
+    @classmethod
+    def customer_wise_machine_wise_month_data(cls, month, year):
+        with CursorFromConnectionFromPool() as cursor:
+            cursor.execute("SELECT i.customer, pd.operation, SUM(p.total_processed_wt) AS total_weight FROM processing p "
+                           "JOIN incoming i ON p.smpl_no = i.smpl_no JOIN "
+                           "( SELECT DISTINCT processing_id, operation FROM processing_detail ) "
+                           "pd ON pd.processing_id = p.processing_id WHERE "
+                           "extract(month from p.processing_date) = %s and extract (year from p.processing_date) = %s "
+                           "GROUP BY i.customer, pd.operation ORDER BY i.customer,pd.operation",
+                           (month, year))
+            user_data = cursor.fetchall()
+            if user_data:
+                return user_data
+            else:
+                return None
+
 
     @classmethod
     def getHondaFGStock(cls):
