@@ -55,7 +55,7 @@
     </div>
 
     <hr class ="style1">
-    <table class = "table table-sm">
+    <table class = "table table-sm" id="stock">
     <tr>
         <th>SMPL No</th>
         <th> Customer</th>
@@ -89,5 +89,9 @@
 
     </table>
 
+    <input type = "button" class="btn btn-default" value="Download" onclick="generateStockExcel('stock')">
+
 </form>
+<script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+<script src = "{{ url_for('static', filename='js/stock.js') }}"></script>
 </html>
