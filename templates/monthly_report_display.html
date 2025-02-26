@@ -152,24 +152,59 @@
     </table>
 
     <h3>Customer Wise Machine Wise Processing</h3>
+
+
+     {% if data %}
     <table class="table table-bordered">
-
-        <tr>
-            <th>Customer</th>
-            <th>Operation</th>
-            <th>Total Weight (in MT)</th>
-
-        </tr>
-        {% for customer  in customer_wise_machine_wise_data %}
-        <tr>
-
-                <td>{{customer[0]}}</td>
-                <td>{{customer[1]}}</td>
-                <td>{{customer[2]}}</td>
-
-        {% endfor %}
-        </tr>
+        <thead>
+            <tr>
+                <th>Customer</th>
+                {% for op in operations %}
+                    <th>{{ op }}</th>
+                {% endfor %}
+                <th class="total-column">Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for customer in customers %}
+                <tr>
+                    <td>{{ customer }}</td>
+                    {% set customer_total = namespace(value=0) %}
+                    {% for op in operations %}
+                        {% set weight = data[customer][op]|float %}
+                        {% set customer_total.value = customer_total.value + weight  %}
+                        <td {% if weight == 0 %} class="zero-value"{% endif %}>
+                            {{ weight|round(3) }}
+                        </td>
+                    {% endfor %}
+                    <td class="total-column">{{ customer_total.value|round(3) }}</td>
+                </tr>
+            {% endfor %}
+            <tr class="total-row">
+                <td>Total</td>
+                {% for op in operations %}
+                    {% set op_total = namespace(value=0) %}
+                    {% for customer in customers %}
+                        {% set op_total.value = op_total.value + data[customer][op]|float %}
+                    {% endfor %}
+                    <td>{{ op_total.value|round(3) }}</td>
+                {% endfor %}
+                {% set grand_total = namespace(value=0) %}
+                {% for customer in customers %}
+                    {% for op in operations %}
+                        {% set grand_total.value = grand_total.value + data[customer][op] %}
+                    {% endfor %}
+                {% endfor %}
+                <td class="total-column">{{ grand_total.value|round(3) }}</td>
+            </tr>
+        </tbody>
     </table>
+    {% else %}
+    <p>No data found for the selected time period.</p>
+    {% endif %}
+
+
+</div>
 
 </body>
 

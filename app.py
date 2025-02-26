@@ -3211,6 +3211,7 @@ def get_monthly_report():
     customer_wise_machine_wise_data = CurrentStock.customer_wise_machine_wise_month_data((report_month), (report_year))
 
     customer_wise_month_data = CurrentStock.customer_wise_month_data((report_month), (report_year))
+
     prev_month_data = []
     prev_prev_month_data = []
     if report_month != 1 or report_month != 2:
@@ -3274,7 +3275,32 @@ def get_monthly_report():
                 prev_prev_month_total_wt += prev_prev_data[1]
         i += 1
 
+    operations = ['CTL', 'CTL 2','Lamination', 'Levelling', 'Mini_Slitting', 'Narrow_CTL', 'Reshearing',
+                  'Slitting', 'Trap_NCTL', 'Trap_Reshearing']
 
+    customer_lst = []
+    for customer in customer_wise_machine_wise_data:
+        customer_lst.append(customer[0])
+
+    # Convert to set to get unique names
+    unique_customers = set(customer_lst)
+
+    # Convert back to list if needed
+    unique_customers_list = list(unique_customers)
+    unique_customers_list.sort()
+
+    # Pivot the data: create a dictionary with customer_name as key and operation values
+    pivoted_data = {}
+    for customer in unique_customers_list:
+        pivoted_data[customer] = {op: float(0) for op in operations}
+
+    # Fill in the actual values
+    for row in customer_wise_machine_wise_data:
+        customer = row[0]
+        operation = row[1]
+        weight = float(row[2])
+        if customer in pivoted_data and operation in pivoted_data[customer]:
+            pivoted_data[customer][operation] = weight
 
 
     return render_template('/monthly_report_display.html', report_month= report_month,
@@ -3285,7 +3311,8 @@ def get_monthly_report():
                                             month_total_wt = month_total_wt, prev_prev_month_total_wt = prev_prev_month_total_wt,
                                             prev_month_total_wt = prev_month_total_wt, cust_month_lst = customer_wise_month_data,
                                             month_dispatch_total = month_dispatch_total, month_incoming_total = month_incoming_total,
-                                            customer_wise_machine_wise_data = customer_wise_machine_wise_data)
+                                            customer_wise_machine_wise_data = customer_wise_machine_wise_data,
+                           customers = unique_customers_list, operations = operations, data = pivoted_data)
 
 
 @app.route('/daily_report_pick_month_year', methods=['GET', 'POST'])
