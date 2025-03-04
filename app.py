@@ -3181,7 +3181,7 @@ def get_daily_report():
         for processing_detail in pro_detail_lst:
              processing_detail_lst.append(processing_detail)
 
-    daily_report_whatsapp()
+
     #Sticker taken but entry not done
     sticker_lst = []
     sticker_lst = ProcessingDetail.no_entry_done(report_date)
