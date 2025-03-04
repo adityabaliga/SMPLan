@@ -8,9 +8,12 @@ from file_uploader import FileUploader
 from flask import Flask, render_template, request, jsonify
 from markupsafe import Markup
 from csv import writer
-from datetime import datetime
+from datetime import datetime, timedelta
 import pandas as pd
 import openpyxl
+import urllib.request
+from apscheduler.schedulers.background import BackgroundScheduler
+import atexit
 
 from user import User
 from current_stock import CurrentStock
@@ -2431,7 +2434,7 @@ def scrap_marked():
 
     cs_id_lst = []
 
-    # For the items to be dispatched, dispatch detail is created and the current stock quantity is deleted or reduced
+
     for smpl in zip(scrap_marked_lst):
         smpl_details = smpl[0].split(',')
         smpl_no = smpl_details[1]
@@ -3178,11 +3181,10 @@ def get_daily_report():
         for processing_detail in pro_detail_lst:
              processing_detail_lst.append(processing_detail)
 
-
+    daily_report_whatsapp()
     #Sticker taken but entry not done
     sticker_lst = []
     sticker_lst = ProcessingDetail.no_entry_done(report_date)
-
 
     #machine_lst = ['CTL 1', 'CTL 2', 'NCTL 1', 'NCTL 2', 'NCTL 3', 'NCTL 4', 'Reshearing 1', 'Reshearing 2', 'Reshearing 3',
     #                'Reshearing 4', 'Reshearing 5', 'Reshearing 6', 'Reshearing 7', 'Reshearing 8']
@@ -3192,6 +3194,70 @@ def get_daily_report():
                            dispatch_hdr_lst=dispatch_hdr_lst, processing_hdr_detail=processing_hdr_detail,
                            machine_lst = machine_lst, processing_detail_lst = processing_detail_lst,
                            total_dispatch_hdr= total_dispatch_hdr, sticker_lst = sticker_lst)
+
+def daily_report_whatsapp():
+    yesterday_date =  datetime.now() - timedelta(1)
+    yesterday_date = yesterday_date.strftime('%Y-%m-%d')
+    incoming_lst = Incoming.get_daily_report(yesterday_date)
+    phone_number_lst = ['919632120048', '919945660080']
+    total_incoming_unit1 = 0
+    total_incoming_unit2 = 0
+    total_incoming_unit4 = 0
+    for incoming in incoming_lst:
+        if incoming[2] == '1':
+            total_incoming_unit1 += incoming[1]
+        if incoming[2] == '2':
+            total_incoming_unit2 += incoming[1]
+        if incoming[2] == '4':
+            total_incoming_unit4 += incoming[1]
+
+    processing_hdr_lst = Processing.get_daily_report(yesterday_date)
+
+    reshearing_unit1 = ['Reshearing 1', 'Reshearing 2', 'Reshearing 3', 'Reshearing 4', 'Reshearing 8']
+    reshearing_unit2 = ['Reshearing 5', 'Reshearing 6', 'Reshearing 7', 'Reshearing 9']
+
+    processing_ctl1 = 0
+    processing_reshearing1 = 0
+    processing_ctl2 = 0
+    processing_reshearing2 = 0
+    processing_slitting = 0
+    processing_nctl = 0
+
+    for processing in processing_hdr_lst:
+        if processing[0] == 'CTL 1':
+            processing_ctl1 += processing[2]
+        if processing[0] in reshearing_unit1:
+            processing_reshearing1 += processing[2]
+        if processing[0] == 'CTL 2':
+            processing_ctl2 += processing[2]
+        if processing[0] == 'Slitting':
+            processing_slitting += processing[2]
+        if processing[0].startswith('NCTL'):
+            processing_nctl += processing[2]
+        if processing[0] in reshearing_unit2:
+            processing_reshearing2 += processing[2]
+
+    for phone_no in phone_number_lst:
+        incoming_msg = 'https://twha.inosms.com/api/sendText?token=624682490c9014d2e917f18e&phone=' + phone_no + '&message=Incoming%20' + change_date_format(yesterday_date) + '%0a%20Unit%201%20-%20' + str(total_incoming_unit1) + '%20MT%0a%20Unit%202%20-%20' + str(total_incoming_unit2) + '%20MT%0a%20Unit%204%20-%20' + str(total_incoming_unit4) +'%20MT'
+
+        urllib.request.urlopen(incoming_msg)
+
+        processing_unit1_msg = 'https://twha.inosms.com/api/sendText?token=624682490c9014d2e917f18e&phone=' + phone_no + '&message=Processing%20Unit%201%20' + change_date_format(yesterday_date) + '%0aCTL%20-%20' + str(processing_ctl1) + '%20MT%0aReshearing%20-%20' + str(processing_reshearing1) + '%20MT'
+
+        urllib.request.urlopen(processing_unit1_msg)
+
+        processing_unit2_msg = 'https://twha.inosms.com/api/sendText?token=624682490c9014d2e917f18e&phone=' + phone_no + '&message=Processing%20U2%20' + change_date_format(yesterday_date) + '%0aCTL%20-%20' + str(processing_ctl2) + '%0aSlitting%20-%20' + str(processing_slitting) + '%0aNCTL%20-%20' + str(processing_nctl) + '%0aReshearing%20-%20' + str(processing_reshearing2) + '%20MT'
+
+        urllib.request.urlopen(processing_unit2_msg)
+
+# This is to schedule the whatsapp messages
+scheduler = BackgroundScheduler()
+scheduler.add_job(func=daily_report_whatsapp, trigger="cron", hour=10, minute=30)
+scheduler.start()
+
+# Shut down the scheduler when exiting the app
+atexit.register(lambda: scheduler.shutdown())
+
 
 @app.route('/get_monthly_report', methods=['GET', 'POST'])
 def get_monthly_report():
