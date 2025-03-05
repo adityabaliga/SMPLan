@@ -27,7 +27,7 @@ class CurrentStock:
         with CursorFromConnectionFromPool() as cursor:
             cursor.execute("insert into current_stock (smpl_no,weight,numbers,width,length,status,customer,thickness"
                            ",grade, unit, packet_name, length2, date, processing_id, second_customer) "
-                           "values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+                           "values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
                            (self.smpl_no, self.weight, self.numbers, self.width, self.length, self.status, self.customer,
                            self.thickness, self.grade, self.unit, self.packet_name, self.length2, self.date,
                             self.processing_id, self.second_customer))

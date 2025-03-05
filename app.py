@@ -471,12 +471,13 @@ def transfer_submit():
         cs_id = int(smpl_details[0])
         cs = CurrentStock.load_smpl_by_id(cs_id)
         dispatch_detail = DispatchDetail(transfer_id, cs.smpl_no, cs.thickness, cs.width, cs.length, int(transfer_nos),
-                                         Decimal(transfer_qty), '', int(no_of_packets), cs.length2, cs.packet_name)
+                                         Decimal(transfer_qty), '', int(no_of_packets), cs.length2,
+                                         cs.packet_name, cs.unit)
         dispatch_detail.save_to_db()
         if int(transfer_nos) == cs.numbers:
             CurrentStock.transfer_material_cls(cs_id, unit)
         else:
-            cs_new = CurrentStock(smpl_no, cs.customer, transfer_qty, transfer_nos, cs.thickness, cs.width,
+            cs_new = CurrentStock(smpl_no, cs.customer, Decimal(transfer_qty), transfer_nos, cs.thickness, cs.width,
                                   cs.length, cs.status, cs.grade, unit, cs.packet_name, cs.length2, cs.date,
                                   cs.processing_id, '')
             cs.change_wt(smpl_no, cs.width, cs.length, transfer_qty, transfer_nos, 'minus', cs.status, cs.length2)
@@ -2538,7 +2539,7 @@ def dispatch():
         cs_id = smpl_details[0]
         cs = CurrentStock.load_smpl_by_id(cs_id)
         dispatch_detail = DispatchDetail(dispatch_id, cs.smpl_no, cs.thickness, cs.width, cs.length, cs.numbers,
-                                         cs.weight, defective, 1, cs.length2, cs.packet_name)
+                                         cs.weight, defective, 1, cs.length2, cs.packet_name, cs.unit)
         dispatch_detail.save_to_db()
 
         CurrentStock.delete_record(cs_id)
