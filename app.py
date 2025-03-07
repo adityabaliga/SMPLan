@@ -3200,7 +3200,7 @@ def daily_report_whatsapp():
     yesterday_date =  datetime.now() - timedelta(1)
     yesterday_date = yesterday_date.strftime('%Y-%m-%d')
     incoming_lst = Incoming.get_daily_report(yesterday_date)
-    phone_number_lst = ['919632120048', '919945660080']
+    phone_number_lst = ['919632120048', '919945660080', '919845015897']
     total_incoming_unit1 = 0
     total_incoming_unit2 = 0
     total_incoming_unit4 = 0
@@ -3238,6 +3238,9 @@ def daily_report_whatsapp():
         if processing[0] in reshearing_unit2:
             processing_reshearing2 += processing[2]
 
+    dispatch_lst = []
+    dispatch_lst =  DispatchHeader.get_daily_report_whatsapp(yesterday_date)
+
     for phone_no in phone_number_lst:
         incoming_msg = 'https://twha.inosms.com/api/sendText?token=624682490c9014d2e917f18e&phone=' + phone_no + '&message=Incoming%20' + change_date_format(yesterday_date) + '%0a%20Unit%201%20-%20' + str(total_incoming_unit1) + '%20MT%0a%20Unit%202%20-%20' + str(total_incoming_unit2) + '%20MT%0a%20Unit%204%20-%20' + str(total_incoming_unit4) +'%20MT'
 
@@ -3250,6 +3253,10 @@ def daily_report_whatsapp():
         processing_unit2_msg = 'https://twha.inosms.com/api/sendText?token=624682490c9014d2e917f18e&phone=' + phone_no + '&message=Processing%20U2%20' + change_date_format(yesterday_date) + '%0aCTL%20-%20' + str(processing_ctl2) + '%0aSlitting%20-%20' + str(processing_slitting) + '%0aNCTL%20-%20' + str(processing_nctl) + '%0aReshearing%20-%20' + str(processing_reshearing2) + '%20MT'
 
         urllib.request.urlopen(processing_unit2_msg)
+
+        dispatch_msg = 'https://twha.inosms.com/api/sendText?token=624682490c9014d2e917f18e&phone=' + phone_no + '&message=Dispatch%20' + change_date_format(yesterday_date) + '%0a%20Unit%20' + dispatch_lst[0][0] + '%20-%20' + str(dispatch_lst[0][1]) + '%20MT%0a%20Unit%20' + dispatch_lst[1][0] + '%20-%20' + str(dispatch_lst[1][1]) + '%20MT%0a%20Unit%20' + dispatch_lst[2][0] + '%20-%20'  + str(dispatch_lst[2][1]) + '%20MT'
+
+        urllib.request.urlopen(dispatch_msg)
 
 # This is to schedule the whatsapp messages
 scheduler = BackgroundScheduler()

@@ -86,4 +86,14 @@ class DispatchHeader:
             user_data = cursor.fetchall()
             return user_data
 
-
+    @classmethod
+    def get_daily_report_whatsapp(cls, date):
+        with CursorFromConnectionFromPool() as cursor:
+            
+            cursor.execute(
+                "SELECT dd.unit, SUM(dd.weight) AS total_weight FROM dispatch_header dh "
+                "JOIN dispatch_detail dd ON dh.dispatch_id = dd.dispatch_id WHERE "
+                "dh.dispatch_date = %s and dh.invoice_no != 'TRANSFER' GROUP BY dd.unit ORDER BY "
+                "dd.unit ", (date, ))
+            user_data = cursor.fetchall()
+            return user_data
