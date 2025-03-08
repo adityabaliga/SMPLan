@@ -9,6 +9,7 @@ from flask import Flask, render_template, request, jsonify
 from markupsafe import Markup
 from csv import writer
 from datetime import datetime, timedelta
+import calendar
 import pandas as pd
 import openpyxl
 import urllib.request
@@ -3182,6 +3183,7 @@ def get_daily_report():
         for processing_detail in pro_detail_lst:
              processing_detail_lst.append(processing_detail)
 
+    #daily_report_whatsapp()
 
     #Sticker taken but entry not done
     sticker_lst = []
@@ -3197,66 +3199,76 @@ def get_daily_report():
                            total_dispatch_hdr= total_dispatch_hdr, sticker_lst = sticker_lst)
 
 def daily_report_whatsapp():
-    yesterday_date =  datetime.now() - timedelta(1)
-    yesterday_date = yesterday_date.strftime('%Y-%m-%d')
-    incoming_lst = Incoming.get_daily_report(yesterday_date)
-    phone_number_lst = ['919632120048', '919945660080', '919845015897']
-    total_incoming_unit1 = 0
-    total_incoming_unit2 = 0
-    total_incoming_unit4 = 0
-    for incoming in incoming_lst:
-        if incoming[2] == '1':
-            total_incoming_unit1 += incoming[1]
-        if incoming[2] == '2':
-            total_incoming_unit2 += incoming[1]
-        if incoming[2] == '4':
-            total_incoming_unit4 += incoming[1]
+    yesterday_date_lst = []
+    yesterday_date_lst.append(datetime.now() - timedelta(1))
+    print(calendar.day_name[yesterday_date_lst[0].weekday()])
 
-    processing_hdr_lst = Processing.get_daily_report(yesterday_date)
+    # On Mondays 2 messages have to be sent, 1 for Saturday and 1 for Sunday
+    if calendar.day_name[yesterday_date_lst[0].weekday()] == 'Sunday':
+        yesterday_date_lst.append(datetime.now() - timedelta(2))
 
-    reshearing_unit1 = ['Reshearing 1', 'Reshearing 2', 'Reshearing 3', 'Reshearing 4', 'Reshearing 8']
-    reshearing_unit2 = ['Reshearing 5', 'Reshearing 6', 'Reshearing 7', 'Reshearing 9']
+    for yesterday_date in yesterday_date_lst:
+        yesterday_date = yesterday_date.strftime('%Y-%m-%d')
+        incoming_lst = Incoming.get_daily_report(yesterday_date)
+        #phone_number_lst = ['919632120048']
+        phone_number_lst = ['919632120048', '919945660080', '919845015897']
+        total_incoming_unit1 = 0
+        total_incoming_unit2 = 0
+        total_incoming_unit4 = 0
+        for incoming in incoming_lst:
+            if incoming[2] == '1':
+                total_incoming_unit1 += incoming[1]
+            if incoming[2] == '2':
+                total_incoming_unit2 += incoming[1]
+            if incoming[2] == '4':
+                total_incoming_unit4 += incoming[1]
 
-    processing_ctl1 = 0
-    processing_reshearing1 = 0
-    processing_ctl2 = 0
-    processing_reshearing2 = 0
-    processing_slitting = 0
-    processing_nctl = 0
+        processing_hdr_lst = Processing.get_daily_report(yesterday_date)
 
-    for processing in processing_hdr_lst:
-        if processing[0] == 'CTL 1':
-            processing_ctl1 += processing[2]
-        if processing[0] in reshearing_unit1:
-            processing_reshearing1 += processing[2]
-        if processing[0] == 'CTL 2':
-            processing_ctl2 += processing[2]
-        if processing[0] == 'Slitting':
-            processing_slitting += processing[2]
-        if processing[0].startswith('NCTL'):
-            processing_nctl += processing[2]
-        if processing[0] in reshearing_unit2:
-            processing_reshearing2 += processing[2]
+        reshearing_unit1 = ['Reshearing 1', 'Reshearing 2', 'Reshearing 3', 'Reshearing 4', 'Reshearing 8']
+        reshearing_unit2 = ['Reshearing 5', 'Reshearing 6', 'Reshearing 7', 'Reshearing 9']
 
-    dispatch_lst = []
-    dispatch_lst =  DispatchHeader.get_daily_report_whatsapp(yesterday_date)
+        processing_ctl1 = 0
+        processing_reshearing1 = 0
+        processing_ctl2 = 0
+        processing_reshearing2 = 0
+        processing_slitting = 0
+        processing_nctl = 0
 
-    for phone_no in phone_number_lst:
-        incoming_msg = 'https://twha.inosms.com/api/sendText?token=624682490c9014d2e917f18e&phone=' + phone_no + '&message=Incoming%20' + change_date_format(yesterday_date) + '%0a%20Unit%201%20-%20' + str(total_incoming_unit1) + '%20MT%0a%20Unit%202%20-%20' + str(total_incoming_unit2) + '%20MT%0a%20Unit%204%20-%20' + str(total_incoming_unit4) +'%20MT'
+        for processing in processing_hdr_lst:
+            if processing[0] == 'CTL 1':
+                processing_ctl1 += processing[2]
+            if processing[0] in reshearing_unit1:
+                processing_reshearing1 += processing[2]
+            if processing[0] == 'CTL 2':
+                processing_ctl2 += processing[2]
+            if processing[0] == 'Slitting':
+                processing_slitting += processing[2]
+            if processing[0].startswith('NCTL'):
+                processing_nctl += processing[2]
+            if processing[0] in reshearing_unit2:
+                processing_reshearing2 += processing[2]
 
-        urllib.request.urlopen(incoming_msg)
+        dispatch_lst = []
+        dispatch_lst =  DispatchHeader.get_daily_report_whatsapp(yesterday_date)
 
-        processing_unit1_msg = 'https://twha.inosms.com/api/sendText?token=624682490c9014d2e917f18e&phone=' + phone_no + '&message=Processing%20Unit%201%20' + change_date_format(yesterday_date) + '%0aCTL%20-%20' + str(processing_ctl1) + '%20MT%0aReshearing%20-%20' + str(processing_reshearing1) + '%20MT'
+        for phone_no in phone_number_lst:
+            incoming_msg = 'https://twha.inosms.com/api/sendText?token=624682490c9014d2e917f18e&phone=' + phone_no + '&message=Incoming%20' + change_date_format(yesterday_date) + '%0a%20Unit%201%20-%20' + str(total_incoming_unit1) + '%20MT%0a%20Unit%202%20-%20' + str(total_incoming_unit2) + '%20MT%0a%20Unit%204%20-%20' + str(total_incoming_unit4) +'%20MT'
 
-        urllib.request.urlopen(processing_unit1_msg)
+            urllib.request.urlopen(incoming_msg)
 
-        processing_unit2_msg = 'https://twha.inosms.com/api/sendText?token=624682490c9014d2e917f18e&phone=' + phone_no + '&message=Processing%20U2%20' + change_date_format(yesterday_date) + '%0aCTL%20-%20' + str(processing_ctl2) + '%0aSlitting%20-%20' + str(processing_slitting) + '%0aNCTL%20-%20' + str(processing_nctl) + '%0aReshearing%20-%20' + str(processing_reshearing2) + '%20MT'
+            processing_unit1_msg = 'https://twha.inosms.com/api/sendText?token=624682490c9014d2e917f18e&phone=' + phone_no + '&message=Processing%20Unit%201%20' + change_date_format(yesterday_date) + '%0aCTL%20-%20' + str(processing_ctl1) + '%20MT%0aReshearing%20-%20' + str(processing_reshearing1) + '%20MT'
 
-        urllib.request.urlopen(processing_unit2_msg)
+            urllib.request.urlopen(processing_unit1_msg)
 
-        dispatch_msg = 'https://twha.inosms.com/api/sendText?token=624682490c9014d2e917f18e&phone=' + phone_no + '&message=Dispatch%20' + change_date_format(yesterday_date) + '%0a%20Unit%20' + dispatch_lst[0][0] + '%20-%20' + str(dispatch_lst[0][1]) + '%20MT%0a%20Unit%20' + dispatch_lst[1][0] + '%20-%20' + str(dispatch_lst[1][1]) + '%20MT%0a%20Unit%20' + dispatch_lst[2][0] + '%20-%20'  + str(dispatch_lst[2][1]) + '%20MT'
+            processing_unit2_msg = 'https://twha.inosms.com/api/sendText?token=624682490c9014d2e917f18e&phone=' + phone_no + '&message=Processing%20U2%20' + change_date_format(yesterday_date) + '%0aCTL%20-%20' + str(processing_ctl2) + '%0aSlitting%20-%20' + str(processing_slitting) + '%0aNCTL%20-%20' + str(processing_nctl) + '%0aReshearing%20-%20' + str(processing_reshearing2) + '%20MT'
 
-        urllib.request.urlopen(dispatch_msg)
+            urllib.request.urlopen(processing_unit2_msg)
+
+            if dispatch_lst:
+                dispatch_msg = 'https://twha.inosms.com/api/sendText?token=624682490c9014d2e917f18e&phone=' + phone_no + '&message=Dispatch%20' + change_date_format(yesterday_date) + '%0a%20Unit%20' + dispatch_lst[0][0] + '%20-%20' + str(dispatch_lst[0][1]) + '%20MT%0a%20Unit%20' + dispatch_lst[1][0] + '%20-%20' + str(dispatch_lst[1][1]) + '%20MT%0a%20Unit%20' + dispatch_lst[2][0] + '%20-%20'  + str(dispatch_lst[2][1]) + '%20MT'
+
+                urllib.request.urlopen(dispatch_msg)
 
 # This is to schedule the whatsapp messages
 scheduler = BackgroundScheduler()
