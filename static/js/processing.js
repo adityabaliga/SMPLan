@@ -1211,7 +1211,7 @@ function make_label_new_slit(th){
             '<td><input type="text" style="width:100px;border: 0px none;" id="lbl_coil_length" name="lbl_coil_length" value="%coil_length%"></td>' +
             '<td><input type="text" style="width:100px;" id="lbl_packet_name" name="lbl_packet_name" value="%packet_name%"></td>' +
             '<td><input type="text" style="width:130px;"  id="lbl_2nd_customer" name="lbl_2nd_customer"></td>' +
-            '<td><input type="text" style="width:100px;"  id="lbl_net_wt" name="lbl_net_wt"></td>' +
+            '<td><input type="text" style="width:100px;"  id="lbl_net_wt" name="lbl_net_wt" onchange = "check_theory_wt_slit()"></td>' +
             '<td><input type="text" style="width:100px;" id="lbl_gross_wt" name="lbl_gross_wt"></td>' +
             '<td><input type="text" style="width:130px;"  id="lbl_lamination" name="lbl_lamination"></td>' +
             '<td><input type="text" style="width:130px;"  id="lbl_batch_no" name="lbl_batch_no"></td>' +
@@ -1225,7 +1225,7 @@ function make_label_new_slit(th){
             '<option value ="TTS">TTS</option><option value ="HONDA">HONDA</option>' +
             '<option value ="TSL">TSL</option></select></td>' +
             '<td><input type = "button" class="btn btn-default" value="Print" onclick="print_label_slit_new()"></td>' +
-            '</tr>';
+            '<td><input type="text" name="lbl_theory_wt" id="lbl_theory_wt" value="%theory_wt%"></td></tr>';
 
     var part_length = parts_table.rows[rowId].cells[0].lastChild.value;
     var part_name = parts_table.rows[rowId].cells[1].lastChild.value;
@@ -1234,6 +1234,7 @@ function make_label_new_slit(th){
     var width, width_name, width_part_name, width_status;
     var thickness = document.getElementById("thickness").value;
     var id = 1;
+    var theory_wt = 0;
     if (fg_table.rows.length > 2){
         id = fg_table.rows.length;
     }
@@ -1246,12 +1247,15 @@ function make_label_new_slit(th){
         width_name = width_table.rows[j].cells[1].lastChild.value;
         width_status = width_table.rows[j].cells[2].lastElementChild.selectedOptions[0].innerHTML;
         size = thickness + " X " + width + " X Coil";
+        theory_wt = parseFloat(thickness)*parseFloat(width)*parseFloat(part_length)*parseFloat(0.00000785);
         width_part_name = part_name + width_name;
         newNEWHTML = newHTML.replace('%packet_name%', width_part_name);
         newNEWHTML = newNEWHTML.replace('%size%', size);
         //newNEWHTML = newNEWHTML.replace('%coil_name%', width_part_name);
         newNEWHTML = newNEWHTML.replace('%status%', width_status);
         newNEWHTML = newNEWHTML.replace('%id%', id);
+        newNEWHTML = newNEWHTML.replace('%theory_wt%', theory_wt.toFixed(3));
+
         document.getElementById('fg_table').insertAdjacentHTML('beforeend', newNEWHTML);
         id = id +1;
     }
@@ -1650,6 +1654,8 @@ function make_label_new(th){
     var machine = document.getElementById("machine").value;
     var width = numbers_table.rows[rowId].cells[0].lastChild.value;
     var output_length = numbers_table.rows[rowId].cells[1].lastChild.value;
+    var theory_wt = numbers_table.rows[rowId].cells[5].lastChild.value;
+
     if(operation.includes('Trap')){
         output_length = numbers_table.rows[rowId].cells[1].lastChild.value + ' - ' + numbers_table.rows[rowId].cells[2].lastChild.value;
     }
@@ -1859,6 +1865,7 @@ function make_label_new(th){
     }
     document.getElementById('lbl_mat_status').value = mat_status;
     document.getElementById('lbl_qc_name').value = qc_name;
+    document.getElementById('lbl_theory_wt').value = theory_wt;
 
 
 
@@ -2345,6 +2352,41 @@ function validateForm(){
     var check_slitters = check_slitter_numbers('slitting_cutters');
     if(check_slitters == false){
         return false;
+    }
+
+}
+
+function check_theory_wt(){
+    var theory_wt = parseFloat(document.getElementById('lbl_theory_wt').value);
+    var net_wt = parseFloat(document.getElementById('lbl_net_wt').value);
+
+
+
+    if(net_wt > 1.025 * theory_wt * 1000 || net_wt < 0.975 * theory_wt * 1000){
+        window.alert('Please check Net Wt.');
+        document.getElementById('lbl_net_wt').style.backgroundColor = 'red';
+    }else{
+        document.getElementById('lbl_net_wt').style.backgroundColor = 'transparent';
+    }
+
+}
+
+function check_theory_wt_slit(){
+    var net_wt_pos = 4;
+    var theory_wt_pos = 14;
+
+    var rowId = parseInt(event.target.parentNode.parentNode.id);
+
+    var fg_table = document.getElementById('fg_table');
+
+    var net_wt = parseFloat(fg_table.rows[rowId].cells[net_wt_pos].lastChild.value);
+    var theory_wt = parseFloat(fg_table.rows[rowId].cells[theory_wt_pos].lastChild.defaultValue);
+
+    if(net_wt > 1.025 * theory_wt * 1000 || net_wt < 0.975 * theory_wt * 1000){
+        window.alert('Please check Net Wt.');
+        fg_table.rows[rowId].cells[net_wt_pos].lastChild.style.backgroundColor = 'red';
+    }else{
+        fg_table.rows[rowId].cells[net_wt_pos].lastChild.style.backgroundColor = 'transparent';
     }
 
 }
