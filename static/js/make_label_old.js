@@ -257,6 +257,7 @@ function make_label_old(smpl_no, customer){
     document.getElementById('lbl_numbers').value = numbers_for_lbl;
     document.getElementById('lbl_packet_name').value = queries[3];
     document.getElementById('lbl_mat_status').value = queries[6];
+    document.getElementById('lbl_theory_wt').value = queries[7];
 
     document.getElementById('lbl_machine').value = queries[1].replaceAll('+',' ');
     //Need to remove Lami type from machine and add it to Lami field
