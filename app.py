@@ -3183,7 +3183,7 @@ def get_daily_report():
         for processing_detail in pro_detail_lst:
              processing_detail_lst.append(processing_detail)
 
-    #daily_report_whatsapp()
+    daily_report_whatsapp()
 
     #Sticker taken but entry not done
     sticker_lst = []
@@ -3210,8 +3210,8 @@ def daily_report_whatsapp():
     for yesterday_date in yesterday_date_lst:
         yesterday_date = yesterday_date.strftime('%Y-%m-%d')
         incoming_lst = Incoming.get_daily_report(yesterday_date)
-        #phone_number_lst = ['919632120048']
-        phone_number_lst = ['919632120048', '919945660080', '919845015897']
+        phone_number_lst = ['919632120048']
+        #phone_number_lst = ['919632120048', '919945660080', '919845015897']
         total_incoming_unit1 = 0
         total_incoming_unit2 = 0
         total_incoming_unit4 = 0
@@ -3261,12 +3261,14 @@ def daily_report_whatsapp():
 
             urllib.request.urlopen(processing_unit1_msg)
 
-            processing_unit2_msg = 'https://twha.inosms.com/api/sendText?token=624682490c9014d2e917f18e&phone=' + phone_no + '&message=Processing%20U2%20' + change_date_format(yesterday_date) + '%0aCTL%20-%20' + str(processing_ctl2) + '%0aSlitting%20-%20' + str(processing_slitting) + '%0aNCTL%20-%20' + str(processing_nctl) + '%0aReshearing%20-%20' + str(processing_reshearing2) + '%20MT'
+            processing_unit2_msg = 'https://twha.inosms.com/api/sendText?token=624682490c9014d2e917f18e&phone=' + phone_no + '&message=Processing%20Unit%202%20' + change_date_format(yesterday_date) + '%0aCTL%20-%20' + str(processing_ctl2) + '%20MT%0aSlitting%20-%20' + str(processing_slitting) + '%20MT%0aNCTL%20-%20' + str(processing_nctl) + '%20MT%0aReshearing%20-%20' + str(processing_reshearing2) + '%20MT'
 
             urllib.request.urlopen(processing_unit2_msg)
 
             if dispatch_lst:
-                dispatch_msg = 'https://twha.inosms.com/api/sendText?token=624682490c9014d2e917f18e&phone=' + phone_no + '&message=Dispatch%20' + change_date_format(yesterday_date) + '%0a%20Unit%20' + dispatch_lst[0][0] + '%20-%20' + str(dispatch_lst[0][1]) + '%20MT%0a%20Unit%20' + dispatch_lst[1][0] + '%20-%20' + str(dispatch_lst[1][1]) + '%20MT%0a%20Unit%20' + dispatch_lst[2][0] + '%20-%20'  + str(dispatch_lst[2][1]) + '%20MT'
+                dispatch_msg = 'https://twha.inosms.com/api/sendText?token=624682490c9014d2e917f18e&phone=' + phone_no + '&message=Dispatch%20' + change_date_format(yesterday_date)
+                for dispatch in dispatch_lst:
+                    dispatch_msg  = dispatch_msg + '%0a%20Unit%20' + dispatch[0] + '%20-%20' + str(dispatch[1]) + '%20MT'
 
                 urllib.request.urlopen(dispatch_msg)
 
