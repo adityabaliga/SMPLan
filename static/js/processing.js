@@ -789,6 +789,10 @@ function print_label_slit_new(){
 
     document.getElementById('stickers').value = '';
 
+    var newHTML = '<tr><td>' + fg_table.rows[rowId].cells[packet_name_pos].lastChild.value + '</td><td>' + fg_table.rows[rowId].cells[net_wt_pos].lastChild.value + '</td><td>' + fg_table.rows[rowId].cells[second_customer_pos].lastChild.value + '</td></tr>'
+
+    document.getElementById('net_wt_table').insertAdjacentHTML('beforeend', newHTML);
+
 }
 
 function print_label_new(){
@@ -865,6 +869,21 @@ function print_label_new(){
     });
 
     document.getElementById('stickers').value = '';
+
+     var net_wt = document.getElementById('lbl_net_wt').value;
+     var second_customer = document.getElementById('lbl_2nd_customer').value;
+     var rowId = document.getElementById('lbl_rowId').value;
+     var numbers_table = document.getElementById('numbers_pkts');
+     var cells_len = numbers_table.rows[rowId].cells.length;
+
+
+     if (net_wt != ''){
+     numbers_table.rows[rowId].cells[cells_len-2].lastChild.value = net_wt;
+     }
+     if (second_customer != ''){
+     numbers_table.rows[rowId].cells[cells_len-1].lastChild.value = second_customer;
+     }
+
 }
 
 function print_label_big(){
@@ -1211,7 +1230,7 @@ function make_label_new_slit(th){
             '<td><input type="text" style="width:100px;border: 0px none;" id="lbl_coil_length" name="lbl_coil_length" value="%coil_length%"></td>' +
             '<td><input type="text" style="width:100px;" id="lbl_packet_name" name="lbl_packet_name" value="%packet_name%"></td>' +
             '<td><input type="text" style="width:130px;"  id="lbl_2nd_customer" name="lbl_2nd_customer"></td>' +
-            '<td><input type="text" style="width:100px;"  id="lbl_net_wt" name="lbl_net_wt" onchange = "check_theory_wt_slit()"></td>' +
+            '<td><input type="number" style="width:100px;"  id="lbl_net_wt" name="lbl_net_wt" onchange = "check_theory_wt_slit()"></td>' +
             '<td><input type="text" style="width:100px;" id="lbl_gross_wt" name="lbl_gross_wt"></td>' +
             '<td><input type="text" style="width:130px;"  id="lbl_lamination" name="lbl_lamination"></td>' +
             '<td><input type="text" style="width:130px;"  id="lbl_batch_no" name="lbl_batch_no"></td>' +
@@ -1239,6 +1258,13 @@ function make_label_new_slit(th){
         id = fg_table.rows.length;
     }
 
+    //const fgTableBody = fgTable.querySelector('tbody');
+
+      // Check if a row with this packet name already exists
+      let existingRow = null;
+
+
+
     for(j=1;j<width_table.rows.length;j++){
         width = width_table.rows[j].cells[0].lastChild.value;
         if( width_table.rows[j].cells[0].lastChild.value == "0"){
@@ -1249,6 +1275,16 @@ function make_label_new_slit(th){
         size = thickness + " X " + width + " X Coil";
         theory_wt = parseFloat(thickness)*parseFloat(width)*parseFloat(part_length)*parseFloat(0.00000785);
         width_part_name = part_name + width_name;
+
+        const rows = fg_table.querySelectorAll('tr');
+        for (let i = 1; i < rows.length; i++) {
+        const packetNameCell = rows[i].cells[2].lastChild.value;
+        if (packetNameCell && packetNameCell === width_part_name) {
+          existingRow = rows[i];
+          break;
+            }
+        }
+        if(existingRow == null){
         newNEWHTML = newHTML.replace('%packet_name%', width_part_name);
         newNEWHTML = newNEWHTML.replace('%size%', size);
         //newNEWHTML = newNEWHTML.replace('%coil_name%', width_part_name);
@@ -1258,7 +1294,17 @@ function make_label_new_slit(th){
 
         document.getElementById('fg_table').insertAdjacentHTML('beforeend', newNEWHTML);
         id = id +1;
+        }else{
+
+            existingRow.cells[0].lastChild.value = size;
+            existingRow.cells[1].lastChild.value = part_length;
+            existingRow.cells[10].lastChild.value = width_status;
+            existingRow.cells[14].lastChild.value = theory_wt.toFixed(3);
+
+
+            }
     }
+
 
 }
 
@@ -1866,6 +1912,7 @@ function make_label_new(th){
     document.getElementById('lbl_mat_status').value = mat_status;
     document.getElementById('lbl_qc_name').value = qc_name;
     document.getElementById('lbl_theory_wt').value = theory_wt;
+    document.getElementById('lbl_rowId').value = rowId;
 
 
 

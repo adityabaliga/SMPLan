@@ -480,7 +480,7 @@ def transfer_submit():
         else:
             cs_new = CurrentStock(smpl_no, cs.customer, Decimal(transfer_qty), transfer_nos, cs.thickness, cs.width,
                                   cs.length, cs.status, cs.grade, unit, cs.packet_name, cs.length2, cs.date,
-                                  cs.processing_id, '')
+                                  cs.processing_id, '', 0)
             cs.change_wt(smpl_no, cs.width, cs.length, transfer_qty, transfer_nos, 'minus', cs.status, cs.length2)
             if cs_new.check_if_size_exists():
                 cs_new.change_wt(cs_new.smpl_no, cs_new.width, cs_new.length, transfer_qty, transfer_nos,
@@ -1259,6 +1259,8 @@ def submit_processing():
         packet_name_lst = request.form.getlist('packet_name')
         processed_wt_lst = request.form.getlist('processed_wt')
         remarks_lst = request.form.getlist('remarks')
+        net_wt_lst = request.form.getlist('net_wt')
+        second_customer_lst = request.form.getlist('second_customer')
         #sticker_txt = request.form['stickers']
 
         machine = request.form['machine']
@@ -1344,10 +1346,12 @@ def submit_processing():
                             operation == "Lamination" or operation == "Levelling" or operation == 'Trap_NCTL' or operation == 'Trap_Reshearing':
                         lamination_lst = request.form.getlist('lamination')
                         for output_width, output_length, output_length2, actual_no_of_pieces, packet_name, processed_wt, \
-                            lamination, fg_yes_no, remarks in zip(output_width_lst, output_length_lst, output_length2_lst,
+                            lamination, fg_yes_no, remarks, net_wt, second_customer in zip(output_width_lst,
+                                                                                           output_length_lst, output_length2_lst,
                                                                   actual_no_of_pieces_lst,
                                                                   packet_name_lst, processed_wt_lst,
-                                                                  lamination_lst, fg_yes_no_lst, remarks_lst):
+                                                                  lamination_lst, fg_yes_no_lst, remarks_lst, net_wt_lst,
+                                                                    second_customer_lst):
                             ip_size = input_size.split('x')
                             ms_width = ip_size[0]
                             ms_length = ip_size[1]
@@ -1543,15 +1547,16 @@ def submit_processing():
                                 else:
                                     cs_cc = CurrentStock(smpl_no, customer, processed_wt, actual_no_of_pieces, thickness,
                                                          output_width, output_length, fg_yes_no, grade, unit, _packet_name,
-                                                         output_length2, processing_date, processing_id[0], '')
+                                                         output_length2, processing_date, processing_id[0],
+                                                         second_customer, net_wt)
                                     cursor.execute(
                                         "insert into current_stock (smpl_no,weight,numbers,width,length,status,customer,thickness"
-                                        ",grade, unit, packet_name, length2, date, processing_id, second_customer) "
-                                        "values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+                                        ",grade, unit, packet_name, length2, date, processing_id, second_customer, net_wt) "
+                                        "values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
                                         (cs_cc.smpl_no, cs_cc.weight, cs_cc.numbers, cs_cc.width, cs_cc.length, cs_cc.status,
                                          cs_cc.customer,
                                          cs_cc.thickness, cs_cc.grade, cs_cc.unit, cs_cc.packet_name, cs_cc.length2,
-                                         cs_cc.date,cs_cc.processing_id,cs_cc.second_customer))
+                                         cs_cc.date,cs_cc.processing_id,cs_cc.second_customer, cs_cc.net_wt))
 
 
 
@@ -1628,6 +1633,13 @@ def submit_slitting_processing():
 
         part_length_lst = request.form.getlist('part_length')
         part_name_lst = request.form.getlist('part_name')
+
+        fg_net_wt_lst = request.form.getlist('lbl_net_wt')
+        fg_packet_name_lst = request.form.getlist('lbl_packet_name')
+        fg_size_lst = request.form.getlist('lbl_size')
+        fg_second_customer_lst = request.form.getlist('lbl_2nd_customer')
+
+
         # processed_wt_lst = request.form.getlist('processed_wt')
         # remarks = request.form['remarks']
         remarks = ''
@@ -1864,18 +1876,32 @@ def submit_slitting_processing():
 
                                     else:
                                         #cc_insert = "insert"
+                                        second_customer = ''
+                                        net_wt = 0
+                                        for fg_packet_name, fg_size, fg_net_wt, fg_second_customer in zip(fg_packet_name_lst,
+                                                                                                          fg_size_lst,
+                                                                                                          fg_net_wt_lst,
+                                                                                                          fg_second_customer_lst):
+
+                                            if fg_packet_name == _packet_name:
+                                                second_customer = fg_second_customer
+                                                net_wt = fg_net_wt
+
+                                        if net_wt == '':
+                                            net_wt = 0
+
                                         cs_cc = CurrentStock(smpl_no, customer, part_weight, processed_numbers, thickness,
                                                              output_width, output_length, fg_yes_no, grade, unit, _packet_name,
-                                                             output_length2, processing_date, processing_id[0], '')
+                                                             output_length2, processing_date, processing_id[0], second_customer, net_wt)
                                         cursor.execute(
                                             "insert into current_stock (smpl_no,weight,numbers,width,length,status,customer,thickness"
-                                            ",grade, unit, packet_name, length2, date, processing_id, second_customer) "
-                                            "values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+                                            ",grade, unit, packet_name, length2, date, processing_id, second_customer, net_wt) "
+                                            "values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
                                             (
                                             cs_cc.smpl_no, cs_cc.weight, cs_cc.numbers, cs_cc.width, cs_cc.length, cs_cc.status,
                                             cs_cc.customer,
                                             cs_cc.thickness, cs_cc.grade, cs_cc.unit, cs_cc.packet_name, cs_cc.length2,
-                                            cs_cc.date, cs_cc.processing_id, cs_cc.second_customer))
+                                            cs_cc.date, cs_cc.processing_id, cs_cc.second_customer, cs_cc.net_wt))
 
                                 # If rewinding insert FG as new stock
                                 else:
@@ -1883,17 +1909,17 @@ def submit_slitting_processing():
                                     cs_cc = CurrentStock(smpl_no, customer, part_weight, processed_numbers, thickness,
                                                          output_width, output_length, fg_yes_no, grade, unit,
                                                          packet_name,
-                                                         output_length2, processing_date, processing_id[0],'')
+                                                         output_length2, processing_date, processing_id[0], second_customer, net_wt)
                                     cursor.execute(
                                         "insert into current_stock (smpl_no,weight,numbers,width,length,status,customer,thickness"
-                                        ",grade, unit, packet_name, length2, date, processing_id, second_customer) "
-                                        "values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+                                        ",grade, unit, packet_name, length2, date, processing_id, second_customer, net_wt) "
+                                        "values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
                                         (
                                             cs_cc.smpl_no, cs_cc.weight, cs_cc.numbers, cs_cc.width, cs_cc.length,
                                             cs_cc.status,
                                             cs_cc.customer,
                                             cs_cc.thickness, cs_cc.grade, cs_cc.unit, cs_cc.packet_name, cs_cc.length2,
-                                            cs_cc.date, cs_cc.processing_id, cs_cc.second_customer))
+                                            cs_cc.date, cs_cc.processing_id, cs_cc.second_customer, cs_cc.net_wt))
 
                                 # Unit of the material is decided based on the machine used to process the material.
                                 # WARNING: This is bad programming

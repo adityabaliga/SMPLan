@@ -115,6 +115,8 @@
                 <td>Numbers</td>
                 <td>Status</td>
                 <td>Unit</td>
+                <td>Sticker Wt(in kgs)</td>
+                <td>Second Customer</td>
             </tr>
             {% for cs in cs_lst %}
             <tr>
@@ -129,6 +131,8 @@
                 <td>{{cs.numbers}}</td>
                 <td>{{cs.status}}</td>
                 <td>{{cs.unit}}</td>
+                <td>{{cs.net_wt}}</td>
+                <td>{{cs.second_customer}}</td>
             </tr>
             {% endfor %}
         {% else %}
