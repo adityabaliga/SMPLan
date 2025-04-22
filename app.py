@@ -3322,6 +3322,9 @@ def get_monthly_report():
 
     month_data = CurrentStock.monthly_report_hdr((report_month), (report_year))
     month_dispatch_total = (DispatchHeader.get_monthly_report((report_month), (report_year)))
+    month_dispatch_total_by_customer = (DispatchHeader.get_monthly_report_by_customer((report_month), (report_year)))
+
+
     month_incoming_total = Incoming.get_monthly_total((report_month), (report_year))
 
     customer_wise_machine_wise_data = CurrentStock.customer_wise_machine_wise_month_data((report_month), (report_year))
@@ -3428,7 +3431,8 @@ def get_monthly_report():
                                             prev_month_total_wt = prev_month_total_wt, cust_month_lst = customer_wise_month_data,
                                             month_dispatch_total = month_dispatch_total, month_incoming_total = month_incoming_total,
                                             customer_wise_machine_wise_data = customer_wise_machine_wise_data,
-                           customers = unique_customers_list, operations = operations, data = pivoted_data)
+                           customers = unique_customers_list, operations = operations, data = pivoted_data,
+                           month_dispatch_total_by_customer = month_dispatch_total_by_customer)
 
 
 @app.route('/daily_report_pick_month_year', methods=['GET', 'POST'])

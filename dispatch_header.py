@@ -79,10 +79,23 @@ class DispatchHeader:
     def get_monthly_report(cls, month, year):
         with CursorFromConnectionFromPool() as cursor:
             cursor.execute(
-                "select sum(weight) from dispatch_header, dispatch_detail "
-                "where extract(month from dispatch_date) = %s  and extract(year from dispatch_date) = %s and "
-                "dispatch_header.dispatch_id = dispatch_detail.dispatch_id and remarks NOT LIKE  %s",
-                (month, year, '%TRANSFER%'))
+                "SELECT  dd.unit, SUM(dd.weight) AS total_weight FROM dispatch_header dh "
+                "JOIN dispatch_detail dd ON dh.dispatch_id = dd.dispatch_id WHERE "
+                "extract(month from dh.dispatch_date) = %s  and extract(year from dh.dispatch_date) = %s "
+                "and dh.invoice_no != 'TRANSFER' GROUP BY dd.unit ORDER BY dd.unit",
+                (month, year))
+            user_data = cursor.fetchall()
+            return user_data
+
+    @classmethod
+    def get_monthly_report_by_customer(cls, month, year):
+        with CursorFromConnectionFromPool() as cursor:
+            cursor.execute(
+                "SELECT  dh.customer, SUM(dd.weight) AS total_weight FROM dispatch_header dh "
+                "JOIN dispatch_detail dd ON dh.dispatch_id = dd.dispatch_id WHERE "
+                "extract(month from dh.dispatch_date) = %s  and extract(year from dh.dispatch_date) = %s"
+                "and dh.invoice_no != 'TRANSFER' GROUP BY dh.customer ORDER BY total_weight desc",
+                (month, year))
             user_data = cursor.fetchall()
             return user_data
 

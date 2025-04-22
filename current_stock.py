@@ -642,7 +642,7 @@ class CurrentStock:
     @classmethod
     def customer_wise_month_data(cls, month, year):
         with CursorFromConnectionFromPool() as cursor:
-            cursor.execute("select 	SUBSTRING(i.customer FROM 1 FOR 20) AS customer_group, "
+            cursor.execute("select 	i.customer AS customer_group, "
                            "sum(p.total_processed_wt) as processed_wt FROM processing p "
                            "left JOIN incoming i ON i.smpl_no = p.smpl_no where "
                            "(extract(month from p.processing_date) = %s and extract (year from p.processing_date) = %s)"

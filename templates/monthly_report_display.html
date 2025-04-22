@@ -107,31 +107,8 @@
         </tr>
     </table>
 
-    <hr>
-    <h3>Incoming and Dispatch</h3>
-    <table class="table table-bordered">
-        <tr>
-            <th></th>
-            <th>Total Weight (in MT)</th>
-        </tr>
 
-         {% for incoming in month_incoming_total %}
-        <tr>
-            <td>Unit {{incoming[1]}}</td>
-            <td>{{incoming[0]}}</td>
-        </tr>
-        {% endfor %}
-
-
-        <tr>
-            <td>Dispatch</td>
-            <td>{{month_dispatch_total[0][0]}}</td>
-        </tr>
-    </table>
-
-
-
-
+    <br><br><br>
     <hr>
     <h3>Customer Wise Processing</h3>
     <table class="table table-bordered">
@@ -151,6 +128,7 @@
         </tr>
     </table>
 
+    <br><br><br>
     <h3>Customer Wise Machine Wise Processing</h3>
 
 
@@ -203,6 +181,77 @@
     <p>No data found for the selected time period.</p>
     {% endif %}
 
+
+    <hr>
+    <br><br><br>
+    <h3>Incoming</h3>
+    <table class="table table-bordered">
+        <tr>
+            <th>Unit</th>
+            <th>Total Weight (in MT)</th>
+        </tr>
+
+        {% set incoming_total = namespace(value=0) %}
+         {% for incoming in month_incoming_total %}
+        <tr>
+            <td>Unit {{incoming[1]}}</td>
+            <td>{{incoming[0]}}</td>
+            {% set incoming_total.value = incoming_total.value + incoming[0] %}
+
+
+        </tr>
+        {% endfor %}
+        <tr>
+            <th>Total Incoming</th>
+            <th class="total-column">{{ incoming_total.value}}</th>
+        </tr>
+
+    </table>
+
+    <br><br><br>
+    <h3>Dispatch</h3>
+    <table class="table table-bordered">
+        <tr>
+            <th>Unit</th>
+            <th>Total Weight (in MT)</th>
+        </tr>
+        {% set dispatch_total = namespace(value=0) %}
+         {% for dispatch in month_dispatch_total %}
+        <tr>
+            <td>Unit {{dispatch[0]}}</td>
+            <td>{{dispatch[1]}}</td>
+             {% set dispatch_total.value = dispatch_total.value + dispatch[1] %}
+        </tr>
+        {% endfor %}
+        <tr>
+            <th>Total Dispatch</th>
+            <th class="total-column">{{ dispatch_total.value}}</th>
+        </tr>
+
+    </table>
+
+
+    <br><br><br>
+    <h3>Dispatch By Customer</h3>
+    <table class="table table-bordered">
+        <tr>
+            <th>Customer</th>
+            <th>Total Weight (in MT)</th>
+        </tr>
+        {% set dispatch_customer_total = namespace(value=0) %}
+         {% for dispatch in month_dispatch_total_by_customer %}
+        <tr>
+            <td>Unit {{dispatch[0]}}</td>
+            <td>{{dispatch[1]}}</td>
+             {% set dispatch_customer_total.value = dispatch_customer_total.value + dispatch[1] %}
+        </tr>
+        {% endfor %}
+        <tr>
+            <th>Total Dispatch</th>
+            <th class="total-column">{{ dispatch_customer_total.value}}</th>
+        </tr>
+
+    </table>
 
 </div>
 
