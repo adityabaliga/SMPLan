@@ -110,3 +110,39 @@ class DispatchHeader:
                 "dd.unit ", (date, ))
             user_data = cursor.fetchall()
             return user_data
+
+    @classmethod
+    def honda_dispatch_for_month(cls, month, year, honda_schedule_sizes):
+        query_string = (("WITH daily_totals AS (SELECT EXTRACT(DAY FROM dispatch_header.dispatch_date)::int as day_of_month, "
+                         "dispatch_detail.width, dispatch_detail.length, SUM(dispatch_detail.numbers) as total "
+                         "FROM dispatch_header "
+                         "JOIN dispatch_detail ON dispatch_header.dispatch_id = dispatch_detail.dispatch_id "
+                         "WHERE dispatch_header.customer = 'HONDA TRADING CORPORATION INDIA PVT LTD' "
+                         "AND EXTRACT(MONTH FROM dispatch_header.dispatch_date) = " + str(month) +
+                         "AND EXTRACT(YEAR FROM dispatch_header.dispatch_date) =  " + str(year) +
+                         "GROUP BY day_of_month, dispatch_detail.width, dispatch_detail.length) SELECT day_of_month"))
+
+        for sizes in honda_schedule_sizes:
+            query_string += (", coalesce(MAX(CASE WHEN width = " + str(sizes[0]) + (" AND length = " + str(sizes[1]) +
+                                                                            " THEN total END),0) "
+                                                                            "AS \"") + str(sizes[0]) + "x"
+                                                                            + str(sizes[1]) +"\" ")
+
+        query_string += "FROM daily_totals GROUP BY day_of_month ORDER BY day_of_month;"
+        with CursorFromConnectionFromPool() as cursor:
+            cursor.execute(query_string)
+            user_data = cursor.fetchall()
+            return user_data
+
+
+    @classmethod
+    def honda_schedule_sizes(cls, month, year):
+        with CursorFromConnectionFromPool() as cursor:
+            cursor.execute("SELECT DISTINCT width, length FROM dispatch_detail JOIN dispatch_header ON "
+                           " dispatch_header.dispatch_id = dispatch_detail.dispatch_id "
+                           "WHERE dispatch_header.customer = 'HONDA TRADING CORPORATION INDIA PVT LTD' " 
+                           "AND EXTRACT(MONTH FROM dispatch_header.dispatch_date) = %s"
+                           " AND EXTRACT(YEAR FROM dispatch_header.dispatch_date) = %s and length != 0 "
+                           "and dispatch_header.invoice_no != 'TRANSFER'", (month, year))
+            user_data = cursor.fetchall()
+            return user_data

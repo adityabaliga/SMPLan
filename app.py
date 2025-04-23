@@ -3422,6 +3422,34 @@ def get_monthly_report():
             pivoted_data[customer][operation] = weight
 
 
+    honda_schedule_sizes = DispatchHeader.honda_schedule_sizes(report_month, report_year)
+
+    honda_dispatch_by_size = DispatchHeader.honda_dispatch_for_month(report_month, report_year, honda_schedule_sizes)
+
+    honda_dispatch_total = []
+    honda_dispatch_total_pkts = []
+
+    column = 1
+    while column < len(honda_dispatch_by_size[column]):
+        column_total = 0
+        row = 0
+        while row < len(honda_dispatch_by_size):
+            column_total += honda_dispatch_by_size[row][column]
+            row +=1
+        column += 1
+        honda_dispatch_total.append(column_total)
+
+    for decimal_sizes, column_tot in zip(honda_schedule_sizes, honda_dispatch_total):
+        sizes = str(decimal_sizes[0]) + 'x' + str(decimal_sizes[1])
+        if sizes == '565x645' or sizes == '655x740':
+            pkts = round(column_tot/450,2)
+        else:
+            pkts = round(column_tot/300, 2)
+        honda_dispatch_total_pkts.append(pkts)
+
+
+
+
     return render_template('/monthly_report_display.html', report_month= report_month,
                            report_year= report_year,
                            month_lst = zip(machine_lst, month_wt_lst_arr, month_cuts_lst_arr, month_time_lst_arr,
@@ -3432,7 +3460,9 @@ def get_monthly_report():
                                             month_dispatch_total = month_dispatch_total, month_incoming_total = month_incoming_total,
                                             customer_wise_machine_wise_data = customer_wise_machine_wise_data,
                            customers = unique_customers_list, operations = operations, data = pivoted_data,
-                           month_dispatch_total_by_customer = month_dispatch_total_by_customer)
+                           month_dispatch_total_by_customer = month_dispatch_total_by_customer,
+                           honda_dispatch_by_size = honda_dispatch_by_size, honda_schedule_sizes = honda_schedule_sizes,
+                           honda_dispatch_total = honda_dispatch_total, honda_dispatch_total_pkts = honda_dispatch_total_pkts)
 
 
 @app.route('/daily_report_pick_month_year', methods=['GET', 'POST'])
@@ -3447,10 +3477,6 @@ def honda_wip_fg_stock():
 
     honda_fg_stock_lst = CurrentStock.getHondaFGStock()
     honda_wip_stock_lst = CurrentStock.getHondaWIPStock()
-
-
-
-
 
     return render_template('/honda_FG_WIP_stock.html', fg_lst = honda_fg_stock_lst, wip_lst = honda_wip_stock_lst)
 

@@ -241,7 +241,7 @@
         {% set dispatch_customer_total = namespace(value=0) %}
          {% for dispatch in month_dispatch_total_by_customer %}
         <tr>
-            <td>Unit {{dispatch[0]}}</td>
+            <td>{{dispatch[0]}}</td>
             <td>{{dispatch[1]}}</td>
              {% set dispatch_customer_total.value = dispatch_customer_total.value + dispatch[1] %}
         </tr>
@@ -254,6 +254,44 @@
     </table>
 
 </div>
+
+<br><br><br>
+<h3>Honda Dispatch for the month</h3>
+<table class="table table-bordered">
+    <tr>
+        <th>Date</th>
+        {% for sizes in honda_schedule_sizes %}
+        <th>{{sizes[0]}}x{{sizes[1]}}</th>
+        {% endfor %}
+    </tr>
+
+        {% for dispatch_nos in honda_dispatch_by_size %}
+        <tr>
+            {% for dispatch_row in dispatch_nos %}
+                <td>{{dispatch_row}}</td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+        <tr>
+            <td>Total Nos</td>
+            {% for total in honda_dispatch_total %}
+            <td>{{total}}</td>
+            {% endfor %}
+
+
+        </tr>
+        <tr>
+            <td>Total Packets</td>
+            {% for total_pkts in honda_dispatch_total_pkts %}
+            <td>{{total_pkts}}</td>
+            {% endfor %}
+
+
+        </tr>
+
+
+
+</table>
 
 </body>
 
