@@ -1906,6 +1906,23 @@ def submit_slitting_processing():
                                 # If rewinding insert FG as new stock
                                 else:
                                     # cc_insert = "insert"
+                                    second_customer = ''
+                                    net_wt = 0
+                                    for fg_packet_name, fg_size, fg_net_wt, fg_second_customer in zip(
+                                            fg_packet_name_lst,
+                                            fg_size_lst,
+                                            fg_net_wt_lst,
+                                            fg_second_customer_lst):
+
+                                        if fg_packet_name == _packet_name:
+                                            second_customer = fg_second_customer
+                                            net_wt = fg_net_wt
+
+                                    if net_wt == '':
+                                        net_wt = 0
+
+
+
                                     cs_cc = CurrentStock(smpl_no, customer, part_weight, processed_numbers, thickness,
                                                          output_width, output_length, fg_yes_no, grade, unit,
                                                          packet_name,
