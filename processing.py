@@ -63,7 +63,7 @@ class Processing:
     @classmethod
     def load_history(cls, smpl_no):
         with CursorFromConnectionFromPool() as cursor:
-            cursor.execute('select * from processing where smpl_no = %s', (smpl_no, ))
+            cursor.execute('select * from processing where smpl_no = %s order by processing_date, start_time asc', (smpl_no, ))
             user_data = cursor.fetchall()
             processing_lst, processing_id_lst = [],[]
             for lst in user_data:
