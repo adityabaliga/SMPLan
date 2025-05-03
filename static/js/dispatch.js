@@ -527,6 +527,7 @@ const userPins = {
             if (!/^\d{4}$/.test(enteredPin)) {
                 errorMessage.textContent = "PIN must be 4 digits!";
                 errorMessage.style.display = "block";
+                event.preventDefault();
                 //document.getElementById('submit').disabled = true;
                 return false;
             }
