@@ -2865,6 +2865,111 @@ def slitter_grinding_submit():
     return render_template('/main_menu.html')
 
 
+@app.route('/maintenance_log',  methods=['GET', 'POST'])
+def maintenance_log():
+    return render_template('/maintenance_pick_machine.html')
+
+
+@app.route('/maintenance_entry',  methods=['GET', 'POST'])
+def maintenance_entry():
+
+    if request.method == 'GET':
+        machine = request.args.get('select_machine')
+
+        # Establish a database connection
+    connection = psycopg2.connect(
+        dbname='smpl_prodn',
+        user='postgres',
+        password='smpl@509',
+        host='localhost',
+        port=5432
+    )
+
+    try:
+        connection.autocommit = False
+        cursor = connection.cursor()
+        cursor.execute('select * from maintenance_history where machine = %s order by repair_start_date desc',(machine,))
+
+        user_data = cursor.fetchall()
+        maint_log = []
+
+        for rec in user_data:
+            rec = list(rec)
+            rec[0] = change_date_format(str(rec[0]))
+            if rec[9] != None:
+                rec[9] = change_date_format(str(rec[9]))
+            maint_log.append(rec)
+
+    except psycopg2.OperationalError as error:
+        # Handle network errors
+
+        print("Rolling back the transaction...")
+        connection.rollback()
+        return render_template('/main_menu.html', message="Not Entered")
+    finally:
+        # Close the database connection
+        connection.commit()
+        connection.close()
+
+    return render_template('/maintenance_entry.html', machine = machine, user_data = maint_log)
+
+
+@app.route('/maintenance_entry_submit',  methods=['GET', 'POST'])
+def maintenance_entry_submit():
+    if request.method == 'GET':
+        machine = request.args.get('machine')
+        repair_start_date = request.args.get('maintenance_start_date')
+        repair_start_time = request.args.get('maintenance_start_time')
+        repair_end_date = request.args.get('maintenance_end_date')
+        repair_end_time = request.args.get('maintenance_end_time')
+
+        machine_part = request.args.get('machine_part')
+        maintenance_by = request.args.get('maintenance_by')
+        description = request.args.get('description')
+
+    if request.method == 'POST':
+        machine = request.form['machine']
+        repair_start_date = request.form['maintenance_start_date']
+        repair_start_time = request.form['maintenance_start_time']
+        repair_end_date = request.form['maintenance_end_date']
+        repair_end_time = request.form['maintenance_end_time']
+
+        machine_part = request.form['machine_part']
+        maintenance_by = request.form['maintenance_by']
+
+        description = request.form.get('description')
+
+
+    # Establish a database connection
+    connection = psycopg2.connect(
+        dbname='smpl_prodn',
+        user='postgres',
+        password='smpl@509',
+        host='localhost',
+        port=5432
+    )
+
+    try:
+        connection.autocommit = False
+        cursor = connection.cursor()
+        cursor.execute("insert into maintenance_history (machine, repair_start_date, repair_start_time,"
+                       "repair_end_date, repair_end_time, part, repair_done_by, description, file_name) values"
+                       "(%s,%s,%s,%s,%s,%s,%s,%s,%s)", (machine, repair_start_date, repair_start_time, repair_end_date
+                                                        ,repair_end_time, machine_part, maintenance_by, description, ''))
+
+    except psycopg2.OperationalError as error:
+        # Handle network errors
+
+        print("Rolling back the transaction...")
+        connection.rollback()
+        return render_template('/main_menu.html', message="Not Entered")
+    finally:
+        # Close the database connection
+        connection.commit()
+        connection.close()
+        return render_template('/main_menu.html', message="Entry Done")
+
+
 @app.route('/enter_smpl_no', methods=['GET', 'POST'])
 def enter_smpl_no():
     return render_template('/history_enter_smpl_no.html')
@@ -3656,13 +3761,13 @@ def tally_stock_check():
             db_data_obj = [cs.smpl_no, str(cs.weight), str(cs.numbers), str(cs.width), str(cs.length),
                            str(cs.status), cs.customer,
                            str(cs.thickness), cs. grade, cs.unit, cs.packet_name, str(cs.length2),
-                           str(cs.date), str(cs.processing_id), cs.second_customer]
+                           str(cs.date), str(cs.processing_id), cs.second_customer, cs_id]
             db_data.append(db_data_obj)
             db_data_obj = []
 
         cs_dataframe = pd.DataFrame(db_data, columns=["smpl_no","weight","numbers","width","length","status",
                                                       "customer","thickness","grade","unit","packet_name","length2",
-                                                      "date","processing_id","second_customer"])
+                                                      "date","processing_id","second_customer", "cs_id"])
 
         missing_in_db = excel_data[~excel_data['SMPL No.'].isin(cs_dataframe['smpl_no'])]
         missing_in_excel = cs_dataframe[~cs_dataframe['smpl_no'].isin(excel_data['SMPL No.'])]

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SMPL MRP - Maintenance Entry</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+<style>
+        hr.style1{
+	        border-top: 15px solid #4d0000;
+            }
+        .oe{
+            font-family: Mathematica6 Bold, Old English Text MT, Engravers Old English BT, Old English, Collins Old English, New Old English, serif;
+            font-size: 50px;
+            color: #4d0000;
+            text-align:center;
+            }
+        .topnav a:hover {
+            color: #4d0000;
+            text-decoration: none;
+        }
+        .nopad {
+                margin: 0;
+                padding: 0;
+                margin-top: 0em;
+                margin-bottom: 0em;
+            }
+    </style>
+
+</head>
+<form method="POST" action="/maintenance_entry_submit">
+    <div class="topnav" id="myTopnav">
+        <br>
+        <table>
+            <td><img src="/static/logo.jpg"  height="70" width="92" align = "left"></td>
+            <td width="1050px"><div align="center" class="nopad"> <a href="\main_menu"  class="oe">SMPL</a></div></td>
+            <td><div align="left" class="nopad">Hi {{current_user.username}}<br>
+            <a href="\change_password_form">Change Password</a><br>
+            <a href="\logout">Logout</a></div></td>
+        </table>
+    </div>
+    <hr class ="style1">
+    <!--select name ="select_smpl"-->
+
+
+        <table class = 'table table-sm'>
+            <tr>
+                <th><input type="text"  name="machine" id="machine" value="{{machine}}"></th>
+            </tr>
+            <tr>
+                <td>Start Date</td>
+                <td><input type="date"  name="maintenance_start_date" id="maintenance_start_date" required></td>
+                <td>Start Time</td>
+                <td><input type="time" id = "maintenance_start_time" name="maintenance_start_time" value = "00:00" required></td>
+            </tr>
+            <tr>
+                <td>End Date</td>
+                <td><input type="date"  name="maintenance_end_date" id="maintenance_end_date" required></td>
+                <td>End Time</td>
+                <td><input type="time" id = "maintenance_end_time" name="maintenance_end_time" value = "00:00" required></td>
+            </tr>
+            <tr>
+                <td>Machine Part</td>
+                <td><input type="text"  name="machine_part" id="machine_part" required></td>
+                <td>Maintenance Done By</td>
+                <td><input type="text"  name="maintenance_by" id="maintenance_by" required></td>
+
+            </tr>
+
+
+        </table>
+    <div>Description</div>
+    <div>
+        <textarea name="description" id="description" rows="7" cols="100" wrap="soft" required> </textarea>
+    </div>
+
+    <br><br><br>
+    <table class= 'table table-sm'>
+        <tr>
+
+            <th>Machine</th>
+            <th>Part</th>
+            <th>Start Date</th>
+            <th>Start Time</th>
+            <th>End Date</th>
+            <th>End Time</th>
+            <th>Repair Done By</th>
+            <th>Description</th>
+            <th></th>
+            <th></th>
+        </tr>
+        {% for rec in user_data %}
+        <tr>
+
+            <td>{{rec[1]}}</td>
+            <td>{{rec[2]}}</td>
+            <td>{{rec[0]}}</td>
+
+
+            <td>{{rec[4]}}</td>
+            <td>{{rec[9]}}</td>
+            <td>{{rec[5]}}</td>
+            <td>{{rec[6]}}</td>
+            <td>{{rec[3]}}</td>
+            <td>{{rec[7]}}</td>
+
+        </tr>
+        {% endfor %}
+
+    </table>
+
+
+    <td>
+        <br><input class="btn btn-default" type="submit" value="Select">
+    </td>
+</form>
+</html>

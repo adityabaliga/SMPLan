@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SMPL MRP - Maintenance Select Machine</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+<style>
+        hr.style1{
+	        border-top: 15px solid #4d0000;
+            }
+        .oe{
+            font-family: Mathematica6 Bold, Old English Text MT, Engravers Old English BT, Old English, Collins Old English, New Old English, serif;
+            font-size: 50px;
+            color: #4d0000;
+            text-align:center;
+            }
+        .topnav a:hover {
+            color: #4d0000;
+            text-decoration: none;
+        }
+        .nopad {
+                margin: 0;
+                padding: 0;
+                margin-top: 0em;
+                margin-bottom: 0em;
+            }
+    </style>
+
+</head>
+<form action="/maintenance_entry">
+    <div class="topnav" id="myTopnav">
+        <br>
+        <table>
+            <td><img src="/static/logo.jpg"  height="70" width="92" align = "left"></td>
+            <td width="1050px"><div align="center" class="nopad"> <a href="\main_menu"  class="oe">SMPL</a></div></td>
+            <td><div align="left" class="nopad">Hi {{current_user.username}}<br>
+            <a href="\change_password_form">Change Password</a><br>
+            <a href="\logout">Logout</a></div></td>
+        </table>
+    </div>
+    <hr class ="style1">
+    <!--select name ="select_smpl"-->
+
+
+        {% if current_user.unit != 2 %}
+        <td><input type = "radio" name = "select_machine" value = "CTL 1" required>  CTL 1</input></td><br>
+        <td><input type = "radio" name = "select_machine" value = "Reshearing 1">  Reshearing 1 Ganesh</input></td><br>
+        <td><input type = "radio" name = "select_machine" value = "Reshearing 2">  Reshearing 2 Godrej</input></td><br>
+        <td><input type = "radio" name = "select_machine" value = "Reshearing 3">  Reshearing 3 TEE</input></td><br>
+        <td><input type = "radio" name = "select_machine" value = "Reshearing 8">  Reshearing 8 Amada</input></td><br>
+        <td><input type = "radio" name = "select_machine" value = "Crane 1 526">  Crane 1  526 Dispatch</input></td><br>
+        <td><input type = "radio" name = "select_machine" value = "Crane 2 526">  Crane 2 526 Production</input></td><br>
+        <td><input type = "radio" name = "select_machine" value = "Crane 3 526">  Crane 2 526 5MT</input></td><br>
+        {% endif %}
+
+        {% if current_user.unit != 1 %}
+        <td><input type = "radio" name = "select_machine" value = "CTL 2">  CTL 2</input></td><br>
+        <td><input type = "radio" name = "select_machine" value = "Reshearing 5">  Reshearing 5 Ruby</input></td><br>
+        <td><input type = "radio" name = "select_machine" value = "Reshearing 6">  Reshearing 6 Amada</input></td><br>
+        <td><input type = "radio" name = "select_machine" value = "Reshearing 7">  Reshearing 7 TEE</input></td><br>
+        <td><input type = "radio" name = "select_machine" value = "Reshearing 9">  Reshearing 9 Ruby</input></td><br>
+
+        <td><input type = "radio" name = "select_machine" value = "NCTL 1">  NCTL 1 Kohler </input></td><br>
+        <td><input type = "radio" name = "select_machine" value = "NCTL 2">  NCTL 2 Dimeco 500 </input></td><br>
+        <td><input type = "radio" name = "select_machine" value = "NCTL 3">  NCTL 3 Dimeco 800/Trap </input></td><br>
+        <td><input type = "radio" name = "select_machine" value = "NCTL 4">  NCTL 4 135 </input></td><br>
+        <td><input type = "radio" name = "select_machine" value = "NCTL 5">  NCTL 5 Dimeco 800/Notching </input></td><br>
+
+        <td><input type = "radio" name = "select_machine" value = "Slitting"> Slitting </input></td><br>
+        <td><input type = "radio" name = "select_machine" value = "Mini Slitting"> Mini Slitting </input></td><br>
+        <td><input type = "radio" name = "select_machine" value = "Slit Coil Packing"> Slit Coil Packing </input></td><br>
+
+
+        <td><input type = "radio" name = "select_machine" value = "Crane 1 509">  Crane 1 509 Dispatch</input></td><br>
+        <td><input type = "radio" name = "select_machine" value = "Crane 2 509">  Crane 2 509 Production</input></td><br>
+        <td><input type = "radio" name = "select_machine" value = "Crane 3 509 5MT">  Crane 3 509 5MT</input></td><br>
+        <td><input type = "radio" name = "select_machine" value = "Crane 4 510 Dispatch 803">  Crane 4 510 Dispatch 803 (40-10 MT)</input></td><br>
+        <td><input type = "radio" name = "select_machine" value = "Crane 5 510 Production 979">  Crane 5 510 979 Production</input></td><br>
+        <td><input type = "radio" name = "select_machine" value = "Crane 1 501">  Crane 1 501 Dispatch</input></td><br>
+        <td><input type = "radio" name = "select_machine" value = "Crane 2 501">  Crane 2 501 Second Bay</input></td><br>
+        <td><input type = "radio" name = "select_machine" value = "Elgi Screw Type Compressor Unit 2">  Elgi Screw Type Compressor Unit 2</input></td><br>
+        {% endif %}
+
+    <td>
+        <br><input class="btn btn-default" type="submit" value="Select">
+    </td>
+</form>
+</html>
