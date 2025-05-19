@@ -1113,7 +1113,7 @@ def processing_load():
     cs_rm = CurrentStock.load_smpl_by_id(cs_rm_id)
     incoming = Incoming.load_smpl_by_smpl_no(cs_rm.smpl_no)
 
-    processing_detail_lst = ProcessingDetail.load_from_db(cs_rm.smpl_no, operation)
+    processing_detail_lst = ProcessingDetail.load_from_db(cs_rm.smpl_no)
 
     '''order_return_lst = Order.load_from_db(smpl_no=cs_rm.smpl_no, status="Open")
     order_id_lst = []

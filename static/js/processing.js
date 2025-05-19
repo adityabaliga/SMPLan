@@ -136,13 +136,13 @@ function setFocusToTextBox_Slit(operation){
     var part;
     for (let i = 1; i < table.rows.length; i++) {
             const row = table.rows[i];
-            packet_name = row.cells[2].lastChild.data.split('W');
+            packet_name = row.cells[2].lastChild.data;
 
             // Traverse the cells in the current row
-            if(part_name_arr.includes(packet_name[0])){
+            if(part_name_arr.includes(packet_name)){
 
             }else{
-                part_name_arr.push(packet_name[0]);
+                part_name_arr.push(packet_name);
             }
     }
 
@@ -211,17 +211,33 @@ function check_part_name(table_id, table_row){
 	var last_row = document.getElementById(table_id).rows[rowCount];
 
     var part_name =  (last_row.cells[1].lastChild.value);
+    var packet_name;
+
+    var width_table = document.getElementById('numbers_pkts1');
+
+    for(i=1;i<width_table.rows.length;i++){
+        packet_name = part_name + width_table.rows[i].cells[1].lastElementChild.value;
+        if(part_name_arr.includes(packet_name)){
+            window.alert('Packet name is already used.' + packet_name);
+            last_row.cells[1].lastChild.value = '';
+            last_row.cells[1].lastChild.focus();
+
+        }else{
+            part_name_arr.push(part_name);
+        }
+    }
+
 
     //packet_key = width + 'X' + length + '-' + packet_name;
 
-    if(part_name_arr.includes(part_name)){
+    /*if(part_name_arr.includes(part_name)){
         window.alert('Packet name is already used');
         last_row.cells[1].lastChild.value = '';
         last_row.cells[1].lastChild.focus();
 
     }else{
         part_name_arr.push(part_name);
-    }
+    }*/
 
 
 }
