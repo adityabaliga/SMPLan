@@ -50,6 +50,14 @@ function setFocusToTextBox(operation){
     for (let i = 1; i < table.rows.length; i++) {
             const row = table.rows[i];
             packet_name = row.cells[0].lastChild.data + 'X' + row.cells[1].lastChild.data + '-' +row.cells[2].lastChild.data;
+
+            //In case of Honda 810 x 1010, the CTL and reshearing sizes are the same and the packet names are also the same
+            //So, in case of reshearing I am adding operation to the packet_key
+
+            if(operation == "Reshearing"){
+                packet_name = packet_name + '+' + row.cells[3].lastChild.data;
+            }
+
             // Traverse the cells in the current row
             pkt_name_arr.push(packet_name);
     }
@@ -167,8 +175,16 @@ function check_packet_name(table_id, table_row){
     var length =  Number(last_row.cells[1].lastChild.value);
     var width =  Number(last_row.cells[0].lastChild.value);
     var packet_name =  (last_row.cells[3].lastChild.value);
+    var operation = document.getElementById("operation").value;
 
     packet_key = width + 'X' + length + '-' + packet_name;
+
+    //In case of Honda 810 x 1010, the CTL and reshearing sizes are the same and the packet names are also the same
+    //So, in case of reshearing I am adding operation to the packet_key
+
+    if(operation == "Reshearing"){
+        packet_key = packet_key + '+' + operation;
+    }
 
     if(pkt_name_arr.includes(packet_key)){
         window.alert('Packet name is already used');
