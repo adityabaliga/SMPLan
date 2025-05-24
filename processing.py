@@ -108,9 +108,11 @@ class Processing:
     @classmethod
     def list_for_invoice_check(cls):
         with CursorFromConnectionFromPool() as cursor:
-            cursor.execute('SELECT distinct p.processing_id, p.*, i.thickness, i.customer, p.no_of_qc + p.no_of_helpers '
-                           'as total_members, p.setting_time + p.production_time as total_time FROM incoming i JOIN '
-                           'processing p ON p.smpl_no = i.smpl_no where '
+            cursor.execute('SELECT distinct p.processing_id, p.*, i.thickness, i.customer, p.no_of_qc + p.no_of_helpers'
+                           ' as total_members, p.setting_time + p.production_time as total_time , d.machine '
+                           'FROM incoming i JOIN '
+                           'processing p ON p.smpl_no = i.smpl_no '
+                           'JOIN processing_detail d ON d.processing_id = p.processing_id where '
                            '(p.processing_date >= current_date - interval %s '
                            'month and p.processing_date < current_date)', ('6',))
 

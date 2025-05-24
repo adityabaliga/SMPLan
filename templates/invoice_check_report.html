@@ -65,9 +65,11 @@
                 <th>Customer</th>
                 <th>Total Members</th>
                 <th>Total Time</th>
+                <th>Machine</th>
                 <th>Machine Cost</th>
                 <th>Labour Cost</th>
                 <th>Total Cost</th>
+                <th>Total Cost/MT</th>
             </tr>
             <tr>
             {% for processing in processing_lst %}
@@ -95,6 +97,8 @@
                     <td>{{processing[21]}}</td>
                     <td>{{processing[22]}}</td>
                     <td>{{processing[23]}}</td>
+                    <td>{{processing[24]}}</td>
+                    <td>{{processing[25]}}</td>
             </tr>
             {% endfor %}
     </table>

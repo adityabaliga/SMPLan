@@ -3679,8 +3679,8 @@ def invoice_check_report():
     machine_name_value = [("Slitting",7155), ("CTL 1", 4598), ("CTL 2", 4598), ("NCTL 1", 1325), ("NCTL 2", 805),
                           ("NCTL 3", 1325), ("NCTL 4", 500), ("NCTL 5", 1325), ("Reshearing 1", 605),
                           ("Reshearing 2", 605), ("Reshearing 3", 605), ("Reshearing 4", 605), ("Reshearing 5", 605),
-                          ("Reshearing 6", 605), ("Reshearing 7", 605), ("Reshearing 8", 605), ("Mini_Slitting", 500),
-                          ("Lamination", 300)]
+                          ("Reshearing 6", 605), ("Reshearing 7", 605), ("Reshearing 8", 605),  ("Reshearing 9", 605),
+                        ("Mini_Slitting", 500), ("Lamination", 300)]
     labour_rate = 190
     indirect_labour = 0
     indirect_labour_value = [("Slitting",2.5), ("CTL 1", 2.5), ("CTL 2", 2.5), ("NCTL 1", 1), ("NCTL 2", 1),
@@ -3704,6 +3704,9 @@ def invoice_check_report():
                 processing.append(labour_cost)
         total_cost = labour_cost + machine_cost
         processing.append(total_cost)
+
+        total_cost_per_mt = round(Decimal(total_cost)/(processing[15]),0)
+        processing.append(total_cost_per_mt)
 
         processing_pass_lst.append(processing)
 
