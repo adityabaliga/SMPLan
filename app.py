@@ -3677,17 +3677,17 @@ def invoice_check_report():
     # The rates machine cost - direct labour cost
     # in the pricing sheet, delete the direct labour row, the total cost you get is the cost mentioned here
     machine_name_value = [("Slitting",7155), ("CTL 1", 4598), ("CTL 2", 4598), ("NCTL 1", 1325), ("NCTL 2", 805),
-                          ("NCTL 3", 1325), ("NCTL 4", 500), ("NCTL 5", 1325), ("Reshearing 1", 605),
-                          ("Reshearing 2", 605), ("Reshearing 3", 605), ("Reshearing 4", 605), ("Reshearing 5", 605),
-                          ("Reshearing 6", 605), ("Reshearing 7", 605), ("Reshearing 8", 605),  ("Reshearing 9", 605),
+                          ("NCTL 3", 1325), ("NCTL 4", 500), ("NCTL 5", 1325), ("Reshearing 1", 410),
+                          ("Reshearing 2", 410), ("Reshearing 3", 410), ("Reshearing 4", 410), ("Reshearing 5", 410),
+                          ("Reshearing 6", 410), ("Reshearing 7", 410), ("Reshearing 8", 410),  ("Reshearing 9", 410),
                         ("Mini_Slitting", 500), ("Lamination", 300)]
     labour_rate = 190
     indirect_labour = 0
     indirect_labour_value = [("Slitting",2.5), ("CTL 1", 2.5), ("CTL 2", 2.5), ("NCTL 1", 1), ("NCTL 2", 1),
                           ("NCTL 3", 1), ("NCTL 4", 0.75), ("NCTL 5", 1), ("Reshearing 1", 1),
                           ("Reshearing 2", 1), ("Reshearing 3", 1), ("Reshearing 4", 1), ("Reshearing 5", 1),
-                          ("Reshearing 6", 1), ("Reshearing 7", 1), ("Reshearing 8", 1), ("Mini_Slitting", 0.75),
-                          ("Lamination", 0.5)]
+                          ("Reshearing 6", 1), ("Reshearing 7", 1), ("Reshearing 8", 1), ("Reshearing 9", 1),
+                             ("Mini_Slitting", 0.75), ("Lamination", 0.5)]
 
     for processing_tup in processing_lst:
         processing = list(processing_tup)
