@@ -2380,7 +2380,7 @@ def check_stock_tsdpl():
     wt_per_sheet = 0
     packet_wt = 0
 
-    cs_lst = CurrentStock.get_stock_by_customer('TATA STEEL DOWNSTREAM PRODUCTS LTD%', 'AllminusScrap')
+    cs_lst = CurrentStock.get_stock_by_customer('TATA STEEL DOWNSTREAM PRODUCTS LTD%', 'FG')
 
     for cs_id, cs in cs_lst:
         if not any(substring in cs.packet_name for substring in ['W0P0', 'D0', 'M0']):
@@ -2388,8 +2388,8 @@ def check_stock_tsdpl():
             _cs_lst.append(cs)
             incoming = Incoming.load_smpl_by_smpl_no(cs.smpl_no)
             incoming_lst.append(incoming)
-            sticker = CurrentStock.get_sticker(cs.smpl_no, cs.packet_name, cs.thickness, cs.width, cs.length)
-            sticker_lst.append(sticker)
+            # sticker = CurrentStock.get_sticker(cs.smpl_no, cs.packet_name, cs.thickness, cs.width, cs.length)
+            # sticker_lst.append(sticker)
 
 
         today_date = datetime.today().strftime('%Y-%m-%d')
@@ -2421,7 +2421,7 @@ def check_stock_tsdpl():
             grade = grade[1].split(';')
             cs.grade = grade[0]'''
 
-    cs_lst = zip(_cs_id_lst, _cs_lst, today_date_lst, no_of_days_lst, finishing_date_lst, incoming_lst, sticker_lst)
+    cs_lst = zip(_cs_id_lst, _cs_lst, today_date_lst, no_of_days_lst, finishing_date_lst, incoming_lst)
     return render_template('stock_display_tsdpl.html', cs_lst=cs_lst)
 
 
@@ -2926,6 +2926,7 @@ def maintenance_entry_submit():
         machine_part = request.args.get('machine_part')
         maintenance_by = request.args.get('maintenance_by')
         description = request.args.get('description')
+        entry_by = request.args.get('entry_by')
 
     if request.method == 'POST':
         machine = request.form['machine']
@@ -2938,6 +2939,7 @@ def maintenance_entry_submit():
         maintenance_by = request.form['maintenance_by']
 
         description = request.form.get('description')
+        entry_by = request.form.get('entry_by')
 
 
     # Establish a database connection
@@ -2953,9 +2955,10 @@ def maintenance_entry_submit():
         connection.autocommit = False
         cursor = connection.cursor()
         cursor.execute("insert into maintenance_history (machine, repair_start_date, repair_start_time,"
-                       "repair_end_date, repair_end_time, part, repair_done_by, description, file_name) values"
-                       "(%s,%s,%s,%s,%s,%s,%s,%s,%s)", (machine, repair_start_date, repair_start_time, repair_end_date
-                                                        ,repair_end_time, machine_part, maintenance_by, description, ''))
+                       "repair_end_date, repair_end_time, part, repair_done_by, description, file_name, entry_by) values"
+                       "(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)", (machine, repair_start_date, repair_start_time, repair_end_date
+                                                        ,repair_end_time, machine_part, maintenance_by, description,
+                                                           '', entry_by))
 
     except psycopg2.OperationalError as error:
         # Handle network errors

@@ -91,7 +91,7 @@
 
     </tr>
 
-    {% for cs_id, cs, today_date, no_of_days,finishing_date, incoming, sticker in cs_lst %}
+    {% for cs_id, cs, today_date, no_of_days,finishing_date, incoming in cs_lst %}
         {% if cs.packet_name != "W0P0" %}
         <tr>
 
@@ -103,7 +103,7 @@
             <td>Peenya</td>
             <td>{{no_of_days}}</td>
             <td>{{cs.status}}</td>
-            <td>{{sticker[13]}}</td>
+            <td>{{cs.second_customer}}</td>
             <td>{{incoming.material_type}}</td>
             <td>{{incoming.mill_id}}</td>
             <td>{{cs.smpl_no}}</td>
@@ -115,7 +115,7 @@
             <td>{{cs.length}}</td>
             <td></td>
             <td>{{cs.weight}}</td>
-            <td>{{sticker[19]}}</td>
+            <td>{{cs.net_wt}}</td>
             <td></td>
             <td></td>
             <td>{{cs.unit}}</td>

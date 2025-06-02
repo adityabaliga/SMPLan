@@ -65,6 +65,12 @@
                 <td><input type="text"  name="maintenance_by" id="maintenance_by" required></td>
 
             </tr>
+             <tr>
+                <td>Entry By</td>
+                <td><input type="text"  name="entry_by" id="entry_by" required></td>
+
+
+            </tr>
 
 
         </table>
@@ -72,6 +78,10 @@
     <div>
         <textarea name="description" id="description" rows="7" cols="100" wrap="soft" required> </textarea>
     </div>
+    <br><br>
+    <td>
+        <br><input class="btn btn-default" type="submit" value="Submit">
+    </td>
 
     <br><br><br>
     <table class= 'table table-sm'>
@@ -83,10 +93,11 @@
             <th>Start Time</th>
             <th>End Date</th>
             <th>End Time</th>
-            <th>Repair Done By</th>
+
             <th>Description</th>
-            <th></th>
-            <th></th>
+            <th>Repair Done By</th>
+            <th>Entry By</th>
+
         </tr>
         {% for rec in user_data %}
         <tr>
@@ -102,6 +113,7 @@
             <td>{{rec[6]}}</td>
             <td>{{rec[3]}}</td>
             <td>{{rec[7]}}</td>
+            <td>{{rec[10]}}</td>
 
         </tr>
         {% endfor %}
@@ -109,8 +121,6 @@
     </table>
 
 
-    <td>
-        <br><input class="btn btn-default" type="submit" value="Select">
-    </td>
+
 </form>
 </html>
