@@ -177,6 +177,14 @@ function check_packet_name(table_id, table_row){
     var packet_name =  (last_row.cells[3].lastChild.value);
     var operation = document.getElementById("operation").value;
 
+
+    // Check if packet name not entered
+    if(packet_name == ""){
+         window.alert('Please enter packet name');
+         last_row.cells[4].lastChild.value = '';
+        last_row.cells[3].lastChild.focus();
+    }
+
     packet_key = width + 'X' + length + '-' + packet_name;
 
     //In case of Honda 810 x 1010, the CTL and reshearing sizes are the same and the packet names are also the same
@@ -189,6 +197,7 @@ function check_packet_name(table_id, table_row){
     if(pkt_name_arr.includes(packet_key)){
         window.alert('Packet name is already used');
         last_row.cells[3].lastChild.value = '';
+        last_row.cells[4].lastChild.value = '';
         last_row.cells[3].lastChild.focus();
 
     }else{
@@ -300,6 +309,15 @@ function enable_lami_co(table_id, table_row){
 // This function calculates the weight for CTL, NCTL and Reshearing functions
 function for_packets_and_weight(table_id,table_row,operation){
 
+   //The logic for checking duplicate packets is changed
+   //The boys were not using tab button to move across fields and since the packet name was auto populated
+   // The check_packet_name function was not called.
+
+   // I have moved it here as numbers for the packet have to be added and so it can be checked
+   // The check also has to be done before the weights are calculated, to avoid confusion
+
+   check_packet_name('numbers_pkts', table_row)
+
    // Get the row where the change was made and calculate the weight of the processed material
 	var rowCount = table_row.offsetParent.parentElement.rowIndex;
 	var last_row = document.getElementById(table_id).rows[rowCount];
@@ -333,6 +351,8 @@ function for_packets_and_weight(table_id,table_row,operation){
     }
 
     calculate_wt_and_cuts(table_id);
+
+
 }
 
 // This function calculates the weight for Trap NCTL and Reshearing functions
