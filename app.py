@@ -3828,6 +3828,22 @@ def tally_stock_check():
         return render_template('/tally_stock_check_result.html', missing_in_db_html = missing_in_db_html,
                                missing_in_excel_html = missing_in_excel_html)
 
+@app.route('/tally_stock_delete', methods=['GET', 'POST'])
+def tally_stock_delete():
+    cs_delete_list = []
+    if request.method == 'POST':
+        cs_delete_list = request.form['cs_delete_list']
+
+    if request.method == 'GET':
+        cs_delete_list = request.args.getlist('cs_delete_list')
+
+
+    cs_delete_list = cs_delete_list.split(",")
+
+    for cs_id in cs_delete_list:
+        CurrentStock.delete_record(cs_id)
+
+    return render_template('/main_menu.html')
 
 @app.errorhandler(Exception)
 def handle_error(e):
