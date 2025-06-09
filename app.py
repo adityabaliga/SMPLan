@@ -2973,6 +2973,41 @@ def maintenance_entry_submit():
         return render_template('/main_menu.html', message="Entry Done")
 
 
+
+@app.route('/maintenance_history_month',  methods=['GET', 'POST'])
+def maintenance_history_month():
+
+    # Establish a database connection
+    connection = psycopg2.connect(
+        dbname='smpl_prodn',
+        user='postgres',
+        password='smpl@509',
+        host='localhost',
+        port=5432
+    )
+
+    try:
+        connection.autocommit = False
+        cursor = connection.cursor()
+        cursor.execute('select * from maintenance_history where repair_start_date >  CURRENT_DATE - INTERVAL %s'
+                       ' order by repair_start_date desc',('30 days',))
+
+        user_data = cursor.fetchall()
+        maint_log = []
+
+        for rec in user_data:
+            rec = list(rec)
+            rec[0] = change_date_format(str(rec[0]))
+            if rec[9] != None:
+                rec[9] = change_date_format(str(rec[9]))
+            maint_log.append(rec)
+
+    finally:
+        # Close the database connection
+
+        connection.close()
+        return render_template('/mainterance_month_history.html', user_data = user_data)
+
 @app.route('/enter_smpl_no', methods=['GET', 'POST'])
 def enter_smpl_no():
     return render_template('/history_enter_smpl_no.html')
