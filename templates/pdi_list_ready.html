@@ -27,8 +27,8 @@
     </style>
 
 </head>
-<body onload="get_size_details()">
-<form action="/dispatch">
+<body>
+<form>
     <div class="topnav" id="myTopnav">
         <br>
         <table>
@@ -42,67 +42,58 @@
 
     <hr class ="style1">
     <input type = "button" class="btn btn-default" value="Download" onclick="generateExcelHondaDispatch()">
-    <h2>DISPATCH LIST - {{dispatch_date}} VEHICLE NO: {{veh_no}}</h2>
-    <p><input id="dispatch_date" name="dispatch_date" value = {{dispatch_date}} hidden></p>
-    <p><input id="vehicle_no" name="vehicle_no" value = {{veh_no}} hidden></p>
-    <p><input id="customer" name="customer" value = 'HONDA TRADING CORPORATION INDIA PVT LTD' hidden></p>
+    <h2><p>DISPATCH LIST - {{staging_dispatch_header.dispatch_date}} VEHICLE NO: {{staging_dispatch_header.vehicle_no}} CUSTOMER: {{staging_dispatch_header.customer}}</p></h2>
+    <p><input id="dispatch_date" name="dispatch_date" value = {{staging_dispatch_header.dispatch_date}} hidden></p>
+    <p><input id="vehicle_no" name="vehicle_no" value = {{staging_dispatch_header.vehicle_no}} hidden></p>
+    <p><input id="customer" name="customer" value = "{{staging_dispatch_header.customer}}" hidden></p>
     <table class = "table table-sm" id = 'dispatch_list'>
             <thead>
-            <tr rowspan = 19>DISPATCH LIST - {{dispatch_date}} VEHICLE NO: {{veh_no}}</tr>
+            <tr rowspan = 19>DISPATCH LIST - {{staging_dispatch_header.dispatch_date}} VEHICLE NO: {{staging_dispatch_header.vehicle_no}}  CUSTOMER: {{staging_dispatch_header.customer}}</tr>
             <tr>
 
-                <th>Sl No.</th>
+                <th></th>
+                <th>SMPL No.</th>
                 <th>Packet Name</th>
-                <th>Part Name</th>
-                <th>Mill</th>
-                <th>Coil No</th>
                 <th>Thickness</th>
                 <th>Width</th>
                 <th>Length</th>
                 <th>Numbers</th>
-                <th>Per Sheet Weight</th>
-                <th>Net Wt</th>
-                <th>G Wt</th>
-                <th>Grade</th>
-                <th>Coating</th>
-                <th>Import Invoice no</th>
-                <th>Coil Size</th>
-                <th>No of Pkts</th>
-                <th>Pallet Type</th>
-                <th>Remarks</th>
-                <th>SMPL No</th>
+                <th>Sticker Wt</th>
+                <th>Second Customer</th>
+                <th>Defectives</th>
+                <th></th>
+
+
+
+
+
 
             </tr>
             </thead>
             <tbody>
-            {% for cs, incoming, import_invoice_number in cs_incoming_lst %}
+            {% for cs_id, cs, dispatch_details, defectives in dispatch_detail_arr %}
             <tr>
-                <td></td>
-                <td>{{cs.smpl_no}}{{cs.packet_name}}</td>
-                <td>Part Name</td>
-                <td>{{incoming.mill}}</td>
-                <td>{{incoming.mill_id}}</td>
-                <td>{{cs.thickness}}</td>
-                <td>{{cs.width}}</td>
-                <td>{{cs.length}}</td>
-                <td>{{cs.numbers}}</td>
-                <td>Per Sheet Weight</td>
-                <td></td>
-                <td>G Wt</td>
-                <td>{{incoming.grade}}</td>
-                <td>Coating</td>
-                <td>{{import_invoice_number}}</td>
-                <td>{{incoming.width}}</td>
-                <td>1</td>
-                <td>Pallet Type</td>
-                <td>MS</td>
-                <td>{{cs.smpl_no}}</td>
+                <td><input type = "text" name = "select_smpl" class = "select_smpl" value ="{{cs_id}},{{cs.smpl_no}}"  hidden></td>
+                <td>{{dispatch_details.smpl_no}}</td>
+                <td>{{dispatch_details.packet_name}}</td>
+                <td>{{dispatch_details.thickness}}</td>
+                <td>{{dispatch_details.width}}</td>
+                <td>{{dispatch_details.length}}</td>
+                <td>{{dispatch_details.numbers}}</td>
+                <td>{{cs.net_wt}}</td>
+                <td>{{cs.second_customer}}</td>
+                <td>{{defectives}}</td>
+                <td><input type ="text" name = "defective" id="defective" value="{{defectives}}" hidden></td>
+
+
+
             </tr>
             {% endfor %}
             </tbody>
     </table>
     <p>Dispatch Time <input type ="time" name = "dispatch_time" required></p>
     <p>Invoice No <input type ="text" name = "invoice_no"></p>
+    <p>Remarks <input type ="text" style = "width:200px;"  name = "remarks"></p>
     <p>Entry By <select name="entry_by" id="entry_by" required>
                     <option value="">Select User</option>
                     <option value="Manjappa">Manjappa</option>
@@ -114,12 +105,13 @@
                     <option value="Aditya">Aditya</option>
 
                 </select>
-    <p>Enter Pin <input type ="password" maxlength="4" placeholder="Enter PIN" style = "width:200px;"  name = "pinInput" id = "pinInput" required></p>
+        <p>Enter Pin <input type ="password" maxlength="4" placeholder="Enter PIN" style = "width:200px;"  name = "pinInput" id = "pinInput" required></p>
         <p id="errorMessage" class="error" style="display:none">Invalid PIN!</p>
         <p id="successMessage" class="success" style="display:none">PIN verified successfully!</p>
-    <p>Remarks <input type ="text" style = "width:200px;"  name = "remarks"></p>
-    <input class="btn btn-default" type="submit" value="Submit">
-    <p>Dispatch Staging ID <input type ="text" style = "width:200px;"  name = "staging_dispatch_id" value = '' hidden></p>
+    <p hidden>Dispatch Staging ID <input type ="text" style = "width:200px;"  name = "staging_dispatch_id" value = {{staging_dispatch_id}}></p>
+    <input class="btn btn-default" id="dispatch" type="submit" formaction="/dispatch" value="Dispatch">
+
+    <input class="btn btn-default" id="delete" type="submit" formaction="/pdi_delete" value="Delete">
 
     <table id = 'dispatch_list_submit'>
 

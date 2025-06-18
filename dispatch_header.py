@@ -70,10 +70,11 @@ class DispatchHeader:
         return dispatch_lst
 
     @classmethod
-    def update_invoice_no(cls, dispatch_id, invoice_no, dispatch_date):
+    def update_invoice_no(cls, dispatch_id, invoice_no, dispatch_date, vehicle_no):
         with CursorFromConnectionFromPool() as cursor:
-            cursor.execute("update dispatch_header set invoice_no = %s, dispatch_date = %s where dispatch_id = %s",
-                           (invoice_no, dispatch_date, dispatch_id))
+            cursor.execute("update dispatch_header set invoice_no = %s, dispatch_date = %s, vehicle_no = %s "
+                           "where dispatch_id = %s",
+                           (invoice_no, dispatch_date, vehicle_no, dispatch_id))
 
     @classmethod
     def get_monthly_report(cls, month, year):
@@ -146,3 +147,38 @@ class DispatchHeader:
                            "and dispatch_header.invoice_no != 'TRANSFER'", (month, year))
             user_data = cursor.fetchall()
             return user_data
+
+    def save_to_staging_db(self):
+        with CursorFromConnectionFromPool() as cursor:
+            cursor.execute("insert into staging_dispatch_header (vehicle_no, dispatch_date, dispatch_time, customer, "
+                           "invoice_no, remarks, entry_by) values"
+                           "(%s, %s, %s, %s, %s, %s, %s)", (self.vehicle_no, self.dispatch_date, self.dispatch_time,
+                                                       self.customer, self.invoice_no, self.remarks, self.entry_by))
+
+            cursor.execute("select dispatch_id from staging_dispatch_header where oid= %s", (cursor.lastrowid,))
+            data = cursor.fetchone()
+            return data[0]
+
+    @classmethod
+    def delete_staging_data(cls, delete_staging_data):
+        with CursorFromConnectionFromPool() as cursor:
+            cursor.execute("delete from staging_dispatch_detail where dispatch_id = %s",(delete_staging_data,))
+            cursor.execute("delete from staging_dispatch_header where dispatch_id = %s",(delete_staging_data,))
+
+
+    @classmethod
+    def get_open_staging_data(cls):
+        with CursorFromConnectionFromPool() as cursor:
+            cursor.execute("select * from staging_dispatch_header order by dispatch_date desc")
+            user_data = cursor.fetchall()
+            return user_data
+
+    @classmethod
+    def get_staging_header(cls, staging_dispatch_id):
+        user_data = []
+        with CursorFromConnectionFromPool() as cursor:
+            cursor.execute("select * from staging_dispatch_header where dispatch_id = %s", (int(staging_dispatch_id),))
+            user_data = cursor.fetchone()
+
+            dispatch_header = DispatchHeader(user_data[1], user_data[6], user_data[2], user_data[3], user_data[4], user_data[5], user_data[7])
+            return dispatch_header

@@ -5,7 +5,7 @@ from werkzeug.middleware.profiler import ProfilerMiddleware
 from decimal import Decimal
 from flask_login import LoginManager, login_user, current_user, logout_user
 from file_uploader import FileUploader
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, send_file
 from markupsafe import Markup
 from csv import writer
 from datetime import datetime, timedelta
@@ -15,6 +15,7 @@ import openpyxl
 import urllib.request
 from apscheduler.schedulers.background import BackgroundScheduler
 import atexit
+import io
 
 from user import User
 from current_stock import CurrentStock
@@ -2544,24 +2545,19 @@ def dispatch_list():
 @app.route('/dispatch', methods=['GET', 'POST'])
 def dispatch():
     if request.method == 'POST':
-        dispatch_lst = request.form.getlist['select_smpl']
-        '''pkt_name = request.form.getlist['packet_name']
-        dispatch_nos = request.form.getlist['dispatch_numbers']
-        dispatch_quantity = request.form.getlist['dispatch_quantity']'''
+        dispatch_lst = request.form.getlist('select_smpl')
         vehicle_no = request.form['vehicle_no']
         customer = request.form['customer']
         dispatch_date = request.form['dispatch_date']
         dispatch_time = request.form['dispatch_time']
-        dispatch_pkts = request.form.getlist['dispatch_packets']
+        #dispatch_pkts = request.form.getlist('dispatch_packets')
         remarks = request.form['remarks']
+        invoice_no = request.form['invoice_no']
         entry_by = request.form['entry_by']
+        staging_dispatch_id = request.form['staging_dispatch_id']
 
     if request.method == 'GET':
         dispatch_lst = request.args.getlist('select_smpl')
-        '''pkt_name = request.args.getlist('packet_name')
-        dispatch_nos = request.args.getlist('dispatch_numbers')
-        dispatch_quantity = request.args.getlist('dispatch_quantity')
-        dispatch_pkts = request.args.getlist('dispatch_packets')'''
         defectives = request.args.getlist('defective')
         vehicle_no = request.args.get('vehicle_no')
         customer = request.args.get('customer')
@@ -2570,14 +2566,11 @@ def dispatch():
         remarks = request.args.get('remarks')
         invoice_no = request.args.get('invoice_no')
         entry_by = request.args.get('entry_by')
+        staging_dispatch_id = request.args.get('staging_dispatch_id')
 
     # This fetches the list and removes the elements that are not selected
     # The ones that are not selected are returned as None. The below list filters out the Nones
-    #dispatch_nos_lst = list(filter(None, dispatch_nos))
-    #dispatch_quantity_lst = list(filter(None, dispatch_quantity))
     defectives_lst = list(filter(None, defectives))
-    #dispatch_pkts_lst = list(filter(None, dispatch_pkts))
-    #pkt_name_lst = list(filter(None, pkt_name))
 
     dispatch_header = DispatchHeader(vehicle_no, customer, dispatch_date, dispatch_time, invoice_no, remarks, entry_by)
     dispatch_id = dispatch_header.save_to_db()
@@ -2593,6 +2586,9 @@ def dispatch():
         dispatch_detail.save_to_db()
 
         CurrentStock.delete_record(cs_id)
+
+    if staging_dispatch_id != '':
+        DispatchHeader.delete_staging_data(int(staging_dispatch_id))
 
 
     return render_template('/main_menu.html')
@@ -2689,6 +2685,173 @@ def qr_dispatch_submit():
     _cs_lst = zip(cs_id_lst, cs_lst, dispatch_numbers_lst, dispatch_wt_lst, packet_name_lst)
     return render_template('qr_dispatch_list.html', _cs_lst = _cs_lst, customer = customer,
                             unmatched_lst = unmatched_lst)
+
+@app.route('/generate_pdi_list', methods=['GET', 'POST'])
+def generate_pdi_list():
+    customer_lst = CurrentStock.customer_list_for_dispatch()
+    return render_template('pdi_pick_customer.html', customer_lst=customer_lst)
+
+@app.route('/pdi_list', methods=['GET', 'POST'])
+def pdi_list():
+    customer = ""
+    display_type = ""
+    dispatch_type = ""
+    if request.method == 'POST':
+        customer = request.form['select_customer']
+        display_type = request.form['FG/RM']
+        dispatch_type = request.form['dispatch_type']
+    if request.method == 'GET':
+        customer = request.args.get('select_customer')
+        display_type = request.args.get('FG/RM')
+        dispatch_type = request.args.get('dispatch_type')
+
+    cs_lst = CurrentStock.get_stock_by_customer(customer, display_type)
+    smpl_no_lst = []
+    _cs_lst = []
+    _cs_id_lst = []
+
+    for cs_id, cs in cs_lst:
+        smpl_no_lst.append(cs.smpl_no)
+        _cs_id_lst.append(cs_id)
+        _cs_lst.append(cs)
+
+
+        # Extract unique sizes
+    unique_smpl_no_lst = []
+    unique_smpl_no_lst = list(set(smpl_no_lst))
+    unique_smpl_no_lst.sort()
+
+    if dispatch_type == 'qr':
+        return render_template('qr_dispatch.html', customer=customer)
+    else:
+        return render_template('pdi_list.html', cs_lst=zip(_cs_id_lst, _cs_lst), customer=customer,
+                               unique_smpl_no_lst = unique_smpl_no_lst)
+
+
+
+
+@app.route('/pdi_prepare_list', methods=['GET', 'POST'])
+def pdi_prepare_list():
+    if request.method == 'POST':
+        dispatch_lst = request.form.getlist['select_smpl']
+        vehicle_no = request.form['vehicle_no']
+        customer = request.form['customer']
+        dispatch_date = request.form['dispatch_date']
+        dispatch_pkts = request.form.getlist['dispatch_packets']
+        remarks = request.form['remarks']
+        entry_by = request.form['entry_by']
+
+    if request.method == 'GET':
+        dispatch_lst = request.args.getlist('select_smpl')
+        defectives = request.args.getlist('defective')
+        vehicle_no = request.args.get('vehicle_no')
+        customer = request.args.get('customer')
+        dispatch_date = request.args.get('dispatch_date')
+        remarks = request.args.get('remarks')
+        invoice_no = request.args.get('invoice_no')
+        entry_by = request.args.get('entry_by')
+
+    # This fetches the list and removes the elements that are not selected
+    # The ones that are not selected are returned as None. The below list filters out the Nones
+    defectives_lst = list(filter(None, defectives))
+
+    staging_dispatch_detail_arr = []
+    cs_lst = []
+    cs_id_lst = []
+
+    staging_dispatch_header = DispatchHeader(vehicle_no, customer, dispatch_date, '00:00:00', invoice_no, remarks, entry_by)
+    staging_dispatch_id = staging_dispatch_header.save_to_staging_db()
+
+    # For the items to be dispatched, dispatch detail is created and the current stock quantity is deleted or reduced
+    for smpl, defective in zip(dispatch_lst, defectives_lst):
+        smpl_details = smpl.split(',')
+        smpl_no = smpl_details[1]
+        cs_id = smpl_details[0]
+        cs = CurrentStock.load_smpl_by_id(cs_id)
+        staging_dispatch_detail = DispatchDetail(staging_dispatch_id, cs.smpl_no, cs.thickness, cs.width, cs.length, cs.numbers,
+                                         cs.weight, defective, 1, cs.length2, cs.packet_name, cs.unit)
+        staging_dispatch_detail.save_to_staging_db(cs_id)
+
+
+        staging_dispatch_detail_arr.append(staging_dispatch_detail)
+        cs_lst.append(cs)
+        CurrentStock.update_status_cls(cs_id, "Dispatch")
+        cs_id_lst.append((cs_id))
+
+    return render_template('/pdi_list_ready.html', staging_dispatch_header = staging_dispatch_header,
+                           dispatch_detail_arr = zip(cs_id_lst, cs_lst,staging_dispatch_detail_arr, defectives_lst),
+                           staging_dispatch_id = staging_dispatch_id)
+
+
+@app.route('/view_pdi_list', methods=['GET', 'POST'])
+def view_pdi_list():
+    open_pdi_list = []
+    open_pdi_list = DispatchHeader.get_open_staging_data()
+
+    if open_pdi_list:
+        return render_template('view_open_pdi_list.html', open_pdi_list = open_pdi_list)
+    if open_pdi_list:
+        return render_template('main_menu.html', message = 'No Open PDIs present')
+
+@app.route('/pdi_view_detail', methods=['GET', 'POST'])
+def pdi_view_detail():
+    if request.method == 'POST':
+        staging_dispatch_hdr_id = request.form.getlist['select_dispatch_hdr']
+
+    if request.method == 'GET':
+        staging_dispatch_hdr_id = request.args.getlist('select_dispatch_hdr')
+
+    staging_dispatch_hdr_id = int(staging_dispatch_hdr_id[0])
+    staging_dispatch_detail_arr = []
+    staging_dispatch_detail_lst = []
+    cs_lst = []
+    cs_id_lst = []
+    defectives_lst = []
+
+    staging_dispatch_header = DispatchHeader.get_staging_header(staging_dispatch_hdr_id)
+    staging_dispatch_detail_lst = DispatchDetail.get_staging_details_by_id(staging_dispatch_hdr_id)
+
+    # For the items to be dispatched, dispatch detail is created and the current stock quantity is deleted or reduced
+    for dispatch_detail in staging_dispatch_detail_lst:
+
+        cs_id = dispatch_detail[2]
+        cs = CurrentStock.load_smpl_by_id(cs_id)
+        staging_dispatch_detail = DispatchDetail(dispatch_detail[1], cs.smpl_no, cs.thickness, cs.width, cs.length, cs.numbers,
+                                        cs.weight, dispatch_detail[9], 1, cs.length2, cs.packet_name, cs.unit)
+        #staging_dispatch_detail.save_to_staging_db(cs_id)
+
+        defectives_lst.append(dispatch_detail[9])
+        staging_dispatch_detail_arr.append(staging_dispatch_detail)
+        cs_lst.append(cs)
+        CurrentStock.update_status_cls(cs_id, "Dispatch")
+        cs_id_lst.append((cs_id))
+
+    return render_template('/pdi_list_ready.html', staging_dispatch_header = staging_dispatch_header,
+                           dispatch_detail_arr = zip(cs_id_lst, cs_lst,staging_dispatch_detail_arr, defectives_lst),
+                           staging_dispatch_id = staging_dispatch_hdr_id)
+
+
+@app.route('/pdi_delete', methods=['GET', 'POST'])
+def pdi_delete():
+    if request.method == 'POST':
+        staging_dispatch_hdr_id = request.form.get['staging_dispatch_id']
+
+    if request.method == 'GET':
+        staging_dispatch_hdr_id = request.args.get('staging_dispatch_id')
+
+    staging_dispatch_header = DispatchHeader.get_staging_header(staging_dispatch_hdr_id)
+
+    staging_dispatch_detail_lst = DispatchDetail.get_staging_details_by_id(staging_dispatch_hdr_id)
+
+    for staging_dispatch_detail in staging_dispatch_detail_lst:
+        cs_id = staging_dispatch_detail[2]
+        cs = CurrentStock.load_smpl_by_id(cs_id)
+        cs.update_status('FG')
+
+    DispatchHeader.delete_staging_data(int(staging_dispatch_hdr_id))
+
+    return render_template('main_menu.html', message = "PDI deleted")
+
 
 @app.route('/honda_dispatch_list', methods=['GET', 'POST'])
 def honda_dispatch_list():
@@ -2812,12 +2975,14 @@ def dispatch_view_invoice_no_update():
         invoice_no = request.form['invoice_no']
         dispatch_hdr_id = request.form['dispatch_hdr_id']
         dispatch_date = request.form['dispatch_date']
+        vehicle_no = request.form['vehicle_no']
     if request.method == 'GET':
         invoice_no = request.args.get('invoice_no')
         dispatch_hdr_id = request.args.get('dispatch_hdr_id')
         dispatch_date = request.args.get('dispatch_date')
+        vehicle_no = request.args.get('vehicle_no')
 
-    DispatchHeader.update_invoice_no(dispatch_hdr_id, invoice_no, dispatch_date)
+    DispatchHeader.update_invoice_no(dispatch_hdr_id, invoice_no, dispatch_date, vehicle_no)
     return render_template('main_menu.html')
 
 @app.route('/pick_slitting_batch', methods=['GET', 'POST'])

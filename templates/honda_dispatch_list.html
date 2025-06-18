@@ -72,7 +72,7 @@
                            value ="{{cs_id}},{{cs.smpl_no}},{{cs.packet_name}}"
                         data-csid="{{ cs_id }}" data-smpl_no = "{{cs.smpl_no}}" data-pkt_no ="{{cs.packet_name}}"
                         data-size1 = "{{cs.thickness}} x {{cs.width}} x {{cs.length}}" data-numbers = "{{cs.numbers}}"
-                >{{cs.smpl_no}}{{cs.packet_name}}</td>
+                        data-weight = "{{cs.weight}}">{{cs.smpl_no}}{{cs.packet_name}}</td>
 
 
 
@@ -103,6 +103,7 @@
                 <th>Packet Name</th>
                 <th>Size</th>
                 <th>Numbers</th>
+                <th>Weight</th>
 
 
             </tr>
@@ -111,8 +112,8 @@
 
             </tbody>
         </table>
-        <!--p>Total Dispatch Wt (in MT) <input type = "number" step = "3" id = "total_disp_wt" value = "0.0" readonly> </p>
-        <p>Total Packets <input type = "number" step = "0" id = "total_packets" value = "0" readonly> </p-->
+        <p>Total Dispatch Wt (in MT) <input type = "number" step = "3" id = "total_disp_wt" value = "0.0" readonly> </p>
+        <!--p>Total Packets <input type = "number" step = "0" id = "total_packets" value = "0" readonly> </p-->
         <p>Vehicle Number <input type = "text" name = "vehicle_no" required> </p>
         <p>Dispatch Date <input type = "date" name = "dispatch_date" required></p>
         <!--p>Dispatch Time <input type ="time" name = "dispatch_time" required></p>

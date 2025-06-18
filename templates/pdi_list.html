@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>SMPL MRP - Dispatch</title>
+    <title>SMPL MRP - PDI List</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
     <style>
         hr.style1{
@@ -35,7 +35,7 @@
     </style>
 
 </head>
-<form action="/dispatch">
+<form action="/pdi_prepare_list">
     <div class="topnav" id="myTopnav">
         <br>
         <table>
@@ -56,7 +56,7 @@
                     {% endfor %}
 
     </select>
-    <table class = "table table-sm" id = 'dispatch_list'>
+   <table class = "table table-sm" id = 'dispatch_list'>
             <tr>
 
                 <th>SMPL No.</th>
@@ -104,8 +104,8 @@
         <p>Total Packets <input type = "number" step = "0" id = "total_packets" value = "0" readonly> </p>
         <p>Vehicle Number <input type = "text" name = "vehicle_no" required> </p>
         <p>Dispatch Date <input type = "date" name = "dispatch_date" required></p>
-        <p>Dispatch Time <input type ="time" name = "dispatch_time" required></p>
-        <p>Invoice No <input type ="text" name = "invoice_no"></p>
+
+
         <p>Entry By <select name="entry_by" id="entry_by" required>
                     <option value="">Select User</option>
                     <option value="Manjappa">Manjappa</option>
@@ -121,7 +121,7 @@
         <p id="errorMessage" class="error">Invalid PIN!</p>
         <p id="successMessage" class="success">PIN verified successfully!</p>
         <p>Remarks <input type ="text" style = "width:200px;"  name = "remarks"></p>
-        <p>Dispatch Staging ID <input type ="text" style = "width:200px;"  name = "staging_dispatch_id" value = '' hidden></p>
+        <p>CS IDs List <input type = "text" name = "cs_id_list" id = "cs_id_list"></p>
         <input class="btn btn-default" id="submit" type="submit" value="Submit" onclick="validatePin(event)">
 
 

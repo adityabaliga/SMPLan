@@ -68,3 +68,21 @@ class DispatchDetail:
                 dispatch_detail_lst.append(dispatch_detail)
 
         return dispatch_detail_lst
+
+    def save_to_staging_db(self, cs_id):
+        with CursorFromConnectionFromPool() as cursor:
+            cursor.execute("insert into staging_dispatch_detail (dispatch_id, cs_id, smpl_no, thickness, width, length, numbers, "
+                           "weight, defective, no_of_packets, length2, packet_name, unit) values (%s, %s, %s, %s, %s, %s, "
+                           "%s, %s, %s, %s, %s, %s, %s)", (self.dispatch_id, cs_id, self.smpl_no, self.thickness, self.width,
+                                                           self.length, self.numbers, self.dispatch_wt, self.defective,
+                                                           self.no_of_pkts, self.length2, self.packet_name, self.unit))
+
+
+    @classmethod
+    def get_staging_details_by_id(cls, staging_dispatch_hdr_id):
+        user_data = []
+        with CursorFromConnectionFromPool() as cursor:
+            cursor.execute("select * from staging_dispatch_detail where dispatch_id = %s",(staging_dispatch_hdr_id,))
+            user_data = cursor.fetchall()
+
+        return user_data

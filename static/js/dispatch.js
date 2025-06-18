@@ -267,6 +267,7 @@ function addPackets(){
     const selectedTable = document.getElementById("dispatch_list_selected").getElementsByTagName("tbody")[0];
     const selectedItems = document.querySelectorAll(".select_packet:checked");
     let currentSerialNumber = selectedTable.getElementsByTagName("tr").length + 1;
+    var total_disp_wt = parseFloat(document.getElementById("total_disp_wt").value);
 
     selectedItems.forEach(item => {
                 const cs_id = item.getAttribute("data-csid");
@@ -274,6 +275,7 @@ function addPackets(){
                 const pkt_no = item.getAttribute("data-pkt_no");
                 const size1 = item.getAttribute("data-size1");
                 const numbers = item.getAttribute("data-numbers");
+                const weight = item.getAttribute("data-weight");
 
                 // Check if the item is already in the selected table to avoid duplicates
                 if (!isDuplicate(cs_id)) {
@@ -289,11 +291,15 @@ function addPackets(){
                     newRow.insertCell(3).textContent = pkt_no;
                     newRow.insertCell(4).textContent = size1;
                     newRow.insertCell(5).textContent = numbers;
+                    newRow.insertCell(6).textContent = weight;
+
+                    total_disp_wt += parseFloat(weight);
                 }
 
                 // Uncheck the item after adding
                 item.checked = false;
             });
+            document.getElementById("total_disp_wt").value = total_disp_wt.toFixed(3);
 
 }
 
@@ -476,9 +482,12 @@ function generateExcelHondaDispatch() {
 
   var dispatch_date = document.getElementById('dispatch_date').value;
   var veh_no = document.getElementById('vehicle_no').value;
-  var file_name = 'Honda_dispatch_' + dispatch_date + veh_no + '.xlsx';
+  var customer = document.getElementById('customer').value;
+  var customer_file_name = customer.split(' ');
+  var file_name = customer_file_name[0] + '_' + dispatch_date + veh_no + '.xlsx';
 
-    header = "DISPATCH LIST - " + dispatch_date + "  VEHICLE NO: " + veh_no;
+
+    header = "DISPATCH LIST - " + dispatch_date + "  VEHICLE NO: " + veh_no + "   CUSTOMER: " + customer;
 
     var ws = workbook.Sheets[workbook.SheetNames[0]];
 
@@ -487,6 +496,14 @@ function generateExcelHondaDispatch() {
 
     // Add the new row at the top (cell A1) of the existing sheet
     XLSX.utils.sheet_add_aoa(ws, newRow, { origin: 0 });
+
+    ws['!cols'] = [
+      { wch: 10 }, // Column A width (optional)
+      { wch: 12 }, // Column B width = 12
+      { wch: 10 }, // Column C width (optional)
+      // Add more columns as needed
+    ];
+
 
 
   XLSX.writeFile(workbook, file_name);
