@@ -114,7 +114,7 @@ class Processing:
                            'processing p ON p.smpl_no = i.smpl_no '
                            'JOIN processing_detail d ON d.processing_id = p.processing_id where '
                            '(p.processing_date >= current_date - interval %s '
-                           'month and p.processing_date < current_date)', ('6',))
+                           'month and p.processing_date < current_date)', ('12',))
 
             user_data = cursor.fetchall()
 

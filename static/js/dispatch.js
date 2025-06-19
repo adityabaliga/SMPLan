@@ -519,7 +519,8 @@ const userPins = {
             Govardhan: "7259",
             Jeevan: "5213",
             Chandu: "1999",
-            Aditya: "0509"
+            Aditya: "0509",
+            Chandrashekar: "7973"
 };
 
  function validatePin(event) {
