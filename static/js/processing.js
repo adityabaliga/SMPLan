@@ -166,6 +166,38 @@ window.addEventListener('beforeunload', function (e) {
 });
 
 
+function get_old_packet_names(table_id, table_row){
+    var rowCount = table_row.offsetParent.parentElement.rowIndex;
+    var total_rows = document.getElementById(table_id).rows.length;
+    var current_row;
+    console.log(pkt_name_arr);
+    var old_packet_names = Array.from(pkt_name_arr);
+
+    for( i=1;i<total_rows;i++){
+        if(i != rowCount){
+            current_row = document.getElementById(table_id).rows[i];
+
+            var length =  Number(current_row.cells[1].lastChild.value);
+            var width =  Number(current_row.cells[0].lastChild.value);
+            var packet_name =  (current_row.cells[3].lastChild.value);
+            var operation = document.getElementById("operation").value;
+
+            packet_key = width + 'X' + length + '-' + packet_name;
+
+            if(operation == "Reshearing"){
+                packet_key = packet_key + '+' + operation;
+            }
+
+            old_packet_names.push(packet_key);
+
+
+        }
+
+    }
+    return old_packet_names;
+
+}
+
 //This is a function to check if packet name has been repeated
 function check_packet_name(table_id, table_row){
     // Get the row where the change was made and calculate the weight of the processed material
@@ -185,6 +217,7 @@ function check_packet_name(table_id, table_row){
         last_row.cells[3].lastChild.focus();
     }
 
+    var old_packet_names = get_old_packet_names(table_id, table_row);
     packet_key = width + 'X' + length + '-' + packet_name;
 
     //In case of Honda 810 x 1010, the CTL and reshearing sizes are the same and the packet names are also the same
@@ -194,14 +227,16 @@ function check_packet_name(table_id, table_row){
         packet_key = packet_key + '+' + operation;
     }
 
-    if(pkt_name_arr.includes(packet_key)){
+
+
+    if(old_packet_names.length > 0 && old_packet_names.includes(packet_key)){
         window.alert('Packet name is already used');
         last_row.cells[3].lastChild.value = '';
         last_row.cells[4].lastChild.value = '';
         last_row.cells[3].lastChild.focus();
 
     }else{
-        pkt_name_arr.push(packet_key);
+        //pkt_name_arr.push(packet_key);
     }
 
 
@@ -1201,6 +1236,7 @@ function make_label_new_slit(th){
         material_type = material_type.replaceAll('SHEETS','');
         material_type = material_type.replaceAll('.','');*/
         material_type = grade_field[0];
+        material_type = material_type.replaceAll('COILS','');
         material_type = material_type.replaceAll('COIL','');
         material_type = material_type.replaceAll('SHEETS','');
         material_type = material_type.replaceAll('.','');
@@ -1227,6 +1263,7 @@ function make_label_new_slit(th){
     }else{
             material_type = document.getElementById('mat_type').value;
 
+            material_type = material_type.replaceAll('COILS','');
             material_type = material_type.replaceAll('COIL','');
             material_type = material_type.replaceAll('SHEETS','');
             material_type = material_type.replaceAll('.','');
@@ -1523,6 +1560,7 @@ function make__part_label_ctl(th){
     mat_type = grade_field.split("ID");
     mat_type = mat_type[0].split("GRADE");
     material_type = mat_type[0];
+    material_type = material_type.replaceAll('COILS','');
     material_type = material_type.replaceAll('COIL','');
     material_type = material_type.replaceAll('SHEETS','');
     material_type = material_type.replaceAll('.','');
@@ -1859,6 +1897,7 @@ function make_label_new(th){
             material_type = material_type.replaceAll('SHEETS','');
             material_type = material_type.replaceAll('.','');*/
             material_type = grade_field[0].toUpperCase();
+            material_type = material_type.replaceAll('COILS','');
             material_type = material_type.replaceAll('COIL','');
             material_type = material_type.replaceAll('SHEETS','');
             material_type = material_type.replaceAll('.','');
@@ -1887,6 +1926,7 @@ function make_label_new(th){
         else{
             material_type = document.getElementById('mat_type').value;
 
+            material_type = material_type.replaceAll('COILS','');
             material_type = material_type.replaceAll('COIL','');
             material_type = material_type.replaceAll('SHEETS','');
             material_type = material_type.replaceAll('.','');
@@ -2093,6 +2133,7 @@ function make_label_trap_new(th){
             material_type = material_type.replaceAll('SHEETS','');
             material_type = material_type.replaceAll('.','');*/
             material_type = grade_field[0].toUpperCase();
+            material_type = material_type.replaceAll('COILS','');
             material_type = material_type.replaceAll('COIL','');
             material_type = material_type.replaceAll('SHEETS','');
             material_type = material_type.replaceAll('.','');
@@ -2121,6 +2162,7 @@ function make_label_trap_new(th){
         else{
             material_type = document.getElementById('mat_type').value;
 
+            material_type = material_type.replaceAll('COILS','');
             material_type = material_type.replaceAll('COIL','');
             material_type = material_type.replaceAll('SHEETS','');
             material_type = material_type.replaceAll('.','');
@@ -2242,6 +2284,7 @@ function make__part_label_reshearing(th){
 
     mat_type = mat_type[0].split("GRADE");
     material_type = mat_type[0];
+    material_type = material_type.replaceAll('COILS','');
     material_type = material_type.replaceAll('COIL','');
     material_type = material_type.replaceAll('SHEETS','');
     material_type = material_type.replaceAll('.','');

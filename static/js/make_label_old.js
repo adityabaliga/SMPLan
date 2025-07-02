@@ -341,6 +341,7 @@ function make_label_old(smpl_no, customer){
             material_type = material_type.replaceAll('SHEETS','');
             material_type = material_type.replaceAll('.','');*/
             material_type = grade_field[0].toUpperCase();
+            material_type = material_type.replaceAll('COILS','');
             material_type = material_type.replaceAll('COIL','');
             material_type = material_type.replaceAll('SHEETS','');
             material_type = material_type.replaceAll('.','');
@@ -368,6 +369,7 @@ function make_label_old(smpl_no, customer){
     }else{
             material_type = document.getElementById('lbl_mat_type').value;
 
+            material_type = material_type.replaceAll('COILS','');
             material_type = material_type.replaceAll('COIL','');
             material_type = material_type.replaceAll('SHEETS','');
             material_type = material_type.replaceAll('.','');
