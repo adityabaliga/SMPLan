@@ -3752,16 +3752,18 @@ def get_monthly_report():
         if customer in pivoted_data and operation in pivoted_data[customer]:
             pivoted_data[customer][operation] = weight
 
-
+    #gets all distinct sizes dispatched in the month
     honda_schedule_sizes = DispatchHeader.honda_schedule_sizes(report_month, report_year)
 
+    #returns total number of pieces dispatched by size by day
     honda_dispatch_by_size = DispatchHeader.honda_dispatch_for_month(report_month, report_year, honda_schedule_sizes)
 
     honda_dispatch_total = []
     honda_dispatch_total_pkts = []
 
     column = 1
-    while column < len(honda_dispatch_by_size[column]):
+    col_size = len(honda_dispatch_by_size[column])
+    while column < col_size:
         column_total = 0
         row = 0
         while row < len(honda_dispatch_by_size):
