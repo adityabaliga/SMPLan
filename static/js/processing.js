@@ -931,15 +931,25 @@ function print_label_new(){
     // Create a new FormData object from the form
     var fieldValue = document.getElementById('stickers').value;
 
+    // Get the current page name without the full path or extension
+    //This part is added so if the page is called from make old label, the net wt and second customer
+    // can be added to the current stock record
+    let pathParts = window.location.pathname.split('/');
+    let currentPage = pathParts[pathParts.length - 1].split('.')[0]; // e.g., "print_old_label_format"
+
+
     // Create an object with the field data
     var data = {
-        fieldName: fieldValue // Replace 'fieldName' with the key you want to use for the field in the JSON
+        fieldName: fieldValue, // Replace 'fieldName' with the key you want to use for the field in the JSON
+        sourcePage: currentPage
     };
+
 
     // Convert the object to a JSON string
     var json = JSON.stringify(data);
 
      // Use fetch to send the data to the Flask server
+     // This adds the data to json, which is passed to python to be added to the sticker db
     fetch('/process_data', {
         method: 'POST',
         headers: {

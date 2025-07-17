@@ -2015,8 +2015,22 @@ def process_sticker_background():
     # Get data sent from the client
     data = request.json
 
+    source_page = data.get('sourcePage')
+
     sticker_txt = data['fieldName']
     sticker_txt = sticker_txt.split(';;')
+
+    size = sticker_txt[4].split(' X ')
+    width = (size[1].strip())
+    length = (size[2].strip())
+    if length == 'Coil':
+        length = 0
+
+    net_wt = sticker_txt[18]
+    if net_wt == '':
+        net_wt = 0
+    else:
+        net_wt = Decimal(net_wt)
 
     # Establish a database connection
     connection = psycopg2.connect(
@@ -2042,6 +2056,11 @@ def process_sticker_background():
                                   sticker_txt[11],sticker_txt[12], sticker_txt[13], sticker_txt[14], sticker_txt[15],
                                   sticker_txt[16], sticker_txt[17], sticker_txt[18], sticker_txt[19], sticker_txt[20],
                                   sticker_txt[21], sticker_txt[22], sticker_txt[23]))
+
+            if source_page == 'print_old_label_format':
+                cursor.execute('update current_stock set net_wt = %s, second_customer = %s where '
+                               'smpl_no = %s and  width = %s and length = %s and packet_name = %s',
+                               (net_wt, sticker_txt[12], sticker_txt[0], width, length, sticker_txt[6]))
 
         except (Exception, psycopg2.Error) as error:
             # Rollback the transaction if an error occurred
