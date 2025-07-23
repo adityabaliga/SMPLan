@@ -32,6 +32,15 @@ import time
 import psycopg2
 from urllib.parse import unquote
 
+# The rates machine cost - direct labour cost
+# in the pricing sheet, delete the direct labour row, the total cost you get is the cost mentioned here
+machine_name_value = [("Slitting",7155), ("CTL 1", 4598), ("CTL 2", 4598), ("NCTL 1", 1325), ("NCTL 2", 805),
+                      ("NCTL 3", 1325), ("NCTL 4", 500), ("NCTL 5", 1325), ("Reshearing 1", 410),
+                      ("Reshearing 2", 410), ("Reshearing 3", 410), ("Reshearing 4", 410), ("Reshearing 5", 410),
+                      ("Reshearing 6", 410), ("Reshearing 7", 410), ("Reshearing 8", 410),  ("Reshearing 9", 410),
+                    ("Mini_Slitting", 500), ("Lamination", 300)]
+labour_rate = 212
+
 app = Flask(__name__)
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -3215,6 +3224,7 @@ def history_show_details():
     order_dtl_lst_by_orderid, order_dtl_id_lst_by_orderid = [], []
     processing_dtl_lst, processing_dtl_lst_by_order_dtl = [], []
     cs_lst, _cs_lst = [], []
+    cost_table = []
 
     smpl_number = str(smpl_number).upper().replace(" ", "")
     # smpl_no.replace(" ", "")
@@ -3235,6 +3245,22 @@ def history_show_details():
                 processing_hdr_lst.append(processing)
                 processing_hdr_id_lst.append(processing_id)
                 processing_dtl_lst.append(ProcessingDetail.load_history(processing_id))
+
+                for machine in machine_name_value:
+                    if processing.operation == machine[0]:
+                        machine_rate = machine[1]
+                        total_time = processing.setting_time + processing.processing_time
+                        total_labour = processing.no_of_qc + processing.no_of_helpers
+                        machine_cost = round(machine_rate * (total_time / 60), 2)
+                        labour_cost = round(labour_rate * (total_labour) * (total_time / 60), 2)
+
+                        total_cost = round((labour_cost + machine_cost),2)
+                        total_cost_per_mt = round(Decimal(total_cost) / (processing.total_processed_wt), 0)
+                        cuts_per_minute = round(Decimal(processing.total_cuts) / (total_time), 2)
+                        cost_tuple = (processing.operation, processing.processing_date, processing.total_processed_wt,
+                                      processing.processing_time, processing.setting_time, machine_cost, labour_cost,
+                                      total_cost, total_cost_per_mt, processing.total_cuts, cuts_per_minute)
+                        cost_table.append(cost_tuple)
 
             '''_order_lst = Order.history_load_from_db(smpl_no)
             for ordr_id, ordr in _order_lst:
@@ -3282,7 +3308,7 @@ def history_show_details():
                                processing_hdr_lst=zip(processing_hdr_lst, processing_hdr_id_lst),
                                dispatch_hdr_lst=zip(dispatch_lst, dispatch_id_lst),
                                dispatch_dtl_lst=dispatch_dtl_lst,
-                               cs_lst=cs_lst, sticker_lst = sticker_lst)
+                               cs_lst=cs_lst, sticker_lst = sticker_lst, cost_table = cost_table)
 
     else:
         return render_template('/main_menu.html', message=smpl_number + " not found.")
@@ -3390,6 +3416,7 @@ def scams_show_details():
     order_dtl_lst_by_orderid, order_dtl_id_lst_by_orderid = [], []
     processing_dtl_lst, processing_dtl_lst_by_order_dtl = [], []
     cs_lst, _cs_lst = [], []
+    cost_table = []
 
     #smpl_number = str(smpl_number).upper().replace(" ", "")
     # smpl_no.replace(" ", "")
@@ -3406,10 +3433,24 @@ def scams_show_details():
                     cs_lst.append(cs)
 
             _processing = Processing.load_history(smpl_no)
+
             for processing_id, processing in _processing:
                 processing_hdr_lst.append(processing)
                 processing_hdr_id_lst.append(processing_id)
                 processing_dtl_lst.append(ProcessingDetail.load_history(processing_id))
+
+                for machine in machine_name_value:
+                    if processing.operation == machine[0]:
+                        machine_rate = machine[1]
+                        machine_cost = round(machine_rate * (processing[20] / 60), 2)
+                        labour_cost = round(labour_rate * (processing[19]) * (processing[20] / 60), 2)
+
+                total_cost = labour_cost + machine_cost
+                total_cost_per_mt = round(Decimal(total_cost) / (processing[15]), 0)
+                cost_tuple = (processing.operation, processing.processing_date, processing.total_processed_wt,
+                              processing.processing_time, processing.setting_time, machine_cost, labour_cost,
+                              total_cost, total_cost_per_mt)
+                cost_table.append(cost_tuple)
 
             '''_order_lst = Order.history_load_from_db(smpl_no)
             for ordr_id, ordr in _order_lst:
@@ -3454,7 +3495,7 @@ def scams_show_details():
                                processing_hdr_lst=zip(processing_hdr_lst, processing_hdr_id_lst),
                                dispatch_hdr_lst=zip(dispatch_lst, dispatch_id_lst),
                                dispatch_dtl_lst=dispatch_dtl_lst,
-                               cs_lst=cs_lst)
+                               cs_lst=cs_lst, cost_table = cost_table)
 
     else:
         return render_template('/main_menu.html', message=scams_no + " not found.")
@@ -3923,13 +3964,13 @@ def invoice_check_report():
                           ("Reshearing 2", 410), ("Reshearing 3", 410), ("Reshearing 4", 410), ("Reshearing 5", 410),
                           ("Reshearing 6", 410), ("Reshearing 7", 410), ("Reshearing 8", 410),  ("Reshearing 9", 410),
                         ("Mini_Slitting", 500), ("Lamination", 300)]
-    labour_rate = 190
+    labour_rate = 212
     indirect_labour = 0
-    indirect_labour_value = [("Slitting",2.5), ("CTL 1", 2.5), ("CTL 2", 2.5), ("NCTL 1", 1), ("NCTL 2", 1),
+    '''indirect_labour_value = [("Slitting",2.5), ("CTL 1", 2.5), ("CTL 2", 2.5), ("NCTL 1", 1), ("NCTL 2", 1),
                           ("NCTL 3", 1), ("NCTL 4", 0.75), ("NCTL 5", 1), ("Reshearing 1", 1),
                           ("Reshearing 2", 1), ("Reshearing 3", 1), ("Reshearing 4", 1), ("Reshearing 5", 1),
                           ("Reshearing 6", 1), ("Reshearing 7", 1), ("Reshearing 8", 1), ("Reshearing 9", 1),
-                             ("Mini_Slitting", 0.75), ("Lamination", 0.5)]
+                             ("Mini_Slitting", 0.75), ("Lamination", 0.5)]'''
 
     for processing_tup in processing_lst:
         processing = list(processing_tup)
@@ -3939,11 +3980,10 @@ def invoice_check_report():
                 machine_rate = machine[1]
                 machine_cost = round(machine_rate * (processing[20]/60),2)
                 processing.append(machine_cost)
-        for _indirect_labour in indirect_labour_value:
-            if processing[3] == _indirect_labour[0]:
-                indirect_labour = _indirect_labour[1]
-                labour_cost = round(labour_rate * (processing[19] + indirect_labour)  * (processing[20]/60),2)
+                labour_cost = round(labour_rate * (processing[19]) * (processing[20] / 60), 2)
                 processing.append(labour_cost)
+
+
         total_cost = labour_cost + machine_cost
         processing.append(total_cost)
 
