@@ -770,3 +770,24 @@ class CurrentStock:
             error_message = f"Unexpected error: {str(e)}"
             logging.error(error_message)
             return error_message
+
+
+    @classmethod
+    def get_cs_by_size(cls, smpl_no, width, length, length2, packet_name):
+        with CursorFromConnectionFromPool() as cursor:
+            cursor.execute(
+                "select * from current_stock where smpl_no = %s and width = %s "
+                "and length = %s and packet_name = %s and length2 = %s",
+                (smpl_no, width, length, packet_name, length2))
+            user_data = cursor.fetchone()
+        if user_data:
+            cs = CurrentStock(smpl_no=user_data[1], weight=Decimal(user_data[2]), numbers=int(user_data[3]),
+                              width=Decimal(user_data[4]), length=Decimal(user_data[5]), status=user_data[6],
+                              customer=user_data[7], thickness=Decimal(user_data[8]), grade=user_data[9],
+                              unit=user_data[10], packet_name=user_data[11], length2=user_data[12],
+                              date=user_data[13], processing_id=user_data[14], second_customer=user_data[15],
+                              net_wt=user_data[16])
+
+            return cs
+        else:
+            return None

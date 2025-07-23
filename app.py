@@ -3501,6 +3501,11 @@ def print_old_label_format():
 
     smpl_no = smpl_number.split(';')
     size = smpl_no[2].split('x')
+    width = (size[0].strip())
+    length = (size[1].split('-'))
+    length2 = length[1].strip()
+    length = length[0].strip()
+
     packet_wt = smpl_no[7]
     _packet_wt = 0
 
@@ -3508,10 +3513,23 @@ def print_old_label_format():
     if size[1] == '0-0':
         _packet_wt = packet_wt
 
+    # get current stock for item to get second customer and net wt
+    cs = CurrentStock.get_cs_by_size(smpl_no[0], width, length, length2, smpl_no[3])
+    if cs == None:
+        second_customer = ''
+        net_wt = ''
+    else:
+        second_customer = cs.second_customer
+        if cs.net_wt == None:
+            net_wt =''
+        else:
+            net_wt = cs.net_wt
+
 
     incoming = Incoming.load_smpl_by_smpl_no(smpl_no[0])
 
-    return render_template('/make_label.html', incoming = incoming, _packet_wt=_packet_wt)
+    return render_template('/make_label.html', incoming = incoming, _packet_wt=_packet_wt,
+                           second_customer = second_customer, net_wt = net_wt)
 
 @app.route('/daily_report_pick_date', methods=['GET', 'POST'])
 def daily_report_pick_date():
