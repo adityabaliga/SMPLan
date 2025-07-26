@@ -3120,6 +3120,7 @@ def maintenance_entry_submit():
         maintenance_by = request.args.get('maintenance_by')
         description = request.args.get('description')
         entry_by = request.args.get('entry_by')
+        serial_no = request.args.get('serial_no')
 
     if request.method == 'POST':
         machine = request.form['machine']
@@ -3133,6 +3134,7 @@ def maintenance_entry_submit():
 
         description = request.form.get('description')
         entry_by = request.form.get('entry_by')
+        serial_no = request.form.get('serial_no')
 
 
     # Establish a database connection
@@ -3147,11 +3149,21 @@ def maintenance_entry_submit():
     try:
         connection.autocommit = False
         cursor = connection.cursor()
-        cursor.execute("insert into maintenance_history (machine, repair_start_date, repair_start_time,"
-                       "repair_end_date, repair_end_time, part, repair_done_by, description, file_name, entry_by) values"
-                       "(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)", (machine, repair_start_date, repair_start_time, repair_end_date
-                                                        ,repair_end_time, machine_part, maintenance_by, description,
-                                                           '', entry_by))
+        if serial_no == '':
+            cursor.execute("insert into maintenance_history (machine, repair_start_date, repair_start_time,"
+                           "repair_end_date, repair_end_time, part, repair_done_by, description, file_name, entry_by) values"
+                           "(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)", (machine, repair_start_date, repair_start_time, repair_end_date
+                                                            ,repair_end_time, machine_part, maintenance_by, description,
+                                                               '', entry_by))
+        else:
+            cursor.execute("update maintenance_history set machine = %s, repair_start_date = %s, repair_start_time = %s,"
+                           "repair_end_date = %s, repair_end_time = %s, part = %s, repair_done_by = %s, description = %s,"
+                           " file_name = %s, entry_by = %s "
+                           "where sl_no = %s"
+                           ,
+                           (machine, repair_start_date, repair_start_time, repair_end_date
+                            , repair_end_time, machine_part, maintenance_by, description,
+                            '', entry_by, (serial_no)))
 
     except psycopg2.OperationalError as error:
         # Handle network errors

@@ -68,6 +68,8 @@
              <tr>
                 <td>Entry By</td>
                 <td><input type="text"  name="entry_by" id="entry_by" required></td>
+                 <td>Serial No</td>
+                <td><input type="text"  name="serial_no" id="serial_no" readonly></td>
 
 
             </tr>
@@ -86,7 +88,7 @@
     <br><br><br>
     <table class= 'table table-sm'>
         <tr>
-
+            <th></th>
             <th>Machine</th>
             <th>Part</th>
             <th>Start Date</th>
@@ -101,7 +103,9 @@
         </tr>
         {% for rec in user_data %}
         <tr>
-
+            {% if current_user.user_type == "all" or current_user.user_type == "plan_head" %}
+            <td><input type="radio" name="recordSelect" value="{{rec[8]}}" onchange="selectRecord({{rec[8]}}, {{rec}})"></td>
+            {% endif %}
             <td>{{rec[1]}}</td>
             <td>{{rec[2]}}</td>
             <td>{{rec[0]}}</td>
@@ -123,4 +127,56 @@
 
 
 </form>
+<script>
+
+
+    function selectRecord(recordId, record) {
+            selectedRecordId = recordId;
+            //const record = maintenanceRecords.find(r => r.id === recordId);
+
+            /*for(i=0;i<user_data.length;i++){
+
+                if (user_data[i][8] == recordId) {
+                    const record = user_data[i];*/
+            // Fill the form with selected record data
+            var startDateObj = parseDate(record[0]);
+            document.getElementById('maintenance_start_date').value = dateToInputValue(startDateObj);
+            document.getElementById('maintenance_start_time').value = record[4];
+            document.getElementById('serial_no').value = record[8];
+
+            var endDateObj = parseDate(record[9]);
+            document.getElementById('maintenance_end_date').value = dateToInputValue(endDateObj);
+            document.getElementById('maintenance_end_time').value = record[5];
+            document.getElementById('description').value = record[6];
+            document.getElementById('machine_part').value = record[2];
+            document.getElementById('maintenance_by').value = record[3];
+            document.getElementById('entry_by').value = record[10];
+
+                    // Add visual feedback
+                    document.querySelectorAll('tr').forEach(row => row.style.background = '');
+                    const selectedRow = document.querySelector(`input[value="${recordId}"]`).closest('tr');
+                    selectedRow.style.background = 'linear-gradient(135deg, rgba(79, 172, 254, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%)';
+                //}
+        //}
+    }
+
+    function parseDate(dateString) {
+    const parts = dateString.split('-');
+    const day = parseInt(parts[0], 10);
+    const month = parseInt(parts[1], 10) - 1; // Month is 0-indexed
+    const year = parseInt(parts[2], 10);
+
+    return new Date(year, month, day);
+}
+    function dateToInputValue(date) {
+    // Convert Date object to "yyyy-mm-dd" format for HTML input
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Add 1 since months are 0-indexed
+    const day = String(date.getDate()).padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
+}
+
+
+</script>
 </html>
