@@ -79,10 +79,20 @@ class DispatchDetail:
 
 
     @classmethod
-    def get_staging_details_by_id(cls, staging_dispatch_hdr_id):
+    def get_staging_details_by_id(cls, staging_dispatch_hdr_id, unit):
         user_data = []
         with CursorFromConnectionFromPool() as cursor:
-            cursor.execute("select * from staging_dispatch_detail where dispatch_id = %s",(staging_dispatch_hdr_id,))
+            if unit == 0:
+                cursor.execute("select * from staging_dispatch_detail where dispatch_id = %s",(staging_dispatch_hdr_id,))
+            else:
+                cursor.execute("select * from staging_dispatch_detail where dispatch_id = %s and unit = %s",
+                               (staging_dispatch_hdr_id, unit))
             user_data = cursor.fetchall()
 
         return user_data
+
+
+    @classmethod
+    def delete_staging_detail(cls, cs_id):
+        with CursorFromConnectionFromPool() as cursor:
+            cursor.execute("delete from staging_dispatch_detail where cs_id = %s", (cs_id,))

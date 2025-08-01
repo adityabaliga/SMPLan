@@ -5,7 +5,7 @@ from werkzeug.middleware.profiler import ProfilerMiddleware
 from decimal import Decimal
 from flask_login import LoginManager, login_user, current_user, logout_user
 from file_uploader import FileUploader
-from flask import Flask, render_template, request, jsonify, send_file
+from flask import Flask, render_template, request, jsonify, send_file, url_for, redirect
 from markupsafe import Markup
 from csv import writer
 from datetime import datetime, timedelta
@@ -16,6 +16,7 @@ import urllib.request
 from apscheduler.schedulers.background import BackgroundScheduler
 import atexit
 import io
+import requests
 
 from user import User
 from current_stock import CurrentStock
@@ -2614,9 +2615,14 @@ def dispatch():
         dispatch_detail.save_to_db()
 
         CurrentStock.delete_record(cs_id)
+        if staging_dispatch_id != '':
+            DispatchDetail.delete_staging_detail(cs_id)
 
     if staging_dispatch_id != '':
-        DispatchHeader.delete_staging_data(int(staging_dispatch_id))
+        dispatch_detail_lst = DispatchDetail.get_staging_details_by_id(int(staging_dispatch_id), 0)
+        length = len(dispatch_detail_lst)
+        if len(dispatch_detail_lst) == 0:
+            DispatchHeader.delete_staging_data(int(staging_dispatch_id))
 
 
     return render_template('/main_menu.html')
@@ -2821,13 +2827,40 @@ def view_pdi_list():
     if open_pdi_list:
         return render_template('main_menu.html', message = 'No Open PDIs present')
 
+
+@app.route('/pdi_pick_unit', methods=['GET', 'POST'])
+def pdi_pick_unit():
+    if request.method == 'POST':
+        staging_dispatch_hdr_id = request.form.getlist['select_dispatch_hdr']
+
+
+    if request.method == 'GET':
+        staging_dispatch_hdr_id = request.args.getlist('select_dispatch_hdr')
+
+    _unit = current_user.unit
+    # Build the full URL
+
+
+    if _unit == 0:
+        base_url = request.url_root  # Gets something like 'http://localhost:5000/'
+        relative_url = url_for('pdi_view_detail')
+        full_url = base_url.rstrip('/') + relative_url
+        parameter = '?select_dispatch_hdr=' + staging_dispatch_hdr_id[0]
+        full_url = full_url + parameter
+        return redirect(url_for('pdi_view_detail', select_dispatch_hdr=staging_dispatch_hdr_id[0]))
+    else:
+        return render_template('pdi_pick_unit.html', select_dispatch_hdr=staging_dispatch_hdr_id[0], _unit = (_unit))
+
+
 @app.route('/pdi_view_detail', methods=['GET', 'POST'])
 def pdi_view_detail():
     if request.method == 'POST':
         staging_dispatch_hdr_id = request.form.getlist['select_dispatch_hdr']
+        unit = request.form.getlist['select_unit']
 
     if request.method == 'GET':
         staging_dispatch_hdr_id = request.args.getlist('select_dispatch_hdr')
+        unit = request.args.getlist('select_unit')
 
     staging_dispatch_hdr_id = int(staging_dispatch_hdr_id[0])
     staging_dispatch_detail_arr = []
@@ -2836,8 +2869,11 @@ def pdi_view_detail():
     cs_id_lst = []
     defectives_lst = []
 
+    if len(unit) == 0:
+        unit.append(0)
+
     staging_dispatch_header = DispatchHeader.get_staging_header(staging_dispatch_hdr_id)
-    staging_dispatch_detail_lst = DispatchDetail.get_staging_details_by_id(staging_dispatch_hdr_id)
+    staging_dispatch_detail_lst = DispatchDetail.get_staging_details_by_id(staging_dispatch_hdr_id, unit[0])
 
     # For the items to be dispatched, dispatch detail is created and the current stock quantity is deleted or reduced
     for dispatch_detail in staging_dispatch_detail_lst:

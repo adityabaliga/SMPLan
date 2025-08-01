@@ -2,9 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>SMPL MRP - Pick PDI</title>
+    <title>SMPL MRP - PDI Select Unit</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
-    <style>
+<style>
         hr.style1{
 	        border-top: 15px solid #4d0000;
             }
@@ -27,7 +27,7 @@
     </style>
 
 </head>
-<form action="/pdi_pick_unit">
+<form action="/pdi_view_detail">
     <div class="topnav" id="myTopnav">
         <br>
         <table>
@@ -38,26 +38,20 @@
             <a href="\logout">Logout</a></div></td>
         </table>
     </div>
-
     <hr class ="style1">
+    <!--select name ="select_smpl"-->
+    <h3>Dispatch From</h3>
+        <input type = "text" name = "select_dispatch_hdr" id="select_dispatch_hdr" value = "{{select_dispatch_hdr}}" hidden >
 
-        <table class = "table table-sm">
-            <tr>
-                <th>Vehicle No.</th>
-                <th>Customer</th>
-                <th>Dispatch Date</th>
-
-            </tr>
-        {% for hdr in open_pdi_list %}
-            <tr>
-                <td><input type = "radio" name = "select_dispatch_hdr" value = {{hdr[0]}}>  {{hdr[1]}}</input></td>
-                <td>{{hdr[6]}}</td>
-                <td>{{hdr[2]}}</td>
-
-            </tr>
-        {% endfor %}
-
-        </table>
-    <input class="btn btn-default" type="submit" value="Submit">
+        {% if _unit == 1 or _unit == 0  %}
+            <td><input type = "radio" name = "select_unit" value = "1" >  Unit 1</input></td><br>
+        {% endif %}
+        {% if _unit == 2 or _unit == 0 %}
+            <td><input type = "radio" name = "select_unit" value = "2">  Unit 2</input></td><br>
+        {% endif %}
+        <td><input type = "radio" name = "select_unit" value = "4" required>  Unit 4 [501]</input></td>
+    <td>
+        <br><input class="btn btn-default" type="submit" value="Select">
+    </td>
 </form>
 </html>
