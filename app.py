@@ -16,7 +16,6 @@ import urllib.request
 from apscheduler.schedulers.background import BackgroundScheduler
 import atexit
 import io
-import requests
 
 from user import User
 from current_stock import CurrentStock
