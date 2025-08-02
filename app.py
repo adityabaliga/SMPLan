@@ -2344,10 +2344,10 @@ def check_stock_htid():
                 wt_per_sheet = 4.79
                 coating = "0/20"
             if cs.length > 0:
-                packet_wt = round((cs.numbers * wt_per_sheet)/1000, 3)
+                packet_wt = int((cs.numbers * wt_per_sheet))
             else:
                 part_no = ''
-                packet_wt = cs.weight
+                packet_wt = int(cs.weight*1000)
 
             incoming = Incoming.load_smpl_by_smpl_no(cs.smpl_no)
             mill_lst.append(incoming.mill)
