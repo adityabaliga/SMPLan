@@ -2823,7 +2823,7 @@ def view_pdi_list():
 
     if open_pdi_list:
         return render_template('view_open_pdi_list.html', open_pdi_list = open_pdi_list)
-    if open_pdi_list:
+    else:
         return render_template('main_menu.html', message = 'No Open PDIs present')
 
 
@@ -2839,7 +2839,9 @@ def pdi_pick_unit():
     _unit = current_user.unit
     # Build the full URL
 
-
+    # if user is all can can see all to be dispatched at one time,
+    # the user is redirected to the pdi view detail
+    # else the user has to pick the unit
     if _unit == 0:
         base_url = request.url_root  # Gets something like 'http://localhost:5000/'
         relative_url = url_for('pdi_view_detail')
@@ -2904,7 +2906,7 @@ def pdi_delete():
 
     staging_dispatch_header = DispatchHeader.get_staging_header(staging_dispatch_hdr_id)
 
-    staging_dispatch_detail_lst = DispatchDetail.get_staging_details_by_id(staging_dispatch_hdr_id)
+    staging_dispatch_detail_lst = DispatchDetail.get_staging_details_by_id(staging_dispatch_hdr_id, 0)
 
     for staging_dispatch_detail in staging_dispatch_detail_lst:
         cs_id = staging_dispatch_detail[2]
