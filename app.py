@@ -3610,7 +3610,7 @@ def print_old_label_format():
         net_wt = ''
     else:
         second_customer = cs.second_customer
-        if cs.net_wt == None:
+        if cs.net_wt == None or cs.net_wt == 0:
             net_wt =''
         else:
             net_wt = cs.net_wt
