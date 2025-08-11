@@ -117,5 +117,19 @@
   "coating": "0/20",
   "pallet": "G",
   "gross_wt": 1454
+  },
+  "720 x 860":{
+  "wt_per_sheet":3.89,
+  "part_name": "K3CF DLX OUTER RL",
+  "coating": "0/20",
+  "pallet": "I",
+  "gross_wt": 1181
+  },
+  "570 x 650":{
+  "wt_per_sheet":2.33,
+  "part_name": "K3CF DLX PLATE BOTTOM",
+  "coating": "20/0",
+  "pallet": "J",
+  "gross_wt": 708
   }
 }

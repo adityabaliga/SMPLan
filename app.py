@@ -2343,6 +2343,14 @@ def check_stock_htid():
                 part_no = "K0NH RL"
                 wt_per_sheet = 4.79
                 coating = "0/20"
+            if cs.width == 720 and cs.length == 860:
+                part_no = "K3CF DLX OUTER RL"
+                wt_per_sheet = 3.89
+                coating = "0/20"
+            if cs.width == 570 and cs.length == 650:
+                part_no = "K3CF DLX PLATE BOTTOM"
+                wt_per_sheet = 2.33
+                coating = "20/0"
             if cs.length > 0:
                 packet_wt = int((cs.numbers * wt_per_sheet))
             else:

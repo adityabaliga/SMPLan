@@ -1652,7 +1652,7 @@ function honda_part_no(width,length){
     var coating = "";
     var wt_per_sheet = "";
 
-            if (width == 720 && length == 745){
+    if (width == 720 && length == 745){
             part_no = "K0NA PLATE BOTTOM";
             wt_per_sheet = 3.37;
             coating = "20/0";
@@ -1747,7 +1747,16 @@ function honda_part_no(width,length){
                 wt_per_sheet = 2.63;
                 coating = "20/0";
             }
-
+    else if (width == 720 && length == 860){
+                part_no = "K3CF DLX OUTER RL";
+                wt_per_sheet = 3.89;
+                coating = "0/20";
+            }
+    else if (width == 570 && length == 650){
+                part_no = "K3CF DLX PLATE BOTTOM";
+                wt_per_sheet = 2.33;
+                coating = "20/0";
+            }
     else{
         part_no = "";
         wt_per_sheet = 0;
