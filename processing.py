@@ -100,7 +100,7 @@ class Processing:
             # cursor.execute('select * from processing where processing_date = %s order by operation asc', (report_date, ))
             cursor.execute('select * from processing where processing_date = %s order by operation, start_time',
                            (report_date,))
-            user_data = cursor.fetchall()
+            user_data = [list(row) for row in cursor.fetchall()]
 
 
         return user_data

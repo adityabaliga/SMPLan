@@ -140,8 +140,13 @@
             <th>Production Time</th>
             <th>Weight (in MT)</th>
             <th>No of cuts</th>
-            <th>No of cuts/minute</th>
+            <th>Tot People</th>
+            <th>Cuts/minute</th>
             <th>kgs/min</th>
+            {% if current_user.user_type == "all" %}
+            <th>Total Cost</th>
+            <th>Cost/MT</th>
+            {% endif %}
         </tr>
         {% for processing_hdr_dtl in processing_hdr_detail %}
             {% if processing_hdr_dtl[2] == machine %}
@@ -165,8 +170,13 @@
                     <td>{{processing_hdr_dtl[6]}}</td>
                     <td>{{processing_hdr_dtl[14]}}</td>
                     <td>{{processing_hdr_dtl[15]}}</td>
+                    <td>{{processing_hdr_dtl[10] + processing_hdr_dtl[11]}}</td>
                     <td>{{(processing_hdr_dtl[15]/processing_hdr_dtl[6])|round(1,'floor')}}</td>
                     <td>{{(processing_hdr_dtl[14]*1000/(processing_hdr_dtl[6]))|round(1,'floor')}}</td>
+                    {% if current_user.user_type == "all" %}
+                    <td>{{processing_hdr_dtl[16]}}</td>
+                    <td>{{processing_hdr_dtl[17]}}</td>
+                    {% endif %}
                 </tr>
             {% endif %}
         {% endfor %}
@@ -181,6 +191,7 @@
                 <th><b>{{processing[3]}}</b></th>
                 <th><b>{{processing[2]}}</b></th>
                 <th><b>{{processing[1]}}</b></th>
+                <th><b></b></th>
                 <th><b>{{(processing[1]/processing[3])|round(1,'floor')}}</b></th>
 
 
@@ -206,6 +217,11 @@
             <th>Weight (in MT)</th>
             <th>Length (in m)</th>
             <th>Metres/minute</th>
+            <th>Tot People</th>
+            {% if current_user.user_type == "all" %}
+            <th>Total Cost</th>
+            <th>Cost/MT</th>
+            {% endif %}
         </tr>
         {% for processing_hdr_dtl in processing_hdr_detail %}
             {% if processing_hdr_dtl[2] == 'Slitting' or processing_hdr_dtl[2] == 'Mini_Slitting' %}
@@ -230,6 +246,11 @@
                     <td>{{processing_hdr_dtl[14]}}</td>
                     <td>{{processing_hdr_dtl[15]}}</td>
                     <td>{{(processing_hdr_dtl[15]/processing_hdr_dtl[6])|round(1,'floor')}}</td>
+                    <td>{{(processing_hdr_dtl[10] + processing_hdr_dtl[11])}}</td>
+                    {% if current_user.user_type == "all" %}
+                    <td>{{(processing_hdr_dtl[16])}}</td>
+                    <td>{{(processing_hdr_dtl[17])}}</td>
+                    {% endif %}
                 </tr>
             {% endif %}
         {% endfor %}

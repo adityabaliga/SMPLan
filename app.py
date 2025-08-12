@@ -3675,6 +3675,19 @@ def get_daily_report():
         for processing_detail in pro_detail_lst:
              processing_detail_lst.append(processing_detail)
 
+        for machine in machine_name_value:
+            if processing_hdr[2] == machine[0]:
+                machine_rate = machine[1]
+                total_time = processing_hdr[9] + processing_hdr[6]
+                total_labour = processing_hdr[10] + processing_hdr[11]
+                machine_cost = round(machine_rate * (total_time / 60), 2)
+                labour_cost = round(labour_rate * (total_labour) * (total_time / 60), 2)
+                total_cost = round((machine_cost + labour_cost),0)
+                cost_per_mt = round((Decimal(total_cost)/processing_hdr[14]),0)
+                processing_hdr.append(total_cost)
+                processing_hdr.append(cost_per_mt)
+
+
     #daily_report_whatsapp()
 
     #Sticker taken but entry not done
