@@ -142,7 +142,7 @@
             <th>No of cuts</th>
             <th>Tot People</th>
             <th>Cuts/minute</th>
-            <th>kgs/min</th>
+            <th>MT/hr</th>
             {% if current_user.user_type == "all" %}
             <th>Total Cost</th>
             <th>Cost/MT</th>
@@ -172,7 +172,7 @@
                     <td>{{processing_hdr_dtl[15]}}</td>
                     <td>{{processing_hdr_dtl[10] + processing_hdr_dtl[11]}}</td>
                     <td>{{(processing_hdr_dtl[15]/processing_hdr_dtl[6])|round(1,'floor')}}</td>
-                    <td>{{(processing_hdr_dtl[14]*1000/(processing_hdr_dtl[6]))|round(1,'floor')}}</td>
+                    <td>{{((processing_hdr_dtl[14]|string|float)/(processing_hdr_dtl[6]/60))|round(1,'floor')}}</td>
                     {% if current_user.user_type == "all" %}
                     <td>{{processing_hdr_dtl[16]}}</td>
                     <td>{{processing_hdr_dtl[17]}}</td>
@@ -218,6 +218,7 @@
             <th>Length (in m)</th>
             <th>Metres/minute</th>
             <th>Tot People</th>
+            <th>MT/hr</th>
             {% if current_user.user_type == "all" %}
             <th>Total Cost</th>
             <th>Cost/MT</th>
@@ -247,6 +248,7 @@
                     <td>{{processing_hdr_dtl[15]}}</td>
                     <td>{{(processing_hdr_dtl[15]/processing_hdr_dtl[6])|round(1,'floor')}}</td>
                     <td>{{(processing_hdr_dtl[10] + processing_hdr_dtl[11])}}</td>
+                    <td>{{((processing_hdr_dtl[14]|string|float)/((processing_hdr_dtl[6]+processing_hdr_dtl[9])/60))|round(1,'floor')}}</td>
                     {% if current_user.user_type == "all" %}
                     <td>{{(processing_hdr_dtl[16])}}</td>
                     <td>{{(processing_hdr_dtl[17])}}</td>
