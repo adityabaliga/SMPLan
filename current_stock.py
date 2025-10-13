@@ -192,17 +192,17 @@ class CurrentStock:
                 if customer_type == "smpl":
                     cursor.execute("select * from current_stock where (status = 'RM' or status = 'HC' or status= 'WIP')"
                                    " and "
-                                   "length = 0 and unit = %s  and customer not like 'TSDPL' and width <=800 order by "
+                                   "length = 0 and unit = %s  and customer not like 'TSDPL' and width <=1000 order by "
                                    "smpl_no asc", (str(unit),))
                 if customer_type == "tr":
                     cursor.execute(
                         "select * from current_stock where (status = 'RM' or status = 'HC' or status= 'WIP') and "
-                        "length = 0 and unit = %s  and (smpl_no like 'TR%%' or smpl_no like '2TR%%') and width <=800 order by smpl_no asc"
+                        "length = 0 and unit = %s  and (smpl_no like 'TR%%' or smpl_no like '2TR%%') and width <=1000 order by smpl_no asc"
                         , (str(unit),))
                 if customer_type == "tts":
                     cursor.execute(
                         "select * from current_stock where (status = 'RM' or status = 'HC' or status= 'WIP') and "
-                        "length = 0 and unit = %s  and smpl_no like 'TTS%%' and width <=800 order by smpl_no asc"
+                        "length = 0 and unit = %s  and smpl_no like 'TTS%%' and width <=1000 order by smpl_no asc"
                         , (str(unit),))
                 user_data = cursor.fetchall()
 
