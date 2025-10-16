@@ -440,7 +440,7 @@ def transfer_submit():
         customer = request.form['customer']
         transfer_date = request.form['dispatch_date']
         transfer_time = request.form['dispatch_time']
-        transfer_pkts = request.form.getlist['dispatch_packets']
+        #transfer_pkts = request.form.getlist['dispatch_packets']
         unit = request.form.getlist['_unit']
         remarks = request.form['remarks']
         entry_by = request.form['entry_by']
@@ -449,7 +449,7 @@ def transfer_submit():
         transfer_lst = request.args.getlist('select_smpl')
         transfer_nos = request.args.getlist('dispatch_numbers')
         transfer_quantity = request.args.getlist('dispatch_quantity')
-        transfer_pkts = request.args.getlist('dispatch_packets')
+        #transfer_pkts = request.args.getlist('dispatch_packets')
         unit = request.args.getlist('_unit')
         vehicle_no = request.args.get('vehicle_no')
         customer = request.args.get('customer')
@@ -465,7 +465,7 @@ def transfer_submit():
     transfer_nos_lst = list(filter(None, transfer_nos))
     transfer_quantity_lst = list(filter(None, transfer_quantity))
     unit_lst = list(filter(None, unit))
-    transfer_pkts_lst = list(filter(None, transfer_pkts))
+    #transfer_pkts_lst = list(filter(None, transfer_pkts))
     remarks = "TRANSFER TO UNIT " + unit[0]
     invoice_no = 'TRANSFER'
 
@@ -474,15 +474,14 @@ def transfer_submit():
 
     # Transfer Material has been changed for only partial material to be shifted.
     # Logic has been borrowed from Dispatch material
-    for smpl, transfer_nos, transfer_qty, unit, no_of_packets in zip(transfer_lst, transfer_nos_lst,
-                                                                     transfer_quantity_lst, unit_lst,
-                                                                     transfer_pkts_lst):
+    for smpl, transfer_nos, transfer_qty, unit in zip(transfer_lst, transfer_nos_lst,
+                                                                     transfer_quantity_lst, unit_lst):
         smpl_details = smpl.split(',')
         smpl_no = smpl_details[1]
         cs_id = int(smpl_details[0])
         cs = CurrentStock.load_smpl_by_id(cs_id)
         dispatch_detail = DispatchDetail(transfer_id, cs.smpl_no, cs.thickness, cs.width, cs.length, int(transfer_nos),
-                                         Decimal(transfer_qty), '', int(no_of_packets), cs.length2,
+                                         Decimal(transfer_qty), '', 1, cs.length2,
                                          cs.packet_name, cs.unit)
         dispatch_detail.save_to_db()
         if int(transfer_nos) == cs.numbers:
