@@ -2428,18 +2428,18 @@ def check_stock_tsdpl():
             # sticker_lst.append(sticker)
 
 
-        today_date = datetime.today().strftime('%Y-%m-%d')
-        change_date_format(today_date)
-        today_date_lst.append(change_date_format(today_date))
+            today_date = datetime.today().strftime('%Y-%m-%d')
+            change_date_format(today_date)
+            today_date_lst.append(change_date_format(today_date))
 
-        no_of_days = (datetime.today().date() - cs.date).days
-        no_of_days_lst.append(no_of_days)
+            no_of_days = (datetime.today().date() - cs.date).days
+            no_of_days_lst.append(no_of_days)
 
-        finishing_date = cs.date.strftime('%Y-%m-%d')
+            finishing_date = cs.date.strftime('%Y-%m-%d')
 
-        finishing_date = (change_date_format(finishing_date))
+            finishing_date = (change_date_format(finishing_date))
 
-        finishing_date_lst.append(finishing_date)
+            finishing_date_lst.append(finishing_date)
 
         '''incoming_flag = 0
         for incoming in incoming_lst:
