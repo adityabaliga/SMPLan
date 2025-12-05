@@ -98,7 +98,9 @@ class Processing:
     def get_daily_report_detail(cls, report_date):
         with CursorFromConnectionFromPool() as cursor:
             # cursor.execute('select * from processing where processing_date = %s order by operation asc', (report_date, ))
-            cursor.execute('select * from processing where processing_date = %s order by operation, start_time',
+            cursor.execute('select p.*, i.thickness, i.customer from processing p LEFT JOIN incoming i ON p.smpl_no = i.smpl_no '
+                           'where p.processing_date = %s order by '
+                           'p.operation, p.start_time',
                            (report_date,))
             user_data = [list(row) for row in cursor.fetchall()]
 

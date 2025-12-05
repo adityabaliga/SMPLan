@@ -4,14 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="43196d60-29a1-4da5-972f-f5ed5d18f5ea" name="Changes" comment="Added numbers to TSDPL stock report">
+    <list default="true" id="43196d60-29a1-4da5-972f-f5ed5d18f5ea" name="Changes" comment="Fixed wrong date issue in TSDPL stock report">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/processing.py" beforeDir="false" afterPath="$PROJECT_DIR$/processing.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/static/js/dispatch.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/js/dispatch.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/js/order.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/js/order.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/daily_report.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/daily_report.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/templates/dispatch_list.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/dispatch_list.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/honda_dispatch_list_ready.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/honda_dispatch_list_ready.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/pdi_list.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/pdi_list.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/pdi_list_ready.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/pdi_list_ready.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/order.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/order.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -474,7 +474,7 @@
       <option name="project" value="LOCAL" />
       <updated>1712825420285</updated>
     </task>
-    <option name="localTasksCounter" value="189" />
+    <option name="localTasksCounter" value="207" />
     <servers />
   </component>
   <component name="Vcs.Log.History.Properties">
@@ -623,24 +623,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Added unit in dispatch detail.&#10;Bug fix in transfer material" />
-    <MESSAGE value="Added dispatch in whatsapp message and Papa's number" />
-    <MESSAGE value="Added extra message on whatsapp for Mondays.1 for Saturday and 1 for Sunday" />
-    <MESSAGE value="Comparing net wt entered with theoretical wt and giving warning" />
-    <MESSAGE value="Comparing net wt entered with theoretical wt and giving warning for print old label" />
-    <MESSAGE value="Bug fix in whatsapp messages" />
-    <MESSAGE value="Added Net Wt and second customer in current_stock. Also, displayed it in history" />
-    <MESSAGE value="Bug fix for whatsapp messages" />
-    <MESSAGE value="Monthly Report improvements in dispatch reporting" />
-    <MESSAGE value="Added Honda dispatch in monthly report" />
-    <MESSAGE value="Bug Fix in mini slitting processing submit" />
-    <MESSAGE value="Get history to sort by date and time so that the operations are shown sequentially" />
-    <MESSAGE value="Bug Fix in dispatch pin entry. If pin was not valid format, page was still getting submitted" />
-    <MESSAGE value="Added Maintenance Log to the system. We can check old logs and add new maintenance in the system" />
-    <MESSAGE value="Bug fix for duplicate packet names. &#10;Also, logic changed for unique packet names for slitting" />
-    <MESSAGE value="In case of Honda 810 x 1010, the CTL and reshearing sizes are the same and the packet names are also the same&#10;So, in case of reshearing I am adding operation to the packet_key" />
-    <MESSAGE value="Improvements to Invoice check" />
-    <MESSAGE value="Improvements to Maintenance&#10;Bug fix in Tally Invoice check" />
     <MESSAGE value="Improvements to Maintenance. Added entry by to table&#10;TSDPL report only for FG" />
     <MESSAGE value="Bug fix to duplicate packet message while entering packet numbers" />
     <MESSAGE value="1 Month maintenance entry page added" />
@@ -648,7 +630,25 @@
     <MESSAGE value="Added PDI functionality for all customers, with downloadable excel. Can make, view, dispatch and delete PDI." />
     <MESSAGE value="Added weigh scales in list of machinery for maintenance" />
     <MESSAGE value="Added numbers to TSDPL stock report" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added numbers to TSDPL stock report" />
+    <MESSAGE value="Added numbers to Chandrashekar as dispatch user and unit in PDI report" />
+    <MESSAGE value="Added defectives entry in PDI ready sheet" />
+    <MESSAGE value="Bug fixes &#10;1. Packet name if changed is not stored in old packet names array&#10;2. Extra S removed when material type entry is COILS" />
+    <MESSAGE value="Bug fix in Monthly report" />
+    <MESSAGE value="Add net_wt and second_customer through print old label" />
+    <MESSAGE value="Display net_wt and second_customer in old label" />
+    <MESSAGE value="Added Cost table to SMPL history" />
+    <MESSAGE value="Allow editing in maintenance h" />
+    <MESSAGE value="Removed Avr cost/MT" />
+    <MESSAGE value="Dispatch from PDI by unit" />
+    <MESSAGE value="Changed weight in Honda stock report to kgs" />
+    <MESSAGE value="PDI delete bug fixed" />
+    <MESSAGE value="Bug fix in make old label, net wt showing as 0 in label" />
+    <MESSAGE value="Added K3CF details for sticker" />
+    <MESSAGE value="Display Cost and Cost/MT for processing in daily report" />
+    <MESSAGE value="Daily report changed from kgs/min to MT/hour" />
+    <MESSAGE value="Removed number of packets entry during transfer" />
+    <MESSAGE value="Fixed wrong date issue in TSDPL stock report" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed wrong date issue in TSDPL stock report" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -660,32 +660,27 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/incoming.py</url>
-          <line>100</line>
-          <option name="timeStamp" value="152" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/incoming.py</url>
           <line>154</line>
           <option name="timeStamp" value="161" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app.py</url>
-          <line>1980</line>
+          <line>1988</line>
           <option name="timeStamp" value="164" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app.py</url>
-          <line>1577</line>
+          <line>1585</line>
           <option name="timeStamp" value="165" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app.py</url>
-          <line>1435</line>
+          <line>1443</line>
           <option name="timeStamp" value="166" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app.py</url>
-          <line>3977</line>
+          <line>4123</line>
           <option name="timeStamp" value="175" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -700,68 +695,88 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app.py</url>
-          <line>3559</line>
-          <option name="timeStamp" value="195" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/app.py</url>
-          <line>3609</line>
+          <line>3754</line>
           <option name="timeStamp" value="196" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app.py</url>
-          <line>1262</line>
-          <option name="timeStamp" value="198" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/app.py</url>
-          <line>1509</line>
+          <line>1517</line>
           <option name="timeStamp" value="199" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app.py</url>
-          <line>1887</line>
+          <line>1895</line>
           <option name="timeStamp" value="202" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app.py</url>
-          <line>1932</line>
+          <line>1940</line>
           <option name="timeStamp" value="205" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app.py</url>
-          <line>3083</line>
+          <line>3155</line>
           <option name="timeStamp" value="218" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app.py</url>
-          <line>3105</line>
-          <option name="timeStamp" value="219" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/app.py</url>
-          <line>2618</line>
+          <line>2658</line>
           <option name="timeStamp" value="224" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app.py</url>
-          <line>3156</line>
+          <line>3240</line>
           <option name="timeStamp" value="225" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app.py</url>
-          <line>3997</line>
+          <line>4143</line>
           <option name="timeStamp" value="227" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app.py</url>
-          <line>2546</line>
-          <option name="timeStamp" value="240" />
+          <line>2030</line>
+          <option name="timeStamp" value="250" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app.py</url>
-          <line>2560</line>
-          <option name="timeStamp" value="243" />
+          <line>3598</line>
+          <option name="timeStamp" value="251" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/app.py</url>
+          <line>3618</line>
+          <option name="timeStamp" value="252" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/app.py</url>
+          <line>3196</line>
+          <option name="timeStamp" value="258" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/app.py</url>
+          <line>3202</line>
+          <option name="timeStamp" value="259" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/app.py</url>
+          <line>2626</line>
+          <option name="timeStamp" value="277" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/app.py</url>
+          <line>2830</line>
+          <option name="timeStamp" value="281" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/processing.py</url>
+          <line>104</line>
+          <option name="timeStamp" value="290" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/app.py</url>
+          <line>3676</line>
+          <option name="timeStamp" value="291" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
