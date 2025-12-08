@@ -178,14 +178,15 @@
                     {% if current_user.user_type == "all" %}
                     <td>{{processing_hdr_dtl[18]}}</td>
                     <td>{{processing_hdr_dtl[19]}}</td>
-                    <td>{{processing_hdr_dtl[17]}}</td>
                     {% endif %}
+                    <td>{{processing_hdr_dtl[17]}}</td>
                 </tr>
             {% endif %}
         {% endfor %}
         {% for processing in processing_hdr_lst %}
             {% if processing[0] == machine %}
             <tr>
+                <th></th>
                 <th></th>
                 <th></th>
                 <th></th>
@@ -271,6 +272,7 @@
                 <th><b>Slitting</b></th>
                 <th></th>
                 <th></th>
+                <th></th>
 
                 <th><b>TOTAL</b></th>
 
@@ -288,6 +290,8 @@
             <tr>
                 <th></th>
                 <th><b>Mini Slitting</b></th>
+                <th></th>
+                <th></th>
                 <th></th>
 
                 <th><b>TOTAL</b></th>
