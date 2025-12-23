@@ -3498,33 +3498,18 @@ def scams_show_details():
                 for machine in machine_name_value:
                     if processing.operation == machine[0]:
                         machine_rate = machine[1]
-                        machine_cost = round(machine_rate * (processing[20] / 60), 2)
-                        labour_cost = round(labour_rate * (processing[19]) * (processing[20] / 60), 2)
+                        total_time = processing.setting_time + processing.processing_time
+                        total_labour = processing.no_of_qc + processing.no_of_helpers
+                        machine_cost = round(machine_rate * (total_time / 60), 2)
+                        labour_cost = round(labour_rate * (total_labour) * (total_time / 60), 2)
 
-                total_cost = labour_cost + machine_cost
-                total_cost_per_mt = round(Decimal(total_cost) / (processing[15]), 0)
+                total_cost = round((labour_cost + machine_cost), 2)
+                total_cost_per_mt = round(Decimal(total_cost) / (processing.total_processed_wt), 0)
+                cuts_per_minute = round(Decimal(processing.total_cuts) / (total_time), 2)
                 cost_tuple = (processing.operation, processing.processing_date, processing.total_processed_wt,
                               processing.processing_time, processing.setting_time, machine_cost, labour_cost,
-                              total_cost, total_cost_per_mt)
+                              total_cost, total_cost_per_mt, processing.total_cuts, cuts_per_minute)
                 cost_table.append(cost_tuple)
-
-            '''_order_lst = Order.history_load_from_db(smpl_no)
-            for ordr_id, ordr in _order_lst:
-                order_id_lst.append(ordr_id)
-                order_lst.append(ordr)
-                _order_dtl_lst = OrderDetail.load_from_db(smpl_no,ordr_id)
-                for _ordr_dtl_id, _ordr_dtl in _order_dtl_lst:
-                    order_dtl_id_lst.append(_ordr_dtl_id)
-                    order_dtl_lst.append(_ordr_dtl)
-                    processing_dtl_lst.append(ProcessingDetail.load_history(_ordr_dtl_id))
-                _processing = Processing.load_history(ordr_id)
-                for processing_id, processing in _processing:
-                    processing_hdr_lst.append(processing)
-                    processing_hdr_id_lst.append(processing_id)
-            order_lst_by_smpl.append(order_lst)
-            order_id_lst_by_smpl.append(order_id_lst)
-            order_dtl_lst_by_orderid.append(order_dtl_lst)
-            order_dtl_id_lst_by_orderid.append(order_dtl_id_lst)'''
 
             _dispatch_dtl_lst.append(DispatchDetail.load_from_db(smpl_no))
             for dispatch_dtl_sublst in _dispatch_dtl_lst:
