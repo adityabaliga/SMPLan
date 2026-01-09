@@ -51,7 +51,6 @@
     </style>
 </head>
 <body>
-
     <div class="topnav" id="myTopnav">
         <br>
         <table>
@@ -320,6 +319,7 @@
         {% endfor %}
     </table>
 </body>
+<script src = "{{ url_for('static', filename='js/processing.js') }}"></script>
 <script>
 function toggleChildRows(button) {
    // Get the parent row of the clicked button

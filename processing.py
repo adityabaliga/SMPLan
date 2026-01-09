@@ -104,6 +104,9 @@ class Processing:
                            (report_date,))
             user_data = [list(row) for row in cursor.fetchall()]
 
+            for processing in user_data:
+                processing[17] = cust_name_for_label(processing[17])
+
 
         return user_data
 
@@ -128,4 +131,83 @@ def change_date_format(date):
 
     new_date = datetime.strptime(str(date),'%Y-%m-%d').strftime('%d/%m/%y')
     return new_date
+
+def cust_name_for_label(customer):
+    customer = customer.lower()
+
+    customer = customer.replace("private",'')
+    customer = customer.replace("limited",'')
+    customer = customer.replace("pvt",'')
+    customer = customer.replace("ltd",'')
+    customer = customer.replace(".",'')
+    customer = customer.replace("&",' and ')
+
+    _customer = customer
+
+    temp_customer = customer.split('[')
+    customer =  temp_customer[0]
+
+
+    if customer.startswith("veer o metal") or customer.startswith("veer-o-metal"):
+        cust_name= "Veer O Metals";
+        if "mkl" in _customer:
+            cust_name= "Veer O Metals [MKL]"
+        elif "bel" in _customer:
+            cust_name= "Veer O Metals [BEL]"
+        elif "jigani" in _customer:
+            cust_name= "Veer O Metals [JIG]"
+        elif "haro" in _customer:
+            cust_name= "Veer O Metals [HRL]"
+
+    elif customer.startswith("ttp technolgies"):
+        cust_name= "TTP Technologies";
+    elif customer.startswith("mpp technolgies"):
+        cust_name= "MPP Technologies";
+    elif customer.startswith("nash industries"):
+        cust_name= "Nash Industries";
+        if "38/1" in _customer:
+            cust_name= "Nash Industries [NGR]"
+        if "70  and  104" in _customer:
+            cust_name= "Nash Industries [DBS]"
+        if "102" in _customer or "236" in _customer or "247" in _customer:
+            cust_name= "Nash Industries [PNY]"
+        if "PLOT-2" in _customer:
+            cust_name= "Nash Industries [JGN]"
+        if "30/1,31/3" in _customer:
+            cust_name= "Nash Industries [JGN]"
+    elif customer.startswith("balmer lawrie"):
+        cust_name= "Balmer Lawrie"
+    elif customer.startswith("metal storage"):
+        cust_name= "Metal Storage"
+    elif customer.startswith("bharat metal"):
+        cust_name= "Bharat Metal"
+    elif customer.startswith("aditya auto"):
+        cust_name= "Aditya Auto"
+    elif customer.startswith("satrac eng"):
+        cust_name= "SATRAC"
+    elif customer.startswith("mallik eng"):
+        cust_name= "Mallik Engg"
+    elif customer.startswith("kanunga"):
+        cust_name= "Kanunga Extrusion"
+    elif customer.startswith("sun zone"):
+        cust_name= "SUN ZONE SOLAR"
+    elif customer.startswith("tata steel downstream products"):
+        cust_name= "TSDPL"
+    elif customer.startswith("honda"):
+        cust_name= "HONDA"
+    elif customer.startswith("tt steel"):
+        cust_name= "TTSSI"
+    elif customer.startswith("jr and "):
+        cust_name= "J R AND COMPANY"
+    elif customer.startswith("vns "):
+        cust_name= "VNS"
+    elif customer.startswith("ets - lindgren "):
+        cust_name= "ETS - LINDGREN ENG"
+    else:
+        cust_split = customer.split(' ')
+        if cust_split.len >=2:
+            customer = cust_split[0] + ' ' + cust_split[1]
+
+    cust_name = cust_name.upper()
+    return cust_name
 

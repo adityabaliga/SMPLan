@@ -1,3 +1,5 @@
+
+
 //This function will manage the customer name for the label
 function cust_name_for_label(customer){
     customer = customer.toLowerCase();
@@ -111,118 +113,18 @@ function honda_part_no(width,length){
     var coating = "";
     var wt_per_sheet = "";
 
-            if (width == 720 && length == 745){
-            part_no = "K0NA PLATE BOTTOM";
-            wt_per_sheet = 3.37;
-            coating = "20/0";
-        }
-    else if (width == 600 && length == 820){
-                part_no = "K0NA OUTER R/L";
-                wt_per_sheet = 3.09;
-                coating = "0/20";
-            }
-    else if (width == 810 && length == 1010){
-                part_no = "K0NH R/L";
-                wt_per_sheet = 4.79;
-                coating = "0/20";
-            }
-    else if (width == 370 && length == 415){
-                part_no = "K0LA+K0PA+K0YA, Tank Upper";
-                wt_per_sheet = 0.97;
-                coating = "0/20";
-            }
-    else if (width == 430 && length == 455){
-                part_no = "K0LA+K0PA+K0YA, Tank Lower";
-                wt_per_sheet = 1.23;
-                coating = "0/20";
-            }
-    else if (width == 570 && length == 830){
-                part_no = "K1KA R/L";
-                wt_per_sheet = 2.97;
-                coating = "0/20";
-            }
-    else if (width == 600 && length == 715){
-                part_no = "K1KA PLATE BOTTOM";
-                wt_per_sheet = 2.69;
-                coating = "20/0";
-            }
-    else if (width == 550 && length == 790){
-                part_no = "K1CA TANK R/L";
-                wt_per_sheet = 2.73;
-                coating = "0/20";
-            }
-    else if (width == 590 && length == 705){
-                part_no = "K1CA TANK BOTTOM";
-                wt_per_sheet = 2.61;
-                coating = "20/0";
-            }
-    else if (width == 530 && length == 765){
-                part_no = "K67 OUTER R/L";
-                wt_per_sheet = 2.55;
-                coating = "0/20";
-            }
-    else if (width == 575 && length == 640){
-                part_no = "K67 PLATE BOTTOM";
-                wt_per_sheet = 2.31;
-                coating = "20/0";
-            }
-    else if (width == 510 && length == 785){
-                part_no = "K0VA OUTER R/L";
-                wt_per_sheet = 2.53;
-                coating = "0/20";
-            }
-    else if (width == 600 && length == 660){
-                part_no = "K0VA PLATE BOTTOM";
-                wt_per_sheet = 2.49;
-                coating = "20/0";
-            }
-    else if (width == 655 && length == 740){
-                part_no = "K3CA UPPER";
-                wt_per_sheet = 2.66;
-                coating = "0/30";
-            }
-    else if (width == 565 && length == 645){
-                part_no = "K3CA BTM";
-                wt_per_sheet = 2.29;
-                coating = "0/20";
-    }
-    else if (width == 520 && length == 765){
-                part_no = "KTE TANK R/L";
-                wt_per_sheet = 2.50;
-                coating = "0/20";
-            }
-    else if (width == 565 && length == 645){
-                part_no = "KTE TANK BOTTOM";
-                wt_per_sheet = 2.29;
-                coating = "20/0";
-            }
-    else if (width == 515 && length == 715){
-                part_no = "K1EA TANK R/L";
-                wt_per_sheet = 2.31;
-                coating = "0/20";
-            }
-    else if (width == 620 && length == 675){
-                part_no = "K1EA TANK BOTTOM";
-                wt_per_sheet = 2.63;
-                coating = "20/0";
-            }
-    else if (width == 720 && length == 860){
-                part_no = "K3CF DLX OUTER RL";
-                wt_per_sheet = 3.89;
-                coating = "0/20";
-            }
-    else if (width == 570 && length == 650){
-                part_no = "K3CF DLX PLATE BOTTOM";
-                wt_per_sheet = 2.33;
-                coating = "20/0";
-            }
+    size = width + ' x ' + length;
 
-    else{
-        part_no = "";
-        wt_per_sheet = 0;
-        coating = "";
+    if (!hondaSizesData) {
+        console.error("Data not loaded yet");
+        return ";;";
     }
-    return (part_no + ";" + wt_per_sheet + ";" +coating);
+
+    if (hondaSizesData[size]) {
+        const part = hondaSizesData[size];
+        return part.part_name + ";" + part.wt_per_sheet + ";" + part.coating;
+    }else
+        return (part_no + ";" + wt_per_sheet + ";" +coating);
     //return part_no;
 }
 

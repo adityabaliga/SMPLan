@@ -5,7 +5,7 @@ from werkzeug.middleware.profiler import ProfilerMiddleware
 from decimal import Decimal
 from flask_login import LoginManager, login_user, current_user, logout_user
 from file_uploader import FileUploader
-from flask import Flask, render_template, request, jsonify, send_file, url_for, redirect
+from flask import Flask, render_template, request, jsonify, send_file, url_for, redirect, current_app
 from markupsafe import Markup
 from csv import writer
 from datetime import datetime, timedelta
@@ -16,6 +16,8 @@ import urllib.request
 from apscheduler.schedulers.background import BackgroundScheduler
 import atexit
 import io
+import json
+import os
 
 from user import User
 from current_stock import CurrentStock
@@ -2262,11 +2264,25 @@ def check_stock_htid():
 
     cs_lst = CurrentStock.get_stock_by_customer('HONDA TRADING CORPORATION INDIA PVT LTD', 'All')
 
+    json_path = os.path.join(current_app.static_folder, 'honda_sizes.json')
+    with open(json_path, 'r') as f:
+        parts_data = json.load(f)
+
     for cs_id, cs in cs_lst:
         if not any(substring in cs.packet_name for substring in ['W0P0', 'D0', 'M0']):
             _cs_id_lst.append(cs_id)
             _cs_lst.append(cs)
-            if cs.width == 720 and cs.length == 745:
+
+            key = f"{cs.width} x {cs.length}"
+            part_data = parts_data.get(key)
+
+            if part_data:
+                wt_per_sheet = part_data['wt_per_sheet']
+                part_no = part_data['part_name']
+                coating = part_data['coating']
+
+
+            '''if cs.width == 720 and cs.length == 745:
                 part_no = "K0NA PLATE BOTTOM"
                 wt_per_sheet = 3.37
                 coating = "20/0"
@@ -2349,7 +2365,7 @@ def check_stock_htid():
             if cs.width == 570 and cs.length == 650:
                 part_no = "K3CF DLX PLATE BOTTOM"
                 wt_per_sheet = 2.33
-                coating = "20/0"
+                coating = "20/0"'''
             if cs.length > 0:
                 packet_wt = int((cs.numbers * wt_per_sheet))
             else:
@@ -2374,21 +2390,7 @@ def check_stock_htid():
             if incoming.dc_date:
                 #if len(incoming.dc_date) > 7:
                 dc_date = incoming.dc_date.strftime('%d-%m-%Y')
-                '''dc_date = incoming.dc_date.replace('/', '-')
-                i=0
-                while i<4:
-                    dc_date_year= dc_date_year + (dc_date[i])
-                    i=i+1
-                while i<6:
-                    dc_date_month = dc_date_month + (dc_date[i])
-                    i=i+1
-                while i<8:
-                    dc_date_date = dc_date_date + (dc_date[i])
-                    i=i+1
-                dc_date = dc_date_date + '-' + dc_date_month + '-' + dc_date_year'''
 
-            #else:
-            #    dc_date = change_date_format(incoming.incoming_date)
             dc_date_lst.append(dc_date)
             grade = (cs.grade.split("GRADE:"))
             if len(grade) > 1:

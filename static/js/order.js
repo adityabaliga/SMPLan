@@ -291,6 +291,7 @@ var UIController = (function() {
        addSizeBtn : '.add_size_btn',
        addOpBtn:'.add_op_btn',
        CTL_table : '.CTL_table',
+       printCTLBtn : '.print_ctl_btn',
        Slitting_table : '.Slitting_table',
        Narrow_CTL_table : '.Narrow_CTL_table',
        Reshearing_table : '.Reshearing_table',
@@ -571,7 +572,9 @@ var controller = (function(orderCtrl, UICtrl) {
 
        document.querySelector(DOM.addOpBtn).addEventListener('click', addOperation);
 
-       document.querySelector(DOM.sizesTable).addEventListener('click', deleteEditSize);
+       //document.querySelector(DOM.sizesTable).addEventListener('click', deleteEditSize);
+
+       document.querySelector(DOM.printCTLBtn).addEventListener('click', printCTL);
 
        document.getElementById('order').addEventListener('submit', function(event){
            //event.preventDefault();
@@ -1268,6 +1271,82 @@ var controller = (function(orderCtrl, UICtrl) {
          }
 
         };
+
+    var printCTL = function(event){
+        // Clone the elements so we can modify them safely
+    const incoming = document.getElementById("incoming_details").cloneNode(true);
+    const ctl = document.getElementById("CTL_table").cloneNode(true);
+
+    // Copy values from all inputs and textareas in the original table
+    [incoming, ctl].forEach(section => {
+        const inputs = section.querySelectorAll("input, textarea, select");
+        inputs.forEach(input => {
+            if (input.tagName.toLowerCase() === "textarea") {
+                input.textContent = input.value;
+            } else if (input.tagName.toLowerCase() === "select") {
+                const selected = input.options[input.selectedIndex];
+                const textNode = document.createTextNode(selected ? selected.text : "");
+                const span = document.createElement("span");
+                span.textContent = textNode.textContent;
+                input.parentNode.replaceChild(span, input);
+            } else {
+                const span = document.createElement("span");
+                span.textContent = input.value;
+                input.parentNode.replaceChild(span, input);
+            }
+        });
+    });
+
+        // Create a new popup window for printing
+        // Open in a new tab (not a popup)
+        const printWindow = window.open('', '_blank');
+
+        // Write HTML content into the new tab
+        printWindow.document.write(`
+            <html>
+            <head>
+                <title>Print</title>
+                <style>
+                    body {
+                        font-family: Arial, sans-serif;
+                        margin: 20px;
+                    }
+                    table {
+                        border-collapse: collapse;
+                        width: 100%;
+                        margin-bottom: 20px;
+                    }
+                    table, th, td {
+                        border: 1px solid #000;
+                        padding: 6px;
+                        font-size: 12px;
+                    }
+                    h2 {
+                        text-align: center;
+                        margin-bottom: 20px;
+                    }
+                </style>
+            </head>
+            <body>
+                ${incoming.outerHTML}
+                ${ctl.outerHTML}
+            </body>
+            </html>
+        `);
+        // Finish writing and trigger print
+    printWindow.document.close();
+
+    // Wait a bit for rendering before printing
+    printWindow.onload = function() {
+        setTimeout(() => {
+            printWindow.focus();
+            printWindow.print();
+            // Keep the tab open (optional)
+            // To auto-close after printing, uncomment:
+            // printWindow.close();
+        }, 500);
+        };
+    };
 
     var onSubmit = function(){
         //alert('submit clicked');
