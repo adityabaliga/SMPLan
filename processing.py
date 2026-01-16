@@ -205,8 +205,8 @@ def cust_name_for_label(customer):
         cust_name= "ETS - LINDGREN ENG"
     else:
         cust_split = customer.split(' ')
-        if cust_split.len >=2:
-            customer = cust_split[0] + ' ' + cust_split[1]
+        if len(cust_split) >=2:
+            cust_name = cust_split[0] + ' ' + cust_split[1]
 
     cust_name = cust_name.upper()
     return cust_name
