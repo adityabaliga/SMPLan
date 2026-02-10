@@ -24,7 +24,7 @@ var full_dispatch_pos = 8;
 var dispatch_nos_pos = 9;
 var dispatch_qty_pos = 10;
 var no_of_pkts_pos = 11;
-var defective_pos=8;
+var defective_pos=9;
 
 
 //Disable Submit button once submit is pressed

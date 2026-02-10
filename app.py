@@ -484,7 +484,7 @@ def transfer_submit():
         cs = CurrentStock.load_smpl_by_id(cs_id)
         dispatch_detail = DispatchDetail(transfer_id, cs.smpl_no, cs.thickness, cs.width, cs.length, int(transfer_nos),
                                          Decimal(transfer_qty), '', 1, cs.length2,
-                                         cs.packet_name, cs.unit)
+                                         cs.packet_name, cs.unit, cs.processing_id)
         dispatch_detail.save_to_db()
         if int(transfer_nos) == cs.numbers:
             CurrentStock.transfer_material_cls(cs_id, unit)
@@ -1310,6 +1310,9 @@ def submit_processing():
         total_cuts = int(request.form['total_cuts'])
         rm_wt = Decimal(request.form['input_weight'])
         cs_rm_id = request.form['cs_rm_id']
+        previous_processing_id = request.form['previous_processing_id']
+        if previous_processing_id == '':
+            previous_processing_id = None
 
         # Establish a database connection
         connection = psycopg2.connect(
@@ -1334,19 +1337,19 @@ def submit_processing():
                     # Processing object created and saved to db
                     processing = Processing(smpl_no, op_for_hdr, processing_date, start_time, end_time, setting_start_time,
                                             setting_end_time, processing_time, setting_time, no_of_qc, no_of_helpers, names_of_qc,
-                                            setting_date, total_processed_wt, total_cuts)
+                                            setting_date, total_processed_wt, total_cuts, previous_processing_id)
 
                     cursor.execute("insert into processing (smpl_no, operation, processing_date, start_time, "
                                    "end_time, setting_start_time, setting_end_time, production_time, setting_time, no_of_qc, "
                                    "no_of_helpers, names_of_qc,setting_date, total_processed_wt,"
-                                   "total_cuts) values (%s, %s,%s, %s, "
-                                   "%s, %s, %s, %s, %s, %s,%s, %s, %s, %s, %s)",
+                                   "total_cuts, previous_processing_id) values (%s, %s,%s, %s, "
+                                   "%s, %s, %s, %s, %s, %s,%s, %s, %s, %s, %s, %s)",
                                    (processing.smpl_no, processing.operation, processing.processing_date,
                                     processing.start_time, processing.end_time, processing.setting_start_time,
                                     processing.setting_end_time, processing.processing_time, processing.setting_time,
                                     processing.no_of_qc, processing.no_of_helpers, processing.names_of_qc,
                                     processing.setting_date,
-                                    processing.total_processed_wt, processing.total_cuts))
+                                    processing.total_processed_wt, processing.total_cuts, previous_processing_id))
 
                     cursor.execute("select processing_id from processing where oid= %s", (cursor.lastrowid,))
                     processing_id = cursor.fetchone()
@@ -1665,6 +1668,9 @@ def submit_slitting_processing():
         thickness = float(request.form['thickness'])
         grade = request.form['grade']
         mat_type = request.form['mat_type']
+        previous_processing_id = request.form['previous_processing_id']
+        if previous_processing_id == '':
+            previous_processing_id = None
 
         no_of_qc = request.form['no_of_qc']
         no_of_helpers = request.form['no_of_helpers']
@@ -1709,20 +1715,20 @@ def submit_slitting_processing():
                     # Processing object created and saved to db
                     processing = Processing(smpl_no, operation, processing_date, start_time, end_time, setting_start_time,
                                             setting_end_time, processing_time, setting_time, no_of_qc, no_of_helpers, names_of_qc,
-                                            setting_date, total_processed_wt, total_length)
+                                            setting_date, total_processed_wt, total_length, previous_processing_id)
                     #processing_id = processing.save_to_db()
 
                     cursor.execute("insert into processing (smpl_no, operation, processing_date, start_time, "
                                    "end_time, setting_start_time, setting_end_time, production_time, setting_time, no_of_qc, "
                                    "no_of_helpers, names_of_qc,setting_date, total_processed_wt,"
-                                   "total_cuts) values (%s, %s,%s, %s, "
-                                   "%s, %s, %s, %s, %s, %s,%s, %s, %s, %s, %s)",
+                                   "total_cuts, previous_processing_id) values (%s, %s,%s, %s, "
+                                   "%s, %s, %s, %s, %s, %s,%s, %s, %s, %s, %s, %s)",
                                    (processing.smpl_no, processing.operation, processing.processing_date,
                                     processing.start_time, processing.end_time, processing.setting_start_time,
                                     processing.setting_end_time, processing.processing_time, processing.setting_time,
                                     processing.no_of_qc, processing.no_of_helpers, processing.names_of_qc,
                                     processing.setting_date,
-                                    processing.total_processed_wt, processing.total_cuts))
+                                    processing.total_processed_wt, processing.total_cuts, processing.previous_processing_id))
 
                     cursor.execute("select processing_id from processing where oid= %s", (cursor.lastrowid,))
                     processing_id = cursor.fetchone()
@@ -2619,7 +2625,8 @@ def dispatch():
         cs_id = smpl_details[0]
         cs = CurrentStock.load_smpl_by_id(cs_id)
         dispatch_detail = DispatchDetail(dispatch_id, cs.smpl_no, cs.thickness, cs.width, cs.length, cs.numbers,
-                                         cs.weight, defective, 1, cs.length2, cs.packet_name, cs.unit)
+                                         cs.weight, defective, 1, cs.length2, cs.packet_name, cs.unit,
+                                         cs.processing_id)
         dispatch_detail.save_to_db()
 
         CurrentStock.delete_record(cs_id)
@@ -2811,7 +2818,7 @@ def pdi_prepare_list():
         cs_id = smpl_details[0]
         cs = CurrentStock.load_smpl_by_id(cs_id)
         staging_dispatch_detail = DispatchDetail(staging_dispatch_id, cs.smpl_no, cs.thickness, cs.width, cs.length, cs.numbers,
-                                         cs.weight, defective, 1, cs.length2, cs.packet_name, cs.unit)
+                                         cs.weight, defective, 1, cs.length2, cs.packet_name, cs.unit, cs.processing_id)
         staging_dispatch_detail.save_to_staging_db(cs_id)
 
 
@@ -2891,7 +2898,8 @@ def pdi_view_detail():
         cs_id = dispatch_detail[2]
         cs = CurrentStock.load_smpl_by_id(cs_id)
         staging_dispatch_detail = DispatchDetail(dispatch_detail[1], cs.smpl_no, cs.thickness, cs.width, cs.length, cs.numbers,
-                                        cs.weight, dispatch_detail[9], 1, cs.length2, cs.packet_name, cs.unit)
+                                        cs.weight, dispatch_detail[9], 1, cs.length2, cs.packet_name, cs.unit,
+                                                 cs.processing_id)
         #staging_dispatch_detail.save_to_staging_db(cs_id)
 
         defectives_lst.append(dispatch_detail[9])
@@ -4049,6 +4057,23 @@ def invoice_check_report():
         processing_pass_lst.append(processing)
 
     return render_template('/invoice_check_report.html', processing_lst = processing_pass_lst)
+
+@app.route('/dispatch_costing_report_get_dates', methods=['GET', 'POST'])
+def dispatch_costing_report_get_dates():
+    return render_template('/dispatch_size_costing_get_dates.html')
+
+@app.route('/dispatch_costing_report', methods=['GET', 'POST'])
+def dispatch_costing_report():
+    if request.method == 'POST':
+        report_from_date = request.form['report_from_date']
+        report_to_date = request.form['report_to_date']
+    if request.method == 'GET':
+        report_from_date = request.args.get('report_from_date')
+        report_to_date = request.args.get('report_to_date')
+
+    DispatchHeader.get_dispatch_costing_summary(report_from_date, report_to_date)
+
+
 
 @app.route('/tally_stock_check_upload', methods=['GET', 'POST'])
 def tally_stock_check_upload():

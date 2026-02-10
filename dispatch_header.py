@@ -182,3 +182,7 @@ class DispatchHeader:
 
             dispatch_header = DispatchHeader(user_data[1], user_data[6], user_data[2], user_data[3], user_data[4], user_data[5], user_data[7])
             return dispatch_header
+
+    @classmethod
+    def get_dispatch_costing_summary(from_date, to_date):
+        query = """ """

@@ -3,7 +3,7 @@ from decimal import *
 
 class DispatchDetail:
     def __init__(self, dispatch_id, smpl_no, thickness, width, length, numbers, dispatch_wt, defective, no_of_pkts,
-                 length2, packet_name, unit):
+                 length2, packet_name, unit, processing_id):
         self.dispatch_id = dispatch_id
         self.smpl_no = smpl_no
         self.thickness = thickness
@@ -16,14 +16,16 @@ class DispatchDetail:
         self.length2 = length2
         self.packet_name = packet_name
         self.unit = unit
+        self.processing_id = processing_id
 
     def save_to_db(self):
         with CursorFromConnectionFromPool() as cursor:
             cursor.execute("insert into dispatch_detail (dispatch_id, smpl_no, thickness, width, length, numbers, "
-                           "weight, defective, no_of_packets, length2, packet_name, unit) values (%s, %s, %s, %s, %s, "
-                           "%s, %s, %s, %s, %s, %s, %s)", (self.dispatch_id, self.smpl_no, self.thickness, self.width,
+                           "weight, defective, no_of_packets, length2, packet_name, unit, processing_id) values (%s, %s, %s, %s, %s, "
+                           "%s, %s, %s, %s, %s, %s, %s,%s)", (self.dispatch_id, self.smpl_no, self.thickness, self.width,
                                                            self.length, self.numbers, self.dispatch_wt, self.defective,
-                                                           self.no_of_pkts, self.length2, self.packet_name, self.unit))
+                                                           self.no_of_pkts, self.length2, self.packet_name, self.unit,
+                                                              self.processing_id))
 
 
     @classmethod
@@ -35,7 +37,7 @@ class DispatchDetail:
             for detail in user_data:
                 dispatch_detail = DispatchDetail(select_dispatch_hdr_id, detail[2], float(detail[3]), float(detail[4]),
                                                  float(detail[5]), int(detail[6]), float(detail[7]), detail[8],
-                                                 detail[9], float(detail[10]), detail[11], detail[12])
+                                                 detail[9], float(detail[10]), detail[11], detail[12], detail[13])
                 dispatch_detail_lst.append(dispatch_detail)
 
         return dispatch_detail_lst
@@ -50,7 +52,7 @@ class DispatchDetail:
             for detail in user_data:
                 dispatch_detail = DispatchDetail(int(detail[1]), detail[2], float(detail[3]), float(detail[4]),
                                                  float(detail[5]), int(detail[6]), float(detail[7]), detail[8],
-                                                 detail[9], float(detail[10]), detail[11], detail[12])
+                                                 detail[9], float(detail[10]), detail[11], detail[12], detail[13])
                 dispatch_detail_lst.append(dispatch_detail)
 
         return dispatch_detail_lst
@@ -64,7 +66,7 @@ class DispatchDetail:
             for detail in user_data:
                 dispatch_detail = DispatchDetail(int(detail[1]), detail[2], float(detail[3]), float(detail[4]),
                                                  float(detail[5]), int(detail[6]), float(detail[7]), detail[8],
-                                                 detail[9], float(detail[10]), detail[11], detail[12])
+                                                 detail[9], float(detail[10]), detail[11], detail[12], detail[13])
                 dispatch_detail_lst.append(dispatch_detail)
 
         return dispatch_detail_lst
@@ -72,10 +74,11 @@ class DispatchDetail:
     def save_to_staging_db(self, cs_id):
         with CursorFromConnectionFromPool() as cursor:
             cursor.execute("insert into staging_dispatch_detail (dispatch_id, cs_id, smpl_no, thickness, width, length, numbers, "
-                           "weight, defective, no_of_packets, length2, packet_name, unit) values (%s, %s, %s, %s, %s, %s, "
-                           "%s, %s, %s, %s, %s, %s, %s)", (self.dispatch_id, cs_id, self.smpl_no, self.thickness, self.width,
+                           "weight, defective, no_of_packets, length2, packet_name, unit, processing_id) values (%s, %s, %s, %s, %s, %s, "
+                           "%s, %s, %s, %s, %s, %s, %s,%s)", (self.dispatch_id, cs_id, self.smpl_no, self.thickness, self.width,
                                                            self.length, self.numbers, self.dispatch_wt, self.defective,
-                                                           self.no_of_pkts, self.length2, self.packet_name, self.unit))
+                                                           self.no_of_pkts, self.length2, self.packet_name, self.unit,
+                                                              self.processing_id))
 
 
     @classmethod

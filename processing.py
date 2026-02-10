@@ -8,7 +8,7 @@ from datetime import datetime
 class Processing:
     def __init__(self, smpl_no, operation, processing_date, start_time, end_time, setting_start_time,
                  setting_end_time, processing_time, setting_time, no_of_qc, no_of_helpers, names_of_qc,
-                 setting_date, total_processed_wt, total_cuts):
+                 setting_date, total_processed_wt, total_cuts, previous_processing_id):
         self.smpl_no = smpl_no
         self.operation = operation
         self.processing_date = change_date_format(processing_date)
@@ -24,6 +24,7 @@ class Processing:
         self.setting_date = setting_date
         self.total_processed_wt = total_processed_wt
         self.total_cuts = total_cuts
+        self.previous_processing_id = previous_processing_id
 
 
     @classmethod
@@ -38,7 +39,7 @@ class Processing:
                                         setting_end_time=lst[8], setting_time=int(lst[9]), no_of_qc=lst[10],
                                         no_of_helpers=lst[11], names_of_qc=lst[12],
                                         setting_date=change_date_format(lst[13]), total_processed_wt = Decimal(lst[14]),
-                                        total_cuts=int(lst[15]))
+                                        total_cuts=int(lst[15]), previous_processing_id=(lst[16]))
                 processing_lst.append(processing)
         return processing_lst
 
@@ -72,7 +73,7 @@ class Processing:
                                         setting_end_time=lst[8], setting_time=int(lst[9]), no_of_qc=lst[10],
                                         no_of_helpers=lst[11], names_of_qc=lst[12],
                                         setting_date= (lst[13]), total_processed_wt = Decimal(lst[14]),
-                                        total_cuts=int(lst[15]))
+                                        total_cuts=int(lst[15]), previous_processing_id=(lst[16]))
                 processing_id = int(lst[0])
                 processing_lst.append(processing)
                 processing_id_lst.append(processing_id)
