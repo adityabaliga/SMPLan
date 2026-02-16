@@ -244,7 +244,7 @@
                         {% endfor %}
                     </table></td>
                     <td><a href="/history_show_details?smpl_no={{processing_hdr_dtl[1]}}">{{processing_hdr_dtl[1]}}</a></td>
-                    <td>{{(processing_hdr_dtl[16])}}</td>
+                    <td>{{(processing_hdr_dtl[17])}}</td>
                     <td>{{processing_hdr_dtl[2]}}</td>
                     <td>{{processing_hdr_dtl[4]}}</td>
                     <td>{{processing_hdr_dtl[5]}}</td>
@@ -256,11 +256,11 @@
                     <td>{{(processing_hdr_dtl[10] + processing_hdr_dtl[11])}}</td>
                     <td>{{((processing_hdr_dtl[14]|string|float)/((processing_hdr_dtl[6]+processing_hdr_dtl[9])/60))|round(1,'floor')}}</td>
                     {% if current_user.user_type == "all" %}
-                    <td>{{(processing_hdr_dtl[18])}}</td>
                     <td>{{(processing_hdr_dtl[19])}}</td>
+                    <td>{{(processing_hdr_dtl[20])}}</td>
 
                     {% endif %}
-                    <td>{{(processing_hdr_dtl[17])}}</td>
+                    <td>{{(processing_hdr_dtl[18])}}</td>
                 </tr>
             {% endif %}
         {% endfor %}
