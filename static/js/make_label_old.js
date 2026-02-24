@@ -1,4 +1,12 @@
+let hondaSizesData = null;
 
+// Load once when page loads
+fetch("/static/honda_sizes.json")
+    .then(response => response.json())
+    .then(data => {
+        hondaSizesData = data;
+        make_label_old();
+    });
 
 //This function will manage the customer name for the label
 function cust_name_for_label(customer){
