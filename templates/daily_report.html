@@ -175,10 +175,10 @@
                     <td>{{(processing_hdr_dtl[15]/processing_hdr_dtl[6])|round(1,'floor')}}</td>
                     <td>{{((processing_hdr_dtl[14]|string|float)/(processing_hdr_dtl[6]/60))|round(1,'floor')}}</td>
                     {% if current_user.user_type == "all" %}
-                    <td>{{processing_hdr_dtl[18]}}</td>
                     <td>{{processing_hdr_dtl[19]}}</td>
+                    <td>{{processing_hdr_dtl[20]}}</td>
                     {% endif %}
-                    <td>{{processing_hdr_dtl[17]}}</td>
+                    <td>{{processing_hdr_dtl[18]}}</td>
                 </tr>
             {% endif %}
         {% endfor %}
