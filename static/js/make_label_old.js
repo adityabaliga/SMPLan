@@ -339,5 +339,106 @@ function make_label_old(smpl_no, customer){
     new_page = window.open('make_label_hist?' + data);*/
 }
 
+function print_label_new(){
+    lbl_format = document.getElementById('lbl_format').value;
+    lbl_format_size = document.getElementById('lbl_format_size').value;
+    var fg_table = document.getElementById('label_table');
+    var data = "";
+    data += document.getElementById('lbl_smpl_no').value + '&';
+    data += document.getElementById('lbl_prod_date').value + '&';
+    data += document.getElementById('lbl_customer').value + '&';
+    data += document.getElementById('lbl_machine').value + '&';
+    data += document.getElementById('lbl_size').value + '&';
+    data += document.getElementById('lbl_numbers').value + '&';
+    data += document.getElementById('lbl_packet_name').value + '&';
+    data += document.getElementById('lbl_lamination').value + '&';
+    data += document.getElementById('lbl_mill_id').value + '&';
+    data += document.getElementById('lbl_grade').value + '&';
+    data += document.getElementById('lbl_mill').value + '&';
+    data += document.getElementById('lbl_comment').value + '&';
+    data += document.getElementById('lbl_2nd_customer').value + '&';
+    data += document.getElementById('lbl_mat_type').value + '&';
+    data += document.getElementById('lbl_scams_no').value + document.getElementById('lbl_scams_pkt').value + '&';
+    data += document.getElementById('lbl_coating').value + '&';
+    data += document.getElementById('lbl_part_no').value + '&';
+    data += document.getElementById('lbl_batch_no').value + '&';
+    data += document.getElementById('lbl_net_wt').value + '&';
+    data += document.getElementById('lbl_gross_wt').value + '&';
+    data += document.getElementById('lbl_top_comment').value + '&';
+    data += document.getElementById('lbl_format_size').value + '&';
+    data += document.getElementById('lbl_mat_status').value + '&';
+    data += document.getElementById('lbl_qc_name').value + '&';
+
+    var sticker_text = '';
+
+    //sticker_text += document.getElementById('lbl_smpl_no').value + ';;';
+    //sticker_text   += document.getElementById('lbl_packet_name').value + ';;';
+    sticker_text += data.replaceAll('&',';;') ;
+    document.getElementById('stickers').value = sticker_text;
+
+
+
+    var new_page;
+    if(document.getElementById('lbl_format').value == "TSL"){
+        new_page = window.open('print_label_tsl?' + data);
+    }else{
+        new_page = window.open('print_label?' + data);
+    }
+
+    // Create a new FormData object from the form
+    var fieldValue = document.getElementById('stickers').value;
+
+    // Get the current page name without the full path or extension
+    //This part is added so if the page is called from make old label, the net wt and second customer
+    // can be added to the current stock record
+    let pathParts = window.location.pathname.split('/');
+    let currentPage = pathParts[pathParts.length - 1].split('.')[0]; // e.g., "print_old_label_format"
+
+
+    // Create an object with the field data
+    var data = {
+        fieldName: fieldValue, // Replace 'fieldName' with the key you want to use for the field in the JSON
+        sourcePage: currentPage
+    };
+
+
+    // Convert the object to a JSON string
+    var json = JSON.stringify(data);
+
+     // Use fetch to send the data to the Flask server
+     // This adds the data to json, which is passed to python to be added to the sticker db
+    fetch('/process_data', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: json
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Success:', data);
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+    });
+
+    document.getElementById('stickers').value = '';
+
+     var net_wt = document.getElementById('lbl_net_wt').value;
+     var second_customer = document.getElementById('lbl_2nd_customer').value;
+     var rowId = document.getElementById('lbl_rowId').value;
+     var numbers_table = document.getElementById('numbers_pkts');
+     var cells_len = numbers_table.rows[rowId].cells.length;
+
+
+     if (net_wt != ''){
+     numbers_table.rows[rowId].cells[cells_len-2].lastChild.value = net_wt;
+     }
+     if (second_customer != ''){
+     numbers_table.rows[rowId].cells[cells_len-1].lastChild.value = second_customer;
+     }
+
+}
+
 //This is to call functions in processing.js
 //cust_name_for_label();
