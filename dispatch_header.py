@@ -185,4 +185,132 @@ class DispatchHeader:
 
     @classmethod
     def get_dispatch_costing_summary(from_date, to_date):
-        query = """ """
+        try:
+
+
+            conn = get_db_connection()
+
+            # Query with TRANSFER TO filter
+            query = """
+                WITH RECURSIVE processing_chain AS (
+                    SELECT 
+                        dd.dispatch_detail_id,
+                        dd.dispatch_id,
+                        dd.smpl_no,
+                        p.processing_id,
+                        p.previous_processing_id,
+                        p.operation,
+                        p.production_time,
+                        p.setting_time,
+                        p.total_processed_wt,
+                        p.no_of_helpers,
+                        p.no_of_qc,
+                        1 as processing_level
+                    FROM dispatch_detail dd
+                    INNER JOIN dispatch_header dh ON dd.dispatch_id = dh.dispatch_id
+                    INNER JOIN processing p ON dd.processing_id = p.processing_id
+                    WHERE dh.dispatch_date >= %(from_date)s 
+                        AND dh.dispatch_date <= %(to_date)s
+                        AND (dh.remarks NOT LIKE '%%TRANSFER TO%%' OR dh.remarks IS NULL)
+                    UNION ALL
+                    SELECT 
+                        pc.dispatch_detail_id,
+                        pc.dispatch_id,
+                        pc.smpl_no,
+                        p.processing_id,
+                        p.previous_processing_id,
+                        p.operation,
+                        p.production_time,
+                        p.setting_time,
+                        p.total_processed_wt,
+                        p.no_of_helpers,
+                        p.no_of_qc,
+                        pc.processing_level + 1
+                    FROM processing_chain pc
+                    INNER JOIN processing p ON pc.previous_processing_id = p.processing_id
+                    WHERE pc.processing_level < 10
+                ),
+                processing_costs AS (
+                    SELECT 
+                        pc.dispatch_detail_id,
+                        pc.operation,
+                        pc.production_time,
+                        pc.setting_time,
+                        pc.total_processed_wt,
+                        pc.no_of_helpers,
+                        pc.no_of_qc,
+                        pc.processing_level,
+                        COALESCE(mr.rate_per_hour, 0) as machine_rate,
+                        COALESCE(mr.rate_per_hour, 0) * (pc.production_time + pc.setting_time)::decimal / 60.0 as machine_cost,
+                        212.0 * (COALESCE(pc.no_of_helpers, 0) + COALESCE(pc.no_of_qc, 0)) * (pc.production_time + pc.setting_time)::decimal / 60.0 as labour_cost,
+                        (COALESCE(mr.rate_per_hour, 0) * (pc.production_time + pc.setting_time)::decimal / 60.0) + (212.0 * (COALESCE(pc.no_of_helpers, 0) + COALESCE(pc.no_of_qc, 0)) * (pc.production_time + pc.setting_time)::decimal / 60.0) as total_cost,
+                        CASE 
+                            WHEN pc.total_processed_wt > 0 THEN
+                                ((COALESCE(mr.rate_per_hour, 0) * (pc.production_time + pc.setting_time)::decimal / 60.0) + (212.0 * (COALESCE(pc.no_of_helpers, 0) + COALESCE(pc.no_of_qc, 0)) * (pc.production_time + pc.setting_time)::decimal / 60.0)) / (pc.total_processed_wt::decimal / 1000.0)
+                            ELSE 0
+                        END as cost_per_mt
+                    FROM processing_chain pc
+                    LEFT JOIN machine_rates mr ON pc.operation = mr.machine_name
+                )
+                SELECT 
+                    dh.dispatch_id,
+                    dh.customer,
+                    dh.vehicle_no,
+                    dh.dispatch_date,
+                    dd.dispatch_detail_id,
+                    dd.smpl_no,
+                    dd.thickness,
+                    dd.width,
+                    dd.length,
+                    dd.weight as dispatch_weight,
+                    dd.numbers as dispatch_numbers,
+                    dd.packet_name,
+                    string_agg(pc.operation, ', ' ORDER BY pc.processing_level DESC) as operations_list,
+                    ROUND(COALESCE(SUM(pc.machine_cost), 0)::numeric, 2) as total_machine_cost,
+                    ROUND(COALESCE(SUM(pc.labour_cost), 0)::numeric, 2) as total_labour_cost,
+                    ROUND(COALESCE(SUM(pc.total_cost), 0)::numeric, 2) as total_processing_cost,
+                    ROUND((COALESCE(SUM(pc.cost_per_mt), 0) / 1000.0)::numeric) as total_cost_per_mt,
+                    COUNT(pc.operation) as total_processing_steps
+                FROM dispatch_header dh
+                INNER JOIN dispatch_detail dd ON dh.dispatch_id = dd.dispatch_id
+                LEFT JOIN processing_costs pc ON dd.dispatch_detail_id = pc.dispatch_detail_id
+                WHERE dh.dispatch_date >= %(from_date)s 
+                    AND dh.dispatch_date <= %(to_date)s
+                    AND (dh.remarks NOT LIKE '%%TRANSFER TO%%' OR dh.remarks IS NULL)
+                GROUP BY dh.dispatch_id, dh.customer, dh.vehicle_no, dh.dispatch_date,
+                         dd.dispatch_detail_id, dd.smpl_no, dd.thickness, dd.width, dd.length,
+                         dd.weight, dd.numbers, dd.packet_name
+                ORDER BY dh.dispatch_date, dh.dispatch_id, dd.dispatch_detail_id;
+                """
+
+            df = pd.read_sql_query(query, conn, params={'from_date': from_date, 'to_date': to_date})
+
+            conn.close()
+
+            # Create Excel file
+            output = BytesIO()
+            with pd.ExcelWriter(output, engine='openpyxl') as writer:
+                df.to_excel(writer, sheet_name='Dispatch Costs', index=False)
+
+                # Auto-adjust column widths
+                worksheet = writer.sheets['Dispatch Costs']
+                for idx, col in enumerate(df.columns):
+                    max_length = max(
+                        df[col].astype(str).apply(len).max(),
+                        len(str(col))
+                    ) + 2
+                    worksheet.column_dimensions[chr(65 + idx)].width = min(max_length, 50)
+
+            output.seek(0)
+
+            return send_file(
+                output,
+                mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                as_attachment=True,
+                download_name=f'dispatch_costs_{from_date}_to_{to_date}.xlsx'
+            )
+
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            return jsonify({'error': str(e)}), 500
