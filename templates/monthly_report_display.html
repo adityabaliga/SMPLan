@@ -54,9 +54,9 @@
     <table class="table table-bordered">
         <tr>
             <th></th>
-            <th colspan = "3" style ="text-align: centre">Current Month</th>
-            <th colspan = "3" text-align="centre">Prev Month  </th>
-            <th colspan = "3" text-align="centre">Prev Prev Month</th>
+            <th colspan="3" style="text-align: center" id="header_current"></th>
+            <th colspan="3" style="text-align: center" id="header_prev"></th>
+            <th colspan="3" style="text-align: center" id="header_prev_prev"></th>
 
         </tr>
         <tr>
@@ -294,6 +294,25 @@
 </table>
 
 </body>
+<script>
+  const monthNames = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ];
 
+  const selectedMonth = {{report_month}};
+  const selectedYear  = {{report_year}};
+
+  // Build Date objects for current and previous 2 months
+  const months = [0, 1, 2].map(offset => {
+    const d = new Date(selectedYear, selectedMonth - 1 - offset, 1);
+    return `${monthNames[d.getMonth()]} ${d.getFullYear()}`;
+  });
+
+  // Set the header text
+  document.getElementById('header_current').textContent   = months[0];
+  document.getElementById('header_prev').textContent      = months[1];
+  document.getElementById('header_prev_prev').textContent = months[2];
+</script>
 
 </html>

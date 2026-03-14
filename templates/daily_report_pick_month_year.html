@@ -43,7 +43,7 @@
         <p>Pick Month
             <select id='report_month' name='report_month'>
             <option value=''>--Select Month--</option>
-            <option selected value='1'>Janaury</option>
+            <option value='1'>Janaury</option>
             <option value='2'>February</option>
             <option value='3'>March</option>
             <option value='4'>April</option>
@@ -64,7 +64,8 @@
             <option  value='2023'>2023</option>
             <option value='2024'>2024</option>
             <option  value='2025'>2025</option>
-            <option selected value='2026'>2026</option>
+            <option value='2026'>2026</option>
+            <option value='2027'>2027</option>
 
 
         </select>
@@ -73,4 +74,9 @@
         <br>
         <input class="btn btn-default" type="submit" value="Submit">
 </form>
+<script>
+  const now = new Date();
+  document.getElementById('report_month').value = now.getMonth() + 1; // getMonth() is 0-indexed
+  document.getElementById('report_year').value = now.getFullYear();
+</script>
 </html>

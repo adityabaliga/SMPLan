@@ -8,7 +8,8 @@ from file_uploader import FileUploader
 from flask import Flask, render_template, request, jsonify, send_file, url_for, redirect, current_app
 from markupsafe import Markup
 from csv import writer
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
+from dateutil.relativedelta import relativedelta
 import calendar
 import pandas as pd
 import openpyxl
@@ -3806,9 +3807,21 @@ def get_monthly_report():
 
     customer_wise_month_data = CurrentStock.customer_wise_month_data((report_month), (report_year))
 
+    # Build a date from the selected month/year
+    current = date(report_year, report_month, 1)
+
+    # Subtract 1 and 2 months cleanly — handles Jan/Feb rollover automatically
+    prev = current - relativedelta(months=1)
+    prev_prev = current - relativedelta(months=2)
+
     prev_month_data = []
     prev_prev_month_data = []
-    if report_month != 1 or report_month != 2:
+
+    prev_month_data = CurrentStock.monthly_report_hdr(prev.month, prev.year)
+    prev_prev_month_data = CurrentStock.monthly_report_hdr(prev_prev.month, prev_prev.year)
+
+
+    '''if report_month != 1 or report_month != 2:
         prev_month_data = CurrentStock.monthly_report_hdr((report_month- 1), (report_year))
         prev_prev_month_data = CurrentStock.monthly_report_hdr((report_month- 2), (report_year))
 
@@ -3825,7 +3838,7 @@ def get_monthly_report():
        prev_month_data = CurrentStock.monthly_report_hdr((report_month- 1), (report_year))
        prev_prev_month_data = CurrentStock.monthly_report_hdr((12), (report_year -1))
        #customer_wise_prev_month_data = CurrentStock.customer_wise_month_data((report_month - 1), (report_year))
-       #customer_wise_prev_prev_month_data = CurrentStock.customer_wise_month_data((12), (report_year - 1))
+       #customer_wise_prev_prev_month_data = CurrentStock.customer_wise_month_data((12), (report_year - 1))'''
 
 
     machine_lst = ['CTL 1', 'CTL 2', 'NCTL 1', 'NCTL 2', 'NCTL 3', 'NCTL 4', 'NCTL 5','Reshearing 1',
