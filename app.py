@@ -758,9 +758,8 @@ def order():
     for cs_id, _current_stock in current_stock:
         cs = _current_stock
 
-    return render_template('order.html', smpl_no=smpl_no, customer=incoming.customer, thickness=incoming.thickness,
-                           width=incoming.width, length=incoming.length, grade=incoming.grade,
-                           weight=cs.weight, numbers=incoming.numbers)
+    return render_template('order.html', smpl_no=smpl_no, incoming = incoming,
+                           weight=cs.weight, cs = cs)
 
 
 # from order.html. The details retrieved from the page and loaded to db in to order and order_detail
@@ -3819,27 +3818,6 @@ def get_monthly_report():
 
     prev_month_data = CurrentStock.monthly_report_hdr(prev.month, prev.year)
     prev_prev_month_data = CurrentStock.monthly_report_hdr(prev_prev.month, prev_prev.year)
-
-
-    '''if report_month != 1 or report_month != 2:
-        prev_month_data = CurrentStock.monthly_report_hdr((report_month- 1), (report_year))
-        prev_prev_month_data = CurrentStock.monthly_report_hdr((report_month- 2), (report_year))
-
-        #customer_wise_prev_month_data = CurrentStock.customer_wise_month_data((report_month - 1), (report_year))
-        #customer_wise_prev_prev_month_data = CurrentStock.customer_wise_month_data((report_month - 2), (report_year))
-
-    if report_month == 1:
-       prev_month_data = CurrentStock.monthly_report_hdr((12), (report_year -1))
-       prev_prev_month_data = CurrentStock.monthly_report_hdr((11), (report_year -1))
-       #customer_wise_prev_month_data = CurrentStock.customer_wise_month_data((12), (report_year - 1))
-       #customer_wise_prev_prev_month_data = CurrentStock.customer_wise_month_data((11), (report_year - 1))
-
-    if report_month == 2:
-       prev_month_data = CurrentStock.monthly_report_hdr((report_month- 1), (report_year))
-       prev_prev_month_data = CurrentStock.monthly_report_hdr((12), (report_year -1))
-       #customer_wise_prev_month_data = CurrentStock.customer_wise_month_data((report_month - 1), (report_year))
-       #customer_wise_prev_prev_month_data = CurrentStock.customer_wise_month_data((12), (report_year - 1))'''
-
 
     machine_lst = ['CTL 1', 'CTL 2', 'NCTL 1', 'NCTL 2', 'NCTL 3', 'NCTL 4', 'NCTL 5','Reshearing 1',
                    'Reshearing 2', 'Reshearing 3', 'Reshearing 4', 'Reshearing 5', 'Reshearing 6',

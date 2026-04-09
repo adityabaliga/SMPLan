@@ -52,55 +52,27 @@
     <hr class ="style1">
     <table class = "table table-sm" id="incoming_details">
     <tr>
-        <!--td>SMPL No</td>
-        <td><input type="text" name="smpl_no" value = "{{smpl_no}}" readonly></td>
 
-        <td >Customer</td>
-        <td><input type="text" name="customer" value = "{{customer}}" readonly></td>
-
-        <td>Grade</td>
-        <td><input type="text"  name="grade"  value = "{{grade}}" readonly></td>
-    </tr>
-    <tr>
-        <td>Thickness</td>
-        <td><input type="text"  name="thickness" id = "thickness" value = "{{thickness}}" readonly></td>
-
-        <td>Width</td>
-        <td><input type="text"  name="width" value = "{{width}}" readonly></td>
-
-        <td>Length</td>
-        <td><input type="text"  name="length" value = "{{length}}" readonly></td>
-    </tr>
-    <tr>
-
-        <td>Available Weight in MT</td>
-        <td><input type="text" name="available_wt"  value = "{{weight}}" readonly></td>
-
-        <td>Numbers</td>
-        <td><input type="text" name="available_numbers"  value = "{{numbers}}" readonly></td-->
-
-
-    </tr>
         <td>SMPL No</td>
         <td><input type="text" name="smpl_no" class = "smpl_no" value = "{{smpl_no}}" readonly></td>
 
         <td >Customer</td>
-        <td><input type="text" name="customer" class = "customer" value = "{{customer}}" readonly></td>
+        <td><b>{{incoming.customer}}</b></td>
+        <!--td><input type="text" name="customer" class = "customer" value = "{{incoming.customer}}" readonly></td-->
 
-        <td>Grade</td>
-        <td>{{grade}}</td>
-        <td><input type ="textarea" name="grade" class="grade" value="{{grade}}" hidden></td>
+        <td>Material Type</td>
+        <td><input type ="text" name="material_type" class="material_type" value="{{incoming.material_type}}" readonly></td>
     </tr>
 
     <tr>
         <td>Thickness</td>
-        <td><input type="text"  name="thickness" class = "thickness" value = "{{thickness}}"  readonly></td>
+        <td><input type="text"  name="thickness" class = "thickness" value = "{{incoming.thickness}}"  readonly></td>
 
         <td>Width</td>
-        <td><input type="text"  name="width" class = "width" value = "{{width}}" readonly></td>
+        <td><input type="text"  name="width" class = "width" value = "{{cs.width}}" readonly></td>
 
         <td>Length</td>
-        <td><input type="text"  name="length" class = "length" id="length" value = "{{length}}" readonly></td>
+        <td><input type="text"  name="length" class = "length" id="length" value = "{{incoming.length}}" readonly></td>
     </tr>
     <tr>
 
@@ -108,16 +80,23 @@
         <td><input type="text" name="available_wt" class = "available_wt"  value = "{{weight}}" readonly></td>
 
         <td>Numbers</td>
-        <td><input type="text" name="available_numbers"  class="available_numbers" value = "{{numbers}}" readonly></td>
+        <td><input type="text" name="available_numbers"  class="available_numbers" value = "{{cs.numbers}}" readonly></td>
 
         <td>Length of Coil (in metres) </td>
         <td><input type="text" name="length_of_coil" class = "length_of_coil" id="length_of_coil" readonly></td>
+    </tr>
 
     <tr>
-
-
-
+        <td>Grade</td>
+        <td><input type ="text" name="grade" class="grade" value="{{incoming.grade}}" readonly></td>
+        <td>Mill</td>
+        <td><input type ="text" name="mill" class="mill" value="{{incoming.mill}}" readonly></td>
+        <td>Mill ID</td>
+        <td><input type ="text" name="mill_id" class="mill_id" value="{{incoming.mill_id}}" readonly></td>
     </tr>
+
+
+
     <tr>
         <td>Coil Processing Weight in MT</td>
         <td><input type="number"  name="processing_wt"  id="processing_wt" class = "processing_wt" step="0.001" required></td>
@@ -128,15 +107,24 @@
         <td>Expected Date</td>
         <td><input type="date"  id = "expected_date" class ="expected_date" name="expected_date" required></td>
     </tr>
+    <tr>
+        <td></td>
+        <td></td>
+
+        <td>Incoming Remarks</td>
+        <td><b>{{incoming.remarks}}</b></td>
+    </tr>
 
     </table>
+    <table id="extra_details">
+
 
     <tr>
 
         <td>Special Instructions</td>
         <td><input type="text"  name="hdr_remarks" style="width:900px;" value="{{remarks}}"></td>
     </tr>
-
+    </table>
     <hr>
 
     <div id="current_op_tbl" class = "current_op">
@@ -219,8 +207,9 @@
 
         <br><br>
         <span class="tol_curr_size" style="width:200px;">
-            <span class="tol_hdr"><b>Tolerance</b></span>
-            <input type="text" class="tol" value="">
+            <span class="tol_hdr"><b>Tolerance:     -</b></span>
+            <b>  </b><input type="number" step ="0.1" style = "width: 50px;" class="negative_tol" value="-">
+            <b>/ +</b><input type="number" step ="0.1" style = "width: 50px;" class="positive_tol" value="+">
         </span>
 
         <span class="lami_hdr_curr_size">
@@ -271,9 +260,31 @@
 
         <br><br>
         <span class="packing_curr_size">
-            <span class="packing_hdr"><b>Packing Type</b></span>
-            <input type="text" class="packing" value="">
-        </span>
+        <span class="packing_hdr"><b>Packing Type</b></span>
+        <select class="packing_covering">
+            <option value="" selected disabled>Material Covering</option>
+            <option value="No Cover">No Cover</option>
+            <option value="Top Cover">Top Cover</option>
+            <option value="HDPE">HDPE</option>
+            <option value="HDPE VCI">HDPE VCI</option>
+            <option value="HDPE HB 1+1">HDPE HB 1+1</option>
+            <option value="HDPE HB 2+2">HDPE HB 2+2</option>
+        </select>
+        <select class="packing_support">
+            <option value="" selected disabled>Material Support</option>
+            <option value="No Support">No Support</option>
+            <option value="Wood Runner">Wood Runner</option>
+            <option value="Sagi Pallet">Sagi Pallet</option>
+            <option value="Customer Pallet">Customer Pallet</option>
+            <option value="Eye Vertical + Pallet">Eye Vertical + Pallet</option>
+        </select>
+        <select class="packing_strapping">
+            <option value="" selected disabled>Strapping</option>
+            <option value="PET">PET</option>
+            <option value="19mm">19mm</option>
+            <option value="32mm">32mm</option>
+        </select>
+    </span>
 
         <span class="remarks_curr_size" style="padding-left:100px">
             <span class="remarks_hdr"><b>Remarks</b></span>
@@ -300,19 +311,21 @@
                 <tr>
                     <th hidden>CTL</th>
                     <th>Stage No</th>
-                    <th>FG/WIP</th>
+                    <th hidden>FG/WIP</th>
                     <th>Input Material</th>
                     <th hidden>Cut Width</th>
                     <th>Cut Length</th>
-                    <th>Lamination</th>
                     <th>Tolerance</th>
+                    <th>Lamination</th>
                     <th hidden>I Dia</th>
-                    <th>Processing Weight</th>
-                    <th>Numbers</th>
                     <th>No.s/pkt</th>
                     <th>No. of pkts</th>
                     <th>Packing Type</th>
+                    <th>Processing Weight MT</th>
+                    <th>Numbers</th>
                     <th>Remarks</th>
+                    <th></th>
+                    <th></th>
                 </tr>
 
         </table>
@@ -322,40 +335,44 @@
                 <tr>
                     <th hidden>Slitting</th>
                     <th>Stage No</th>
-                    <th>FG/WIP</th>
+                    <th hidden>FG/WIP</th>
                     <th>Input Material</th>
                     <th>Cut Width</th>
                     <th hidden>Cut Length</th>
                     <th hidden>Lamination</th>
                     <th>Tolerance</th>
                     <th>I Dia</th>
-                    <th>Processing Weight</th>
+                    <th>Processing Weight MT</th>
                     <th>No. of Slits</th>
                     <th>Length/Part</th>
                     <th>No. of parts</th>
                     <th>Packing Type</th>
                     <th>Remarks</th>
+                    <th></th>
+                    <th></th>
                 </tr>
         </table>
-
+        <input type="button" name="print_slitting" class = "print_slit_btn" id="print_slit" value ="Print Slitting">
         <h5>Narrow CTL</h5>
         <table id="Narrow_CTL_table" class = "table table-sm Narrow_CTL_table">
                 <tr>
                     <th hidden>Narrow CTL</th>
                     <th>Stage No</th>
-                    <th>FG/WIP</th>
+                    <th hidden>FG/WIP</th>
                     <th>Input Material</th>
                     <th hidden>Cut Width</th>
                     <th>Cut Length</th>
-                    <th>Lamination</th>
                     <th>Tolerance</th>
+                    <th>Lamination</th>
                     <th hidden>I Dia</th>
-                    <th>Processing Weight</th>
+                    <th>Processing Weight MT</th>
                     <th>Numbers</th>
                     <th>No.s/pkt</th>
                     <th>No. of pkts</th>
                     <th>Packing Type</th>
                     <th>Remarks</th>
+                    <th></th>
+                    <th></th>
                 </tr>
 
         </table>
@@ -365,19 +382,21 @@
                 <tr>
                     <th hidden>Mini Slitting</th>
                     <th>Stage No</th>
-                    <th>FG/WIP</th>
+                    <th hidden>FG/WIP</th>
                     <th>Input Material</th>
                     <th>Cut Width</th>
                     <th hidden>Cut Length</th>
-                    <th hidden>Lamination</th>
                     <th>Tolerance</th>
+                    <th>Lamination</th>
                     <th>I Dia</th>
-                    <th>Processing Weight</th>
+                    <th>Processing Weight MT</th>
                     <th>No. of Slits</th>
                     <th>Length/Part</th>
                     <th>No. of parts</th>
                     <th>Packing Type</th>
                     <th>Remarks</th>
+                    <th></th>
+                    <th></th>
                 </tr>
         </table>
 
@@ -387,19 +406,21 @@
                 <tr>
                     <th hidden>Reshearing</th>
                     <th>Stage No</th>
-                    <th>FG/WIP</th>
+                    <th hidden>FG/WIP</th>
                     <th>Input Material</th>
                     <th>Cut Width</th>
                     <th>Cut Length</th>
                     <th hidden>Lamination</th>
                     <th>Tolerance</th>
                     <td hidden>I dia</td>
-                    <th>Processing Weight</th>
+                    <th>Processing Weight MT</th>
                     <th>Numbers</th>
                     <th>No.s/pkt</th>
                     <th>No. of pkts</th>
                     <th>Packing Type</th>
                     <th>Remarks</th>
+                    <th></th>
+                    <th></th>
                 </tr>
         </table>
 
@@ -408,40 +429,44 @@
                 <tr>
                     <th hidden>Lamination</th>
                     <th>Stage No</th>
-                    <th>FG/WIP</th>
+                    <th hidden>FG/WIP</th>
                     <th>Input Material</th>
                     <th>Cut Width</th>
                     <th>Cut Length</th>
                     <th>Lamination</th>
                     <th>Tolerance</th>
                     <td hidden>I dia</td>
-                    <th>Processing Weight</th>
+                    <th>Processing Weight MT</th>
                     <th>Numbers</th>
                     <th>No.s/pkt</th>
                     <th>No. of pkts</th>
                     <th>Packing Type</th>
                     <th>Remarks</th>
+                    <th></th>
+                    <th></th>
                 </tr>
         </table>
 
-        <h5>Lamination</h5>
+        <h5>Levelling</h5>
         <table id="Levelling_table" name = "Levelling_table" class = "table table-sm Levelling_table">
                 <tr>
                     <th hidden>Levelling</th>
                     <th>Stage No</th>
-                    <th>FG/WIP</th>
+                    <th hidden>FG/WIP</th>
                     <th>Input Material</th>
                     <th>Cut Width</th>
                     <th>Cut Length</th>
                     <th hidden>Lamination</th>
                     <th hidden>Tolerance</th>
                     <td hidden>I dia</td>
-                    <th>Processing Weight</th>
+                    <th>Processing Weight MT</th>
                     <th>Numbers</th>
                     <th>No.s/pkt</th>
                     <th>No. of pkts</th>
                     <th>Packing Type</th>
                     <th>Remarks</th>
+                    <th></th>
+                    <th></th>
                 </tr>
         </table>
 

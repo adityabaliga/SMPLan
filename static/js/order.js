@@ -293,6 +293,7 @@ var UIController = (function() {
        CTL_table : '.CTL_table',
        printCTLBtn : '.print_ctl_btn',
        Slitting_table : '.Slitting_table',
+       printSlitBtn : '.print_slit_btn',
        Narrow_CTL_table : '.Narrow_CTL_table',
        Reshearing_table : '.Reshearing_table',
        Mini_Slitting_table : '.Mini_Slitting_table',
@@ -319,14 +320,18 @@ var UIController = (function() {
                cut_width : parseFloat(document.querySelector(DOMStrings.currentWidth).value),
                cut_length : parseFloat(document.querySelector(DOMStrings.currentLength).value),
                lamination : document.querySelector(DOMStrings.currentLami).value,
-               tolerance : document.querySelector(DOMStrings.currentTolerance).value,
+               tolerance : '-' + document.querySelector('.negative_tol').value + '/+' + document.querySelector('.positive_tol').value,
                i_dia : parseFloat(document.querySelector(DOMStrings.currentIDia).value),
                processing_wt : parseFloat(document.querySelector(DOMStrings.currentProcWt).value),
                wt_per_pkt : parseFloat(document.querySelector(DOMStrings.currentWtPerPkt).value),
                numbers : parseFloat(document.querySelector(DOMStrings.currentNumbers).value),
                nos_per_pkt : parseFloat(document.querySelector(DOMStrings.currentNoPerPkt).value),
                no_of_pkts : parseFloat(document.querySelector(DOMStrings.currentNoOfPkts).value),
-               packing : document.querySelector(DOMStrings.currentPkg).value,
+               packing : document.querySelector(DOMStrings.currentFG_WIP).value === "WIP"
+          ? "WIP"
+          : document.querySelector('.packing_covering').value + ' / ' +
+            document.querySelector('.packing_support').value + ' / ' +
+            document.querySelector('.packing_strapping').value,
                remarks : document.querySelector(DOMStrings.currentRemarks).value
            };
        },
@@ -336,17 +341,17 @@ var UIController = (function() {
 
            if(operation === "CTL"){
                element = DOMStrings.CTL_table;
-               html = '<tr id="size-CTL-%id%"><td>%stage_no%</td><td>%fg_wip%</td><td>%input_material%</td><td hidden>%op_width%</td><td>%op_length%</td><td>%lamination%</td><td>%tolerance%</td><td hidden>%i_dia%</td><td>%proc_wt%</td><td>%numbers%</td><td>%nos_per_packet%</td><td>%no_of_pkts%</td><td>%packing%</td><td>%remarks%</td><td><input type="button" class="item__delete--btn" value="Delete"></button></td><td><input type="button" class="item__edit--btn" value="Edit"></button></td></tr>';
+               html = '<tr id="size-CTL-%id%"><td>%stage_no%</td><td hidden>%fg_wip%</td><td>%input_material%</td><td hidden>%op_width%</td><td style="font-size:18px; font-weight:bold;">%op_length%</td><td>%tolerance%</td><td>%lamination%</td><td hidden>%i_dia%</td><td>%nos_per_packet%</td><td>%no_of_pkts%</td><td>%packing%</td><td>%proc_wt%</td><td>%numbers%</td><td>%remarks%</td><td><input type="button" class="item__delete--btn" value="Delete"></button></td><td><input type="button" class="item__edit--btn" value="Edit"></button></td></tr>';
 
            }
            if(operation === "Narrow_CTL"){
                element = DOMStrings.Narrow_CTL_table;
-               html = '<tr id="size-Narrow_CTL-%id%"><td>%stage_no%</td><td>%fg_wip%</td><td>%input_material%</td><td hidden>%op_width%</td><td>%op_length%</td><td hidden>%lamination%</td><td>%tolerance%</td><td hidden>%i_dia%</td><td>%proc_wt%</td><td>%numbers%</td><td>%nos_per_packet%</td><td>%no_of_pkts%</td><td>%packing%</td><td>%remarks%</td><td><input type="button" class="item__delete--btn" id="del_size" name="del_size" value="Delete"></button></td><td><input type="button" class="item__edit--btn" id="edit_size" name="edit_size" value="Edit"></button></td></tr>';
+               html = '<tr id="size-Narrow_CTL-%id%"><td>%stage_no%</td><td>%fg_wip%</td><td>%input_material%</td><td hidden>%op_width%</td><td>%op_length%</td><td>%tolerance%</td><td>%lamination%</td><td hidden>%i_dia%</td><td>%nos_per_packet%</td><td>%no_of_pkts%</td><td>%packing%</td><td>%proc_wt%</td><td>%numbers%</td><td>%remarks%</td><td><input type="button" class="item__delete--btn" id="del_size" name="del_size" value="Delete"></button></td><td><input type="button" class="item__edit--btn" id="edit_size" name="edit_size" value="Edit"></button></td></tr>';
 
            }
            if(operation === "Reshearing"){
                element = DOMStrings.Reshearing_table;
-               html = '<tr id="size-Reshearing-%id%"><td>%stage_no%</td><td>%fg_wip%</td><td>%input_material%</td><td>%op_width%</td><td>%op_length%</td><td hidden>%lamination%</td><td>%tolerance%</td><td hidden>%i_dia%</td><td>%proc_wt%</td><td>%numbers%</td><td>%nos_per_packet%</td><td>%no_of_pkts%</td><td>%packing%</td><td>%remarks%</td><td><input type="button" class="item__delete--btn" id="del_size" name="del_size" value="Delete"></button></td><td><input type="button" class="item__edit--btn" id="edit_size" name="edit_size" value="Edit"></button></td></tr>';
+               html = '<tr id="size-Reshearing-%id%"><td>%stage_no%</td><td>%fg_wip%</td><td>%input_material%</td><td>%op_width%</td><td>%op_length%</td><td hidden>%lamination%</td><td>%tolerance%</td><td hidden>%i_dia%</td><td>%nos_per_packet%</td><td>%no_of_pkts%</td><td>%packing%</td><td>%proc_wt%</td><td>%numbers%</td><td>%remarks%</td><td><input type="button" class="item__delete--btn" id="del_size" name="del_size" value="Delete"></button></td><td><input type="button" class="item__edit--btn" id="edit_size" name="edit_size" value="Edit"></button></td></tr>';
 
            }
            if(operation === "Slitting"){
@@ -356,7 +361,7 @@ var UIController = (function() {
            }
            if(operation === "Mini_Slitting"){
                element = DOMStrings.Mini_Slitting_table;
-               html = '<tr id="size-Mini_Slitting-%id%"><td>%stage_no%</td><td>%fg_wip%</td><td>%input_material%</td><td>%op_width%</td><td hidden>%op_length%</td><td hidden>%lamination%</td><td>%tolerance%</td><td>%i_dia%</td><td>%proc_wt%</td><td>%numbers%</td><td>%nos_per_packet%</td><td>%no_of_pkts%</td><td>%packing%</td><td>%remarks%</td><td><input type="button" class="item__delete--btn" id="del_size" name="del_size" value="Delete"></button></td><td><input type="button" class="item__edit--btn" id="edit_size" name="edit_size" value="Edit"></button></td></tr>';
+               html = '<tr id="size-Mini_Slitting-%id%"><td>%stage_no%</td><td>%fg_wip%</td><td>%input_material%</td><td>%op_width%</td><td hidden>%op_length%</td><td>%tolerance%</td><td>%lamination%</td><td>%i_dia%</td><td>%proc_wt%</td><td>%numbers%</td><td>%nos_per_packet%</td><td>%no_of_pkts%</td><td>%packing%</td><td>%remarks%</td><td><input type="button" class="item__delete--btn" id="del_size" name="del_size" value="Delete"></button></td><td><input type="button" class="item__edit--btn" id="edit_size" name="edit_size" value="Edit"></button></td></tr>';
 
            }
            if(operation === "Lamination"){
@@ -401,17 +406,21 @@ var UIController = (function() {
            document.querySelector(DOMStrings.currentWidth).value = "";
            document.querySelector(DOMStrings.currentLength).value = "";
            document.querySelector(DOMStrings.currentLami).value = "No Lamination";
-           document.querySelector(DOMStrings.currentTolerance).value = "";
+           document.querySelector('.negative_tol').value = "";
+           document.querySelector('.positive_tol').value = "";
            //document.querySelector(DOMStrings.currentIDia).value = "";
            document.querySelector(DOMStrings.currentProcWt).value = "";
            document.querySelector(DOMStrings.currentWtPerPkt).value = "";
            document.querySelector(DOMStrings.currentNumbers).value = "";
            document.querySelector(DOMStrings.currentNoPerPkt).value = "";
            document.querySelector(DOMStrings.currentNoOfPkts).value = "";
-           document.querySelector(DOMStrings.currentPkg).value = "";
+           //document.querySelector(DOMStrings.currentPkg).value = "";
            document.querySelector(DOMStrings.currentRemarks).value ="";
-           document.querySelector(DOMStrings.currentPkg).hidden = false;
-           document.querySelector(DOMStrings.currentPkgHdr).hidden = false;
+           //document.querySelector(DOMStrings.currentPkg).hidden = false;
+           //document.querySelector(DOMStrings.currentPkgHdr).hidden = false;
+           document.querySelector('.packing_covering').selectedIndex = 0;
+           document.querySelector('.packing_support').selectedIndex = 0;
+           document.querySelector('.packing_strapping').selectedIndex = 0;
 
        },
 
@@ -492,7 +501,9 @@ var UIController = (function() {
            document.querySelector(DOMStrings.currentFG_WIP).value = size_details.fg_wip;
            document.querySelector(DOMStrings.currentWidth).value = size_details.output_width;
            document.querySelector(DOMStrings.currentLength).value = size_details.output_length;
-           document.querySelector(DOMStrings.currentTolerance).value = size_details.tolerance;
+           var tol = size_details.tolerance.split('/');
+           document.querySelector('.negative_tol').value = tol[0].replace('-', '');
+           document.querySelector('.positive_tol').value = tol[1].replace('+', '');
            document.querySelector(DOMStrings.currentLami).value = size_details.lamination;
            document.querySelector(DOMStrings.currentProcWt).value = size_details.processing_wt;
            document.querySelector(DOMStrings.currentWtPerPkt).value = size_details.wt_per_pkt;
@@ -575,6 +586,7 @@ var controller = (function(orderCtrl, UICtrl) {
        //document.querySelector(DOM.sizesTable).addEventListener('click', deleteEditSize);
 
        document.querySelector(DOM.printCTLBtn).addEventListener('click', printCTL);
+       document.querySelector(DOM.printSlitBtn).addEventListener('click', printSlit);
 
        document.getElementById('order').addEventListener('submit', function(event){
            //event.preventDefault();
@@ -1088,6 +1100,28 @@ var controller = (function(orderCtrl, UICtrl) {
             document.querySelector(DOM.currentOperation).disabled = false;
         }
 
+        // --- NEW: Add/remove HALF CUT row in special instructions ---
+        var length = parseFloat(document.getElementById('length').value);
+        var halfCutRow = document.getElementById('half_cut_row');
+
+        if(coil_proc_wt < mc_wt && length === 0.0){
+            // Only add the row if it doesn't already exist
+            if(!halfCutRow){
+                var table = document.getElementById('extra_details');
+                var newRow = table.insertRow(-1);
+                newRow.id = 'half_cut_row';
+                var cell1 = newRow.insertCell(0);
+                var cell2 = newRow.insertCell(1);
+                cell1.innerHTML = '<b>Note</b>';
+                cell2.innerHTML = '<b style="font-size:16px;">HALF CUT</b>';
+            }
+        } else {
+            // Remove it if conditions are no longer met
+            if(halfCutRow){
+                halfCutRow.parentNode.removeChild(halfCutRow);
+            }
+        }
+
 
 
     };
@@ -1137,13 +1171,23 @@ var controller = (function(orderCtrl, UICtrl) {
         // Get field input data
         input = UICtrl.getInput();
 
-        if(document.querySelector(DOM.currentFG_WIP).value === "FG"){
-                if(document.querySelector(DOM.currentPkg).value === ""){
-                    alert("Please enter packing type");
-                    document.querySelector(DOM.currentPkg).focus();
-                    return false;
-                }
-        }
+       if(document.querySelector(DOM.currentFG_WIP).value === "FG"){
+            if(document.querySelector('.packing_covering').value === ""){
+                alert("Please select Material Covering");
+                document.querySelector('.packing_covering').focus();
+                return false;
+            }
+            if(document.querySelector('.packing_support').value === ""){
+                alert("Please select Material Support");
+                document.querySelector('.packing_support').focus();
+                return false;
+            }
+            if(document.querySelector('.packing_strapping').value === ""){
+                alert("Please select Strapping");
+                document.querySelector('.packing_strapping').focus();
+                return false;
+            }
+    }
 
         if(checkValidInputs(input)){
             //Add item to order Controller
@@ -1275,10 +1319,29 @@ var controller = (function(orderCtrl, UICtrl) {
     var printCTL = function(event){
         // Clone the elements so we can modify them safely
     const incoming = document.getElementById("incoming_details").cloneNode(true);
+    const extra_details = document.getElementById("extra_details").cloneNode(true);
     const ctl = document.getElementById("CTL_table").cloneNode(true);
 
+    // 2. Handle date inputs specially — read from LIVE DOM, format, inject as span
+    document.getElementById("incoming_details").querySelectorAll('input[type="date"]').forEach(originalInput => {
+    if (originalInput.value) {
+        const parts = originalInput.value.split('-');
+        const formatted = parts[2] + '-' + parts[1] + '-' + parts[0];
+
+        // Find the matching input in the clone by name or id
+        const clonedInput = incoming.querySelector('input[name="' + originalInput.name + '"]')
+                         || incoming.querySelector('input[id="' + originalInput.id + '"]');
+
+        if (clonedInput) {
+            const span = document.createElement('span');
+            span.textContent = formatted;
+            clonedInput.parentNode.replaceChild(span, clonedInput);
+        }
+    }
+    });
+
     // Copy values from all inputs and textareas in the original table
-    [incoming, ctl].forEach(section => {
+    [incoming, ctl, extra_details].forEach(section => {
         const inputs = section.querySelectorAll("input, textarea, select");
         inputs.forEach(input => {
             if (input.tagName.toLowerCase() === "textarea") {
@@ -1297,6 +1360,54 @@ var controller = (function(orderCtrl, UICtrl) {
         });
     });
 
+
+     // Make first 2 rows of incoming table bigger
+        const incomingRows = incoming.querySelectorAll("tr");
+        for (let i = 0; i < Math.min(2, incomingRows.length); i++) {
+            incomingRows[i].querySelectorAll("td, th").forEach(cell => {
+                cell.setAttribute("style", "font-size: 18px !important; font-weight: bold !important;");
+    });
+}
+
+
+        // Remove last 2 cells (Delete/Edit buttons) from every CTL row
+        const ctlRows = ctl.querySelectorAll("tr");
+        ctlRows.forEach(row => {
+            const cells = row.cells;
+            if (cells.length >= 2) {
+                row.deleteCell(-1); // removes last cell (Edit)
+                row.deleteCell(-1); // removes new last cell (Delete)
+            }
+        });
+
+        // Sort CTL rows in print - WIP first, then FG (operates on clone only)
+        const ctlTbody = ctl.querySelector('tbody') || ctl;
+        const allRows = Array.from(ctlTbody.querySelectorAll('tr'));
+
+        // Separate header row(s) from data rows
+        const headerRows = allRows.filter(row => row.querySelector('th'));
+        const dataRows = allRows.filter(row => !row.querySelector('th'));
+
+        // FG/WIP is in the fg_wip column - check the cell text
+        const wipRows = dataRows.filter(row => {
+            const cells = row.querySelectorAll('td');
+            return Array.from(cells).some(cell => cell.textContent.trim() === 'WIP');
+        });
+        const fgRows = dataRows.filter(row => {
+            const cells = row.querySelectorAll('td');
+            return Array.from(cells).some(cell => cell.textContent.trim() === 'FG');
+        });
+        const otherRows = dataRows.filter(row => {
+            const cells = row.querySelectorAll('td');
+            return !Array.from(cells).some(cell =>
+                cell.textContent.trim() === 'WIP' || cell.textContent.trim() === 'FG'
+            );
+        });
+
+        // Re-append in order: headers, WIP rows, FG rows, anything else
+        [...headerRows, ...wipRows, ...fgRows, ...otherRows].forEach(row => ctlTbody.appendChild(row));
+
+
         // Create a new popup window for printing
         // Open in a new tab (not a popup)
         const printWindow = window.open('', '_blank');
@@ -1307,6 +1418,9 @@ var controller = (function(orderCtrl, UICtrl) {
             <head>
                 <title>Print</title>
                 <style>
+                    @page {
+                            size: A4 landscape;
+                            }
                     body {
                         font-family: Arial, sans-serif;
                         margin: 20px;
@@ -1329,7 +1443,105 @@ var controller = (function(orderCtrl, UICtrl) {
             </head>
             <body>
                 ${incoming.outerHTML}
+                ${extra_details.outerHTML}
                 ${ctl.outerHTML}
+            </body>
+            </html>
+        `);
+        // Finish writing and trigger print
+    printWindow.document.close();
+
+    // Wait a bit for rendering before printing
+    printWindow.onload = function() {
+        setTimeout(() => {
+            printWindow.focus();
+            printWindow.print();
+            // Keep the tab open (optional)
+            // To auto-close after printing, uncomment:
+            // printWindow.close();
+        }, 500);
+        };
+    };
+
+    var printSlit = function(event){
+        // Clone the elements so we can modify them safely
+    const incoming = document.getElementById("incoming_details").cloneNode(true);
+    const slit = document.getElementById("Slitting_table").cloneNode(true);
+
+    // Copy values from all inputs and textareas in the original table
+    [incoming, slit].forEach(section => {
+        const inputs = section.querySelectorAll("input, textarea, select");
+        inputs.forEach(input => {
+            if (input.tagName.toLowerCase() === "textarea") {
+                input.textContent = input.value;
+            } else if (input.tagName.toLowerCase() === "select") {
+                const selected = input.options[input.selectedIndex];
+                const textNode = document.createTextNode(selected ? selected.text : "");
+                const span = document.createElement("span");
+                span.textContent = textNode.textContent;
+                input.parentNode.replaceChild(span, input);
+            } else {
+                const span = document.createElement("span");
+                span.textContent = input.value;
+                input.parentNode.replaceChild(span, input);
+            }
+        });
+    });
+
+
+     // Make first 2 rows of incoming table bigger
+        const incomingRows = incoming.querySelectorAll("tr");
+        for (let i = 0; i < Math.min(3, incomingRows.length); i++) {
+            incomingRows[i].style.fontSize = "22px";
+            incomingRows[i].style.fontWeight = "bold";
+        }
+
+        // Remove last 2 cells (Delete/Edit buttons) from every CTL row
+        const slitRows = slit.querySelectorAll("tr");
+        slitRows.forEach(row => {
+            const cells = row.cells;
+            if (cells.length >= 2) {
+                row.deleteCell(-1); // removes last cell (Edit)
+                row.deleteCell(-1); // removes new last cell (Delete)
+            }
+        });
+
+        // Create a new popup window for printing
+        // Open in a new tab (not a popup)
+        const printWindow = window.open('', '_blank');
+
+        // Write HTML content into the new tab
+        printWindow.document.write(`
+            <html>
+            <head>
+                <title>Print</title>
+                <style>
+                @page {
+                            size: A4 landscape;
+                        }
+                    body {
+                        font-family: Arial, sans-serif;
+                        margin: 20px;
+                    }
+                    table {
+                        border-collapse: collapse;
+                        width: 100%;
+                        margin-bottom: 20px;
+                    }
+                    table, th, td {
+                        border: 1px solid #000;
+                        padding: 6px;
+                        font-size: 12px;
+                    }
+                    h2 {
+                        text-align: center;
+                        margin-bottom: 20px;
+                    }
+                </style>
+            </head>
+            <body>
+                ${incoming.outerHTML}
+                ${slit.outerHTML}
             </body>
             </html>
         `);
