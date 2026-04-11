@@ -4,12 +4,17 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="43196d60-29a1-4da5-972f-f5ed5d18f5ea" name="Changes" comment="Implementing order for CTL only html and js">
+    <list default="true" id="43196d60-29a1-4da5-972f-f5ed5d18f5ea" name="Changes" comment="Order submit implemented">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/js/order.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/js/order.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/main_menu.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/main_menu.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/order.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/order.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/js/processing.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/js/processing.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/processing_ctl.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/processing_ctl.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/processing_lamination.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/processing_lamination.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/processing_levelling.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/processing_levelling.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/processing_nctl.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/processing_nctl.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/processing_reshearing.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/processing_reshearing.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/processing_slit.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/processing_slit.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/processing_trap_nctl.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/processing_trap_nctl.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/processing_trap_reshearing.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/processing_trap_reshearing.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -474,7 +479,7 @@
       <option name="project" value="LOCAL" />
       <updated>1712825420285</updated>
     </task>
-    <option name="localTasksCounter" value="217" />
+    <option name="localTasksCounter" value="218" />
     <servers />
   </component>
   <component name="Vcs.Log.History.Properties">
@@ -623,7 +628,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Bug fixes &#10;1. Packet name if changed is not stored in old packet names array&#10;2. Extra S removed when material type entry is COILS" />
     <MESSAGE value="Bug fix in Monthly report" />
     <MESSAGE value="Add net_wt and second_customer through print old label" />
     <MESSAGE value="Display net_wt and second_customer in old label" />
@@ -648,7 +652,8 @@
     <MESSAGE value="Dispatch cost summary added" />
     <MESSAGE value="Improvements in monthly report" />
     <MESSAGE value="Implementing order for CTL only html and js" />
-    <option name="LAST_COMMIT_MESSAGE" value="Implementing order for CTL only html and js" />
+    <MESSAGE value="Order submit implemented" />
+    <option name="LAST_COMMIT_MESSAGE" value="Order submit implemented" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

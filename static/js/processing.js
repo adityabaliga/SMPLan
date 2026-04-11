@@ -910,7 +910,7 @@ function print_label_new(){
     data += document.getElementById('lbl_comment').value + '&';
     data += document.getElementById('lbl_2nd_customer').value + '&';
     data += document.getElementById('lbl_mat_type').value + '&';
-    data += document.getElementById('lbl_scams_no').value + document.getElementById('lbl_scams_pkt').value + '&';
+    data += document.getElementById('lbl_scams_no').value + '&';
     data += document.getElementById('lbl_coating').value + '&';
     data += document.getElementById('lbl_part_no').value + '&';
     data += document.getElementById('lbl_batch_no').value + '&';
