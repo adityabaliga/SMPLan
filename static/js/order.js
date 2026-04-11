@@ -235,8 +235,11 @@ var orderController = (function () {
        incrementMaxStageNo : function(){
            data.max_stage_no +=1;
            return data.max_stage_no;
-       }
+       },
 
+       getAllOrders: function(){
+           return data.allOrders;
+       }
 
 
         };
@@ -417,11 +420,13 @@ var UIController = (function() {
            //document.querySelector(DOMStrings.currentPkg).value = "";
            document.querySelector(DOMStrings.currentRemarks).value ="";
            //document.querySelector(DOMStrings.currentPkg).hidden = false;
-           //document.querySelector(DOMStrings.currentPkgHdr).hidden = false;
+           document.querySelector(DOMStrings.currentPkgHdr).hidden = false;
            document.querySelector('.packing_covering').selectedIndex = 0;
            document.querySelector('.packing_support').selectedIndex = 0;
            document.querySelector('.packing_strapping').selectedIndex = 0;
-
+           document.querySelector('.packing_covering').hidden = false;
+           document.querySelector('.packing_support').hidden = false;
+           document.querySelector('.packing_strapping').hidden = false;
        },
 
 
@@ -722,13 +727,9 @@ var controller = (function(orderCtrl, UICtrl) {
             document.querySelector('.current_op_slitting').hidden = true;
 
             //numbers was moved to before length for slitting, moving it back to no_per_packet
-            var numbers = document.querySelector('.numbers_curr_size');
-            var parent = numbers.parentNode;
-            var no_per_pakt = document.querySelector('.no_per_pkt_curr_size');
-            parent.insertBefore(numbers,no_per_pakt);
-            var no_of_pakts = document.querySelector('.no_of_pkts_curr_size');
-            var packing = document.querySelector('.packing_curr_size');
-            parent.insertBefore(no_of_pakts,packing);
+            var noWrapDiv = document.querySelector('.numbers_curr_size').parentNode;
+            var packingSpan = document.querySelector('.packing_curr_size');
+            packingSpan.parentNode.insertBefore(noWrapDiv, packingSpan);
         }
 
         // For Slitting, change headings, make length and lami hidden
@@ -779,12 +780,9 @@ var controller = (function(orderCtrl, UICtrl) {
 
             //Changing order of no. of slits for better usability
             //var current_sizes = document.querySelector('.current_sizes');
-            var no_of_slits = document.querySelector('.numbers_curr_size');
-            var no_of_parts = document.querySelector('.no_of_pkts_curr_size')
-            var parent = no_of_slits.parentNode;
-            var length = document.querySelector('.cut_length_curr_size');
-            parent.insertBefore(no_of_slits,length);
-            parent.insertBefore(no_of_parts,length);
+            var noWrapDiv = document.querySelector('.numbers_curr_size').parentNode;
+            var cutLengthSpan = document.querySelector('.cut_length_curr_size');
+            cutLengthSpan.parentNode.insertBefore(noWrapDiv, cutLengthSpan);
 
         }
 
@@ -915,17 +913,30 @@ var controller = (function(orderCtrl, UICtrl) {
         var DOM = UICtrl.getDOMstrings();
         //HIde packing, number of packing type, make number of packets value to 1
         if(document.querySelector(DOM.currentFG_WIP).value === "WIP"){
-            document.querySelector(DOM.currentPkg).hidden = true;
+            document.querySelector('.packing_covering').hidden = true;
+            document.querySelector('.packing_support').hidden = true;
+            document.querySelector('.packing_strapping').hidden = true;
+
             document.querySelector(DOM.currentPkgHdr).hidden = true;
-            document.querySelector(DOM.currentPkg).required = false;
+
+            document.querySelector('.packing_covering').required = false;
+            document.querySelector('.packing_support').required = false;
+            document.querySelector('.packing_strapping').required = false;
             //document.querySelector(DOM.currentNoOfPkts).value = "1";
 
         }
         if(document.querySelector(DOM.currentFG_WIP).value === "FG"){
-            document.querySelector(DOM.currentPkg).hidden = false;
+            document.querySelector('.packing_covering').hidden = false;
+            document.querySelector('.packing_support').hidden = false;
+            document.querySelector('.packing_strapping').hidden = false;
+
             document.querySelector(DOM.currentPkgHdr).hidden = false;
-            document.querySelector(DOM.currentPkg).required = true;
-            document.querySelector(DOM.currentPkg).value = " ";
+
+            document.querySelector('.packing_covering').required = true;
+            document.querySelector('.packing_support').required = true;
+            document.querySelector('.packing_strapping').required = true;
+
+            //document.querySelector(DOM.currentPkg).value = " ";
             //document.querySelector(DOM.currentNoOfPkts).value = "1";
 
         }
@@ -1168,6 +1179,15 @@ var controller = (function(orderCtrl, UICtrl) {
 
         DOM = UICtrl.getDOMstrings();
 
+        // --- NEW: Check if input material is selected ---
+        var ipMtrl = document.querySelector(DOM.currentInputMaterial);
+        if(!ipMtrl.value || ipMtrl.options[ipMtrl.selectedIndex].disabled){
+        alert("Please select an Input Material before adding a size");
+        UICtrl.clearSizeFields();
+        ipMtrl.focus();
+        return false;
+        }
+
         // Get field input data
         input = UICtrl.getInput();
 
@@ -1321,6 +1341,7 @@ var controller = (function(orderCtrl, UICtrl) {
     const incoming = document.getElementById("incoming_details").cloneNode(true);
     const extra_details = document.getElementById("extra_details").cloneNode(true);
     const ctl = document.getElementById("CTL_table").cloneNode(true);
+    console.log(ctl.outerHTML);
 
     // 2. Handle date inputs specially — read from LIVE DOM, format, inject as span
     document.getElementById("incoming_details").querySelectorAll('input[type="date"]').forEach(originalInput => {
@@ -1381,31 +1402,27 @@ var controller = (function(orderCtrl, UICtrl) {
         });
 
         // Sort CTL rows in print - WIP first, then FG (operates on clone only)
-        const ctlTbody = ctl.querySelector('tbody') || ctl;
-        const allRows = Array.from(ctlTbody.querySelectorAll('tr'));
+        // Get all tbodies - each data row is in its own tbody
+        const allTbodies = Array.from(ctl.querySelectorAll('tbody'));
 
-        // Separate header row(s) from data rows
-        const headerRows = allRows.filter(row => row.querySelector('th'));
-        const dataRows = allRows.filter(row => !row.querySelector('th'));
+        // First tbody is the header, rest are data rows
+        const headerTbody = allTbodies[0];
+        const dataTbodies = allTbodies.slice(1);
 
-        // FG/WIP is in the fg_wip column - check the cell text
-        const wipRows = dataRows.filter(row => {
-            const cells = row.querySelectorAll('td');
-            return Array.from(cells).some(cell => cell.textContent.trim() === 'WIP');
-        });
-        const fgRows = dataRows.filter(row => {
-            const cells = row.querySelectorAll('td');
-            return Array.from(cells).some(cell => cell.textContent.trim() === 'FG');
-        });
-        const otherRows = dataRows.filter(row => {
-            const cells = row.querySelectorAll('td');
-            return !Array.from(cells).some(cell =>
-                cell.textContent.trim() === 'WIP' || cell.textContent.trim() === 'FG'
-            );
+        // FG/WIP is always cell index 1 (hidden td)
+        const wipTbodies = dataTbodies.filter(tbody =>
+            tbody.querySelector('tr').cells[1].textContent.trim() === 'WIP'
+        );
+        const fgTbodies = dataTbodies.filter(tbody =>
+            tbody.querySelector('tr').cells[1].textContent.trim() === 'FG'
+        );
+        const otherTbodies = dataTbodies.filter(tbody => {
+            const val = tbody.querySelector('tr').cells[1].textContent.trim();
+            return val !== 'WIP' && val !== 'FG';
         });
 
-        // Re-append in order: headers, WIP rows, FG rows, anything else
-        [...headerRows, ...wipRows, ...fgRows, ...otherRows].forEach(row => ctlTbody.appendChild(row));
+        // Re-append tbodies in sorted order to the table
+        [...wipTbodies, ...fgTbodies, ...otherTbodies].forEach(tbody => ctl.appendChild(tbody));
 
 
         // Create a new popup window for printing
@@ -1561,16 +1578,46 @@ var controller = (function(orderCtrl, UICtrl) {
     };
 
     var onSubmit = function(){
-        //alert('submit clicked');
-        var orderString, DOM,url, print_order_string;
-        DOM = UICtrl.getDOMstrings();
-        orderString = orderCtrl.makeOrderString();
-        console.log(orderString);
-        document.querySelector(DOM.orderString).value = orderString;
+        var DOM = UICtrl.getDOMstrings();
 
-        /*print_order_string = document.querySelector(DOM.smpl_no).value + "," + document.querySelector(DOM.grade).value + "," + document.querySelector(DOM.customer).value + "," + document.querySelector(DOM.order_date).value + "," + document.querySelector(DOM.expected_date).value
-        url = 'print_order?print=' + print_order_string
-        window.open(url)*/
+    // Build a JSON object instead of a delimited string
+    var orderData = {
+        smpl_no: document.querySelector(DOM.smpl_no).value,
+        order_date: document.getElementById('order_date').value,
+        expected_date: document.getElementById('expected_date').value,
+        processing_wt: document.getElementById('processing_wt').value,
+        remarks: document.querySelector('[name="hdr_remarks"]').value,
+        order_details: []
+    };
+
+    // Loop through all operations and their orders
+    var allOrders = orderCtrl.getAllOrders();
+    Object.keys(allOrders).forEach(function(operation){
+        allOrders[operation].forEach(function(order){
+            orderData.order_details.push({
+                operation:      order.operation,
+                stage_no:       order.stage_no,
+                ms_width:       order.input_width,
+                ms_length:      order.input_length,
+                fg_yes_no:      order.fg_wip,
+                cc_width:       order.output_width,
+                cc_length:      order.output_length,
+                lamination:     order.lamination,
+                tolerance:      order.tolerance,
+                i_dia:          order.i_dia,
+                processing_wt:  order.processing_wt,
+                wt_per_pkt:     order.wt_per_pkt,
+                numbers:        order.numbers,
+                no_of_pkts:     order.no_of_pkts,
+                nos_per_pkt:    order.nos_per_pkt,
+                packing:        order.packing,
+                remarks:        order.remarks
+            });
+        });
+    });
+
+    // Store JSON in the hidden field for form submission
+    document.querySelector(DOM.orderString).value = JSON.stringify(orderData);
     };
 
     return {

@@ -766,107 +766,95 @@ def order():
 @app.route('/submit_order', methods=['GET', 'POST'])
 def submit_order():
     if request.method == 'POST':
-        smpl_no = request.form['smpl_no']
+        connection = psycopg2.connect(
+            dbname='smpl_prodn',
+            user='postgres',
+            password='smpl@509',
+            host='localhost',
+            port=5432
+        )
 
-        order_date = request.form['order_date']
-        expected_date = request.form['expected_date']
-        processing_wt = request.form['processing_wt']
-        available_wt = request.form['available_wt']
-        customer = request.form['customer']
-        available_numbers = request.form['available_numbers']
-        thickness = request.form['thickness']
-        width = request.form['width']
-        length = request.form['length']
-        grade = request.form['grade']
-        header_remarks = request.form['hdr_remarks']
-        order_string = request.form['order_string']
+        try:
+            # Begin a transaction
+            connection.autocommit = False
+            cursor = connection.cursor()
+            import json
 
-        order_string_lst = order_string.split('^')
+            # Parse the JSON from the hidden field
+            order_data = json.loads(request.form.get('order_string', '{}'))
 
-        '''ms_width_lst = []
-        ms_length_lst = []
-        operation_lst = request.form.getlist('Reshearing_table')
-        input_material_lst = request.form.getlist('input_material')
-        cut_width_lst = request.form.getlist('cut_width')
-        cut_length_lst = request.form.getlist('cut_length')
-        processing_wt_op_lst = request.form.getlist('weight')
-        numbers_lst = request.form.getlist('numbers')
-        positive_tolerance_lst = request.form.getlist('positive_tolerance')
-        negative_tolerance_lst = request.form.getlist('negative_tolerance')
-        fg_yes_no_lst = request.form.getlist('fg_yes_no')
-        no_per_packet_lst = request.form.getlist('no_per_packet')
-        no_of_packets_lst = request.form.getlist('no_of_packets')
-        packing_type_lst = request.form.getlist('packing_type')
-        remarks_lst = request.form.getlist('remarks')
-        stage_no_lst = request.form.getlist('stage_no')'''
+            smpl_no = order_data.get('smpl_no')
+            order_date = order_data.get('order_date')
+            expected_date = order_data.get('expected_date')
+            processing_wt = order_data.get('processing_wt')
+            remarks = order_data.get('remarks')
+            order_details = order_data.get('order_details', [])
 
-    # This is saved to order_header. The id generated is retrieved for order_detail
-    order = Order(smpl_no, order_date, expected_date, processing_wt, "Open", header_remarks)
-    _order_id = order.save_to_db()
+            # Insert header
+            cursor.execute("""
+                    INSERT INTO public.order_header
+                        (smpl_no, order_date, expected_date, processing_wt, status, remarks)
+                    VALUES
+                        (%s, %s, %s, %s, %s, %s)
+                    RETURNING order_id
+                """, (smpl_no, order_date, expected_date, processing_wt, 'Open', remarks))
 
-    '''for input_material in input_material_lst:
-        mother_material = input_material.split(' x ')
-        ms_width_lst.append(mother_material[0])
-        ms_length_lst.append(mother_material[1])
+            order_id = cursor.fetchone()[0]
 
-    for _operation, ms_width, ms_length, cut_width, cut_length, processing_wt_op, numbers, fg_yes_no, no_per_packet, no_of_packets, packing_type, remarks, stage_no, positive_tolerance, negative_tolerance in zip(
-            operation_lst, ms_width_lst, ms_length_lst, cut_width_lst, cut_length_lst, processing_wt_op_lst,
-            numbers_lst, fg_yes_no_lst, no_per_packet_lst, no_of_packets_lst, packing_type_lst, remarks_lst,
-            stage_no_lst, positive_tolerance_lst, negative_tolerance_lst):'''
-    for order_str in order_string_lst:
-        # Status of stage 1 has to be in Ready so it can be picked up for processing.
-        # The other stages are marked as not ready
-        order_dtl_str = order_str.split(',')
-        if len(order_dtl_str) > 16:
-            _operation = order_dtl_str[0]
-            stage_no = order_dtl_str[1]
-            ms_width = order_dtl_str[2]
-            ms_length = order_dtl_str[3]
-            fg_yes_no = order_dtl_str[4]
-            cut_width = order_dtl_str[5]
-            cut_length = order_dtl_str[6]
-            lamination = order_dtl_str[7]
-            tolerance = order_dtl_str[8]
-            internal_dia = order_dtl_str[9]
-            processing_wt_op = order_dtl_str[10]
-            wt_per_pkt = order_dtl_str[11]
-            numbers = order_dtl_str[12]
-            no_per_packet = order_dtl_str[14]
-            no_of_packets = order_dtl_str[13]
-            packing_type = order_dtl_str[15]
-            remarks = order_dtl_str[16]
+            # Insert each detail row
+            for d in order_details:
+                cursor.execute("""
+                        INSERT INTO public.order_details
+                            (order_id, smpl_no, operation, ms_width, ms_length,
+                             cc_width, cc_length, processing_wt, processing_numbers,
+                             fg_yes_no, no_per_packet, no_of_packets, packing_type,
+                             remarks, status, stage_no, tolerance, lamination,
+                             wt_per_pkt, internal_dia)
+                        VALUES
+                            (%s, %s, %s, %s, %s,
+                             %s, %s, %s, %s,
+                             %s, %s, %s, %s,
+                             %s, %s, %s, %s, %s,
+                             %s, %s)
+                    """, (
+                    order_id,
+                    smpl_no,
+                    d.get('operation'),
+                    d.get('ms_width') or 0,
+                    d.get('ms_length') or 0,
+                    d.get('cc_width') or 0,
+                    d.get('cc_length') or 0,
+                    d.get('processing_wt') or 0,
+                    d.get('numbers') or 0,
+                    d.get('fg_yes_no'),
+                    d.get('nos_per_pkt') or 0,
+                    d.get('no_of_pkts') or 0,
+                    d.get('packing'),
+                    d.get('remarks'),
+                    'Open',
+                    d.get('stage_no'),
+                    d.get('tolerance'),
+                    d.get('lamination'),
+                    d.get('wt_per_pkt') or 0,
+                    d.get('i_dia') or 0
+                ))
 
-            if stage_no == '1':
-                status = "Ready"
-            else:
-                status = "Not Ready"
+            connection.commit()
+            #flash('Order placed successfully', 'success')
+            return render_template('/main_menu.html', message="Order for " + smpl_no + " created.")
 
-            order_detail = OrderDetail(_order_id, smpl_no, _operation, ms_width, ms_length, cut_width, cut_length,
-                                       processing_wt_op, numbers, fg_yes_no, no_per_packet, no_of_packets, packing_type,
-                                       remarks, status, stage_no, tolerance, lamination, wt_per_pkt, internal_dia)
-            order_detail.save_to_db()
+        except Exception as e:
+            if connection:
+                connection.rollback()
+            #flash('Error placing order: ' + str(e), 'danger')
+            return render_template('/main_menu.html', message="Error! Order for not placed." + str(e))
 
-    # This part is for half cut.
-    # If the processing weight is less than available weight. It is assumed that the coil is going to be half cut.
-    # The half cut coil is given a new smpl no. which is old smpl_no +_H. The wt and no.s for the half cut coil are calculated
-    # This is then added to incoming with the same details of the mother coil and new smpl_no
-    if Decimal(processing_wt) < Decimal(available_wt):
-        new_wt = Decimal(available_wt) - Decimal(processing_wt)
-        if Decimal(length) > 0:
-            new_nos = int(new_wt / (thickness * width * length * 0.00000785))
-        if Decimal(length) == 0:
-            new_nos = 1
-        new_smpl_no = smpl_no + "_H"
-        incoming = Incoming.load_smpl_by_smpl_no(smpl_no)
-        incoming_new = Incoming(new_smpl_no, customer, incoming.incoming_date, thickness, width, length, grade, new_wt,
-                                new_nos,
-                                incoming.mill, incoming.mill_id, incoming.remarks, incoming.unit)
-        incoming_new.savetodb()
-        rm_status = CurrentStock.change_wt(smpl_no, width, length, new_wt, new_nos, "minus", "RM", 0)
 
-    # The status of the smpl is updated in current_stock
-    cs = CurrentStock(smpl_no, customer, available_wt, available_numbers, thickness, width, length, "RM", grade, "X")
-    cs.update_status("Order")
+        finally:
+            if cursor:
+                cursor.close()
+            if connection:
+                connection.close()
 
     return render_template('/main_menu.html', message="Order for " + smpl_no + " created.")
 

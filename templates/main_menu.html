@@ -198,7 +198,9 @@
             <th><h3>Dispatch</h3></th>
             {% endif %}
             <th><h3>Reports</h3></th>
+            {% if current_user.user_type == "all" or current_user.user_type == "plan_head" %}
             <th><h3>Order</h3></th>
+            {% endif %}
         </tr>
         <tr>
             {% if current_user.user_type == "all" or current_user.user_type == "incoming_head" or current_user.user_type == "plan_head"  %}
@@ -239,11 +241,13 @@
                 {% endif %}
 
             </td>
+            {% if current_user.user_type == "all" or current_user.user_type == "plan_head" %}
             <td>
                 <a href="\smpl_for_order">SMPL - Place Order</a><br>
                 <a href="\tr_for_order">TSDPL - Place Order</a><br>
                 <a href ="\smpl_for_modify_order">View/Delete Order</a>
             </td>
+            {% endif %}
         </tr>
 
     </table>
