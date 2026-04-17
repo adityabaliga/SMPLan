@@ -98,6 +98,8 @@
         {% endfor %}
     </table>
     <input class="btn btn-default" formaction="/dispatch_view_invoice_no_update" type="submit" value="Submit">
+    {% if current_user.user_type == "all" or current_user.user_type == "plan_head" %}
     <input class="btn btn-default" formaction="/reverse_dispatch_detail" type="submit" value="Reverse Dispatch">
+    {% endif %}
 </form>
 </html>
