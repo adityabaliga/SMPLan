@@ -3029,15 +3029,23 @@ def dispatch_list_hdr_by_date():
 
 @app.route('/dispatch_view_detail', methods=['GET', 'POST'])
 def dispatch_view_detail():
+    dispatch_detail_lst = []
+    dispatch_detail_id_lst = []
+
     if request.method == 'POST':
         select_dispatch_hdr_id = request.form['select_dispatch_hdr']
     if request.method == 'GET':
         select_dispatch_hdr_id = request.args.get('select_dispatch_hdr')
 
-    dispatch_detail_lst = DispatchDetail.get_details_by_id(select_dispatch_hdr_id)
+    dispatch_return_lst = DispatchDetail.get_details_by_id(select_dispatch_hdr_id)
     dispatch_hdr = DispatchHeader.get_hdr_by_id(select_dispatch_hdr_id)
 
-    return render_template('dispatch_view.html', dispatch_hdr=dispatch_hdr, dispatch_detail_lst=dispatch_detail_lst,
+    for dispatch_detail_id, dispatch_detail in dispatch_return_lst:
+        dispatch_detail_id_lst.append(dispatch_detail_id)
+        dispatch_detail_lst.append(dispatch_detail)
+
+    return render_template('dispatch_view.html', dispatch_hdr=dispatch_hdr,
+                           dispatch_detail_lst=zip(dispatch_detail_id_lst,dispatch_detail_lst),
                            dispatch_hdr_id=select_dispatch_hdr_id)
 
 
@@ -3056,6 +3064,119 @@ def dispatch_view_invoice_no_update():
 
     DispatchHeader.update_invoice_no(dispatch_hdr_id, invoice_no, dispatch_date, vehicle_no)
     return render_template('main_menu.html')
+
+
+@app.route('/reverse_dispatch_detail', methods=['GET', 'POST'])
+def reverse_dispatch_detail():
+    if request.method == 'POST':
+        dispatch_detail_lst = request.form.getlist('dispatch_detail_id')
+
+        # Establish a database connection
+        connection = psycopg2.connect(
+            dbname='smpl_prodn',
+            user='postgres',
+            password='smpl@509',
+            host='localhost',
+            port=5432
+        )
+
+        try:
+            connection.autocommit = False
+            cursor = connection.cursor()
+
+            for dispatch_detail_id in dispatch_detail_lst:
+                query = """
+                    WITH dispatch_to_reverse AS (
+                        SELECT 
+                            dd.dispatch_detail_id,
+                            dd.dispatch_id,
+                            dd.smpl_no,
+                            dd.thickness,
+                            dd.width,
+                            dd.length,
+                            dd.numbers,
+                            dd.weight,
+                            dd.length2,
+                            dd.packet_name,
+                            dd.unit,
+                            dd.processing_id,
+                            dh.customer,
+                            dh.dispatch_date,
+                            inc.grade,
+                            p.processing_date
+                        FROM dispatch_detail dd
+                        JOIN dispatch_header dh ON dd.dispatch_id = dh.dispatch_id
+                        LEFT JOIN incoming inc ON dd.smpl_no = inc.smpl_no 
+                        LEFT JOIN processing p ON dd.processing_id = p.processing_id
+                        WHERE dd.dispatch_detail_id = %(dispatch_detail_id)s
+                    ),
+                    insert_to_stock AS (
+                        INSERT INTO current_stock (
+                            smpl_no,
+                            weight,
+                            numbers,
+                            width,
+                            length,
+                            status,
+                            customer,
+                            thickness,
+                            grade,
+                            unit,
+                            packet_name,
+                            length2,
+                            date,
+                            processing_id,
+                            net_wt
+                        )
+                        SELECT 
+                            smpl_no,
+                            weight,
+                            numbers,
+                            width,
+                            length,
+                            'FG' as status,
+                            customer,
+                            thickness,
+                            grade,
+                            unit,
+                            packet_name,
+                            length2,
+                            processing_date,
+                            processing_id,
+                            weight as net_wt
+                        FROM dispatch_to_reverse
+                        RETURNING cs_id, smpl_no, weight, numbers, customer
+                    )
+                    DELETE FROM dispatch_detail
+                    WHERE dispatch_detail_id = %(dispatch_detail_id)s
+                    RETURNING dispatch_detail_id, dispatch_id, smpl_no, weight, numbers;
+                    """
+                cursor.execute(query, {'dispatch_detail_id': int(dispatch_detail_id)})
+                cursor.fetchone()
+                connection.commit()
+            return render_template('/main_menu.html', message="Dispatch Reversed.")
+
+        except Exception as e:
+            if connection:
+                connection.rollback()
+            # flash('Error placing order: ' + str(e), 'danger')
+            return render_template('/main_menu.html', message="Error! " + str(e))
+
+
+        finally:
+            if cursor:
+                cursor.close()
+            if connection:
+                connection.close()
+
+
+    return render_template('/main_menu.html', message="Dispatch reversed")
+
+
+
+
+
+
 
 @app.route('/pick_slitting_batch', methods=['GET', 'POST'])
 def pick_slitting_batch():

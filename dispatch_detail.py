@@ -31,6 +31,7 @@ class DispatchDetail:
     @classmethod
     def get_details_by_id(cls, select_dispatch_hdr_id):
         dispatch_detail_lst = []
+        dispatch_id_lst = []
         with CursorFromConnectionFromPool() as cursor:
             cursor.execute("select * from dispatch_detail where dispatch_id = %s",(select_dispatch_hdr_id,))
             user_data = cursor.fetchall()
@@ -39,8 +40,8 @@ class DispatchDetail:
                                                  float(detail[5]), int(detail[6]), float(detail[7]), detail[8],
                                                  detail[9], float(detail[10]), detail[11], detail[12], detail[13])
                 dispatch_detail_lst.append(dispatch_detail)
-
-        return dispatch_detail_lst
+                dispatch_id_lst.append(detail[0])
+        return zip(dispatch_id_lst, dispatch_detail_lst)
 
 
     @classmethod
