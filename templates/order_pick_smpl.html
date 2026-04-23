@@ -49,9 +49,9 @@
                 <th>Size</th>
                 <th>Unit</th>
             </tr>
-        {% for cs in smpl_lst %}
+        {% for cs_id, cs in smpl_lst %}
             <tr>
-                <td><input type = "radio" name = "select_smpl" value = "{{cs.smpl_no}},{{cs.unit}}">  {{cs.smpl_no}}</input></td>
+                <td><input type = "radio" name = "select_smpl" value = "{{cs_id}}">  {{cs.smpl_no}}</input></td>
                 <td>{{cs.customer}}</td>
                 <td>{{cs.weight}}</td>
                 <td>{{cs.thickness}} x {{cs.width}} x {{cs.length}}</td>

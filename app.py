@@ -719,9 +719,16 @@ def upload_docs_submit():
 # A smpl list is got whose status is RM. The list is sent to the html
 @app.route('/smpl_for_order', methods=['GET', 'POST'])
 def smpl_for_order():
-    smpl_lst = CurrentStock.smpl_list_for_place_order('SMPL')
-    if smpl_lst:
-        return render_template('order_pick_smpl.html', smpl_lst=smpl_lst)
+    _cs_lst = CurrentStock.smpl_list_for_place_order('SMPL')
+    cs_lst = []
+    cs_id_lst = []
+
+    for cs_id, cs in _cs_lst:
+        cs_id_lst.append(cs_id)
+        cs_lst.append(cs)
+
+    if _cs_lst:
+        return render_template('order_pick_smpl.html', smpl_lst=zip(cs_id_lst, cs_lst))
     else:
         return render_template('/main_menu.html', message="No material to place order")
 
@@ -740,25 +747,23 @@ def tr_for_order():
 # the smpl_no is retrieved from the page. The details of the smpl_no are loaded from the db and details sent to order.html
 @app.route('/order', methods=['GET', 'POST'])
 def order():
-    smpl_no = ""
+    cs_id = ""
     if request.method == 'POST':
-        _smpl_no = request.form['select_smpl']
+        cs_id = request.form['select_smpl']
 
     if request.method == 'GET':
-        _smpl_no = request.args.get('select_smpl')
+        cs_id = request.args.get('select_smpl')
 
-    _smpl_no = _smpl_no.split(',')
-    smpl_no = _smpl_no[0]
-    unit = _smpl_no[1]
-
-    incoming = Incoming.load_smpl_by_smpl_no(smpl_no)
+    cs = CurrentStock.load_smpl_by_id(cs_id)
 
 
-    current_stock = CurrentStock.load_smpl_by_smplno(smpl_no, unit)
-    for cs_id, _current_stock in current_stock:
-        cs = _current_stock
+    incoming = Incoming.load_smpl_by_smpl_no(cs.smpl_no)
 
-    return render_template('order.html', smpl_no=smpl_no, incoming = incoming,
+
+
+
+
+    return render_template('order.html', smpl_no= cs.smpl_no, incoming = incoming,
                            weight=cs.weight, cs = cs)
 
 

@@ -69,6 +69,7 @@ class CurrentStock:
     def smpl_list_for_place_order(cls, string):
         user_data = []
         cs_lst = []
+        cs_id_lst = []
         if string == 'SMPL':
             query = "select * from current_stock where customer not like 'TSDPL%' and status = 'RM' or status = 'HC' order by smpl_no asc"
         if string == 'TR':
@@ -84,8 +85,8 @@ class CurrentStock:
                                   grade=lst[9], unit=lst[10], packet_name = lst [11], length2 = lst[12],
                                   date = lst[13], processing_id= lst[14], second_customer= lst[15], net_wt= lst[16])
                 cs_lst.append(cs)
-
-            return cs_lst
+                cs_id_lst.append(lst[0])
+            return zip(cs_id_lst,cs_lst)
         else:
             return None
 
