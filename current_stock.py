@@ -684,7 +684,9 @@ class CurrentStock:
                            "(width = 515 and length =715) or (width = 620 and length =675) or "
                            "(width = 520 and length =765) or (width = 565 and length =645) or "
                            "(width = 570 and length =830) or (width = 600 and length =715) or "
-                           "(width = 565 and length = 645) or (width = 655 and length = 740)) "
+                           "(width = 565 and length = 645) or (width = 655 and length = 740) or "
+                           "(width = 720 and length = 860) or (width = 570 and length = 650) or "
+                           "(width = 810 and length = 1010)) "
                            "group by width, length, customer order by customer, width")
             user_data = cursor.fetchall()
         if user_data:
