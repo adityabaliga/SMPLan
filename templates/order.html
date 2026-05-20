@@ -152,7 +152,7 @@
         <!--option value="{{width}} x {{length}}">{{width}} x {{length}}</option-->
         <!--option value="1250 x 0">1250 x 0    22.54 MT</option-->
         <br><br>
-        <div class="current_op_slitting" hidden>
+        <div class="current_op_slitting"  id="current_op_slitting" hidden>
             <span class="processing_wt_for_op_hdr" style = "padding-right:20px;">
                 <span><b>Processing Wt</b></span>
                 <input type="number" class ="processing_wt_for_op" value="" step="0.001">
@@ -166,14 +166,18 @@
                 <input type="number" class ="no_of_parts" value=""></span>
             <span class="iDia_hdr" style = "padding-right:20px;">
                 <b>Internal Dia</b>
-            </span>
+
+
                  <select class="iDia">
                     <option value = "0" selected="selected"> </option>
                     <option value = "610">610</option>
                     <option value = "508">508</option>
                     <option value = "350">350</option>
                 </select>
-
+            </span>
+            <span class="length_per_part_hdr" style = "padding-right:20px;">
+                <span><b>Length per part (in m)</b></span>
+                <input type="number" class ="length_per_part" value=""></span>
 
         </div>
     <hr>
@@ -342,11 +346,11 @@
                     <th hidden>Cut Length</th>
                     <th hidden>Lamination</th>
                     <th>Tolerance</th>
-                    <th>I Dia</th>
+                    <th hidden>I Dia</th>
                     <th>Processing Weight MT</th>
                     <th>No. of Slits</th>
                     <th>Length/Part</th>
-                    <th>No. of parts</th>
+                    <th hidden>No. of parts</th>
                     <th>Packing Type</th>
                     <th>Remarks</th>
                     <th></th>

@@ -4149,9 +4149,9 @@ def invoice_check_report():
         for machine in machine_name_value:
             if processing[3] == machine[0]:
                 machine_rate = machine[1]
-                machine_cost = round(machine_rate * (processing[20]/60),2)
+                machine_cost = round(machine_rate * (processing[21]/60),2)
                 processing.append(machine_cost)
-                labour_cost = round(labour_rate * (processing[19]) * (processing[20] / 60), 2)
+                labour_cost = round(labour_rate * (processing[20]) * (processing[21] / 60), 2)
                 processing.append(labour_cost)
 
 

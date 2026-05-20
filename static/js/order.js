@@ -359,7 +359,7 @@ var UIController = (function() {
            }
            if(operation === "Slitting"){
                element = DOMStrings.Slitting_table;
-               html = '<tr id="size-Slitting-%id%"><td>%stage_no%</td><td>%fg_wip%</td><td>%input_material%</td><td>%op_width%</td><td hidden>%op_length%</td><td hidden>%lamination%</td><td>%tolerance%</td><td>%i_dia%</td><td>%proc_wt%</td><td>%numbers%</td><td>%nos_per_packet%</td><td>%no_of_pkts%</td><td>%packing%</td><td>%remarks%</td><td><input type="button" class="item__delete--btn" id="del_size" name="del_size" value="Delete"></button></td><td><input type="button" class="item__edit--btn" id="edit_size" name="edit_size" value="Edit"></button></td></tr>';
+               html = '<tr id="size-Slitting-%id%"><td>%stage_no%</td><td>%input_material%</td><td>%op_width%</td><td hidden>%op_length%</td><td hidden>%lamination%</td><td>%tolerance%</td><td>%proc_wt%</td><td>%numbers%</td><td>%nos_per_packet%</td><td>%packing%</td><td>%remarks%</td><td><input type="button" class="item__delete--btn" id="del_size" name="del_size" value="Delete"></button></td><td><input type="button" class="item__edit--btn" id="edit_size" name="edit_size" value="Edit"></button></td></tr>';
 
            }
            if(operation === "Mini_Slitting"){
@@ -560,6 +560,10 @@ var controller = (function(orderCtrl, UICtrl) {
        //document.getElementById(DOM.coilProcWtID).addEventListener("focusout", onFocusOutCoilProcessingWt);
 
        document.querySelector(DOM.currentOperation).addEventListener("change", onChangeOperation);
+
+       document.querySelector('.no_of_parts').addEventListener("change", onChangeNoParts);
+
+       document.querySelector(DOM.currentOpProcWt).addEventListener("change", onChangeNoParts);
 
        document.querySelector(DOM.currentInputMaterial).addEventListener("change", onChangeInputMaterial);
 
@@ -1156,6 +1160,23 @@ var controller = (function(orderCtrl, UICtrl) {
         }
     };
 
+    var onChangeNoParts = function(){
+    var DOM = UICtrl.getDOMstrings();
+
+    var processing_wt = parseFloat(document.querySelector('.processing_wt_for_op').value) || 0;
+    var thickness = parseFloat(document.querySelector(DOM.thickness).value) || 0;
+    var width = parseFloat(document.querySelector(DOM.mc_width).value) || 0;
+    var no_of_parts = parseFloat(document.querySelector('.no_of_parts').value) || 0;
+
+    if(thickness > 0 && width > 0 && no_of_parts > 0 && processing_wt > 0){
+        var coil_length = (processing_wt * 1000) / (thickness * width * 0.00000785) / 1000;
+        var length_per_part = coil_length / no_of_parts;
+        document.querySelector('.length_per_part').value = length_per_part.toFixed(0);
+    } else {
+        document.querySelector('.length_per_part').value = "";
+    }
+    };
+
     var checkValidInputs = function(input){
         //Check if all the input fields have valid inputs like processing wt, width<mc_width, wt of size<mc_wt and coil proc wt, etc
         var DOM,ip_mtrl_wt,ip_mtrl_selected;
@@ -1481,21 +1502,51 @@ var controller = (function(orderCtrl, UICtrl) {
     };
 
     var printSlit = function(event){
-        // Clone the elements so we can modify them safely
+
     const incoming = document.getElementById("incoming_details").cloneNode(true);
+    const extra_details = document.getElementById("extra_details").cloneNode(true);
+    const slitting_op = document.getElementById("current_op_slitting").cloneNode(true);
     const slit = document.getElementById("Slitting_table").cloneNode(true);
 
-    // Copy values from all inputs and textareas in the original table
-    [incoming, slit].forEach(section => {
+    // Copy live select values from original current_op_slitting into clone
+    const originalSlittingSelects = document.getElementById("current_op_slitting").querySelectorAll("select");
+    const clonedSlittingSelects = slitting_op.querySelectorAll("select");
+    originalSlittingSelects.forEach((original, i) => {
+        clonedSlittingSelects[i].value = original.value;
+    });
+
+    // Copy live input values from original current_op_slitting into clone
+    const originalSlittingInputs = document.getElementById("current_op_slitting").querySelectorAll("input");
+    const clonedSlittingInputs = slitting_op.querySelectorAll("input");
+    originalSlittingInputs.forEach((original, i) => {
+        clonedSlittingInputs[i].value = original.value;
+    });
+
+    // Handle date inputs — read from live DOM, format, inject as span
+    document.getElementById("incoming_details").querySelectorAll('input[type="date"]').forEach(originalInput => {
+        if (originalInput.value) {
+            const parts = originalInput.value.split('-');
+            const formatted = parts[2] + '-' + parts[1] + '-' + parts[0];
+            const clonedInput = incoming.querySelector('input[name="' + originalInput.name + '"]')
+                             || incoming.querySelector('input[id="' + originalInput.id + '"]');
+            if (clonedInput) {
+                const span = document.createElement('span');
+                span.textContent = formatted;
+                clonedInput.parentNode.replaceChild(span, clonedInput);
+            }
+        }
+    });
+
+    // Replace all inputs/selects with spans
+    [incoming, extra_details, slitting_op, slit].forEach(section => {
         const inputs = section.querySelectorAll("input, textarea, select");
         inputs.forEach(input => {
             if (input.tagName.toLowerCase() === "textarea") {
                 input.textContent = input.value;
             } else if (input.tagName.toLowerCase() === "select") {
                 const selected = input.options[input.selectedIndex];
-                const textNode = document.createTextNode(selected ? selected.text : "");
                 const span = document.createElement("span");
-                span.textContent = textNode.textContent;
+                span.textContent = selected ? selected.text : "";
                 input.parentNode.replaceChild(span, input);
             } else {
                 const span = document.createElement("span");
@@ -1505,76 +1556,72 @@ var controller = (function(orderCtrl, UICtrl) {
         });
     });
 
-
-     // Make first 2 rows of incoming table bigger
-        const incomingRows = incoming.querySelectorAll("tr");
-        for (let i = 0; i < Math.min(3, incomingRows.length); i++) {
-            incomingRows[i].style.fontSize = "22px";
-            incomingRows[i].style.fontWeight = "bold";
-        }
-
-        // Remove last 2 cells (Delete/Edit buttons) from every CTL row
-        const slitRows = slit.querySelectorAll("tr");
-        slitRows.forEach(row => {
-            const cells = row.cells;
-            if (cells.length >= 2) {
-                row.deleteCell(-1); // removes last cell (Edit)
-                row.deleteCell(-1); // removes new last cell (Delete)
-            }
+    // Make first 2 rows of incoming table bigger
+    const incomingRows = incoming.querySelectorAll("tr");
+    for (let i = 0; i < Math.min(2, incomingRows.length); i++) {
+        incomingRows[i].querySelectorAll("td, th").forEach(cell => {
+            cell.setAttribute("style", "font-size: 18px !important; font-weight: bold !important;");
         });
+    }
 
-        // Create a new popup window for printing
-        // Open in a new tab (not a popup)
-        const printWindow = window.open('', '_blank');
+    // Remove Delete/Edit columns from slitting table
+    const slitAllTbodies = Array.from(slit.querySelectorAll('tbody'));
+    const slitDataTbodies = slitAllTbodies.slice(1);
+    slitDataTbodies.forEach(tbody => {
+        const row = tbody.querySelector('tr');
+        if (row && row.cells.length >= 2) {
+            row.deleteCell(-1); // Edit
+            row.deleteCell(-1); // Delete
+        }
+    });
 
-        // Write HTML content into the new tab
-        printWindow.document.write(`
-            <html>
-            <head>
-                <title>Print</title>
-                <style>
-                @page {
-                            size: A4 landscape;
-                        }
-                    body {
-                        font-family: Arial, sans-serif;
-                        margin: 20px;
-                    }
-                    table {
-                        border-collapse: collapse;
-                        width: 100%;
-                        margin-bottom: 20px;
-                    }
-                    table, th, td {
-                        border: 1px solid #000;
-                        padding: 6px;
-                        font-size: 12px;
-                    }
-                    h2 {
-                        text-align: center;
-                        margin-bottom: 20px;
-                    }
-                </style>
-            </head>
-            <body>
-                ${incoming.outerHTML}
-                ${slit.outerHTML}
-            </body>
-            </html>
-        `);
-        // Finish writing and trigger print
+    // Sort slitting rows - WIP first, then FG
+    const slitHeaderTbody = slitAllTbodies[0];
+    const wipTbodies = slitDataTbodies.filter(tbody =>
+        tbody.querySelector('tr').cells[1].textContent.trim() === 'WIP'
+    );
+    const fgTbodies = slitDataTbodies.filter(tbody =>
+        tbody.querySelector('tr').cells[1].textContent.trim() === 'FG'
+    );
+    const otherTbodies = slitDataTbodies.filter(tbody => {
+        const val = tbody.querySelector('tr').cells[1].textContent.trim();
+        return val !== 'WIP' && val !== 'FG';
+    });
+    [...wipTbodies, ...fgTbodies, ...otherTbodies].forEach(tbody => slit.appendChild(tbody));
+
+    // Make slitting_op visible in print (it's hidden on page)
+    slitting_op.removeAttribute('hidden');
+    slitting_op.style.display = 'block';
+
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(`
+        <html>
+        <head>
+            <title>Print</title>
+            <style>
+                @page { size: A4 landscape; }
+                body { font-family: Arial, sans-serif; margin: 20px; }
+                table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
+                table, th, td { border: 1px solid #000; padding: 6px; font-size: 12px; }
+                h2 { text-align: center; margin-bottom: 20px; }
+            </style>
+        </head>
+        <body>
+            ${incoming.outerHTML}
+            ${extra_details.outerHTML}
+            ${slitting_op.outerHTML}
+            <div style="margin-top: 20px;"></div>
+            ${slit.outerHTML}
+        </body>
+        </html>
+    `);
     printWindow.document.close();
-
-    // Wait a bit for rendering before printing
     printWindow.onload = function() {
         setTimeout(() => {
             printWindow.focus();
             printWindow.print();
-            // Keep the tab open (optional)
-            // To auto-close after printing, uncomment:
-            // printWindow.close();
         }, 500);
-        };
+    };
     };
 
     var onSubmit = function(){
