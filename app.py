@@ -3804,6 +3804,10 @@ def get_daily_report():
     sticker_lst = []
     sticker_lst = ProcessingDetail.no_entry_done(report_date)
 
+    lamination_data = Processing.get_lamination_report(report_date,report_date)
+    # Calculate totals
+    total_lami_metres = sum(item['total_length_metres'] for item in lamination_data if item['total_length_metres'])
+
     #machine_lst = ['CTL 1', 'CTL 2', 'NCTL 1', 'NCTL 2', 'NCTL 3', 'NCTL 4', 'Reshearing 1', 'Reshearing 2', 'Reshearing 3',
     #                'Reshearing 4', 'Reshearing 5', 'Reshearing 6', 'Reshearing 7', 'Reshearing 8']
 
@@ -3811,7 +3815,8 @@ def get_daily_report():
                            total_incoming=total_incoming, processing_hdr_lst=processing_hdr_lst,
                            dispatch_hdr_lst=dispatch_hdr_lst, processing_hdr_detail=processing_hdr_detail,
                            machine_lst = machine_lst, processing_detail_lst = processing_detail_lst,
-                           total_dispatch_hdr= total_dispatch_hdr, sticker_lst = sticker_lst)
+                           total_dispatch_hdr= total_dispatch_hdr, sticker_lst = sticker_lst,
+                           lamination_data = lamination_data, total_lami_metres = total_lami_metres)
 
 def daily_report_whatsapp():
     yesterday_date_lst = []
@@ -4029,6 +4034,23 @@ def get_monthly_report():
             pkts = round(column_tot/300, 2)
         honda_dispatch_total_pkts.append(pkts)
 
+        # Convert to integers
+    month_int = int(report_month)
+    year_int = int(report_year)
+
+    # Calculate first day of month
+    from_date = date(year_int, month_int, 1)
+
+    # Calculate last day of month
+    last_day = calendar.monthrange(year_int, month_int)[1]
+    to_date = date(year_int, month_int, last_day)
+
+    # Fetch lamination data
+    lamination_data = Processing.get_lamination_report(from_date.isoformat(), to_date.isoformat())
+
+    # Calculate totals
+    total_lami_metres = sum(item['total_length_metres'] for item in lamination_data if item['total_length_metres'])
+
 
 
 
@@ -4044,7 +4066,9 @@ def get_monthly_report():
                            customers = unique_customers_list, operations = operations, data = pivoted_data,
                            month_dispatch_total_by_customer = month_dispatch_total_by_customer,
                            honda_dispatch_by_size = honda_dispatch_by_size, honda_schedule_sizes = honda_schedule_sizes,
-                           honda_dispatch_total = honda_dispatch_total, honda_dispatch_total_pkts = honda_dispatch_total_pkts)
+                           honda_dispatch_total = honda_dispatch_total,
+                           honda_dispatch_total_pkts = honda_dispatch_total_pkts, lamination_data = lamination_data,
+                           total_lami_metres = total_lami_metres)
 
 
 @app.route('/daily_report_pick_month_year', methods=['GET', 'POST'])

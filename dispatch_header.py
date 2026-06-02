@@ -94,7 +94,7 @@ class DispatchHeader:
             cursor.execute(
                 "SELECT  dh.customer, SUM(dd.weight) AS total_weight FROM dispatch_header dh "
                 "JOIN dispatch_detail dd ON dh.dispatch_id = dd.dispatch_id WHERE "
-                "extract(month from dh.dispatch_date) = %s  and extract(year from dh.dispatch_date) = %s"
+                "extract(month from dh.dispatch_date) = %s  and extract(year from dh.dispatch_date) = %s "
                 "and dh.invoice_no != 'TRANSFER' GROUP BY dh.customer ORDER BY total_weight desc",
                 (month, year))
             user_data = cursor.fetchall()
@@ -120,8 +120,8 @@ class DispatchHeader:
                          "JOIN dispatch_detail ON dispatch_header.dispatch_id = dispatch_detail.dispatch_id "
                          "WHERE dispatch_header.customer = 'HONDA TRADING CORPORATION INDIA PVT LTD' "
                          "AND EXTRACT(MONTH FROM dispatch_header.dispatch_date) = " + str(month) +
-                         "AND EXTRACT(YEAR FROM dispatch_header.dispatch_date) =  " + str(year) +
-                         "GROUP BY day_of_month, dispatch_detail.width, dispatch_detail.length) SELECT day_of_month"))
+                         " AND EXTRACT(YEAR FROM dispatch_header.dispatch_date) =  " + str(year) +
+                         " GROUP BY day_of_month, dispatch_detail.width, dispatch_detail.length) SELECT day_of_month"))
 
         for sizes in honda_schedule_sizes:
             query_string += (", coalesce(MAX(CASE WHEN width = " + str(sizes[0]) + (" AND length = " + str(sizes[1]) +
@@ -129,7 +129,7 @@ class DispatchHeader:
                                                                             "AS \"") + str(sizes[0]) + "x"
                                                                             + str(sizes[1]) +"\" ")
 
-        query_string += "FROM daily_totals GROUP BY day_of_month ORDER BY day_of_month;"
+        query_string += " FROM daily_totals GROUP BY day_of_month ORDER BY day_of_month;"
         with CursorFromConnectionFromPool() as cursor:
             cursor.execute(query_string)
             user_data = cursor.fetchall()

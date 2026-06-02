@@ -126,6 +126,142 @@ class Processing:
 
             return user_data
 
+
+
+    def get_lamination_report(from_date, to_date):
+        """
+        Get lamination usage report aggregated by make, colour, and width.
+        """
+        query = """
+                 WITH lamination_data AS (
+                SELECT 
+                    COALESCE(NULLIF(split_part(split_part(pd.remarks, 'TOPLAMI:', 2), '|', 1), ''), 'Not Entered') as lamination_make,
+                    'White' as colour,
+                    pd.cut_width as width,
+                    ROUND((pd.cut_length::numeric * pd.processed_numbers) / 1000, 2) as total_length_metres
+                FROM processing p
+                JOIN processing_detail pd ON p.processing_id = pd.processing_id
+                WHERE pd.machine LIKE '%%Single Side - White%%'
+                    AND p.processing_date >= %s
+                    AND p.processing_date <= %s
+        
+                UNION ALL
+        
+                SELECT 
+                    COALESCE(NULLIF(split_part(split_part(pd.remarks, 'TOPLAMI:', 2), '|', 1), ''), 'Not Entered'),
+                    'Blue',
+                    pd.cut_width,
+                    ROUND((pd.cut_length::numeric * pd.processed_numbers) / 1000, 2)
+                FROM processing p
+                JOIN processing_detail pd ON p.processing_id = pd.processing_id
+                WHERE pd.machine LIKE '%%Single Side - Blue%%'
+                    AND p.processing_date >= %s
+                    AND p.processing_date <= %s
+        
+                UNION ALL
+        
+                SELECT 
+                    COALESCE(NULLIF(split_part(split_part(pd.remarks, 'TOPLAMI:', 2), '|', 1), ''), 'Not Entered'),
+                    'White',
+                    pd.cut_width,
+                    ROUND((pd.cut_length::numeric * pd.processed_numbers) / 1000, 2)
+                FROM processing p
+                JOIN processing_detail pd ON p.processing_id = pd.processing_id
+                WHERE pd.machine LIKE '%%Both Side - White%%'
+                    AND p.processing_date >= %s
+                    AND p.processing_date <= %s
+        
+                UNION ALL
+        
+                SELECT 
+                    COALESCE(NULLIF(split_part(split_part(pd.remarks, 'TOPLAMI:', 2), '|', 1), ''), 'Not Entered'),
+                    'Blue',
+                    pd.cut_width,
+                    ROUND((pd.cut_length::numeric * pd.processed_numbers) / 1000, 2)
+                FROM processing p
+                JOIN processing_detail pd ON p.processing_id = pd.processing_id
+                WHERE pd.machine LIKE '%%Both Side - Blue%%'
+                    AND p.processing_date >= %s
+                    AND p.processing_date <= %s
+        
+                UNION ALL
+        
+                SELECT 
+                    COALESCE(NULLIF(split_part(split_part(pd.remarks, 'TOPLAMI:', 2), '|', 1), ''), 'Not Entered'),
+                    'Blue',
+                    pd.cut_width,
+                    ROUND((pd.cut_length::numeric * pd.processed_numbers) / 1000, 2)
+                FROM processing p
+                JOIN processing_detail pd ON p.processing_id = pd.processing_id
+                WHERE pd.machine LIKE '%%Top Blue Bottom White%%'
+                    AND p.processing_date >= %s
+                    AND p.processing_date <= %s
+        
+                UNION ALL
+        
+                SELECT 
+                    COALESCE(NULLIF(split_part(split_part(pd.remarks, 'BOTMLAMI:', 2), '|', 1), ''), 'Not Entered'),
+                    'White',
+                    pd.cut_width,
+                    ROUND((pd.cut_length::numeric * pd.processed_numbers) / 1000, 2)
+                FROM processing p
+                JOIN processing_detail pd ON p.processing_id = pd.processing_id
+                WHERE pd.machine LIKE '%%Top Blue Bottom White%%'
+                    AND p.processing_date >= %s
+                    AND p.processing_date <= %s
+        
+                UNION ALL
+        
+                SELECT 
+                    COALESCE(NULLIF(split_part(split_part(pd.remarks, 'TOPLAMI:', 2), '|', 1), ''), 'Not Entered'),
+                    'White',
+                    pd.cut_width,
+                    ROUND((pd.cut_length::numeric * pd.processed_numbers) / 1000, 2)
+                FROM processing p
+                JOIN processing_detail pd ON p.processing_id = pd.processing_id
+                WHERE pd.machine LIKE '%%Top White Bottom Blue%%'
+                    AND p.processing_date >= %s
+                    AND p.processing_date <= %s
+        
+                UNION ALL
+        
+                SELECT 
+                    COALESCE(NULLIF(split_part(split_part(pd.remarks, 'BOTMLAMI:', 2), '|', 1), ''), 'Not Entered'),
+                    'Blue',
+                    pd.cut_width,
+                    ROUND((pd.cut_length::numeric * pd.processed_numbers) / 1000, 2)
+                FROM processing p
+                JOIN processing_detail pd ON p.processing_id = pd.processing_id
+                WHERE pd.machine LIKE '%%Top White Bottom Blue%%'
+                    AND p.processing_date >= %s
+                    AND p.processing_date <= %s
+            )
+            SELECT 
+                lamination_make,
+                colour,
+                width,
+                SUM(total_length_metres) as total_length_metres
+            FROM lamination_data
+            GROUP BY 
+                lamination_make,
+                colour,
+                width
+            ORDER BY 
+                CASE WHEN lamination_make = 'Not Entered' THEN 1 ELSE 0 END,
+                lamination_make, colour, width;"""
+
+        with CursorFromConnectionFromPool() as cur:
+            params = [from_date, to_date] * 8
+            cur.execute(query, params)
+
+            columns = [desc[0] for desc in cur.description]
+            results = []
+
+            for row in cur.fetchall():
+                results.append(dict(zip(columns, row)))
+
+            return results
+
 def change_date_format(date):
     # split_date = date.split('-')
     # new_date = split_date[2] + '-' + split_date[1] + '-' + split_date[0]

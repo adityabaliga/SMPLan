@@ -631,7 +631,7 @@ class CurrentStock:
         with CursorFromConnectionFromPool() as cursor:
             cursor.execute("select operation, sum(total_processed_wt) as total_wt, sum(total_cuts) "
                            "as total_cuts, sum(production_time + setting_time) as total_time from processing p "
-                           "where extract(month from processing_date) = %s and extract(year from processing_date) = %s"
+                           "where extract(month from processing_date) = %s and extract(year from processing_date) = %s "
                            "group by operation order by operation asc",
                            (month, year))
             user_data = cursor.fetchall()
