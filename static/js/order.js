@@ -1,5 +1,7 @@
 var orderController = (function () {
-   var Order = function(id, operation, stage_no, input_width, input_length, fg_wip, output_width, output_length, lamination, tolerance, i_dia, processing_wt, wt_per_pkt, numbers, no_of_pkts, no_per_pkt, packing, remarks){
+   var Order = function(id, operation, stage_no, input_width, input_length, fg_wip, output_width, output_length,
+   lamination, tolerance, i_dia, processing_wt, wt_per_pkt, numbers, no_of_pkts, no_per_pkt, packing,
+   remarks,op_processing_wt, no_of_parts, length_per_part, outer_dia){
         this.id = id;
         this.operation = operation;
         this.stage_no = stage_no;
@@ -18,7 +20,21 @@ var orderController = (function () {
         this.nos_per_pkt = no_per_pkt;
         this.packing = packing;
         this.remarks = remarks;
+        this.op_processing_wt = op_processing_wt || 0;
+        this.no_of_parts      = no_of_parts || 0;
+        this.length_per_part  = length_per_part || 0;
+        this.outer_dia        = outer_dia || 0;
    };
+
+   var operationAbbr = {
+    'CTL'          : 'CTL',
+    'Slitting'     : 'SLIT',
+    'Mini_Slitting': 'MINISLIT',
+    'Narrow_CTL'   : 'NCTL',
+    'Reshearing'   : 'RESH',
+    'Lamination'   : 'LAM',
+    'Levelling'    : 'LEV'
+    };
 
     var Input_size = function(input_size, weight, stage_no){
         this.input_size = input_size;
@@ -49,6 +65,8 @@ var orderController = (function () {
         // for each stage the total of processed weights
     };
 
+
+
    return{
           addOrder: function(input){
                 var newOrder, id, input_material;
@@ -67,7 +85,8 @@ var orderController = (function () {
                 newOrder = new Order(id, input.operation, input.stage_no, input_material[0], input_material[1],
                 input.fg_wip, input.cut_width, input.cut_length, input.lamination, input.tolerance, input.i_dia,
                 input.processing_wt, input.wt_per_pkt, input.numbers, input.no_of_pkts, input.nos_per_pkt,
-                input.packing, input.remarks);
+                input.packing, input.remarks, input.op_processing_wt, input.no_of_parts, input.length_per_part,
+                 input.outer_dia);
 
                 // Add it to the array based on the operation
                 data.allOrders[input.operation].push(newOrder);
@@ -290,6 +309,8 @@ var UIController = (function() {
        currentAvailableWidth: '.available_width',
        currentNoOfParts_:'.no_of_parts',
        currentNoOfPartsHdr:'.no_of_parts_hdr',
+       currentOuterDiaHeader:'.outer_dia_hdr',
+       currentOuterDia:'.outer_dia',
        currentRemarks : '.remarks',
        addSizeBtn : '.add_size_btn',
        addOpBtn:'.add_op_btn',
@@ -330,6 +351,10 @@ var UIController = (function() {
                numbers : parseFloat(document.querySelector(DOMStrings.currentNumbers).value),
                nos_per_pkt : parseFloat(document.querySelector(DOMStrings.currentNoPerPkt).value),
                no_of_pkts : parseFloat(document.querySelector(DOMStrings.currentNoOfPkts).value),
+               op_processing_wt : parseFloat(document.querySelector('.processing_wt_for_op').value) || 0,
+               no_of_parts : parseFloat(document.querySelector('.no_of_parts').value) || 0,
+               length_per_part : parseFloat(document.querySelector('.length_per_part').value) || 0,
+               outer_dia : parseFloat(document.querySelector('.outer_dia').value) || 0,
                packing : document.querySelector(DOMStrings.currentFG_WIP).value === "WIP"
           ? "WIP"
           : document.querySelector('.packing_covering').value + ' / ' +
@@ -344,12 +369,12 @@ var UIController = (function() {
 
            if(operation === "CTL"){
                element = DOMStrings.CTL_table;
-               html = '<tr id="size-CTL-%id%"><td>%stage_no%</td><td hidden>%fg_wip%</td><td>%input_material%</td><td hidden>%op_width%</td><td style="font-size:18px; font-weight:bold;">%op_length%</td><td>%tolerance%</td><td>%lamination%</td><td hidden>%i_dia%</td><td>%nos_per_packet%</td><td>%no_of_pkts%</td><td>%packing%</td><td>%proc_wt%</td><td>%numbers%</td><td>%remarks%</td><td><input type="button" class="item__delete--btn" value="Delete"></button></td><td><input type="button" class="item__edit--btn" value="Edit"></button></td></tr>';
+               html = '<tr id="size-CTL-%id%"><td>%stage_no%</td><td>%fg_wip%</td><td>%input_material%</td><td hidden>%op_width%</td><td style="font-size:18px; font-weight:bold;">%op_length%</td><td>%tolerance%</td><td>%lamination%</td><td hidden>%i_dia%</td><td>%nos_per_packet%</td><td>%no_of_pkts%</td><td>%packing%</td><td>%proc_wt%</td><td>%numbers%</td><td>%remarks%</td><td><input type="button" class="item__delete--btn" value="Delete"></button></td><td><input type="button" class="item__edit--btn" value="Edit"></button></td></tr>';
 
            }
            if(operation === "Narrow_CTL"){
                element = DOMStrings.Narrow_CTL_table;
-               html = '<tr id="size-Narrow_CTL-%id%"><td>%stage_no%</td><td>%fg_wip%</td><td>%input_material%</td><td hidden>%op_width%</td><td>%op_length%</td><td>%tolerance%</td><td>%lamination%</td><td hidden>%i_dia%</td><td>%nos_per_packet%</td><td>%no_of_pkts%</td><td>%packing%</td><td>%proc_wt%</td><td>%numbers%</td><td>%remarks%</td><td><input type="button" class="item__delete--btn" id="del_size" name="del_size" value="Delete"></button></td><td><input type="button" class="item__edit--btn" id="edit_size" name="edit_size" value="Edit"></button></td></tr>';
+               html = '<tr id="size-Narrow_CTL-%id%"><td>%stage_no%</td><td>%input_material%</td><td hidden>%op_width%</td><td style="font-size:18px; font-weight:bold;">%op_length%</td><td>%tolerance%</td><td>%lamination%</td><td>%fg_wip%</td><td hidden>%i_dia%</td><td>%nos_per_packet%</td><td>%no_of_pkts%</td><td>%packing%</td><td>%proc_wt%</td><td>%numbers%</td><td>%remarks%</td><td><input type="button" class="item__delete--btn" id="del_size" name="del_size" value="Delete"></button></td><td><input type="button" class="item__edit--btn" id="edit_size" name="edit_size" value="Edit"></button></td></tr>';
 
            }
            if(operation === "Reshearing"){
@@ -358,10 +383,47 @@ var UIController = (function() {
 
            }
            if(operation === "Slitting"){
-               element = DOMStrings.Slitting_table;
-               html = '<tr id="size-Slitting-%id%"><td>%stage_no%</td><td>%input_material%</td><td>%op_width%</td><td hidden>%op_length%</td><td hidden>%lamination%</td><td>%tolerance%</td><td>%proc_wt%</td><td>%numbers%</td><td>%nos_per_packet%</td><td>%packing%</td><td>%remarks%</td><td><input type="button" class="item__delete--btn" id="del_size" name="del_size" value="Delete"></button></td><td><input type="button" class="item__edit--btn" id="edit_size" name="edit_size" value="Edit"></button></td></tr>';
+                    element = DOMStrings.Slitting_table;
 
-           }
+                    // Add op details row for this stage if not already present
+                    var existingOpRow = document.querySelector('.slitting-op-details[data-stage="' + newOrder.stage_no + '"]');
+                    if(!existingOpRow){
+                        var opTbody = document.createElement('tbody');
+                    opTbody.className = 'slitting-op-stage-header';
+                    opTbody.innerHTML = '<tr class="slitting-op-details" data-stage="' + newOrder.stage_no + '">' +
+                        '<td colspan="3" style="background:#f0f0f0;"><b>Stage ' + newOrder.stage_no +
+                        ' — Proc Wt: ' + newOrder.op_processing_wt + ' MT' +
+                        ' | No of Parts: ' + newOrder.no_of_parts +
+                        ' | Length/Part: ' + newOrder.length_per_part + ' m' +
+                        ' | I.Dia: ' + newOrder.i_dia +
+                        ' | O.Dia: ' + newOrder.outer_dia + '</b></td>' +
+                        '<td colspan="20"></td></tr>';
+                    document.querySelector(DOMStrings.Slitting_table).appendChild(opTbody);
+                }
+
+                // Calculate product for the new column
+                var product = (parseFloat(newOrder.output_width) * parseFloat(newOrder.numbers)).toFixed(0);
+
+                html = '<tr id="size-Slitting-%id%">' +
+                    '<td>%stage_no%</td>' +
+                    '<td>%input_material%</td>' +
+                    '<td style="font-size:18px; font-weight:bold;">%op_width% x %numbers%</td>' +
+                    '<td>%product%</td>' +           // new product column
+                    '<td>%fg_wip%</td>' +
+                    '<td hidden>%op_length%</td>' +
+                    '<td hidden>%lamination%</td>' +
+                    '<td>%tolerance%</td>' +
+                    '<td>%proc_wt%</td>' +
+                    '<td>%wt_per_pkt%</td>' +
+                    '<td>%packing%</td>' +
+                    '<td>%remarks%</td>' +
+                    '<td><input type="button" class="item__delete--btn" value="Delete"></td>' +
+                    '<td><input type="button" class="item__edit--btn" value="Edit"></td>' +
+                    '</tr>';
+
+                // Replace %product% token
+                html = html.replace('%product%', product);
+            }
            if(operation === "Mini_Slitting"){
                element = DOMStrings.Mini_Slitting_table;
                html = '<tr id="size-Mini_Slitting-%id%"><td>%stage_no%</td><td>%fg_wip%</td><td>%input_material%</td><td>%op_width%</td><td hidden>%op_length%</td><td>%tolerance%</td><td>%lamination%</td><td>%i_dia%</td><td>%proc_wt%</td><td>%numbers%</td><td>%nos_per_packet%</td><td>%no_of_pkts%</td><td>%packing%</td><td>%remarks%</td><td><input type="button" class="item__delete--btn" id="del_size" name="del_size" value="Delete"></button></td><td><input type="button" class="item__edit--btn" id="edit_size" name="edit_size" value="Edit"></button></td></tr>';
@@ -391,6 +453,7 @@ var UIController = (function() {
            newHTML = newHTML.replace('%numbers%', newOrder.numbers);
            newHTML = newHTML.replace('%nos_per_packet%', newOrder.nos_per_pkt);
            newHTML = newHTML.replace('%no_of_pkts%', newOrder.no_of_pkts);
+           newHTML = newHTML.replace('%wt_per_pkt%', newOrder.wt_per_pkt);
            newHTML = newHTML.replace('%packing%', newOrder.packing);
            newHTML = newHTML.replace('%remarks%', newOrder.remarks);
 
@@ -427,6 +490,7 @@ var UIController = (function() {
            document.querySelector('.packing_covering').hidden = false;
            document.querySelector('.packing_support').hidden = false;
            document.querySelector('.packing_strapping').hidden = false;
+           document.querySelector('.outer_dia').hidden = false;
        },
 
 
@@ -574,6 +638,8 @@ var controller = (function(orderCtrl, UICtrl) {
        document.querySelector(DOM.currentLength).addEventListener("change", onChangeLength);
        document.querySelector(DOM.currentProcWt).addEventListener("change", onChangeLength);
 
+       document.querySelector(DOM.currentIDia).addEventListener("change", calculateOuterDia);
+
        document.querySelector(DOM.currentNumbers).addEventListener("change", onChangeNumbers);
 
        document.querySelector(DOM.currentWtPerPkt).addEventListener("change", function(event){
@@ -596,6 +662,8 @@ var controller = (function(orderCtrl, UICtrl) {
 
        document.querySelector(DOM.printCTLBtn).addEventListener('click', printCTL);
        document.querySelector(DOM.printSlitBtn).addEventListener('click', printSlit);
+
+       document.querySelector('.print_all_btn').addEventListener('click', printAllStages);
 
        document.getElementById('order').addEventListener('submit', function(event){
            //event.preventDefault();
@@ -697,13 +765,16 @@ var controller = (function(orderCtrl, UICtrl) {
             document.querySelector(DOM.currentWidth).readOnly = true;
             //document.querySelector(DOM.currentWidthHdr).hidden = true;
 
-            if(document.querySelector(DOM.currentOperation).value === "CTL"){
+            document.querySelector(DOM.currentLami).hidden = false;
+            document.querySelector(DOM.currentLamiHdr).hidden = false;
+
+            /*if(document.querySelector(DOM.currentOperation).value === "CTL"){
                 document.querySelector(DOM.currentLami).hidden = false;
                 document.querySelector(DOM.currentLamiHdr).hidden = false;
             }else{
                 document.querySelector(DOM.currentLami).hidden = true;
                 document.querySelector(DOM.currentLamiHdr).hidden = true;
-            }
+            }*/
 
             document.querySelector(DOM.currentProcWt).readOnly = false;
             document.querySelector(DOM.currentProcWtHdr).hidden = false;
@@ -1175,6 +1246,7 @@ var controller = (function(orderCtrl, UICtrl) {
     } else {
         document.querySelector('.length_per_part').value = "";
     }
+    calculateOuterDia();
     };
 
     var checkValidInputs = function(input){
@@ -1195,6 +1267,86 @@ var controller = (function(orderCtrl, UICtrl) {
         return true;
     };
 
+    var calculateOuterDia = function(){
+    var DOM = UICtrl.getDOMstrings();
+
+    var length_per_part = parseFloat(document.querySelector('.length_per_part').value) || 0;
+    var thickness = parseFloat(document.querySelector(DOM.thickness).value) || 0;
+    var i_dia = parseFloat(document.querySelector('.iDia').value) || 0;
+
+    if(length_per_part > 0 && thickness > 0 && i_dia > 0){
+        var outer_dia = Math.sqrt(
+            (i_dia * i_dia) + (4 * length_per_part * thickness * 1000 / Math.PI)
+        );
+        document.querySelector('.outer_dia').value = outer_dia.toFixed(0);
+        } else {
+            document.querySelector('.outer_dia').value = "";
+        }
+    };
+
+    var updateSlittingTotal = function(stage_no, operation){
+    var orders = orderCtrl.getAllOrders()[operation];
+    var stageOrders = orders.filter(function(o){ return o.stage_no === stage_no; });
+
+    var total = stageOrders.reduce(function(sum, o){
+        return sum + (o.output_width * o.numbers);
+    }, 0);
+
+    // Remove existing total row for this stage if present
+    var existingTotal = document.querySelector('.slitting-total-row[data-stage="' + stage_no + '"]');
+    if(existingTotal) existingTotal.closest('tbody').remove();  // remove the whole tbody not just the tr
+
+    // Add updated total row
+    var totalTbody = document.createElement('tbody');
+    totalTbody.className = 'slitting-total-stage';
+    totalTbody.setAttribute('data-total-stage', stage_no);
+    totalTbody.innerHTML = '<tr class="slitting-total-row" data-stage="' + stage_no + '">' +
+        '<td colspan="3" style="text-align:right;"><b>Total Width Used (Stage ' + stage_no + '):</b></td>' +
+        '<td><b>' + total.toFixed(0) + '</b></td>' +
+        '<td colspan="100"></td>' +
+        '</tr>';
+
+    document.getElementById('Slitting_table').appendChild(totalTbody);
+    };
+
+    var operationAbbr = {
+    'CTL'          : 'CTL',
+    'Slitting'     : 'SLIT',
+    'Mini_Slitting': 'MINISLIT',
+    'Narrow_CTL'   : 'NCTL',
+    'Reshearing'   : 'RESH',
+    'Lamination'   : 'LAM',
+    'Levelling'    : 'LEV'
+    };
+
+    var updateWIPLabel = function(newOrder){
+        // Only run if the new order consumes an input material (always true)
+        var inputKey = newOrder.input_width + ' x ' + newOrder.input_length;
+        var abbr = operationAbbr[newOrder.operation] || newOrder.operation;
+        var allOrders = orderCtrl.getAllOrders();
+
+        // Loop through all operations and all orders to find matching WIP rows
+        Object.keys(allOrders).forEach(function(operation){
+            allOrders[operation].forEach(function(order){
+                if(order.fg_wip === 'WIP'){
+                    var outputKey = order.output_width + ' x ' + order.output_length;
+                    if(outputKey === inputKey){
+                        // Update in allOrders data
+                        order.fg_wip = 'WIP-' + abbr;
+
+                        // Update in live table cell
+                        var rowId = 'size-' + operation + '-' + order.id;
+                        var row = document.getElementById(rowId);
+                        if(row){
+
+                            row.cells[4].textContent = 'WIP-' + abbr;
+                        }
+                    }
+                }
+            });
+        });
+    };
+
     var addSize = function(){
         var DOM, input, new_input_size, new_input, available_width, width_used, new_width;
 
@@ -1211,6 +1363,8 @@ var controller = (function(orderCtrl, UICtrl) {
 
         // Get field input data
         input = UICtrl.getInput();
+
+        console.log('op_processing_wt:', input.op_processing_wt, 'no_of_parts:', input.no_of_parts, 'outer_dia:', input.outer_dia);
 
        if(document.querySelector(DOM.currentFG_WIP).value === "FG"){
             if(document.querySelector('.packing_covering').value === ""){
@@ -1231,11 +1385,20 @@ var controller = (function(orderCtrl, UICtrl) {
     }
 
         if(checkValidInputs(input)){
+
+            console.log('stage_no being used:', orderCtrl.getMaxStageNo());
             //Add item to order Controller
             newOrder = orderCtrl.addOrder(input);
 
             // Add order to UI in appropriate table
             UICtrl.addListOrder(newOrder, newOrder.operation);
+
+            // Update WIP label if this order consumes a WIP output
+            updateWIPLabel(newOrder);
+
+            if(input.operation === 'Slitting' || input.operation === 'Mini_Slitting'){
+                updateSlittingTotal(input.stage_no, input.operation);
+            }
 
             // Clear input fields
             UICtrl.clearSizeFields();
@@ -1262,7 +1425,7 @@ var controller = (function(orderCtrl, UICtrl) {
                 width_used = newOrder.output_width * newOrder.numbers;
                 available_width = parseFloat(document.querySelector(DOM.currentAvailableWidth).value);
                 new_width = available_width - width_used;
-                if(new_width>=0){
+                if(new_width>=-15){
                     document.querySelector(DOM.currentAvailableWidth).value = new_width;
                 }else{
                     alert("Please check width");
@@ -1283,7 +1446,30 @@ var controller = (function(orderCtrl, UICtrl) {
         UICtrl.clearOperationFields();
 
         //Increment stage no
-        document.querySelector(DOM.currentStageNo).value = orderController.incrementMaxStageNo();
+        var new_stage = orderController.incrementMaxStageNo();
+        document.querySelector(DOM.currentStageNo).value = new_stage;
+
+        // Add separator row to all operation tables showing new stage
+        var tables = ['CTL_table', 'Slitting_table', 'Mini_Slitting_table',
+                      'Narrow_CTL_table', 'Reshearing_table', 'Lamination_table', 'Levelling_table'];
+
+        tables.forEach(function(tableId){
+            var table = document.getElementById(tableId);
+            if(table){
+                var allTbodies = table.querySelectorAll('tbody');
+                // Only add separator if this table has data rows (more than just header tbody)
+                if(allTbodies.length > 1){
+                    var newTbody = document.createElement('tbody');
+                    newTbody.className = 'stage-separator';
+                    newTbody.setAttribute('data-separator-stage', new_stage);
+                    var colspan = allTbodies[0].querySelector('tr').cells.length;
+                    newTbody.innerHTML = `<tr><td colspan="${colspan}" style="background-color:#d0e8ff; font-weight:bold; text-align:center; font-size:14px;">── Stage ${new_stage} ──</td></tr>`;
+                    table.appendChild(newTbody);
+                }
+            }
+        });
+
+
 
 
         //Store available width
@@ -1577,9 +1763,10 @@ var controller = (function(orderCtrl, UICtrl) {
 
     // Sort slitting rows - WIP first, then FG
     const slitHeaderTbody = slitAllTbodies[0];
-    const wipTbodies = slitDataTbodies.filter(tbody =>
-        tbody.querySelector('tr').cells[1].textContent.trim() === 'WIP'
-    );
+    const wipTbodies = slitDataTbodies.filter(tbody => {
+        var row = tbody.querySelector('tr');
+        return row && row.cells.length > 1 && row.cells[1].textContent.trim().startsWith('WIP');
+    });
     const fgTbodies = slitDataTbodies.filter(tbody =>
         tbody.querySelector('tr').cells[1].textContent.trim() === 'FG'
     );
@@ -1595,26 +1782,27 @@ var controller = (function(orderCtrl, UICtrl) {
 
     const printWindow = window.open('', '_blank');
     printWindow.document.write(`
-        <html>
-        <head>
-            <title>Print</title>
-            <style>
-                @page { size: A4 landscape; }
-                body { font-family: Arial, sans-serif; margin: 20px; }
-                table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
-                table, th, td { border: 1px solid #000; padding: 6px; font-size: 12px; }
-                h2 { text-align: center; margin-bottom: 20px; }
-            </style>
+    <html>
+    <head>
+        <title>Print All Stages</title>
+        <style>
+            @page { size: A4 landscape; margin: 10mm; }
+            body { font-family: Arial, sans-serif; margin: 10px; font-size: 11px; }
+            table { border-collapse: collapse; width: 100%; margin-bottom: 10px; }
+            table, th, td { border: 1px solid #000; padding: 4px; font-size: 11px; }
+            h3 { text-align: center; margin: 5px 0; }
+            .stage-page { margin-bottom: 10px; }
+            @media print {
+                .stage-page { page-break-inside: avoid; }
+            }
+        </style>
         </head>
         <body>
-            ${incoming.outerHTML}
-            ${extra_details.outerHTML}
-            ${slitting_op.outerHTML}
-            <div style="margin-top: 20px;"></div>
-            ${slit.outerHTML}
+            ${pagesHTML}
         </body>
         </html>
     `);
+
     printWindow.document.close();
     printWindow.onload = function() {
         setTimeout(() => {
@@ -1623,6 +1811,250 @@ var controller = (function(orderCtrl, UICtrl) {
         }, 500);
     };
     };
+
+    var printAllStages = function(){
+    var allOrders = orderCtrl.getAllOrders();
+    var maxStage = orderCtrl.getMaxStageNo();
+
+    // Build a list of unique stage+operation combinations
+    var stagePairs = [];
+    Object.keys(allOrders).forEach(function(operation){
+        allOrders[operation].forEach(function(order){
+            var key = order.stage_no + '_' + operation;
+            if(!stagePairs.find(p => p.key === key)){
+                stagePairs.push({ key: key, stage_no: order.stage_no, operation: operation });
+            }
+        });
+    });
+
+    // Sort by stage_no first, then operation
+    stagePairs.sort(function(a, b){
+        if(a.stage_no !== b.stage_no) return a.stage_no - b.stage_no;
+        return a.operation.localeCompare(b.operation);
+    });
+
+    // Clone incoming and extra_details — shared across all pages
+    const incoming = document.getElementById("incoming_details").cloneNode(true);
+    const extra_details = document.getElementById("extra_details").cloneNode(true);
+
+    // Reformat dates
+    document.getElementById("incoming_details").querySelectorAll('input[type="date"]').forEach(originalInput => {
+        if(originalInput.value){
+            const parts = originalInput.value.split('-');
+            const formatted = parts[2] + '-' + parts[1] + '-' + parts[0];
+            const clonedInput = incoming.querySelector('input[name="' + originalInput.name + '"]')
+                             || incoming.querySelector('input[id="' + originalInput.id + '"]');
+            if(clonedInput){
+                const span = document.createElement('span');
+                span.textContent = formatted;
+                clonedInput.parentNode.replaceChild(span, clonedInput);
+            }
+        }
+    });
+
+    // Replace inputs with spans in incoming and extra_details
+    [incoming, extra_details].forEach(section => {
+        section.querySelectorAll("input, textarea, select").forEach(input => {
+            const span = document.createElement("span");
+            if(input.tagName.toLowerCase() === "select"){
+                const selected = input.options[input.selectedIndex];
+                span.textContent = selected ? selected.text : "";
+            } else {
+                span.textContent = input.value;
+            }
+            input.parentNode.replaceChild(span, input);
+        });
+    });
+
+    // Make first 2 rows of incoming bigger
+    const incomingRows = incoming.querySelectorAll("tr");
+    for(let i = 0; i < Math.min(2, incomingRows.length); i++){
+        incomingRows[i].querySelectorAll("td, th").forEach(cell => {
+            cell.setAttribute("style", "font-size: 18px !important; font-weight: bold !important;");
+        });
+    }
+
+    // Build HTML for each stage+operation page
+    var pagesHTML = '';
+
+    stagePairs.forEach(function(pair, index){
+        var operation = pair.operation;
+        var stage_no = pair.stage_no;
+        var isSlitting = (operation === 'Slitting' || operation === 'Mini_Slitting');
+        var slittingTotalHTML = '';
+
+        // Get the relevant table and clone only matching rows
+        var tableId = operation + '_table';
+        var originalTable = document.getElementById(tableId);
+        if(!originalTable) return;
+
+        var clonedTable = originalTable.cloneNode(true);
+
+        // Remove separator tbodies
+        clonedTable.querySelectorAll('tbody.stage-separator').forEach(sep => sep.remove());
+
+        // Keep only tbodies whose row matches this stage
+        var allTbodies = Array.from(clonedTable.querySelectorAll('tbody'));
+        var headerTbody = allTbodies[0];
+
+        allTbodies.slice(1).forEach(function(tbody){
+            var row = tbody.querySelector('tr');
+            if(!row) return;
+            // stage_no is stored in the Order object; we identify by checking
+            // the data rows against our allOrders for this stage+operation
+            var stageMatch = allOrders[operation].find(function(order){
+                return order.stage_no === stage_no &&
+                       'size-' + operation + '-' + order.id === row.id;
+            });
+            if(!stageMatch){
+                tbody.remove();
+            }
+        });
+
+        // Remove Delete/Edit columns
+        Array.from(clonedTable.querySelectorAll('tbody')).slice(1).forEach(function(tbody){
+            var row = tbody.querySelector('tr');
+            if(row && row.cells.length >= 2){
+                row.deleteCell(-1);
+                row.deleteCell(-1);
+            }
+        });
+
+        // Also remove Delete/Edit headers from header tbody
+        var headerRow = headerTbody.querySelector('tr');
+        if(headerRow){
+            var headerCells = headerRow.cells.length;
+            headerRow.deleteCell(headerCells - 1);
+            headerRow.deleteCell(headerCells - 2);
+        }
+
+        // Replace inputs with spans in cloned table
+        clonedTable.querySelectorAll("input, textarea, select").forEach(input => {
+            const span = document.createElement("span");
+            if(input.tagName.toLowerCase() === "select"){
+                const selected = input.options[input.selectedIndex];
+                span.textContent = selected ? selected.text : "";
+            } else {
+                span.textContent = input.value;
+            }
+            input.parentNode.replaceChild(span, input);
+        });
+
+        // Make cut length bigger for CTL
+        if(operation === 'CTL' || operation === 'Narrow_CTL'){
+            Array.from(clonedTable.querySelectorAll('tbody')).slice(1).forEach(function(tbody){
+                var row = tbody.querySelector('tr');
+                if(row && row.cells[4]){
+                    row.cells[4].setAttribute('style', 'font-size:18px !important; font-weight:bold !important;');
+                }
+            });
+        }
+
+        // Build slitting_op section if needed
+        var slittingOpHTML = '';
+        if(isSlitting){
+                var stageOrders = allOrders[operation].filter(function(o){ return o.stage_no === stage_no; });
+                var firstOrder = stageOrders[0];
+
+                 // Calculate total width used for this stage
+                var totalWidth = stageOrders.reduce(function(sum, o){
+                    return sum + (parseFloat(o.output_width) * parseFloat(o.numbers));
+                }, 0);
+
+                slittingOpHTML = '<table style="border-collapse:collapse; width:100%; margin-bottom:10px;">' +
+                    '<tr style="background:#f0f0f0;">' +
+                    '<td style="border:1px solid #000; padding:6px;"><b>Processing Wt</b><br>' + firstOrder.op_processing_wt + ' MT</td>' +
+                    '<td style="border:1px solid #000; padding:6px;"><b>No of Parts</b><br>' + firstOrder.no_of_parts + '</td>' +
+                    '<td style="border:1px solid #000; padding:6px;"><b>Length Per Part</b><br>' + firstOrder.length_per_part + ' m</td>' +
+                    '<td style="border:1px solid #000; padding:6px;"><b>Internal Dia</b><br>' + firstOrder.i_dia + '</td>' +
+                    '<td style="border:1px solid #000; padding:6px;"><b>Outer Dia</b><br>' + firstOrder.outer_dia + '</td>' +
+                    '</tr></table>';
+
+                     var totalWidth = stageOrders.reduce(function(sum, o){
+                        return sum + (parseFloat(o.output_width) * parseFloat(o.numbers));
+                    }, 0);
+                    slittingTotalHTML = '<tr style="background:#e8e8e8;">' +
+                        '<td colspan="3" style="text-align:right; border:1px solid #000; padding:6px;"><b>Total Width Used:</b></td>' +
+                        '<td style="border:1px solid #000; padding:6px;"><b>' + totalWidth.toFixed(0) + '</b></td>' +
+                        '<td colspan="100"></td>' +
+                        '</tr>';
+        }
+
+        // Add page-break-after for all but last page
+        var pageBreak = (index < stagePairs.length - 1)
+            ? '<div style="page-break-after: always;"></div>'
+            : '';
+
+        if(slittingTotalHTML){
+                var totalTbody = document.createElement('tbody');
+                totalTbody.innerHTML = slittingTotalHTML;
+                clonedTable.appendChild(totalTbody);
+            }
+
+
+        var stageSummary = stagePairs.map(function(p, idx2){
+        var isCurrent = (p.stage_no === stage_no && p.operation === operation);
+        return (isCurrent ? '► ' : '') +
+               'Stage ' + (idx2 + 1) + ': ' + p.operation.replace(/_/g, ' ') +
+               (isCurrent ? ' ◄' : '');
+        }).join('  |  ');
+
+        var isLastPage = (index === stagePairs.length - 1);
+        var turnOverMsg = !isLastPage
+            ? '<div style="text-align:center; font-weight:bold; font-size:14px; margin-top:15px; border:2px solid #000; padding:8px;">⟵ PLEASE TURN OVER — Next: Stage ' + (index + 2) + ': ' + stagePairs[index + 1].operation.replace(/_/g, ' ') + ' ⟶</div>'
+            : '<div style="text-align:center; font-weight:bold; font-size:14px; margin-top:15px; border:2px solid #000; padding:8px;">✓ LAST STAGE</div>';
+
+        pagesHTML += `
+            <div class="stage-page">
+                <h3 style="text-align:center; font-size:16px;">
+                    Stage ${index + 1} of ${stagePairs.length} — ${operation.replace(/_/g, ' ')}
+                </h3>
+                ${incoming.outerHTML}
+                ${extra_details.outerHTML}
+                ${slittingOpHTML}
+                ${clonedTable.outerHTML}
+                <div style="margin-top:20px; border-top:2px solid #000; padding-top:8px;">
+                    <div style="font-size:11px;">
+                        <b>All Stages:</b> ${stageSummary}
+                    </div>
+                </div>
+                ${turnOverMsg}
+            </div>
+            ${!isLastPage ? '<div style="page-break-after:always;"></div>' : ''}
+        `;
+    });
+
+    // Open print window
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(`
+        <html>
+        <head>
+            <title>Print All Stages</title>
+            <style>
+                @page { size: A4 landscape; }
+                body { font-family: Arial, sans-serif; margin: 20px; }
+                table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
+                table, th, td { border: 1px solid #000; padding: 6px; font-size: 12px; }
+                h3 { text-align: center; margin-bottom: 10px; }
+                .stage-page { margin-bottom: 20px; }
+                @media print {
+                    .stage-page { page-break-inside: avoid; }
+                }
+            </style>
+        </head>
+        <body>
+            ${pagesHTML}
+        </body>
+        </html>
+    `);
+    printWindow.document.close();
+    printWindow.onload = function(){
+        setTimeout(() => {
+            printWindow.focus();
+            printWindow.print();
+        }, 500);
+    };
+};
 
     var onSubmit = function(){
         var DOM = UICtrl.getDOMstrings();

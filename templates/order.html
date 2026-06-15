@@ -82,7 +82,7 @@
         <td>Numbers</td>
         <td><input type="text" name="available_numbers"  class="available_numbers" value = "{{cs.numbers}}" readonly></td>
 
-        <td>Length of Coil (in metres) </td>
+        <td>Length of Coil (in m) </td>
         <td><input type="text" name="length_of_coil" class = "length_of_coil" id="length_of_coil" readonly></td>
     </tr>
 
@@ -98,7 +98,7 @@
 
 
     <tr>
-        <td>Coil Processing Weight in MT</td>
+        <td>Processing Weight in MT</td>
         <td><input type="number"  name="processing_wt"  id="processing_wt" class = "processing_wt" step="0.001" required></td>
 
         <td>Order Date</td>
@@ -178,6 +178,9 @@
             <span class="length_per_part_hdr" style = "padding-right:20px;">
                 <span><b>Length per part (in m)</b></span>
                 <input type="number" class ="length_per_part" value=""></span>
+            <span class="outer_dia_hdr" style = "padding-right:20px;">
+                <span><b>Outer Dia</b></span>
+                <input type="number" class ="outer_dia" value=""></span>
 
         </div>
     <hr>
@@ -334,7 +337,7 @@
                 </tr>
 
         </table>
-        <input type="button" name="print_ctl" class = "print_ctl_btn" id="print_ctl" value ="Print CTL">
+        <!--input type="button" name="print_ctl" class = "print_ctl_btn" id="print_ctl" value ="Print CTL"-->
          <h5>Slitting</h5>
         <table id="Slitting_table" class = "table table-sm Slitting_table">
                 <tr>
@@ -342,14 +345,16 @@
                     <th>Stage No</th>
                     <th hidden>FG/WIP</th>
                     <th>Input Material</th>
-                    <th>Cut Width</th>
+                    <th>Width x Slits</th>
+                    <th>Total Width</th>
+                    <th>FG/WIP</th>
                     <th hidden>Cut Length</th>
                     <th hidden>Lamination</th>
                     <th>Tolerance</th>
                     <th hidden>I Dia</th>
                     <th>Processing Weight MT</th>
-                    <th>No. of Slits</th>
-                    <th>Length/Part</th>
+                    <th hidden>No. of Slits</th>
+                    <th>Wt/Part</th>
                     <th hidden>No. of parts</th>
                     <th>Packing Type</th>
                     <th>Remarks</th>
@@ -357,24 +362,25 @@
                     <th></th>
                 </tr>
         </table>
-        <input type="button" name="print_slitting" class = "print_slit_btn" id="print_slit" value ="Print Slitting">
+        <!--input type="button" name="print_slitting" class = "print_slit_btn" id="print_slit" value ="Print Slitting"-->
         <h5>Narrow CTL</h5>
         <table id="Narrow_CTL_table" class = "table table-sm Narrow_CTL_table">
                 <tr>
                     <th hidden>Narrow CTL</th>
                     <th>Stage No</th>
-                    <th hidden>FG/WIP</th>
+
                     <th>Input Material</th>
                     <th hidden>Cut Width</th>
                     <th>Cut Length</th>
                     <th>Tolerance</th>
                     <th>Lamination</th>
+                    <th>FG/WIP</th>
                     <th hidden>I Dia</th>
-                    <th>Processing Weight MT</th>
-                    <th>Numbers</th>
                     <th>No.s/pkt</th>
                     <th>No. of pkts</th>
                     <th>Packing Type</th>
+                    <th>Processing Weight MT</th>
+                    <th>Numbers</th>
                     <th>Remarks</th>
                     <th></th>
                     <th></th>
@@ -477,7 +483,7 @@
 
     </div>
     <input type = "text" value="" class="order_string" name="order_string" id="order_string" hidden>
-
+    <button type="button" class="print_all_btn">Print All Stages</button>
     <input type="submit" name = "submit" id = "submit" class="btn btn-default"  value="Submit">
     <script src = "{{ url_for('static', filename='js/order.js') }}"></script>
     </form>
