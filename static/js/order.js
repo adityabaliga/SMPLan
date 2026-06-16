@@ -660,8 +660,8 @@ var controller = (function(orderCtrl, UICtrl) {
 
        //document.querySelector(DOM.sizesTable).addEventListener('click', deleteEditSize);
 
-       document.querySelector(DOM.printCTLBtn).addEventListener('click', printCTL);
-       document.querySelector(DOM.printSlitBtn).addEventListener('click', printSlit);
+       //document.querySelector(DOM.printCTLBtn).addEventListener('click', printCTL);
+       //document.querySelector(DOM.printSlitBtn).addEventListener('click', printSlit);
 
        document.querySelector('.print_all_btn').addEventListener('click', printAllStages);
 
