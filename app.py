@@ -759,12 +759,11 @@ def order():
 
     incoming = Incoming.load_smpl_by_smpl_no(cs.smpl_no)
 
-
-
+    today_date = date.today().isoformat()
 
 
     return render_template('order.html', smpl_no= cs.smpl_no, incoming = incoming,
-                           weight=cs.weight, cs = cs)
+                           weight=cs.weight, cs = cs, today_date = today_date)
 
 
 # from order.html. The details retrieved from the page and loaded to db in to order and order_detail

@@ -379,7 +379,7 @@ var UIController = (function() {
            }
            if(operation === "Reshearing"){
                element = DOMStrings.Reshearing_table;
-               html = '<tr id="size-Reshearing-%id%"><td>%stage_no%</td><td>%fg_wip%</td><td>%input_material%</td><td>%op_width%</td><td>%op_length%</td><td hidden>%lamination%</td><td>%tolerance%</td><td hidden>%i_dia%</td><td>%nos_per_packet%</td><td>%no_of_pkts%</td><td>%packing%</td><td>%proc_wt%</td><td>%numbers%</td><td>%remarks%</td><td><input type="button" class="item__delete--btn" id="del_size" name="del_size" value="Delete"></button></td><td><input type="button" class="item__edit--btn" id="edit_size" name="edit_size" value="Edit"></button></td></tr>';
+               html = '<tr id="size-Reshearing-%id%"><td>%stage_no%</td><td>%input_material%</td><td style="font-size:18px; font-weight:bold;">%op_width%</td><td style="font-size:18px; font-weight:bold;">%op_length%</td><td hidden>%lamination%</td><td>%tolerance%</td><td>%fg_wip%</td><td hidden>%i_dia%</td><td>%nos_per_packet%</td><td>%no_of_pkts%</td><td>%packing%</td><td>%proc_wt%</td><td>%numbers%</td><td>%remarks%</td><td><input type="button" class="item__delete--btn" id="del_size" name="del_size" value="Delete"></button></td><td><input type="button" class="item__edit--btn" id="edit_size" name="edit_size" value="Edit"></button></td></tr>';
 
            }
            if(operation === "Slitting"){

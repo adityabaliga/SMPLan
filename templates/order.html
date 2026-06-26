@@ -57,11 +57,10 @@
         <td><input type="text" name="smpl_no" class = "smpl_no" value = "{{smpl_no}}" readonly></td>
 
         <td >Customer</td>
-        <td><b>{{incoming.customer}}</b></td>
+        <td colspan="5"><b>{{incoming.customer}}</b></td>
         <!--td><input type="text" name="customer" class = "customer" value = "{{incoming.customer}}" readonly></td-->
 
-        <td>Material Type</td>
-        <td><input type ="text" name="material_type" class="material_type" value="{{incoming.material_type}}" readonly></td>
+
     </tr>
 
     <tr>
@@ -73,6 +72,9 @@
 
         <td>Length</td>
         <td><input type="text"  name="length" class = "length" id="length" value = "{{incoming.length}}" readonly></td>
+
+        <td>Material Type</td>
+        <td><input type ="text" name="material_type" class="material_type" value="{{incoming.material_type}}" readonly></td>
     </tr>
     <tr>
 
@@ -84,15 +86,19 @@
 
         <td>Length of Coil (in m) </td>
         <td><input type="text" name="length_of_coil" class = "length_of_coil" id="length_of_coil" readonly></td>
+
+        <td>Grade</td>
+        <td><input type ="text" name="grade" class="grade" value="{{incoming.grade}}" readonly></td>
     </tr>
 
     <tr>
-        <td>Grade</td>
-        <td><input type ="text" name="grade" class="grade" value="{{incoming.grade}}" readonly></td>
+
         <td>Mill</td>
         <td><input type ="text" name="mill" class="mill" value="{{incoming.mill}}" readonly></td>
         <td>Mill ID</td>
         <td><input type ="text" name="mill_id" class="mill_id" value="{{incoming.mill_id}}" readonly></td>
+        <td>Incoming Remarks</td>
+        <td colspan="3"><b>{{incoming.remarks}}</b></td>
     </tr>
 
 
@@ -102,17 +108,16 @@
         <td><input type="number"  name="processing_wt"  id="processing_wt" class = "processing_wt" step="0.001" required></td>
 
         <td>Order Date</td>
-        <td><input type="date"  id = "order_date" class ="order_date" name="order_date" required></td>
+        <td><input type="date"  id = "order_date" class ="order_date" name="order_date" value = "{{today_date}}" required></td>
 
         <td>Expected Date</td>
-        <td><input type="date"  id = "expected_date" class ="expected_date" name="expected_date" required></td>
+        <td><input type="date"  id = "expected_date" class ="expected_date" name="expected_date"></td>
     </tr>
     <tr>
         <td></td>
         <td></td>
 
-        <td>Incoming Remarks</td>
-        <td><b>{{incoming.remarks}}</b></td>
+
     </tr>
 
     </table>
@@ -417,18 +422,20 @@
                 <tr>
                     <th hidden>Reshearing</th>
                     <th>Stage No</th>
-                    <th hidden>FG/WIP</th>
+
                     <th>Input Material</th>
                     <th>Cut Width</th>
                     <th>Cut Length</th>
                     <th hidden>Lamination</th>
                     <th>Tolerance</th>
                     <td hidden>I dia</td>
+                    <th>FG/WIP</th>
                     <th>Processing Weight MT</th>
-                    <th>Numbers</th>
+
                     <th>No.s/pkt</th>
                     <th>No. of pkts</th>
                     <th>Packing Type</th>
+                     <th>Numbers</th>
                     <th>Remarks</th>
                     <th></th>
                     <th></th>
