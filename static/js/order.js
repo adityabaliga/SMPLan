@@ -1338,8 +1338,11 @@ var controller = (function(orderCtrl, UICtrl) {
                         var rowId = 'size-' + operation + '-' + order.id;
                         var row = document.getElementById(rowId);
                         if(row){
-
+                            if(operation == "CTL"){
+                                row.cells[6].textContent = 'WIP-' + abbr;
+                            }else{
                             row.cells[4].textContent = 'WIP-' + abbr;
+                            }
                         }
                     }
                 }
