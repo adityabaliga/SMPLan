@@ -79,3 +79,27 @@ class Order:
                 order_id_lst.append(order_id)
                 order_lst.append(order)
         return zip(order_id_lst, order_lst)
+
+    @classmethod
+    def smpl_list_for_modify_order(cls):
+        user_data = []
+        cs_lst = []
+        order_lst = []
+        order_id_lst = []
+
+        with CursorFromConnectionFromPool() as cursor:
+            cursor.execute("select * from order_header where status= 'Open' order by smpl_no asc")
+            # cursor.execute("select * from current_stock order by smpl_no asc")
+            user_data = cursor.fetchall()
+
+            if user_data:
+                for lst in user_data:
+                    order = Order(smpl_no=lst[1], order_date=lst[2], expected_date=lst[3], processing_wt=lst[4],
+                                  status=lst[5], remarks=lst[6])
+
+                    order_id = int(lst[0])
+                    order_id_lst.append(order_id)
+                    order_lst.append(order)
+                return order_lst
+            else:
+                return None

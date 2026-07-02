@@ -790,6 +790,7 @@ def submit_order():
             smpl_no = order_data.get('smpl_no')
             order_date = order_data.get('order_date')
             expected_date = order_data.get('expected_date')
+            expected_date = expected_date if expected_date else None
             processing_wt = order_data.get('processing_wt')
             remarks = order_data.get('remarks')
             order_details = order_data.get('order_details', [])
@@ -879,7 +880,7 @@ def print_order():
 # Select smpl for modifying the order from current_stock where the status is Order
 @app.route('/smpl_for_modify_order', methods=['GET', 'POST'])
 def smpl_for_modify_order():
-    smpl_lst = CurrentStock.smpl_list_for_modify_order()
+    smpl_lst = Order.smpl_list_for_modify_order()
     if smpl_lst:
         return render_template('order_pick_smpl_for_view_delete.html', smpl_lst=smpl_lst)
     else:
