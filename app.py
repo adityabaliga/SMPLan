@@ -1338,7 +1338,8 @@ def submit_processing():
                                    "end_time, setting_start_time, setting_end_time, production_time, setting_time, no_of_qc, "
                                    "no_of_helpers, names_of_qc,setting_date, total_processed_wt,"
                                    "total_cuts, previous_processing_id) values (%s, %s,%s, %s, "
-                                   "%s, %s, %s, %s, %s, %s,%s, %s, %s, %s, %s, %s)",
+                                   "%s, %s, %s, %s, %s, %s,%s, %s, %s, %s, %s, %s) "
+                                   "returning processing_id",
                                    (processing.smpl_no, processing.operation, processing.processing_date,
                                     processing.start_time, processing.end_time, processing.setting_start_time,
                                     processing.setting_end_time, processing.processing_time, processing.setting_time,
@@ -1346,8 +1347,8 @@ def submit_processing():
                                     processing.setting_date,
                                     processing.total_processed_wt, processing.total_cuts, previous_processing_id))
 
-                    cursor.execute("select processing_id from processing where oid= %s", (cursor.lastrowid,))
-                    processing_id = cursor.fetchone()
+                    # cursor.execute("select processing_id from processing where oid= %s", (cursor.lastrowid,))
+                    processing_id = cursor.fetchone()[0]
                     #processing_id = processing.save_to_db()
 
                     # Slitting/Mini Slitting and CTL/Reshearing/NCTL are managed differently
@@ -1556,7 +1557,7 @@ def submit_processing():
                                 else:
                                     cs_cc = CurrentStock(smpl_no, customer, processed_wt, actual_no_of_pieces, thickness,
                                                          output_width, output_length, fg_yes_no, grade, unit, _packet_name,
-                                                         output_length2, processing_date, processing_id[0],
+                                                         output_length2, processing_date, processing_id,
                                                          second_customer, net_wt)
                                     cursor.execute(
                                         "insert into current_stock (smpl_no,weight,numbers,width,length,status,customer,thickness"
@@ -1717,7 +1718,8 @@ def submit_slitting_processing():
                                    "end_time, setting_start_time, setting_end_time, production_time, setting_time, no_of_qc, "
                                    "no_of_helpers, names_of_qc,setting_date, total_processed_wt,"
                                    "total_cuts, previous_processing_id) values (%s, %s,%s, %s, "
-                                   "%s, %s, %s, %s, %s, %s,%s, %s, %s, %s, %s, %s)",
+                                   "%s, %s, %s, %s, %s, %s,%s, %s, %s, %s, %s, %s) "
+                                   "returning processing_id",
                                    (processing.smpl_no, processing.operation, processing.processing_date,
                                     processing.start_time, processing.end_time, processing.setting_start_time,
                                     processing.setting_end_time, processing.processing_time, processing.setting_time,
@@ -1725,8 +1727,8 @@ def submit_slitting_processing():
                                     processing.setting_date,
                                     processing.total_processed_wt, processing.total_cuts, processing.previous_processing_id))
 
-                    cursor.execute("select processing_id from processing where oid= %s", (cursor.lastrowid,))
-                    processing_id = cursor.fetchone()
+                    # cursor.execute("select processing_id from processing where oid= %s", (cursor.lastrowid,))
+                    processing_id = cursor.fetchone()[0]
 
                     ip_size = input_size.split('x')
                     ms_width = Decimal(ip_size[0])
@@ -1904,7 +1906,7 @@ def submit_slitting_processing():
 
                                         cs_cc = CurrentStock(smpl_no, customer, part_weight, processed_numbers, thickness,
                                                              output_width, output_length, fg_yes_no, grade, unit, _packet_name,
-                                                             output_length2, processing_date, processing_id[0], second_customer, net_wt)
+                                                             output_length2, processing_date, processing_id, second_customer, net_wt)
                                         cursor.execute(
                                             "insert into current_stock (smpl_no,weight,numbers,width,length,status,customer,thickness"
                                             ",grade, unit, packet_name, length2, date, processing_id, second_customer, net_wt) "
@@ -1944,7 +1946,7 @@ def submit_slitting_processing():
                                     cs_cc = CurrentStock(smpl_no, customer, part_weight, processed_numbers, thickness,
                                                          output_width, output_length, fg_yes_no, grade, unit,
                                                          packet_name,
-                                                         output_length2, processing_date, processing_id[0], second_customer, net_wt)
+                                                         output_length2, processing_date, processing_id, second_customer, net_wt)
                                     cursor.execute(
                                         "insert into current_stock (smpl_no,weight,numbers,width,length,status,customer,thickness"
                                         ",grade, unit, packet_name, length2, date, processing_id, second_customer, net_wt) "
