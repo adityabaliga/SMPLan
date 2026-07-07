@@ -15,12 +15,12 @@ class DispatchHeader:
     def save_to_db(self):
         with CursorFromConnectionFromPool() as cursor:
             cursor.execute("insert into dispatch_header (vehicle_no, dispatch_date, dispatch_time, customer, invoice_no, remarks, entry_by) values"
-                           "(%s, %s, %s, %s, %s, %s, %s)",(self.vehicle_no, self.dispatch_date, self.dispatch_time,
+                           "(%s, %s, %s, %s, %s, %s, %s) returning dispatch_id",(self.vehicle_no, self.dispatch_date, self.dispatch_time,
                                                        self.customer, self.invoice_no, self.remarks, self.entry_by))
 
-            cursor.execute("select dispatch_id from dispatch_header where oid= %s", (cursor.lastrowid,))
-            data = cursor.fetchone()
-            return data[0]
+            #cursor.execute("select dispatch_id from dispatch_header where oid= %s", (cursor.lastrowid,))
+            dispatch_id = cursor.fetchone()[0]
+            return dispatch_id
 
 
     @classmethod
@@ -152,12 +152,12 @@ class DispatchHeader:
         with CursorFromConnectionFromPool() as cursor:
             cursor.execute("insert into staging_dispatch_header (vehicle_no, dispatch_date, dispatch_time, customer, "
                            "invoice_no, remarks, entry_by) values"
-                           "(%s, %s, %s, %s, %s, %s, %s)", (self.vehicle_no, self.dispatch_date, self.dispatch_time,
+                           "(%s, %s, %s, %s, %s, %s, %s) returning dispatch_id", (self.vehicle_no, self.dispatch_date, self.dispatch_time,
                                                        self.customer, self.invoice_no, self.remarks, self.entry_by))
 
-            cursor.execute("select dispatch_id from staging_dispatch_header where oid= %s", (cursor.lastrowid,))
-            data = cursor.fetchone()
-            return data[0]
+            #cursor.execute("select dispatch_id from staging_dispatch_header where oid= %s", (cursor.lastrowid,))
+            dispatch_id = cursor.fetchone()[0]
+            return dispatch_id
 
     @classmethod
     def delete_staging_data(cls, delete_staging_data):
