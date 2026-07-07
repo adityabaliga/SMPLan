@@ -2,6 +2,12 @@ from database import CursorFromConnectionFromPool
 from decimal import *
 from order_detail import OrderDetail
 from psycopg2.extras import execute_values
+from datetime import datetime
+import uuid
+import json
+from flask import jsonify
+from pathlib import Path
+import io
 
 
 class CurrentStock:
@@ -793,4 +799,268 @@ class CurrentStock:
 
             return cs
         else:
+            return None
+
+    @classmethod
+    def get_unexported_fg_by_size(cls, smpl_no=None):
+        """
+        Get all FG grouped by size that haven't been completely exported
+        """
+        query = """SELECT fg_size,  thickness, width, length, smpl_no, processing_id, packet_count, total_quantity, total_weight, packets, cs_ids, earliest_production_date, latest_production_date, unexported_packet_count FROM exportable_fg_view WHERE any_exported = FALSE """
+
+        params = []
+        if smpl_no:
+            query += " AND smpl_no = %s"
+            params.append(smpl_no)
+
+        query += " ORDER BY smpl_no, fg_size"
+
+        with CursorFromConnectionFromPool() as cursor:
+            cursor.execute(query, params)
+            columns = [desc[0] for desc in cursor.description]
+            results = []
+            for row in cursor.fetchall():
+                results.append(dict(zip(columns, row)))
+            return results
+
+
+    @classmethod
+    def export_fg_to_tally(cls, smpl_no, fg_size_description, thickness, width, length, cs_ids_str):
+        """
+        Export a specific FG size group to Tally
+        cs_ids_str: comma-separated packet IDs (e.g., "1,5,12,18")
+        """
+
+        cs_ids = []
+        try:
+            print(f"Step 1: Initialized cs_ids as empty list: {cs_ids}")
+
+            # Convert to string just to be safe
+            cs_ids_str = str(cs_ids_str).strip()
+            print(f"Step 2: After str() and strip(): '{cs_ids_str}'")
+
+            # Split by comma
+            split_result = cs_ids_str.split(',')
+            print(f"Step 3: After split by comma: {split_result}")
+            print(f"Step 3: Number of parts: {len(split_result)}")
+
+            # Process each part
+            print(f"Step 4: Processing each part...")
+            for i, part in enumerate(split_result):
+                print(f"  Part {i}: '{part}' (type: {type(part)}, len: {len(part)})")
+                stripped = part.strip()
+                print(f"    After strip: '{stripped}' (type: {type(stripped)}, len: {len(stripped)})")
+
+                if stripped and stripped != '':
+                    try:
+                        int_value = int(stripped)
+                        print(f"    Converted to int: {int_value}")
+                        cs_ids.append(int_value)
+                    except ValueError as ve:
+                        print(f"    ERROR converting to int: {ve}")
+                else:
+                    print(f"    Skipping empty part")
+
+            print(f"Step 5: Final cs_ids list: {cs_ids}")
+            print(f"Step 5: Length of cs_ids: {len(cs_ids)}")
+
+            if not cs_ids:
+                print("ERROR: cs_ids is still empty after processing!")
+                return {'success': False, 'message': 'Could not parse CS IDs'}
+
+            # Continue with rest of function...
+            print(f"Step 6: CS IDs successfully parsed: {cs_ids}")
+        except ValueError as e:
+            return {
+                'success': False,
+                'message': f'Invalid CS IDs format: {str(e)}'
+            }
+            if not cs_ids:
+                return {
+                    'success': False,
+                    'message': 'No packets selected'
+                }
+
+        try:
+            with CursorFromConnectionFromPool() as cursor:
+
+                # Fetch all packets for this group
+                placeholders = ','.join(['%s'] * len(cs_ids))
+                query = f"""
+                SELECT cs_id, smpl_no, thickness, width, length, weight, numbers, packet_name, customer, grade, date FROM current_stock WHERE cs_id IN ({placeholders}) AND tally_exported = FALSE
+                """
+
+                cursor.execute(query, cs_ids)
+                packets = cursor.fetchall()
+
+                if not packets:
+                    return {
+                        'success': False,
+                        'message': 'No unexported packets found'
+                    }
+
+                # Calculate totals
+                total_weight = sum(p[5] for p in packets)
+                total_quantity = sum(p[6] for p in packets)
+
+                # Calculate totals
+                total_weight = 0
+                total_quantity = 0
+
+                for packet in packets:
+                    # packet = (cs_id, smpl_no, thickness, width, length, weight, numbers, packet_name, customer, grade, date)
+                    total_weight += packet[5]  # weight
+                    total_quantity += packet[6]  # numbers
+
+                    # Generate batch ID and filename
+                    batch_id = f"TALLY_{smpl_no}_{datetime.now().strftime('%Y%m%d_%H%M%S')}_{uuid.uuid4().hex[:6]}"
+
+                    # Format filename: smpl_no_fgsize_date.xml
+                    # Clean fg_size for filename (remove spaces, special chars)
+                    fg_size_clean = fg_size_description.replace(' ', '_').replace('x', 'x')
+                    date_str = datetime.now().strftime('%d%m%Y')
+                    xml_filename = f"{smpl_no}_{fg_size_clean}_{date_str}.xml"
+
+
+                # Generate XML for Tally
+                xml_content = cls.generate_tally_stock_journal_xml(
+                    smpl_no=smpl_no,
+                    fg_size=fg_size_description,
+                    thickness=thickness,
+                    width=width,
+                    length=length,
+                    total_quantity=total_quantity,
+                    total_weight=total_weight,
+                    packets=packets,
+                    batch_id=batch_id
+                )
+
+                # Log the export
+                log_query = """
+                INSERT INTO tally_export_log 
+                (export_batch_id, fg_size_description, total_quantity, total_weight, 
+                 smpl_no, packet_count, xml_generated, xml_content, exported_by)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                """
+
+                cursor.execute(log_query, (
+                    batch_id,
+                    fg_size_description,
+                    total_quantity,
+                    total_weight,
+                    smpl_no,
+                    len(packets),
+                    True,
+                    xml_content,
+                    'system'  # or get from session
+                ))
+
+                # Update current_stock records
+                for packet in packets:
+                    cs_id = packet[0]
+                    packet_name = packet[7]
+                    weight = packet[5]
+                    numbers = packet[6]
+
+                    update_query = """
+                                    UPDATE current_stock
+                                    SET tally_exported = TRUE,
+                                        tally_export_date = CURRENT_TIMESTAMP,
+                                        tally_export_batch_id = %s
+                                    WHERE cs_id = %s
+                                    """
+                    cursor.execute(update_query, (batch_id, cs_id))
+
+                    # Log the mapping
+                    mapping_query = """
+                    INSERT INTO tally_export_packet_map 
+                    (export_batch_id, cs_id, packet_name, weight, numbers)
+                    VALUES (%s, %s, %s, %s, %s)
+                    """
+                    cursor.execute(mapping_query, (
+                        batch_id,
+                        cs_id,
+                        packet[7],  # packet_name
+                        packet[5],  # weight
+                        packet[6]  # numbers
+                    ))
+
+                return {
+                    'success': True,
+                    'batch_id': batch_id,
+                    'fg_size': fg_size_description,
+                    'packet_count': len(packets),
+                    'total_quantity': total_quantity,
+                    'total_weight': total_weight,
+                    'xml_generated': True,
+                    'xml_filename': f"{batch_id}.xml",
+                    'message': f'Export successful. {len(packets)} packets exported.'
+                }
+
+        except Exception as e:
+           return {
+                'success': False,
+                'message': f'Error during export: {str(e)}'
+            }
+
+
+    @classmethod
+    def generate_tally_stock_journal_xml(cls, smpl_no, fg_size, thickness, width, length,
+                                         total_quantity, total_weight, packets, batch_id):
+        """
+        Generate Tally XML for Stock Journal entry
+        """
+        try:
+            xml = f"""<?xml version="1.0" encoding="utf-8"?>
+            <TALLY>
+              <STOCKJOURNAL>
+                <GUID>{uuid.uuid4().hex.upper()}</GUID>
+                <DATE>{datetime.now().strftime('%Y-%m-%d')}</DATE>
+                <REFERENCE>SJ-{batch_id}</REFERENCE>
+                <NOTES>Auto-generated from Production System - FG: {fg_size}</NOTES>
+                <LINEITEM>
+                  <ITEM>{fg_size}</ITEM>
+                  <QUANTITY>{total_quantity}</QUANTITY>
+                  <BASEUNITS>{total_weight}</BASEUNITS>
+                  <UNIT>MT</UNIT>
+                  <COIL_NUMBER>{smpl_no}</COIL_NUMBER>
+                  <THICKNESS>{thickness}</THICKNESS>
+                  <WIDTH>{width}</WIDTH>
+                  <LENGTH>{length}</LENGTH>
+                  <PACKET_DETAILS>
+            """
+
+            # Add details of each packet
+            for packet in packets:
+                cs_id = packet[0]
+                coil = packet[1]
+                thick = packet[2]
+                w = packet[3]
+                l = packet[4]
+            weight = packet[5]
+            qty = packet[6]
+            pkt_name = packet[7]
+            cust = packet[8] if packet[8] else "N/A"
+            grade = packet[9] if packet[9] else "N/A"
+            prod_date = packet[10] if packet[10] else datetime.now().date()
+
+            xml += f"""        <PACKET>
+                  <PACKET_NAME>{pkt_name}</PACKET_NAME>
+                  <QUANTITY>{qty}</QUANTITY>
+                  <WEIGHT>{weight}</WEIGHT>
+                  <CUSTOMER>{cust}</CUSTOMER>
+                  <PRODUCTION_DATE>{prod_date}</PRODUCTION_DATE>
+                </PACKET>"""
+
+            xml += """      </PACKET_DETAILS>
+                </LINEITEM>
+              </STOCKJOURNAL>
+            </TALLY>"""
+
+            return xml
+
+        except Exception as e:
+            print(f"Error generating XML: {str(e)}")
+            import traceback
+            traceback.print_exc()
             return None

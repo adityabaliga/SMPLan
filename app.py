@@ -5,7 +5,7 @@ from werkzeug.middleware.profiler import ProfilerMiddleware
 from decimal import Decimal
 from flask_login import LoginManager, login_user, current_user, logout_user
 from file_uploader import FileUploader
-from flask import Flask, render_template, request, jsonify, send_file, url_for, redirect, current_app
+from flask import Flask, render_template, request, jsonify, send_file, url_for, redirect, current_app, make_response
 from markupsafe import Markup
 from csv import writer
 from datetime import datetime, timedelta, date
@@ -3180,7 +3180,149 @@ def reverse_dispatch_detail():
     return render_template('/main_menu.html', message="Dispatch reversed")
 
 
+@app.route('/tally_export', methods=['GET', 'POST'])
+def tally_export():
+    # Display unexported FG
+    unexported_fg = CurrentStock.get_unexported_fg_by_size()
 
+    return render_template('tally_export.html', unexported_fg=unexported_fg)
+
+
+@app.route('/export_fg_to_tally', methods=['POST'])
+def export_fg_to_tally_route():
+    try:
+        data = request.get_json()
+
+        # Validate input
+        if not data:
+            return jsonify({'success': False, 'message': 'No data received'}), 400
+
+        required_fields = ['smpl_no', 'fg_size', 'thickness', 'width', 'length', 'cs_ids']
+        for field in required_fields:
+            if field not in data:
+                return jsonify({'success': False, 'message': f'Missing field: {field}'}), 400
+
+        print(f"Exporting: {data['smpl_no']} - {data['fg_size']}")
+
+        result = CurrentStock.export_fg_to_tally(
+            smpl_no=data['smpl_no'],
+            fg_size_description=data['fg_size'],
+            thickness=data['thickness'],
+            width=data['width'],
+            length=data['length'],
+            cs_ids_str=data['cs_ids']
+        )
+
+        return jsonify(result), 200
+
+    except Exception as e:
+        print(f"Error in export_fg_to_tally_route: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({
+            'success': False,
+            'message': f'Server error: {str(e)}'
+        }), 500
+
+
+@app.route('/download_export_xml/<batch_id>', methods=['GET'])
+def download_export_xml(batch_id):
+    """Download the XML file"""
+    query = """
+    SELECT xml_content, xml_filename
+    FROM tally_export_log
+    WHERE export_batch_id = %s
+    """
+
+    conn = psycopg2.connect(
+            dbname='smpl_prodn',
+            user='postgres',
+            password='smpl@509',
+            host='localhost',
+            port=5432
+        )
+    try:
+        with conn.cursor() as cur:
+            cur.execute(query, (batch_id,))
+            result = cur.fetchone()
+
+        if not result:
+            return "Export not found", 404
+
+        xml_content, xml_filename = result
+
+        print(f"xml_content type: {type(xml_content)}")
+        print(f"xml_content length: {len(str(xml_content)) if xml_content else 0}")
+        print(f"xml_filename: {xml_filename}")
+
+        if not xml_content:
+            print("No XML content found")
+            return "No XML content found", 404
+
+        # Generate filename if not set
+        if not xml_filename or xml_filename == '':
+            xml_filename = f"{batch_id}.xml"
+
+        print(f"Final filename: {xml_filename}")
+
+        # Create response
+        response = make_response(xml_content)
+        response.headers['Content-Type'] = 'application/xml'
+        response.headers['Content-Disposition'] = f'attachment; filename="{xml_filename}"'
+        response.headers['Content-Length'] = len(xml_content)
+
+        return response
+
+    except Exception as e:
+        print(f"Error in download_export_xml: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return f"Error: {str(e)}", 500
+    finally:
+        conn.close()
+
+
+@app.route('/get_export_status/<smpl_no>', methods=['GET'])
+def get_export_status(smpl_no):
+    """
+    Show which packets of a coil have been exported
+    """
+    query = """
+    SELECT 
+        cs.cs_id,
+        cs.smpl_no,
+        CONCAT(cs.thickness, ' x ', cs.width, ' x ', cs.length) as size,
+        cs.weight,
+        cs.numbers,
+        cs.packet_name,
+        cs.tally_exported,
+        cs.tally_export_date,
+        cs.tally_export_batch_id,
+        telm.mapping_id
+    FROM current_stock cs
+    LEFT JOIN tally_export_packet_map telm ON cs.cs_id = telm.cs_id
+    WHERE cs.smpl_no = %s
+        AND cs.status = 'FG'
+    ORDER BY cs.thickness, cs.width, cs.length, cs.cs_id
+    """
+
+    conn = psycopg2.connect(
+            dbname='smpl_prodn',
+            user='postgres',
+            password='smpl@509',
+            host='localhost',
+            port=5432
+        )
+    try:
+        with conn.cursor() as cur:
+            cur.execute(query, (smpl_no,))
+            columns = [desc[0] for desc in cur.description]
+            results = []
+            for row in cur.fetchall():
+                results.append(dict(zip(columns, row)))
+            return jsonify(results)
+    finally:
+        conn.close()
 
 
 

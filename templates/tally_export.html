@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SMPL MRP - Display Stock</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+    <style>
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    td, th {
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 8px;
+    }
+
+    tr:nth-child(even) {
+        background-color: #dddddd;
+    }
+
+    hr.style1{
+	        border-top: 15px solid #4d0000;
+            }
+    .oe{
+            font-family: Mathematica6 Bold, Old English Text MT, Engravers Old English BT, Old English, Collins Old English, New Old English, serif;
+            font-size: 50px;
+            color: #4d0000;
+            text-align:center;
+    }
+    .topnav a:hover {
+            color: #4d0000;
+            text-decoration: none;
+    }
+    .nopad {
+                margin: 0;
+                padding: 0;
+                margin-top: 0em;
+                margin-bottom: 0em;
+    }
+    .badge {
+        padding: 0.4em 0.6em;
+        font-size: 0.85em;
+    }
+
+    </style>
+</head>
+<body action="/get_stock_full_by_customer" method="post">
+    <div class="topnav" id="myTopnav">
+        <br>
+        <table>
+            <td><img src="/static/logo.jpg"  height="70" width="92" align = "left"></td>
+            <td width="1050px"><div align="center" class="nopad"> <a href="\main_menu"  class="oe">SMPL</a></div></td>
+            <td><div align="left" class="nopad">Hi {{current_user.username}}<br>
+            <a href="\change_password_form">Change Password</a><br>
+            <a href="\logout">Logout</a></div></td>
+        </table>
+    </div>
+
+    <hr class ="style1">
+<div class="container-fluid mt-4">
+    <h2>Tally Export - Finished Goods</h2>
+
+    <div class="alert alert-info mt-4">
+        <strong>Instructions:</strong> Click Export, the XML will be generated, and your browser will show a save dialog where you can choose where to save it.
+    </div>
+
+    <!-- Unexported FG Table -->
+    <div class="table-responsive mt-4">
+        <table class="table table-striped table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th>Coil #</th>
+                    <th>FG Size</th>
+                    <th>Packets</th>
+                    <th>Total Qty</th>
+                    <th>Total Weight (MT)</th>
+                    <th>Production Dates</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if unexported_fg %}
+                    {% for fg in unexported_fg %}
+                    <tr>
+                        <td><strong>{{ fg.smpl_no }}</strong></td>
+                        <td>{{ fg.fg_size }}</td>
+                        <td>{{ fg.packet_count }}
+                            {% if fg.unexported_packet_count > 0 %}
+                                <span class="badge badge-warning">{{ fg.unexported_packet_count }} Unexported</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ fg.total_quantity }}</td>
+                        <td>{{ "%.2f"|format(fg.total_weight) }}</td>
+                        <td>
+                            <small>{{ fg.earliest_production_date }} to {{ fg.latest_production_date }}</small>
+                        </td>
+                        <td>
+                            {% if fg.all_exported %}
+                                <span class="badge badge-success">All Exported</span>
+                            {% elif fg.any_exported %}
+                                <span class="badge badge-warning">Partially Exported</span>
+                            {% else %}
+                                <span class="badge badge-danger">Not Exported</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if fg.unexported_packet_count > 0 %}
+                                <button class="btn btn-sm btn-primary export-btn"
+                                        data-smpl-no="{{ fg.smpl_no }}"
+                                        data-fg-size="{{ fg.fg_size }}"
+                                        data-thickness="{{ fg.thickness }}"
+                                        data-width="{{ fg.width }}"
+                                        data-length="{{ fg.length }}"
+                                        data-cs-ids="{{ fg.cs_ids }}"
+                                        onclick="handleExport(event)">
+                                    <span class="spinner-border spinner-border-sm" style="display:none; margin-right: 5px;"></span>
+                                    Export
+                                </button>
+                            {% else %}
+                                <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="8" class="text-center text-muted">No unexported FG found</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- View Export History -->
+    <div class="mt-5">
+        <h4>Export History</h4>
+        <a href="/tally_export_history" class="btn btn-secondary">View All Exports</a>
+    </div>
+</div>
+
+<script>
+function handleExport(event) {
+    event.preventDefault();
+    const btn = event.target.closest('button');
+    const spinner = btn.querySelector('.spinner-border');
+
+    const data = {
+        smpl_no: btn.dataset.smplNo,
+        fg_size: btn.dataset.fgSize,
+        thickness: btn.dataset.thickness,
+        width: btn.dataset.width,
+        length: btn.dataset.length,
+        cs_ids: btn.dataset.csIds
+    };
+
+    console.log('=== EXPORT REQUEST ===');
+    console.log('Data:', data);
+
+    // Validate data
+    for (const [key, value] of Object.entries(data)) {
+        if (!value || value.trim() === '') {
+            alert(`Error: Field '${key}' is empty`);
+            console.error(`Field ${key} is empty:`, value);
+            return;
+        }
+    }
+
+    // Disable button and show spinner
+    btn.disabled = true;
+    spinner.style.display = 'inline-block';
+
+    fetch('/export_fg_to_tally', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => {
+        console.log('Response status:', response.status);
+        return response.json();
+    })
+    .then(result => {
+        console.log('Result:', result);
+
+        if (result.success) {
+            alert(`Export successful!\n\nFile: ${result.xml_filename}\nPackets: ${result.packet_count}\n\nClick OK to download.`);
+
+            // Trigger download
+            window.location.href = `/download_export_xml/${result.batch_id}`;
+
+            // Reload after a short delay
+            setTimeout(() => location.reload(), 2000);
+        } else {
+            alert(`Export failed: ${result.message}`);
+            btn.disabled = false;
+            spinner.style.display = 'none';
+        }
+    })
+    .catch(error => {
+        console.error('Fetch error:', error);
+        alert(`Error: ${error.message}`);
+        btn.disabled = false;
+        spinner.style.display = 'none';
+    });
+}
+</script>
+
+
+</body>
+</html>
