@@ -939,8 +939,8 @@ class CurrentStock:
                 log_query = """
                 INSERT INTO tally_export_log 
                 (export_batch_id, fg_size_description, total_quantity, total_weight, 
-                 smpl_no, packet_count, xml_generated, xml_content, exported_by)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                 smpl_no, packet_count, xml_generated, xml_filename, xml_content, exported_by)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                 """
 
                 cursor.execute(log_query, (
@@ -951,6 +951,7 @@ class CurrentStock:
                     smpl_no,
                     len(packets),
                     True,
+                    xml_filename,
                     xml_content,
                     'system'  # or get from session
                 ))
@@ -1011,6 +1012,16 @@ class CurrentStock:
         Generate Tally XML for Stock Journal entry
         """
         try:
+            # Format FG size: if length is 0, replace with "Coils"
+            if length == 0 or length == '0':
+                fg_size_formatted = f"{thickness} x {width} x Coils"
+            else:
+                fg_size_formatted = fg_size
+
+            # Add space after coil prefixes
+            smpl_no_formatted = cls.format_coil_number(smpl_no)
+
+
             xml = f"""<?xml version="1.0" encoding="utf-8"?>
             <TALLY>
               <STOCKJOURNAL>
@@ -1023,7 +1034,7 @@ class CurrentStock:
                   <QUANTITY>{total_quantity}</QUANTITY>
                   <BASEUNITS>{total_weight}</BASEUNITS>
                   <UNIT>MT</UNIT>
-                  <COIL_NUMBER>{smpl_no}</COIL_NUMBER>
+                  <COIL_NUMBER>{smpl_no_formatted}</COIL_NUMBER>
                   <THICKNESS>{thickness}</THICKNESS>
                   <WIDTH>{width}</WIDTH>
                   <LENGTH>{length}</LENGTH>
@@ -1031,26 +1042,33 @@ class CurrentStock:
             """
 
             # Add details of each packet
-            for packet in packets:
+            print(f"Adding {len(packets)} packets to XML...")
+            for i, packet in enumerate(packets):
                 cs_id = packet[0]
                 coil = packet[1]
                 thick = packet[2]
                 w = packet[3]
                 l = packet[4]
-            weight = packet[5]
-            qty = packet[6]
-            pkt_name = packet[7]
-            cust = packet[8] if packet[8] else "N/A"
-            grade = packet[9] if packet[9] else "N/A"
-            prod_date = packet[10] if packet[10] else datetime.now().date()
+                weight = packet[5]
+                qty = packet[6]
+                pkt_name = packet[7] if packet[7] else "Unknown"
+                cust = packet[8] if packet[8] else "N/A"
+                grade = packet[9] if packet[9] else "N/A"
+                prod_date = packet[10] if packet[10] else datetime.now().date()
 
-            xml += f"""        <PACKET>
-                  <PACKET_NAME>{pkt_name}</PACKET_NAME>
-                  <QUANTITY>{qty}</QUANTITY>
-                  <WEIGHT>{weight}</WEIGHT>
-                  <CUSTOMER>{cust}</CUSTOMER>
-                  <PRODUCTION_DATE>{prod_date}</PRODUCTION_DATE>
-                </PACKET>"""
+
+                xml += f"""        <PACKET>
+                      <PACKET_ID>{cs_id}</PACKET_ID>
+                      <PACKET_NAME>{pkt_name}</PACKET_NAME>
+                      <COIL_NUMBER>{smpl_no_formatted}</COIL_NUMBER>
+                      <QUANTITY>{qty}</QUANTITY>
+                      <WEIGHT>{weight}</WEIGHT>
+                      <CUSTOMER>{cust}</CUSTOMER>
+                      <GRADE>{grade}</GRADE>
+                      <PRODUCTION_DATE>{prod_date}</PRODUCTION_DATE>
+                    </PACKET>
+            """
+                print(f"  Packet {i + 1}: {pkt_name} - {qty} qty, {weight} kg")
 
             xml += """      </PACKET_DETAILS>
                 </LINEITEM>
@@ -1064,3 +1082,28 @@ class CurrentStock:
             import traceback
             traceback.print_exc()
             return None
+
+
+    @classmethod
+    def format_coil_number(cls, coil_number):
+        """
+        Format coil number by adding space after prefix
+        Examples: SMPL1111A -> SMPL 1111A, 2SMPL2222B -> 2SMPL 2222B, TR123 -> TR 123
+        """
+        coil_number = str(coil_number).strip()
+
+        # Define prefixes to look for
+        prefixes = ['SMPL', '2SMPL', '4SMPL', 'TR']
+
+        for prefix in prefixes:
+            if coil_number.upper().startswith(prefix):
+                # Get the prefix part and the rest
+                prefix_part = coil_number[:len(prefix)]
+                rest_part = coil_number[len(prefix):]
+
+                # Add space if there's something after the prefix
+                if rest_part:
+                    return f"{prefix_part} {rest_part}"
+
+        # If no prefix matches, return as is
+        return coil_number
