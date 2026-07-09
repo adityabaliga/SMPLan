@@ -1615,12 +1615,12 @@ def submit_processing():
                 return render_template('/main_menu.html', message="Processing Entry not completed")
             cursor.close()
 
-        except psycopg2.OperationalError as error:
+        except Exception as error:
             # Handle network errors
             print("Network error occurred:", error)
             print("Rolling back the transaction...")
             connection.rollback()
-            return render_template('/main_menu.html', message="Processing Entry not completed")
+            return render_template('/main_menu.html', message=f"Processing Entry not completed. {error}")
         finally:
             # Close the database connection
             connection.close()
@@ -2006,7 +2006,7 @@ def submit_slitting_processing():
                 # Rollback the transaction if an error occurred
                 connection.rollback()
                 print("Entry Failed:", error)
-                return render_template('/main_menu.html', message="Processing Entry not completed")
+                return render_template('/main_menu.html', message=f"Processing Entry not completed. {error}")
                 # Close the cursor
             cursor.close()
 
@@ -2015,7 +2015,7 @@ def submit_slitting_processing():
             print("Network error occurred:", error)
             print("Rolling back the transaction...")
             connection.rollback()
-            return render_template('/main_menu.html', message="Entry Failed")
+            return render_template('/main_menu.html', message=f"Processing Entry not completed. {error}")
         finally:
             # Close the database connection
             connection.close()
@@ -2612,32 +2612,70 @@ def dispatch():
     # The ones that are not selected are returned as None. The below list filters out the Nones
     defectives_lst = list(filter(None, defectives))
 
-    dispatch_header = DispatchHeader(vehicle_no, customer, dispatch_date, dispatch_time, invoice_no, remarks, entry_by)
-    dispatch_id = dispatch_header.save_to_db()
+    # Establish a database connection
+    connection = psycopg2.connect(
+        dbname='smpl_prodn',
+        user='postgres',
+        password='smpl@509',
+        host='localhost',
+        port=5432
+    )
 
-    # For the items to be dispatched, dispatch detail is created and the current stock quantity is deleted or reduced
-    for smpl, defective in zip(dispatch_lst, defectives_lst):
-        smpl_details = smpl.split(',')
-        smpl_no = smpl_details[1]
-        cs_id = smpl_details[0]
-        cs = CurrentStock.load_smpl_by_id(cs_id)
-        dispatch_detail = DispatchDetail(dispatch_id, cs.smpl_no, cs.thickness, cs.width, cs.length, cs.numbers,
-                                         cs.weight, defective, 1, cs.length2, cs.packet_name, cs.unit,
-                                         cs.processing_id)
-        dispatch_detail.save_to_db()
+    try:
+        # Begin a transaction
+        connection.autocommit = False
+        cursor = connection.cursor()
 
-        CurrentStock.delete_record(cs_id)
+        dispatch_header = DispatchHeader(vehicle_no, customer, dispatch_date, dispatch_time, invoice_no, remarks, entry_by)
+        cursor.execute(
+            "insert into dispatch_header (vehicle_no, dispatch_date, dispatch_time, customer, invoice_no, remarks, entry_by) values"
+            "(%s, %s, %s, %s, %s, %s, %s) returning dispatch_id",
+            (dispatch_header.vehicle_no, dispatch_header.dispatch_date, dispatch_header.dispatch_time,
+             dispatch_header.customer, dispatch_header.invoice_no, dispatch_header.remarks, dispatch_header.entry_by))
+
+        dispatch_id = cursor.fetchone()[0]
+
+        # For the items to be dispatched, dispatch detail is created and the current stock quantity is deleted or reduced
+        for smpl, defective in zip(dispatch_lst, defectives_lst):
+            smpl_details = smpl.split(',')
+            smpl_no = smpl_details[1]
+            cs_id = smpl_details[0]
+            cs = CurrentStock.load_smpl_by_id(cs_id)
+            dispatch_detail = DispatchDetail(dispatch_id, cs.smpl_no, cs.thickness, cs.width, cs.length, cs.numbers,
+                                             cs.weight, defective, 1, cs.length2, cs.packet_name, cs.unit,
+                                             cs.processing_id)
+            cursor.execute("insert into dispatch_detail (dispatch_id, smpl_no, thickness, width, length, numbers, "
+                           "weight, defective, no_of_packets, length2, packet_name, unit, processing_id) values (%s, %s, %s, %s, %s, "
+                           "%s, %s, %s, %s, %s, %s, %s,%s)",
+                           (dispatch_detail.dispatch_id, dispatch_detail.smpl_no, dispatch_detail.thickness, dispatch_detail.width,
+                            dispatch_detail.length, dispatch_detail.numbers, dispatch_detail.dispatch_wt, dispatch_detail.defective,
+                            dispatch_detail.no_of_pkts, dispatch_detail.length2, dispatch_detail.packet_name, dispatch_detail.unit,
+                            dispatch_detail.processing_id))
+
+            cursor.execute('delete from current_stock where cs_id = %s',(cs_id,))
+            if staging_dispatch_id != '':
+                cursor.execute("delete from staging_dispatch_detail where cs_id = %s", (cs_id,))
+
         if staging_dispatch_id != '':
-            DispatchDetail.delete_staging_detail(cs_id)
+            dispatch_detail_lst = DispatchDetail.get_staging_details_by_id(int(staging_dispatch_id), 0)
+            #length = len(dispatch_detail_lst)
+            #if len(dispatch_detail_lst) == 0:
+                #DispatchHeader.delete_staging_data(int(staging_dispatch_id))
+            cursor.execute("delete from staging_dispatch_detail where dispatch_id = %s", (int(staging_dispatch_id),))
+            cursor.execute("delete from staging_dispatch_header where dispatch_id = %s", (int(staging_dispatch_id),))
+        connection.commit()
+    except Exception as error:
+        # Handle network errors
+        print("Network error occurred:", error)
+        print("Rolling back the transaction...")
+        connection.rollback()
+        return render_template('/main_menu.html', message=f"Dispatch Entry not completed. {error}")
+    finally:
+        # Close the database connection
+        connection.close()
 
-    if staging_dispatch_id != '':
-        dispatch_detail_lst = DispatchDetail.get_staging_details_by_id(int(staging_dispatch_id), 0)
-        length = len(dispatch_detail_lst)
-        if len(dispatch_detail_lst) == 0:
-            DispatchHeader.delete_staging_data(int(staging_dispatch_id))
 
-
-    return render_template('/main_menu.html')
+    return render_template('/main_menu.html', message = "Dispatch complete")
 
 
 @app.route('/qr_dispatch', methods=['GET', 'POST'])
