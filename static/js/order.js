@@ -666,7 +666,8 @@ var controller = (function(orderCtrl, UICtrl) {
        document.querySelector('.print_all_btn').addEventListener('click', printAllStages);
 
        document.getElementById('order').addEventListener('submit', function(event){
-           //event.preventDefault();
+           event.preventDefault();
+           if(!validateBeforePrintOrSubmit()) return;
             onSubmit();
        });
    });
@@ -1255,6 +1256,30 @@ var controller = (function(orderCtrl, UICtrl) {
 
         DOM = UICtrl.getDOMstrings();
 
+        // Check Cut Width
+    if(!input.cut_width || input.cut_width <= 0){
+        alert('Please enter a valid Cut Width');
+        return false;
+    }
+
+    // Check Tolerance
+    if(!input.tolerance || input.tolerance === '-/+'){
+        alert('Please enter a valid Tolerance');
+        return false;
+    }
+
+    // Check Processing Weight
+    if(!input.processing_wt || input.processing_wt <= 0){
+        alert('Please enter a valid Processing Weight');
+        return false;
+    }
+
+    // Check Weight per Packet
+    if(!input.wt_per_pkt || input.wt_per_pkt <= 0){
+        alert('Please enter a valid Weight per Packet');
+        return false;
+    }
+
         ip_mtrl_selected = document.querySelector(DOM.currentInputMaterial).options[document.querySelector(DOM.currentInputMaterial).selectedIndex].text;
 
         ip_mtrl_selected = ip_mtrl_selected.split(' ');
@@ -1263,6 +1288,8 @@ var controller = (function(orderCtrl, UICtrl) {
             alert('Processing Wt is greater than input material weight');
             return false;
         }
+
+
 
         return true;
     };
@@ -1815,9 +1842,63 @@ var controller = (function(orderCtrl, UICtrl) {
     };
     };
 
+    var validateBeforePrintOrSubmit = function(){
+        var allOrders = orderCtrl.getAllOrders();
+        var processingWt = parseFloat(document.getElementById('processing_wt').value) || 0;
+
+        if(processingWt === 0){
+            alert('Please enter Processing Weight before proceeding.');
+            return false;
+        }
+
+        // Check if there are any orders at all
+        var totalOrders = Object.values(allOrders).reduce(function(sum, arr){ return sum + arr.length; }, 0);
+        if(totalOrders === 0){
+            alert('No operations have been added. Please add at least one operation.');
+            return false;
+        }
+
+        // Calculate total FG weight across all operations
+        var totalFGWt = 0;
+        Object.keys(allOrders).forEach(function(operation){
+            allOrders[operation].forEach(function(order){
+                if(order.fg_wip === 'FG'){
+                    totalFGWt += parseFloat(order.processing_wt) || 0;
+                }
+            });
+        });
+
+        totalFGWt = parseFloat(totalFGWt.toFixed(3));
+
+        // FG cannot exceed processing weight
+        if(totalFGWt > processingWt){
+            alert('Total FG weight (' + totalFGWt + ' MT) is greater than processing weight (' + processingWt + ' MT). Please check.');
+            return false;
+        }
+
+        // FG must be at least 95% of processing weight
+        if(totalFGWt < (0.95 * processingWt)){
+            alert('Total FG weight (' + totalFGWt + ' MT) is less than 95% of processing weight (' + processingWt + ' MT). Please check.');
+            return false;
+        }
+
+        // Date check
+        var orderDate = new Date(document.getElementById('order_date').value);
+        var expectedDate = new Date(document.getElementById('expected_date').value);
+        if(orderDate > expectedDate){
+            alert('Order date cannot be greater than expected date.');
+            return false;
+        }
+
+        return true;
+    };
+
+
     var printAllStages = function(){
     var allOrders = orderCtrl.getAllOrders();
     var maxStage = orderCtrl.getMaxStageNo();
+
+    if(!validateBeforePrintOrSubmit()) return;
 
     // Build a list of unique stage+operation combinations
     var stagePairs = [];
@@ -2017,7 +2098,7 @@ var controller = (function(orderCtrl, UICtrl) {
                 ${slittingOpHTML}
                 ${clonedTable.outerHTML}
                 <div style="margin-top:20px; border-top:2px solid #000; padding-top:8px;">
-                    <div style="font-size:11px;">
+                    <div style="font-size:16px;">
                         <b>All Stages:</b> ${stageSummary}
                     </div>
                 </div>
@@ -2061,6 +2142,8 @@ var controller = (function(orderCtrl, UICtrl) {
 
     var onSubmit = function(){
         var DOM = UICtrl.getDOMstrings();
+
+
 
     // Build a JSON object instead of a delimited string
     var orderData = {
