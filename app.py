@@ -761,9 +761,15 @@ def order():
 
     today_date = date.today().isoformat()
 
+    # THis is a flag to indicate if the coil is half cut prior to processing
+    half_cut = ''
+
+    if incoming.weight > cs.weight:
+        half_cut = " HALF CUT"
+
 
     return render_template('order.html', smpl_no= cs.smpl_no, incoming = incoming,
-                           weight=cs.weight, cs = cs, today_date = today_date)
+                           weight=cs.weight, cs = cs, today_date = today_date, half_cut = half_cut)
 
 
 # from order.html. The details retrieved from the page and loaded to db in to order and order_detail
@@ -1121,7 +1127,7 @@ def processing_load():
 
     processing_detail_lst = ProcessingDetail.load_from_db(cs_rm.smpl_no)
 
-    '''order_return_lst = Order.load_from_db(smpl_no=cs_rm.smpl_no, status="Open")
+    order_return_lst = Order.load_from_db(smpl_no=cs_rm.smpl_no, status="Open")
     order_id_lst = []
     order_lst = []
     for order_id, order in order_return_lst:
@@ -1133,19 +1139,21 @@ def processing_load():
     numbers = 0
     _scrap = 0
     order_detail_lst = OrderDetail.load_from_db(cs_rm.smpl_no, order_id)
+    stage_no = 0
 
     order_detail_lst_by_operation = []
     order_detail_id_lst_by_operation = []
     total_order_wt = 0
     for order_detail_id, order_detail in order_detail_lst:
-        if order_detail.operation.startswith(operation) and order_detail.status == 'Ready' and order_detail.ms_width == cs_rm.width and order_detail.ms_length == cs_rm.length:
+        if order_detail.operation.startswith(operation):
+            #and order_detail.status == 'Ready' and order_detail.ms_width == cs_rm.width and order_detail.ms_length == cs_rm.length:
             order_detail_lst_by_operation.append(order_detail)
             order_detail_id_lst_by_operation.append(order_detail_id)
             numbers += order_detail.numbers
             stage_no = order_detail.stage_no
             ms_width = order_detail.ms_width
             total_order_wt += order_detail.processing_wt
-            _scrap += (order_detail.cut_width * order_detail.numbers)'''
+            _scrap += (order_detail.cut_width * order_detail.numbers)
 
     '''completed_processing_wt_lst = []
     completed_processing_numbers_lst = []
@@ -1164,13 +1172,12 @@ def processing_load():
 
     if operation == "CTL":
         unit = current_user.unit
-        return render_template('processing_ctl.html', incoming=incoming, operation=operation,
-                               processing_details_lst=processing_detail_lst, cs_rm=cs_rm, cs_rm_id=cs_rm_id)
-        ''', order=order,
-                               order_detail_lst=zip(order_detail_id_lst_by_operation,order_detail_lst_by_operation),
+        return (render_template('processing_ctl.html', incoming=incoming, operation=operation,
+                               processing_details_lst=processing_detail_lst, cs_rm=cs_rm, cs_rm_id=cs_rm_id
+                                , order=order, order_detail_lst=zip(order_detail_id_lst_by_operation,order_detail_lst_by_operation),
                                _order_detail_lst=zip(order_detail_id_lst_by_operation, order_detail_lst_by_operation),
-                               numbers=numbers, order_id=order_id, stage_no=stage_no, total_order_wt = total_order_wt,
-                               total_completed_proc_wt = total_completed_proc_wt,
+                               numbers=numbers, order_id=order_id, stage_no=stage_no, total_order_wt = total_order_wt))
+        ''', total_completed_proc_wt = total_completed_proc_wt,
                                completed_processing_details_lst = zip(order_detail_lst_by_operation,
                                                                                 completed_processing_wt_lst,
                                                                                 completed_processing_numbers_lst))'''

@@ -1,7 +1,7 @@
 var orderController = (function () {
    var Order = function(id, operation, stage_no, input_width, input_length, fg_wip, output_width, output_length,
    lamination, tolerance, i_dia, processing_wt, wt_per_pkt, numbers, no_of_pkts, no_per_pkt, packing,
-   remarks,op_processing_wt, no_of_parts, length_per_part, outer_dia){
+   remarks,op_processing_wt, no_of_parts, length_per_part, outer_dia, half_cut_stop){
         this.id = id;
         this.operation = operation;
         this.stage_no = stage_no;
@@ -24,6 +24,7 @@ var orderController = (function () {
         this.no_of_parts      = no_of_parts || 0;
         this.length_per_part  = length_per_part || 0;
         this.outer_dia        = outer_dia || 0;
+        this.half_cut_stop = half_cut_stop || 0;
    };
 
    var operationAbbr = {
@@ -355,6 +356,7 @@ var UIController = (function() {
                no_of_parts : parseFloat(document.querySelector('.no_of_parts').value) || 0,
                length_per_part : parseFloat(document.querySelector('.length_per_part').value) || 0,
                outer_dia : parseFloat(document.querySelector('.outer_dia').value) || 0,
+               half_cut_stop : parseFloat(document.querySelector('.length_per_part').value) * parseFloat(document.querySelector('.no_of_parts').value) || 0,
                packing : document.querySelector(DOMStrings.currentFG_WIP).value === "WIP"
           ? "WIP"
           : document.querySelector('.packing_covering').value + ' / ' +
@@ -369,7 +371,7 @@ var UIController = (function() {
 
            if(operation === "CTL"){
                element = DOMStrings.CTL_table;
-               html = '<tr id="size-CTL-%id%"><td>%stage_no%</td><td>%input_material%</td><td hidden>%op_width%</td><td style="font-size:18px; font-weight:bold;">%op_length%</td><td>%tolerance%</td><td>%lamination%</td><td>%fg_wip%</td><td hidden>%i_dia%</td><td>%nos_per_packet%</td><td>%no_of_pkts%</td><td>%packing%</td><td>%proc_wt%</td><td>%numbers%</td><td>%remarks%</td><td><input type="button" class="item__delete--btn" value="Delete"></button></td><td><input type="button" class="item__edit--btn" value="Edit"></button></td></tr>';
+               html = '<tr id="size-CTL-%id%"><td>%stage_no%</td><td hidden>%input_material%</td><td hidden>%op_width%</td><td style="font-size:18px; font-weight:bold;">%op_length%</td><td>%tolerance%</td><td>%lamination%</td><td>%fg_wip%</td><td hidden>%i_dia%</td><td>%nos_per_packet%</td><td>%no_of_pkts%</td><td>%packing%</td><td>%proc_wt%</td><td>%numbers%</td><td>%remarks%</td><td><input type="button" class="item__delete--btn" value="Delete"></button></td><td><input type="button" class="item__edit--btn" value="Edit"></button></td></tr>';
 
            }
            if(operation === "Narrow_CTL"){
@@ -406,7 +408,7 @@ var UIController = (function() {
 
                 html = '<tr id="size-Slitting-%id%">' +
                     '<td>%stage_no%</td>' +
-                    '<td>%input_material%</td>' +
+                    '<td hidden>%input_material%</td>' +
                     '<td style="font-size:18px; font-weight:bold;">%op_width% x %numbers%</td>' +
                     '<td>%product%</td>' +           // new product column
                     '<td>%fg_wip%</td>' +
@@ -491,6 +493,8 @@ var UIController = (function() {
            document.querySelector('.packing_support').hidden = false;
            document.querySelector('.packing_strapping').hidden = false;
            document.querySelector('.outer_dia').hidden = false;
+           var halfCutDiv = document.querySelector('.slitting_half_cut');
+            if(halfCutDiv) halfCutDiv.style.display = 'none';
        },
 
 
@@ -1248,6 +1252,28 @@ var controller = (function(orderCtrl, UICtrl) {
         document.querySelector('.length_per_part').value = "";
     }
     calculateOuterDia();
+
+    // --- NEW: Half Cut check ---
+    var available_wt = parseFloat(document.querySelector(DOM.mc_weight).value) || 0;
+    var length_per_part_val = parseFloat(document.querySelector('.length_per_part').value) || 0;
+    var halfCutDiv = document.querySelector('.slitting_half_cut');
+
+    if(processing_wt > 0 && processing_wt < available_wt && no_of_parts > 0 && length_per_part_val > 0){
+        var stop_at = (length_per_part_val * no_of_parts).toFixed(2);
+        if(!halfCutDiv){
+            // Create the div if it doesn't exist
+            var newDiv = document.createElement('div');
+            newDiv.className = 'slitting_half_cut';
+            newDiv.style.cssText = 'margin-top:8px; font-weight:bold; display:inline-block;';
+            document.getElementById('current_op_slitting').appendChild(newDiv);
+            halfCutDiv = newDiv;
+        }
+        halfCutDiv.textContent = 'HALF CUT — Stop at ' + stop_at + ' m';
+        halfCutDiv.style.display = 'inline-block';
+    } else {
+        // Hide it if conditions no longer met
+        if(halfCutDiv) halfCutDiv.style.display = 'none';
+    }
     };
 
     var checkValidInputs = function(input){
@@ -2039,6 +2065,12 @@ var controller = (function(orderCtrl, UICtrl) {
         if(isSlitting){
                 var stageOrders = allOrders[operation].filter(function(o){ return o.stage_no === stage_no; });
                 var firstOrder = stageOrders[0];
+                var halfCutHTML = '';
+                if(firstOrder.op_processing_wt < parseFloat(document.getElementById('processing_wt').value) &&
+                firstOrder.length_per_part > 0 && firstOrder.no_of_parts > 0){
+                var stop_at = (firstOrder.length_per_part * firstOrder.no_of_parts).toFixed(2);
+                halfCutHTML = '<tr><td colspan="5" style="border; padding:6px; font-weight:bold; text-align:center;">HALF CUT — Stop at ' + stop_at + ' m</td></tr>';
+                }
 
                  // Calculate total width used for this stage
                 var totalWidth = stageOrders.reduce(function(sum, o){
@@ -2052,13 +2084,15 @@ var controller = (function(orderCtrl, UICtrl) {
                     '<td style="border:1px solid #000; padding:6px;"><b>Length Per Part</b><br>' + firstOrder.length_per_part + ' m</td>' +
                     '<td style="border:1px solid #000; padding:6px;"><b>Internal Dia</b><br>' + firstOrder.i_dia + '</td>' +
                     '<td style="border:1px solid #000; padding:6px;"><b>Outer Dia</b><br>' + firstOrder.outer_dia + '</td>' +
-                    '</tr></table>';
+                    '</tr>' +
+                    halfCutHTML +
+                    '</table>';
 
                      var totalWidth = stageOrders.reduce(function(sum, o){
                         return sum + (parseFloat(o.output_width) * parseFloat(o.numbers));
                     }, 0);
                     slittingTotalHTML = '<tr style="background:#e8e8e8;">' +
-                        '<td colspan="3" style="text-align:right; border:1px solid #000; padding:6px;"><b>Total Width Used:</b></td>' +
+                        '<td colspan="2" style="text-align:right; border:1px solid #000; padding:6px;"><b>Total Width Used:</b></td>' +
                         '<td style="border:1px solid #000; padding:6px;"><b>' + totalWidth.toFixed(0) + '</b></td>' +
                         '<td colspan="100"></td>' +
                         '</tr>';
@@ -2095,6 +2129,9 @@ var controller = (function(orderCtrl, UICtrl) {
                 </h3>
                 ${incoming.outerHTML}
                 ${extra_details.outerHTML}
+                <h3 style="text-align:center; font-size:22px;">
+                    ${operation}
+                </h3>
                 ${slittingOpHTML}
                 ${clonedTable.outerHTML}
                 <div style="margin-top:20px; border-top:2px solid #000; padding-top:8px;">
