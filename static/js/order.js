@@ -673,6 +673,7 @@ var controller = (function(orderCtrl, UICtrl) {
            event.preventDefault();
            if(!validateBeforePrintOrSubmit()) return;
             onSubmit();
+            HTMLFormElement.prototype.submit.call(this);;
        });
    });
 
