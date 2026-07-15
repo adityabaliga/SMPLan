@@ -1127,33 +1127,34 @@ def processing_load():
 
     processing_detail_lst = ProcessingDetail.load_from_db(cs_rm.smpl_no)
 
-    order_return_lst = Order.load_from_db(smpl_no=cs_rm.smpl_no, status="Open")
+    '''order_return_lst = Order.load_from_db(smpl_no=cs_rm.smpl_no, status="Open")
     order_id_lst = []
     order_lst = []
-    for order_id, order in order_return_lst:
-        order_id_lst.append(order_id)
-        order_lst.append(order)
+    if order_return_lst:
+        for order_id, order in order_return_lst:
+            order_id_lst.append(order_id)
+            order_lst.append(order)
 
-    order_id = order_id_lst[0]
-    order = order_lst[0]
-    numbers = 0
-    _scrap = 0
-    order_detail_lst = OrderDetail.load_from_db(cs_rm.smpl_no, order_id)
-    stage_no = 0
+        order_id = order_id_lst[0]
+        order = order_lst[0]
+        numbers = 0
+        _scrap = 0
+        order_detail_lst = OrderDetail.load_from_db(cs_rm.smpl_no, order_id)
+        stage_no = 0
 
-    order_detail_lst_by_operation = []
-    order_detail_id_lst_by_operation = []
-    total_order_wt = 0
-    for order_detail_id, order_detail in order_detail_lst:
-        if order_detail.operation.startswith(operation):
-            #and order_detail.status == 'Ready' and order_detail.ms_width == cs_rm.width and order_detail.ms_length == cs_rm.length:
-            order_detail_lst_by_operation.append(order_detail)
-            order_detail_id_lst_by_operation.append(order_detail_id)
-            numbers += order_detail.numbers
-            stage_no = order_detail.stage_no
-            ms_width = order_detail.ms_width
-            total_order_wt += order_detail.processing_wt
-            _scrap += (order_detail.cut_width * order_detail.numbers)
+        order_detail_lst_by_operation = []
+        order_detail_id_lst_by_operation = []
+        total_order_wt = 0
+        for order_detail_id, order_detail in order_detail_lst:
+            if order_detail.operation.startswith(operation):
+                #and order_detail.status == 'Ready' and order_detail.ms_width == cs_rm.width and order_detail.ms_length == cs_rm.length:
+                order_detail_lst_by_operation.append(order_detail)
+                order_detail_id_lst_by_operation.append(order_detail_id)
+                numbers += order_detail.numbers
+                stage_no = order_detail.stage_no
+                ms_width = order_detail.ms_width
+                total_order_wt += order_detail.processing_wt
+                _scrap += (order_detail.cut_width * order_detail.numbers)'''
 
     '''completed_processing_wt_lst = []
     completed_processing_numbers_lst = []
