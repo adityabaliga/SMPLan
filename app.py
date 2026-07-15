@@ -1174,11 +1174,11 @@ def processing_load():
     if operation == "CTL":
         unit = current_user.unit
         return (render_template('processing_ctl.html', incoming=incoming, operation=operation,
-                               processing_details_lst=processing_detail_lst, cs_rm=cs_rm, cs_rm_id=cs_rm_id
-                                , order=order, order_detail_lst=zip(order_detail_id_lst_by_operation,order_detail_lst_by_operation),
+                               processing_details_lst=processing_detail_lst, cs_rm=cs_rm, cs_rm_id=cs_rm_id))
+        ''', order=order, order_detail_lst=zip(order_detail_id_lst_by_operation,order_detail_lst_by_operation),
                                _order_detail_lst=zip(order_detail_id_lst_by_operation, order_detail_lst_by_operation),
                                numbers=numbers, order_id=order_id, stage_no=stage_no, total_order_wt = total_order_wt))
-        ''', total_completed_proc_wt = total_completed_proc_wt,
+                                , total_completed_proc_wt = total_completed_proc_wt,
                                completed_processing_details_lst = zip(order_detail_lst_by_operation,
                                                                                 completed_processing_wt_lst,
                                                                                 completed_processing_numbers_lst))'''
