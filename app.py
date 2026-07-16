@@ -719,16 +719,14 @@ def upload_docs_submit():
 # A smpl list is got whose status is RM. The list is sent to the html
 @app.route('/smpl_for_order', methods=['GET', 'POST'])
 def smpl_for_order():
-    _cs_lst = CurrentStock.smpl_list_for_place_order('SMPL')
-    cs_lst = []
-    cs_id_lst = []
+    user_data = CurrentStock.smpl_list_for_place_order('SMPL')
 
-    for cs_id, cs in _cs_lst:
-        cs_id_lst.append(cs_id)
-        cs_lst.append(cs)
 
-    if _cs_lst:
-        return render_template('order_pick_smpl.html', smpl_lst=zip(cs_id_lst, cs_lst))
+    #cs_id, smpl_no, thickness, width, length, status, total_weight, numbers, customer, grade, "
+    #available_weight
+
+    if user_data:
+        return render_template('order_pick_smpl.html', smpl_lst=user_data)
     else:
         return render_template('/main_menu.html', message="No material to place order")
 
@@ -736,9 +734,9 @@ def smpl_for_order():
 # A smpl list is got whose status is RM. The list is sent to the html
 @app.route('/tr_for_order', methods=['GET', 'POST'])
 def tr_for_order():
-    smpl_lst = CurrentStock.smpl_list_for_place_order('TR')
-    if smpl_lst:
-        return render_template('order_pick_smpl.html', smpl_lst=smpl_lst)
+    user_data = CurrentStock.smpl_list_for_place_order('TR')
+    if user_data:
+        return render_template('order_pick_smpl.html', smpl_lst=user_data)
     else:
         return render_template('/main_menu.html', message="No material to place order")
 
@@ -754,7 +752,9 @@ def order():
     if request.method == 'GET':
         cs_id = request.args.get('select_smpl')
 
-    cs = CurrentStock.load_smpl_by_id(cs_id)
+    cs_id = cs_id.split(',')
+
+    cs = CurrentStock.load_smpl_by_id(cs_id[0])
 
 
     incoming = Incoming.load_smpl_by_smpl_no(cs.smpl_no)
@@ -769,7 +769,7 @@ def order():
 
 
     return render_template('order.html', smpl_no= cs.smpl_no, incoming = incoming,
-                           weight=cs.weight, cs = cs, today_date = today_date, half_cut = half_cut)
+                           weight=cs_id[1], cs = cs, today_date = today_date, half_cut = half_cut)
 
 
 # from order.html. The details retrieved from the page and loaded to db in to order and order_detail

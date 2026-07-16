@@ -1897,8 +1897,8 @@ var controller = (function(orderCtrl, UICtrl) {
 
         totalFGWt = parseFloat(totalFGWt.toFixed(3));
 
-        // FG cannot exceed processing weight
-        if(totalFGWt > processingWt){
+        // FG cannot exceed processing weight. 5% allowance given
+        if(totalFGWt > 1.05*processingWt){
             alert('Total FG weight (' + totalFGWt + ' MT) is greater than processing weight (' + processingWt + ' MT). Please check.');
             return false;
         }

@@ -30,6 +30,7 @@ class CurrentStock:
         self.second_customer = second_customer
         self.net_wt = net_wt
 
+
     def save_to_db(self):
         with CursorFromConnectionFromPool() as cursor:
             cursor.execute("insert into current_stock (smpl_no,weight,numbers,width,length,status,customer,thickness"
@@ -76,25 +77,24 @@ class CurrentStock:
         user_data = []
         cs_lst = []
         cs_id_lst = []
+        result_list = []
         if string == 'SMPL':
-            query = "select * from current_stock where customer not like 'TSDPL%' and status = 'RM' or status = 'HC' order by smpl_no asc"
+            query = ("select cs_id, smpl_no, thickness, width, length, status, total_weight, numbers, customer, grade, "
+                     "available_weight, unit from available_coils_for_order "
+                     "where customer not like 'TSDPL%' and status = 'RM' or status = 'HC' order by smpl_no asc")
         if string == 'TR':
-            query = "select * from current_stock where customer like 'TSDPL%'  and status = 'RM' or status = 'HC' order by smpl_no asc"
+            query = ("select cs_id, smpl_no, thickness, width, length, status, total_weight, numbers, customer, grade, "
+                     "available_weight, unit from available_coils_for_order "
+                     "where customer like 'TSDPL%'  and status = 'RM' or status = 'HC' order by smpl_no asc")
         with CursorFromConnectionFromPool() as cursor:
             cursor.execute(query)
             user_data = cursor.fetchall()
 
         if user_data:
-            for lst in user_data:
-                cs = CurrentStock(smpl_no=lst[1], weight=Decimal(lst[2]), numbers=int(lst[3]), width=Decimal(lst[4]),
-                                  length=Decimal(lst[5]), status=lst[6], customer=lst[7], thickness=Decimal(lst[8]),
-                                  grade=lst[9], unit=lst[10], packet_name = lst [11], length2 = lst[12],
-                                  date = lst[13], processing_id= lst[14], second_customer= lst[15], net_wt= lst[16])
-                cs_lst.append(cs)
-                cs_id_lst.append(lst[0])
-            return zip(cs_id_lst,cs_lst)
+            return user_data
         else:
             return None
+
 
     @classmethod
     def smpl_for_processing_search_lst(cls, operation, smpl_no, unit):
