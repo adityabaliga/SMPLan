@@ -384,6 +384,20 @@ var UIController = (function() {
                html = '<tr id="size-Reshearing-%id%"><td>%stage_no%</td><td>%input_material%</td><td style="font-size:18px; font-weight:bold;">%op_width%</td><td style="font-size:18px; font-weight:bold;">%op_length%</td><td hidden>%lamination%</td><td>%tolerance%</td><td>%fg_wip%</td><td hidden>%i_dia%</td><td>%nos_per_packet%</td><td>%no_of_pkts%</td><td>%packing%</td><td>%proc_wt%</td><td>%numbers%</td><td>%remarks%</td><td><input type="button" class="item__delete--btn" id="del_size" name="del_size" value="Delete"></button></td><td><input type="button" class="item__edit--btn" id="edit_size" name="edit_size" value="Edit"></button></td></tr>';
 
            }
+           if(operation === 'CTL'){
+                var existingCTLHeader = document.querySelector('.ctl-stage-header[data-stage="' + newOrder.stage_no + '"]');
+                if(!existingCTLHeader){
+                    var ctlHeaderTbody = document.createElement('tbody');
+                    ctlHeaderTbody.className = 'ctl-stage-header';
+                    ctlHeaderTbody.setAttribute('data-stage', newOrder.stage_no);
+                    ctlHeaderTbody.innerHTML = '<tr>' +
+                        '<td colspan="20" style="background:#f0f0f0; font-weight:bold; padding:4px;">' +
+                        'Stage ' + newOrder.stage_no + ' — Input Material: ' + newOrder.input_width + ' x ' + newOrder.input_length +
+                        '</td></tr>';
+                    document.getElementById('CTL_table').appendChild(ctlHeaderTbody);
+                }
+                // existing CTL html template unchanged
+            }
            if(operation === "Slitting"){
                     element = DOMStrings.Slitting_table;
 
@@ -394,7 +408,8 @@ var UIController = (function() {
                     opTbody.className = 'slitting-op-stage-header';
                     opTbody.innerHTML = '<tr class="slitting-op-details" data-stage="' + newOrder.stage_no + '">' +
                         '<td colspan="3" style="background:#f0f0f0;"><b>Stage ' + newOrder.stage_no +
-                        ' — Proc Wt: ' + newOrder.op_processing_wt + ' MT' +
+                        '  — Input Material: ' + newOrder.input_width + ' x ' + newOrder.input_length +
+                        ' | Proc Wt: ' + newOrder.op_processing_wt + ' MT' +
                         ' | No of Parts: ' + newOrder.no_of_parts +
                         ' | Length/Part: ' + newOrder.length_per_part + ' m' +
                         ' | I.Dia: ' + newOrder.i_dia +
@@ -2123,6 +2138,14 @@ var controller = (function(orderCtrl, UICtrl) {
             ? '<div style="text-align:center; font-weight:bold; font-size:14px; margin-top:15px; border:2px solid #000; padding:8px;">⟵ PLEASE TURN OVER — Next: Stage ' + (index + 2) + ': ' + stagePairs[index + 1].operation.replace(/_/g, ' ') + ' ⟶</div>'
             : '<div style="text-align:center; font-weight:bold; font-size:14px; margin-top:15px; border:2px solid #000; padding:8px;">✓ LAST STAGE</div>';
 
+        var inputMaterialHTML = '';
+        if(operation === 'CTL' || operation === 'Slitting'){
+                var firstStageOrder = allOrders[operation].find(function(o){ return o.stage_no === stage_no; });
+                inputMaterialHTML = '<div style="font-weight:bold; font-size:13px;">' +
+                'Input Material: <span style="font-size:18px;">' + firstStageOrder.input_width + ' x ' + firstStageOrder.input_length + '</span>' +
+                '</div>';
+        }
+
         pagesHTML += `
             <div class="stage-page">
                 <h3 style="text-align:center; font-size:16px;">
@@ -2132,6 +2155,7 @@ var controller = (function(orderCtrl, UICtrl) {
                 ${extra_details.outerHTML}
                 <h3 style="text-align:center; font-size:22px;">
                     ${operation}
+                    ${inputMaterialHTML}
                 </h3>
                 ${slittingOpHTML}
                 ${clonedTable.outerHTML}
