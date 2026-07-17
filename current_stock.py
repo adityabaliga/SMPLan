@@ -79,11 +79,11 @@ class CurrentStock:
         cs_id_lst = []
         result_list = []
         if string == 'SMPL':
-            query = ("select cs_id, smpl_no, thickness, width, length, status, total_weight, numbers, customer, grade, "
+            query = ("select cs_id, smpl_no, thickness, width, length, status, incoming_weight, numbers, customer, grade, "
                      "available_weight, unit from available_coils_for_order "
                      "where customer not like 'TSDPL%' and status = 'RM' or status = 'HC' order by smpl_no asc")
         if string == 'TR':
-            query = ("select cs_id, smpl_no, thickness, width, length, status, total_weight, numbers, customer, grade, "
+            query = ("select cs_id, smpl_no, thickness, width, length, status, incoming_weight, numbers, customer, grade, "
                      "available_weight, unit from available_coils_for_order "
                      "where customer like 'TSDPL%'  and status = 'RM' or status = 'HC' order by smpl_no asc")
         with CursorFromConnectionFromPool() as cursor:
