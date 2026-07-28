@@ -117,6 +117,7 @@
                 <td>Unit</td>
                 <td>Sticker Wt(in kgs)</td>
                 <td>Second Customer</td>
+                <td>Lamination</td>
             </tr>
             {% for cs in cs_lst %}
             <tr>
@@ -133,6 +134,7 @@
                 <td>{{cs.unit}}</td>
                 <td>{{cs.net_wt}}</td>
                 <td>{{cs.second_customer}}</td>
+                <td>{{cs.lami}}</td>
             </tr>
             {% endfor %}
         {% else %}
@@ -257,6 +259,7 @@
                             <th>No.s </th>
                             <th>Packet Name</th>
                             <th>FG/WIP</th>
+                            <th>Lamination</th>
                             <th>Remarks </th>
                          </tr>
 
@@ -272,6 +275,7 @@
                             <td>{{processing_dtl.processed_numbers}} </td>
                              <td>{{processing_dtl.packet_name}}</td>
                              <td>{{processing_dtl.status}}</td>
+                             <td>{{processing_dtl.lami}}</td>
                              <td>{{processing_dtl.remarks}}</td>
 
 

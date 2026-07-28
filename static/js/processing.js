@@ -349,6 +349,43 @@ function enable_lami_co(table_id, table_row){
 
 }
 
+//This function will enable Lami Co if lamination is selected
+function enable_lami_co_slitting(table_id, table_row){
+    var rowCount = table_row.offsetParent.parentElement.rowIndex;
+	var last_row = document.getElementById(table_id).rows[rowCount];
+
+	var selectedOption = last_row.cells[2].firstElementChild.selectedIndex;
+	var lami_type = last_row.cells[2].firstElementChild[selectedOption].innerText;
+
+
+	if(lami_type.includes("Single Side")){
+	    //console.log(last_row.cells[7].firstElementChild[0].innerText);
+	    //last_row.cells[7].disabled = false;
+	    last_row.cells[3].innerHTML ='<select id="lami_co_top" name="lami_co_top"><option value="">Select</option><option value="Futura">Futura</option><option value="SVS">SVS Pack</option><option value="Paragon">Paragon</option><option value="Superbright">Superbright</option><option value="Crystal">Crystal</option><option value="Other">Other</option></select>';
+        last_row.cells[4].innerHTML ='<td><select id = "lami_co_top" name= "lami_co_top" ><option value = "No Lami">No Lami</option></select></td>';
+        //last_row.cells[7].required = true;
+        //last_row.cells[8].required = false;
+	}
+	else if(lami_type.includes("Both Side")){
+	    //console.log(last_row.cells[7].firstElementChild[0].innerText);
+	    //last_row.cells[7].disabled = false;
+	    last_row.cells[3].innerHTML ='<select id="lami_co_top" name="lami_co_top"><option value="">Select</option><option value="Futura">Futura</option><option value="SVS">SVS Pack</option><option value="Paragon">Paragon</option><option value="Superbright">Superbright</option><option value="Crystal">Crystal</option><option value="Other">Other</option></select>';
+	    last_row.cells[4].innerHTML ='<select id="lami_co_top" name="lami_co_top"><option value="">Select</option><option value="Futura">Futura</option><option value="SVS">SVS Pack</option><option value="Paragon">Paragon</option><option value="Superbright">Superbright</option><option value="Crystal">Crystal</option><option value="Other">Other</option></select>';
+        //last_row.cells[7].required = true;
+        //last_row.cells[8].required = true;
+	}
+	else if(lami_type.includes("No Lami")){
+	    //console.log(last_row.cells[7].firstElementChild[0].innerText);
+	    //last_row.cells[7].disabled = false;
+	    last_row.cells[3].innerHTML ='<td><select id = "lami_co_top" name= "lami_co_top" ><option value = "No Lami">No Lami</option></select></td>'
+	    last_row.cells[4].innerHTML ='<td><select id = "lami_co_top" name= "lami_co_top" ><option value = "No Lami">No Lami</option></select></td>'
+        //last_row.cells[7].required = false;
+        //last_row.cells[8].required = false;
+	}
+
+
+}
+
 
 // This function calculates the weight for CTL, NCTL and Reshearing functions
 function for_packets_and_weight(table_id,table_row,operation){
@@ -665,7 +702,9 @@ function addRow(tableID)
 			var rowCount = table.rows.length;
 			var row = table.insertRow(rowCount);
             if(tableID == "part_tbl" || tableID == "numbers_pkts"){
+                console.log("Before:", row.id, "rowCount =", rowCount);
                 row.id = rowCount;
+                console.log("After:", row.id);
             }
 			var last_row = document.getElementById(tableID).rows[rowCount-1];
 
@@ -709,22 +748,9 @@ function addRow(tableID)
                     newcell.lastElementChild.value = firstPart + secondPart.toString();
                     //return [firstPart, secondPart];
                 }
-				//if(operation == 'Reshearing' || operation == 'Narrow_CTL'){
-				//    newcell.lastChild.value = table.rows[rowCount-1].cells[i].lastChild.value;
-				//}
-				//alert(newcell.childNodes);
-				/*switch(newcell.childNodes[0].type) {
-					case "text":
-							newcell.childNodes[0].value = "";
-							break;
-					case "checkbox":
-							newcell.childNodes[0].checked = false;
-							break;
-					case "select-one":
-							newcell.childNodes[0].selectedIndex = 0;
-							break;
-				}*/
+
 				}
+
 			}
     }
 
@@ -733,7 +759,12 @@ function validate(){
     //total_processed_wt = Number(document.getElementById("total_processed_wt").value);
     //total_order_wt = Number(document.getElementById("order_wt").value);
     completed_proc_wt = Number(document.getElementById("total_processed_wt").value);
-    rm_wt = Number(document.getElementById("weight").value);
+    operation = document.getElementById("operation").value;
+    if(operation.includes("Slitting")){
+        rm_wt = Number(document.getElementById("input_weight").value);
+    }else{
+        rm_wt = Number(document.getElementById("weight").value);
+    }
     order_completed_chk = true;
     total_processed_wt = 0;
 
@@ -1332,6 +1363,46 @@ function make_label_new_slit(th){
         //document.getElementById('lbl_scams_no').readOnly = true;
     }
 
+    var lami_type;
+    var lamination = parts_table.rows[rowId].cells[2].lastElementChild.selectedOptions[0].innerHTML;;
+
+
+    var remarks = parts_table.rows[rowId].cells[7].lastChild.value;
+    var input_lami = document.getElementById('input_lami').value;
+
+
+    if(lamination == "No Lamination"){
+        lami_type = " ";
+        lamination = "";
+    }else{
+        lamination = lamination.split('-');
+        lami_type = lamination[0].toUpperCase() + "LAMINATION";
+        var top_lami_co = parts_table.rows[rowId].cells[3].lastElementChild.selectedOptions[0].innerHTML;
+        var bottom_lami_co = parts_table.rows[rowId].cells[4].lastElementChild.selectedOptions[0].innerHTML;
+        if(lami_type.includes('SINGLE SIDE')){
+            if(top_lami_co == 'Select'){
+                window.alert("Please Enter Lami Company");
+                return;
+            }else{
+                remarks = remarks + "|TOPLAMI:" + top_lami_co + "|";
+            }
+        }
+        if(lami_type.includes('BOTH SIDE')){
+            if(top_lami_co == 'Select' || bottom_lami_co == 'Select'){
+                window.alert("Please Enter Lami Company");
+                return;
+            }else{
+                remarks = remarks + "|TOPLAMI:" + top_lami_co + "|BOTMLAMI:" + bottom_lami_co + "|" ;
+            }
+        }
+    }
+
+     if (lamination === "No Lamination" && input_lami.includes("Side")) {
+          lamination = input_lami;
+    }
+
+    parts_table.rows[rowId].cells[7].lastChild.value = remarks;
+
     //FG_Table population
     var html = '<tr id= %id%>' +
             '<td><input type="text" style="width:100px;border: 0px none;" id="lbl_size" name="lbl_size" value="%size%"></td>' +
@@ -1340,7 +1411,7 @@ function make_label_new_slit(th){
             '<td><input type="text" style="width:130px;"  id="lbl_2nd_customer" name="lbl_2nd_customer"></td>' +
             '<td><input type="number" style="width:100px;"  id="lbl_net_wt" name="lbl_net_wt" onchange = "check_theory_wt_slit()"></td>' +
             '<td><input type="text" style="width:100px;" id="lbl_gross_wt" name="lbl_gross_wt"></td>' +
-            '<td><input type="text" style="width:130px;"  id="lbl_lamination" name="lbl_lamination"></td>' +
+            '<td><input type="text" style="width:130px;"  id="lbl_lamination" name="lbl_lamination" value="%lamination%"></td>' +
             '<td><input type="text" style="width:130px;"  id="lbl_batch_no" name="lbl_batch_no"></td>' +
             '<td><input type="text" style="width:130px;"  id="lbl_top_comment" name="lbl_top_comment"></td>' +
             '<td><input type="text" style="width:130px;"  id="lbl_comment" name="lbl_comment"></td>' +
@@ -1362,7 +1433,7 @@ function make_label_new_slit(th){
     var thickness = document.getElementById("thickness").value;
     var id = 1;
     var theory_wt = 0;
-    if (fg_table.rows.length > 2){
+    if (fg_table.rows.length >= 2){
         id = fg_table.rows.length;
     }
 
@@ -1399,6 +1470,7 @@ function make_label_new_slit(th){
         newNEWHTML = newNEWHTML.replace('%status%', width_status);
         newNEWHTML = newNEWHTML.replace('%id%', id);
         newNEWHTML = newNEWHTML.replace('%theory_wt%', theory_wt.toFixed(3));
+        newNEWHTML = newNEWHTML.replace('%lamination%', lamination);
 
         document.getElementById('fg_table').insertAdjacentHTML('beforeend', newNEWHTML);
         id = id +1;
@@ -1763,9 +1835,13 @@ function make_label_new(th){
     var lami_type;
 
     var remarks = numbers_table.rows[rowId].cells[9].lastChild.value;
+    var input_lami = document.getElementById('input_lami').value;
 
-    if(lamination == "No Lamination"){
+
+    if(lamination == "" || lamination == "No Lamination"){
         lami_type = " ";
+        lamination = '';
+
     }else{
         lamination = lamination.split('-');
         lami_type = lamination[0].toUpperCase() + "LAMINATION";
@@ -1787,6 +1863,10 @@ function make_label_new(th){
                 remarks = remarks + "|TOPLAMI:" + top_lami_co + "|BOTMLAMI:" + bottom_lami_co + "|" ;
             }
         }
+    }
+
+     if ((lamination === "No Lamination" || lamination === "") && input_lami.includes("Side")) {
+          lamination = input_lami;
     }
 
     numbers_table.rows[rowId].cells[9].lastChild.value = remarks;

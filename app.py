@@ -1262,6 +1262,7 @@ def submit_processing():
         # order_id = request.form['order_id']
 
         input_size = request.form['input_material']
+        input_lami  = request.form['input_lami']
         output_width_lst = request.form.getlist('output_width')
         output_length_lst = request.form.getlist('output_length')
         output_length2_lst = request.form.getlist('output_length2')
@@ -1374,20 +1375,19 @@ def submit_processing():
                             ms_width = ip_size[0]
                             ms_length = ip_size[1]
 
-                            if lamination != "no-lami" and lamination != "No Lamination":
-                                machine = temp_machine + " " + lamination
 
                             if processed_wt != '' and Decimal(processed_wt) > 0.0:
                                 # Get mother size and cut size from the screen. Create processing detail and then update to db
                                 processing_detail = ProcessingDetail(smpl_no, operation, machine, processing_id, output_width,
                                                                      output_length, actual_no_of_pieces,
                                                                      packet_name, remarks, processed_wt, ms_width,
-                                                                     ms_length, fg_yes_no, output_length2)
+                                                                     ms_length, fg_yes_no, output_length2, lamination)
 
                                 cursor.execute(
                                     "insert into processing_detail (smpl_no, operation, machine, processing_id, input_width,"
                                     "input_length, cut_width, cut_length, processed_numbers, packet_name, processed_wt, "
-                                    "remarks, status, cut_length2) values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                                    "remarks, status, cut_length2, lami) values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s,"
+                                    " %s, %s, %s, %s, %s)",
                                     (processing_detail.smpl_no,
                                      processing_detail.operation,
                                      processing_detail.machine,
@@ -1401,8 +1401,16 @@ def submit_processing():
                                      processing_detail.processed_wt,
                                      processing_detail.remarks,
                                      processing_detail.status,
-                                     processing_detail.cut_length2))
+                                     processing_detail.cut_length2, processing_detail.lami))
                                 #processing_detail.save_to_db()
+
+
+                                #This is done so the material's lamination state can be stored in current_stock
+                                if lamination == "No Lamination":
+                                    if input_lami == '':
+                                        lamination = ''
+                                    elif "Side" in input_lami:
+                                        lamination = input_lami
 
                                 if operation == "Reshearing":
                                     # For reshearing, the mother material no. of pieces consumed have to be calculated and scrap
@@ -1454,15 +1462,13 @@ def submit_processing():
                                     #length = ms_length
                                     if packet_name == "":
                                         cursor.execute(
-                                            "select weight, numbers, unit, cs_id from current_stock where smpl_no = %s and width = %s "
-                                            "and length = %s and status = %s and length2 = %s",
-                                            (smpl_no, ms_width, ms_length, cs_rm.status, cs_rm.length2))
+                                            "select weight, numbers, unit, cs_id from current_stock where cs_id = %s",
+                                            (cs_rm_id,))
                                         user_data = cursor.fetchone()
                                     else:
                                         cursor.execute(
-                                            "select weight, numbers, unit, cs_id from current_stock where smpl_no = %s and width = %s "
-                                            "and length = %s and status = %s and packet_name = %s and length2 = %s",
-                                            (smpl_no, ms_width, ms_length, cs_rm.status, cs_rm.packet_name, cs_rm.length2))
+                                            "select weight, numbers, unit, cs_id from current_stock where cs_id = %s",
+                                            (cs_rm_id,))
                                         user_data = cursor.fetchone()
                                     if user_data:
                                         weight = Decimal(user_data[0])
@@ -1503,7 +1509,7 @@ def submit_processing():
                                         "CTL 2") or machine == "Slitting" or machine == "Mini_Slitting" or \
                                         machine == "Reshearing 5" or machine == "Reshearing 6" or machine == "Reshearing 7" or \
                                         machine == "Reshearing 9" or machine == "NCTL 2" or machine == "NCTL 3" or machine == "NCTL 4" or \
-                                        machine == "NCTL 5" or machine == "NCTL 1":
+                                        machine == "NCTL 5" or machine == "NCTL 1" or machine == "Lamination":
                                     unit = '2'
 
                                 else:
@@ -1528,14 +1534,14 @@ def submit_processing():
                                 if _packet_name == "":
                                     cursor.execute(
                                         "select weight, numbers, unit, cs_id from current_stock where smpl_no = %s and width = %s "
-                                        "and length = %s and status = %s and length2 = %s",
-                                        (smpl_no, output_width, output_length, fg_yes_no, output_length2))
+                                        "and length = %s and status = %s and length2 = %s and lami = %s",
+                                        (smpl_no, output_width, output_length, fg_yes_no, output_length2, lamination))
                                     user_data = cursor.fetchone()
                                 else:
                                     cursor.execute(
                                         "select weight, numbers, unit, cs_id from current_stock where smpl_no = %s and width = %s "
-                                        "and length = %s and status = %s and packet_name = %s and length2 = %s",
-                                        (smpl_no, output_width, output_length, fg_yes_no, _packet_name, output_length2))
+                                        "and length = %s and status = %s and packet_name = %s and length2 = %s and lami = %s",
+                                        (smpl_no, output_width, output_length, fg_yes_no, _packet_name, output_length2, lamination))
                                     user_data = cursor.fetchone()
                                 if user_data and fg_yes_no != 'FG':
                                     weight = Decimal(user_data[0])
@@ -1566,15 +1572,15 @@ def submit_processing():
                                     cs_cc = CurrentStock(smpl_no, customer, processed_wt, actual_no_of_pieces, thickness,
                                                          output_width, output_length, fg_yes_no, grade, unit, _packet_name,
                                                          output_length2, processing_date, processing_id,
-                                                         second_customer, net_wt)
+                                                         second_customer, net_wt, lamination)
                                     cursor.execute(
                                         "insert into current_stock (smpl_no,weight,numbers,width,length,status,customer,thickness"
-                                        ",grade, unit, packet_name, length2, date, processing_id, second_customer, net_wt) "
-                                        "values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+                                        ",grade, unit, packet_name, length2, date, processing_id, second_customer, net_wt, lami) "
+                                        "values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s, %s)",
                                         (cs_cc.smpl_no, cs_cc.weight, cs_cc.numbers, cs_cc.width, cs_cc.length, cs_cc.status,
                                          cs_cc.customer,
                                          cs_cc.thickness, cs_cc.grade, cs_cc.unit, cs_cc.packet_name, cs_cc.length2,
-                                         cs_cc.date,cs_cc.processing_id,cs_cc.second_customer, cs_cc.net_wt))
+                                         cs_cc.date,cs_cc.processing_id,cs_cc.second_customer, cs_cc.net_wt, cs_cc.lami))
 
 
 
@@ -1620,7 +1626,7 @@ def submit_processing():
                 print("Error inserting data:", error)
 
                 # Close the cursor
-                return render_template('/main_menu.html', message="Processing Entry not completed")
+                return render_template('/main_menu.html', message=f"Processing Entry not completed. {error}")
             cursor.close()
 
         except Exception as error:
@@ -1644,6 +1650,7 @@ def submit_slitting_processing():
         # order_id = request.form['order_id']
 
         input_size = request.form['input_material']
+        input_lami = request.form['input_lami']
         output_width_lst = request.form.getlist('output_width')
         width_name_lst = request.form.getlist('width_name')
         # order_detail_id_lst = request.form.getlist('order_detail_id')
@@ -1651,6 +1658,8 @@ def submit_slitting_processing():
 
         part_length_lst = request.form.getlist('part_length')
         part_name_lst = request.form.getlist('part_name')
+        lamination_lst = request.form.getlist('lamination')
+        remarks_lst = request.form.getlist('remarks')
 
         fg_net_wt_lst = request.form.getlist('lbl_net_wt')
         fg_packet_name_lst = request.form.getlist('lbl_packet_name')
@@ -1660,7 +1669,7 @@ def submit_slitting_processing():
 
         # processed_wt_lst = request.form.getlist('processed_wt')
         # remarks = request.form['remarks']
-        remarks = ''
+
 
         machine = request.form['machine']
         temp_machine = machine
@@ -1745,8 +1754,9 @@ def submit_slitting_processing():
                     # For Slitting unit will be unit 2
                     unit = '2'
 
-                    for output_width, width_name, fg_yes_no in zip(output_width_lst, width_name_lst, fg_yes_no_lst):
-                        for part_length, part_name in zip(part_length_lst, part_name_lst):
+                    for output_width, width_name, fg_yes_no in (
+                            zip(output_width_lst, width_name_lst, fg_yes_no_lst)):
+                        for part_length, part_name, lami, remarks in zip(part_length_lst, part_name_lst, lamination_lst, remarks_lst):
                             output_length = 0
                             output_length2 = 0
                             processed_numbers = 1
@@ -1762,12 +1772,13 @@ def submit_slitting_processing():
                             processing_detail = ProcessingDetail(smpl_no, operation, machine, processing_id, output_width,
                                                                  output_length, processed_numbers, packet_name, _remarks,
                                                                  part_weight,
-                                                                 ms_width, ms_length, fg_yes_no, output_length2)
+                                                                 ms_width, ms_length, fg_yes_no, output_length2, lami)
 
                             cursor.execute(
                                 "insert into processing_detail (smpl_no, operation, machine, processing_id, input_width,"
                                 "input_length, cut_width, cut_length, processed_numbers, packet_name, processed_wt, "
-                                "remarks, status, cut_length2) values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                                "remarks, status, cut_length2, lami) values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,"
+                                " %s, %s, %s, %s)",
                                 (processing_detail.smpl_no,
                                  processing_detail.operation,
                                  processing_detail.machine,
@@ -1781,11 +1792,16 @@ def submit_slitting_processing():
                                  processing_detail.processed_wt,
                                  processing_detail.remarks,
                                  processing_detail.status,
-                                 processing_detail.cut_length2))
+                                 processing_detail.cut_length2, processing_detail.lami))
 
                             #processing_detail.save_to_db()
 
                             _remarks = ''
+                            if lami == "No Lamination" or lami == '':
+                                if input_lami == '':
+                                    lami = ''
+                                elif "Side" in input_lami:
+                                    lami = input_lami
 
                             # Reduce weight of mother material by the processed weight of cut material
                             # In case of rewinding, there is the RM and the FG which have the same size.
@@ -1863,14 +1879,14 @@ def submit_slitting_processing():
                                     if _packet_name == "WIP":
                                         cursor.execute(
                                             "select weight, numbers, unit, cs_id from current_stock where smpl_no = %s and width = %s "
-                                            "and length = %s and status = %s and length2 = %s",
-                                            (smpl_no, output_width, output_length, fg_yes_no, output_length2))
+                                            "and length = %s and status = %s and length2 = %s and lami = %s",
+                                            (smpl_no, output_width, output_length, fg_yes_no, output_length2, lami))
                                         user_data = cursor.fetchone()
                                     else:
                                         cursor.execute(
                                             "select weight, numbers, unit, cs_id from current_stock where smpl_no = %s and width = %s "
-                                            "and length = %s and status = %s and packet_name = %s and length2 = %s",
-                                            (smpl_no, output_width, output_length, fg_yes_no, _packet_name, output_length2))
+                                            "and length = %s and status = %s and packet_name = %s and length2 = %s and lami = %s",
+                                            (smpl_no, output_width, output_length, fg_yes_no, _packet_name, output_length2, lami))
 
                                         user_data = cursor.fetchone()
                                     if user_data:
@@ -1914,16 +1930,17 @@ def submit_slitting_processing():
 
                                         cs_cc = CurrentStock(smpl_no, customer, part_weight, processed_numbers, thickness,
                                                              output_width, output_length, fg_yes_no, grade, unit, _packet_name,
-                                                             output_length2, processing_date, processing_id, second_customer, net_wt)
+                                                             output_length2, processing_date, processing_id, second_customer,
+                                                             net_wt, lami)
                                         cursor.execute(
                                             "insert into current_stock (smpl_no,weight,numbers,width,length,status,customer,thickness"
-                                            ",grade, unit, packet_name, length2, date, processing_id, second_customer, net_wt) "
-                                            "values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+                                            ",grade, unit, packet_name, length2, date, processing_id, second_customer, net_wt, lami) "
+                                            "values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
                                             (
                                             cs_cc.smpl_no, cs_cc.weight, cs_cc.numbers, cs_cc.width, cs_cc.length, cs_cc.status,
                                             cs_cc.customer,
                                             cs_cc.thickness, cs_cc.grade, cs_cc.unit, cs_cc.packet_name, cs_cc.length2,
-                                            cs_cc.date, cs_cc.processing_id, cs_cc.second_customer, cs_cc.net_wt))
+                                            cs_cc.date, cs_cc.processing_id, cs_cc.second_customer, cs_cc.net_wt, cs_cc.lami))
 
                                 # If rewinding insert FG as new stock
                                 else:
@@ -1954,17 +1971,19 @@ def submit_slitting_processing():
                                     cs_cc = CurrentStock(smpl_no, customer, part_weight, processed_numbers, thickness,
                                                          output_width, output_length, fg_yes_no, grade, unit,
                                                          packet_name,
-                                                         output_length2, processing_date, processing_id, second_customer, net_wt)
+                                                         output_length2, processing_date, processing_id, second_customer,
+                                                         net_wt, lami)
                                     cursor.execute(
                                         "insert into current_stock (smpl_no,weight,numbers,width,length,status,customer,thickness"
-                                        ",grade, unit, packet_name, length2, date, processing_id, second_customer, net_wt) "
-                                        "values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+                                        ",grade, unit, packet_name, length2, date, processing_id, second_customer, "
+                                        "net_wt, lami) "
+                                        "values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
                                         (
                                             cs_cc.smpl_no, cs_cc.weight, cs_cc.numbers, cs_cc.width, cs_cc.length,
                                             cs_cc.status,
                                             cs_cc.customer,
                                             cs_cc.thickness, cs_cc.grade, cs_cc.unit, cs_cc.packet_name, cs_cc.length2,
-                                            cs_cc.date, cs_cc.processing_id, cs_cc.second_customer, cs_cc.net_wt))
+                                            cs_cc.date, cs_cc.processing_id, cs_cc.second_customer, cs_cc.net_wt, cs_cc.lami))
 
                                 # Unit of the material is decided based on the machine used to process the material.
                                 # WARNING: This is bad programming

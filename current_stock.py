@@ -12,7 +12,7 @@ import io
 
 class CurrentStock:
     def __init__(self, smpl_no, customer, weight, numbers, thickness, width, length, status, grade, unit, packet_name,
-                 length2, date, processing_id, second_customer, net_wt):
+                 length2, date, processing_id, second_customer, net_wt, lami = ''):
         self.smpl_no = smpl_no
         self.customer = customer
         self.weight = weight
@@ -29,21 +29,22 @@ class CurrentStock:
         self.processing_id = processing_id
         self.second_customer = second_customer
         self.net_wt = net_wt
+        self.lami = lami
 
 
     def save_to_db(self):
         with CursorFromConnectionFromPool() as cursor:
             cursor.execute("insert into current_stock (smpl_no,weight,numbers,width,length,status,customer,thickness"
-                           ",grade, unit, packet_name, length2, date, processing_id, second_customer, net_wt) "
-                           "values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                           ",grade, unit, packet_name, length2, date, processing_id, second_customer, net_wt, lami) "
+                           "values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
                            (self.smpl_no, self.weight, self.numbers, self.width, self.length, self.status, self.customer,
                            self.thickness, self.grade, self.unit, self.packet_name, self.length2, self.date,
-                            self.processing_id, self.second_customer, self.net_wt))
+                            self.processing_id, self.second_customer, self.net_wt, self.lami))
 
     def update_status(self, status):
         with CursorFromConnectionFromPool() as cursor:
-            cursor.execute("update current_stock set status = %s where smpl_no = %s and width = %s and length = %s",
-                           (status, self.smpl_no, self.width, self.length))
+            cursor.execute("update current_stock set status = %s where smpl_no = %s and width = %s and length = %s and lami = %s",
+                           (status, self.smpl_no, self.width, self.length, self.lami))
 
     @classmethod
     def update_status_cls(cls,cs_id,status):
@@ -271,7 +272,8 @@ class CurrentStock:
                     cs = CurrentStock(smpl_no=lst[1], weight=Decimal(lst[2]), numbers=int(lst[3]), width=Decimal(lst[4]),
                                       length=Decimal(lst[5]), status=lst[6], customer=lst[7], thickness=Decimal(lst[8]),
                                       grade=lst[9], unit=lst[10], packet_name = lst [11], length2 = lst[12],
-                                      date = lst[13], processing_id= lst[14], second_customer= lst[15], net_wt= lst[16])
+                                      date = lst[13], processing_id= lst[14], second_customer= lst[15], net_wt= lst[16],
+                                      lami= lst[20])
                     cs_lst.append(cs)
                     cs_id_lst.append(lst[0])
 
@@ -291,7 +293,8 @@ class CurrentStock:
                     cs = CurrentStock(smpl_no=lst[1], weight=Decimal(lst[2]), numbers=int(lst[3]), width=Decimal(lst[4]),
                                       length=Decimal(lst[5]), status=lst[6], customer=lst[7], thickness=Decimal(lst[8]),
                                       grade=lst[9], unit=lst[10], packet_name=lst[11], length2 = lst[12],
-                                      date = lst[13], processing_id= lst[14], second_customer= lst[15], net_wt=lst[16])
+                                      date = lst[13], processing_id= lst[14], second_customer= lst[15], net_wt=lst[16],
+                                      lami = lst[20])
                     cs_lst.append(cs)
                     cs_id_lst.append(lst[0])
 
@@ -313,7 +316,8 @@ class CurrentStock:
                                       width=Decimal(lst[4]),
                                       length=Decimal(lst[5]), status=lst[6], customer=lst[7], thickness=Decimal(lst[8]),
                                       grade=lst[9], unit=lst[10], packet_name = lst [11], length2 = lst[12],
-                                      date = lst[13], processing_id= lst[14], second_customer= lst[15], net_wt= lst[16])
+                                      date = lst[13], processing_id= lst[14], second_customer= lst[15], net_wt= lst[16],
+                                      lami = lst[21])
                     cs_lst.append(cs)
 
 
@@ -335,25 +339,25 @@ class CurrentStock:
                                   customer=user_data[7], thickness=Decimal(user_data[8]), grade=user_data[9],
                                   unit=user_data[10], packet_name = user_data[11], length2 = user_data[12],
                                   date = user_data[13], processing_id= user_data[14], second_customer= user_data[15],
-                                  net_wt= user_data[16])
+                                  net_wt= user_data[16], lami = user_data[21])
 
                 return cs
             else:
                 return None
 
     @classmethod
-    def change_wt(cls, smpl_no, width, length, processed_wt, actual_no_of_pieces, sign, status, length2, packet_name = ""):
+    def change_wt(cls, smpl_no, width, length, processed_wt, actual_no_of_pieces, sign, status, length2, lami, packet_name = ""):
         with CursorFromConnectionFromPool() as cursor:
             if packet_name == "":
                 cursor.execute("select weight, numbers, unit, cs_id from current_stock where smpl_no = %s and width = %s "
-                               "and length = %s and status = %s and length2 = %s",
-                               (smpl_no, width, length, status, length2))
+                               "and length = %s and status = %s and length2 = %s and lami = %s",
+                               (smpl_no, width, length, status, length2, lami))
                 user_data = cursor.fetchone()
             else:
                 cursor.execute(
                     "select weight, numbers, unit, cs_id from current_stock where smpl_no = %s and width = %s "
-                    "and length = %s and status = %s and packet_name = %s and length2 = %s",
-                    (smpl_no, width, length, status, packet_name, length2))
+                    "and length = %s and status = %s and packet_name = %s and length2 = %s and lami = %s",
+                    (smpl_no, width, length, status, packet_name, length2, lami))
                 user_data = cursor.fetchone()
             if user_data:
                 weight = Decimal(user_data[0])
@@ -440,7 +444,8 @@ class CurrentStock:
             cs = CurrentStock(smpl_no=lst[1],weight = Decimal(lst[2]),numbers=int(lst[3]),width=Decimal(lst[4]),
                               length=Decimal(lst[5]),status=lst[6],customer=lst[7], thickness=Decimal(lst[8]),
                               grade=lst[9],unit=lst[10], packet_name = lst [11], length2 = lst[12],
-                              date = lst[13], processing_id= lst[14], second_customer= lst[15], net_wt= lst[16])
+                              date = lst[13], processing_id= lst[14], second_customer= lst[15], net_wt= lst[16],
+                              lami = lst[20])
             cs_lst.append(cs)
             cs_id_lst.append(lst[0])
         return zip(cs_id_lst,cs_lst)
@@ -457,7 +462,8 @@ class CurrentStock:
             cs = CurrentStock(smpl_no=lst[1], weight=Decimal(lst[2]), numbers=int(lst[3]), width=Decimal(lst[4]),
                               length=Decimal(lst[5]), status=lst[6], customer=lst[7], thickness=Decimal(lst[8]),
                               grade=lst[9], unit=lst[10], packet_name = lst [11], length2 = lst[12],
-                              date = lst[13], processing_id= lst[14], second_customer= lst[15], net_wt= lst[16])
+                              date = lst[13], processing_id= lst[14], second_customer= lst[15], net_wt= lst[16],
+                              lami = lst[20])
             cs_lst.append(cs)
             cs_id_lst.append(lst[0])
         return zip(cs_id_lst,cs_lst)
@@ -540,7 +546,8 @@ class CurrentStock:
             cs = CurrentStock(smpl_no=lst[1],weight = Decimal(lst[2]),numbers=int(lst[3]),width=Decimal(lst[4]),
                               length=Decimal(lst[5]),status=lst[6],customer=lst[7], thickness=Decimal(lst[8]),
                               grade=lst[9],unit=lst[10], packet_name = lst [11], length2 = lst[12],
-                              date = lst[13], processing_id= lst[14], second_customer= lst[15], net_wt= lst[16])
+                              date = lst[13], processing_id= lst[14], second_customer= lst[15], net_wt= lst[16],
+                              lami = lst[20])
             cs_lst.append(cs)
             cs_id_lst.append(lst[0])
 
@@ -592,7 +599,7 @@ class CurrentStock:
                                   thickness=Decimal(user_data[8]), grade=user_data[9],
                                   unit=user_data[10], packet_name=user_data[11], length2 = user_data[12],
                                   date = user_data[13], processing_id= user_data[14], second_customer= user_data[15],
-                                  net_wt= user_data[16])
+                                  net_wt= user_data[16], lami = user_data[20])
                 cs_lst.append(cs)
                 cs_id_lst.append(user_data[0])
                 return zip(cs_id_lst, cs_lst)
@@ -613,7 +620,7 @@ class CurrentStock:
                                   customer=user_data[7], thickness=Decimal(user_data[8]), grade=user_data[9],
                                   unit=user_data[10], packet_name = user_data[11], length2 = user_data[12],
                                   date = user_data[13], processing_id= user_data[14], second_customer= user_data[15],
-                                  net_wt= user_data[16])
+                                  net_wt= user_data[16], lami = user_data[20])
 
                 return cs
             else:
@@ -795,7 +802,7 @@ class CurrentStock:
                               customer=user_data[7], thickness=Decimal(user_data[8]), grade=user_data[9],
                               unit=user_data[10], packet_name=user_data[11], length2=user_data[12],
                               date=user_data[13], processing_id=user_data[14], second_customer=user_data[15],
-                              net_wt=user_data[16])
+                              net_wt=user_data[16], lami = user_data[20])
 
             return cs
         else:
