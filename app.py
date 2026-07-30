@@ -36,6 +36,7 @@ from slitter_batch import SlitterBatch
 import time
 import psycopg2
 from urllib.parse import unquote
+import ssl
 
 # The rates machine cost - direct labour cost
 # in the pricing sheet, delete the direct labour row, the total cost you get is the cost mentioned here
@@ -4082,18 +4083,21 @@ def daily_report_whatsapp():
         dispatch_lst =  DispatchHeader.get_daily_report_whatsapp(yesterday_date)
         dispatch_msg = ''
 
+        # Create the unverified context once before the loop
+        context = ssl._create_unverified_context()
+
         for phone_no in phone_number_lst:
             incoming_msg = 'https://twha.inosms.com/api/sendText?token=624682490c9014d2e917f18e&phone=' + phone_no + '&message=Incoming%20' + change_date_format(yesterday_date) + '%0a%20Unit%201%20-%20' + str(total_incoming_unit1) + '%20MT%0a%20Unit%202%20-%20' + str(total_incoming_unit2) + '%20MT%0a%20Unit%204%20-%20' + str(total_incoming_unit4) +'%20MT'
 
-            urllib.request.urlopen(incoming_msg)
+            urllib.request.urlopen(incoming_msg, context=context)
 
             processing_unit1_msg = 'https://twha.inosms.com/api/sendText?token=624682490c9014d2e917f18e&phone=' + phone_no + '&message=Processing%20Unit%201%20' + change_date_format(yesterday_date) + '%0aCTL%20-%20' + str(processing_ctl1) + '%20MT%0aReshearing%20-%20' + str(processing_reshearing1) + '%20MT'
 
-            urllib.request.urlopen(processing_unit1_msg)
+            urllib.request.urlopen(processing_unit1_msg, context=context)
 
             processing_unit2_msg = 'https://twha.inosms.com/api/sendText?token=624682490c9014d2e917f18e&phone=' + phone_no + '&message=Processing%20U2%20' + change_date_format(yesterday_date) + '%0aCTL%20-%20' + str(processing_ctl2) + '%0aSlitting%20-%20' + str(processing_slitting) + '%0aNCTL%20-%20' + str(processing_nctl) + '%0aReshearing%20-%20' + str(processing_reshearing2) + '%20MT'
 
-            urllib.request.urlopen(processing_unit2_msg)
+            urllib.request.urlopen(processing_unit2_msg, context=context)
 
             dispatch_msg = 'https://twha.inosms.com/api/sendText?token=624682490c9014d2e917f18e&phone=' + phone_no + '&message=Dispatch%20' + change_date_format(yesterday_date)
             if dispatch_lst:
@@ -4101,7 +4105,7 @@ def daily_report_whatsapp():
                 for dispatch in dispatch_lst:
                     dispatch_msg = dispatch_msg + '%0a%20Unit%20' + dispatch[0] + '%20-%20' + str(dispatch[1]) + '%20MT'
 
-            urllib.request.urlopen(dispatch_msg)
+            urllib.request.urlopen(dispatch_msg, context=context)
 
 # This is to schedule the whatsapp messages
 scheduler = BackgroundScheduler()
