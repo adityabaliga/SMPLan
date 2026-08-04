@@ -65,11 +65,11 @@ class Order:
             return data[0]
 
     @classmethod
-    def history_load_from_db(cls, smpl_no):
+    def history_load_from_db(cls, order_id):
         order_id_lst = []
         order_lst = []
         with CursorFromConnectionFromPool() as cursor:
-            cursor.execute('select * from order_header where smpl_no = %s', (smpl_no,))
+            cursor.execute('select * from order_header where order_id = %s', (order_id,))
             lst = cursor.fetchone()
             if lst:
                 order = Order(smpl_no=lst[1], order_date=lst[2], expected_date=lst[3], processing_wt=lst[4],
@@ -88,18 +88,13 @@ class Order:
         order_id_lst = []
 
         with CursorFromConnectionFromPool() as cursor:
-            cursor.execute("select * from order_header where status= 'Open' order by smpl_no asc")
+            cursor.execute("select o.*, i.customer, i.thickness, i.width from order_header o "
+                           "left join incoming i on o.smpl_no = i.smpl_no "
+                           "where status= 'Open' order by o.smpl_no asc")
             # cursor.execute("select * from current_stock order by smpl_no asc")
             user_data = cursor.fetchall()
 
             if user_data:
-                for lst in user_data:
-                    order = Order(smpl_no=lst[1], order_date=lst[2], expected_date=lst[3], processing_wt=lst[4],
-                                  status=lst[5], remarks=lst[6])
-
-                    order_id = int(lst[0])
-                    order_id_lst.append(order_id)
-                    order_lst.append(order)
-                return order_lst
+                return user_data
             else:
                 return None

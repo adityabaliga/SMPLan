@@ -908,20 +908,22 @@ def view_order():
     stage_no_lst = []
 
     if request.method == 'POST':
-        smpl_no = request.form['select_smpl']
+        order_id = request.form['select_order']
 
     if request.method == 'GET':
-        smpl_no = request.args.get('select_smpl')
+        order_id = request.args.get('select_order')
 
-    incoming = Incoming.load_smpl_by_smpl_no(smpl_no)
-    order_lst = Order.history_load_from_db(smpl_no)
+    order_lst = Order.history_load_from_db(order_id)
 
     for order_id, _order in order_lst:
-        _order_detail_lst = OrderDetail.load_from_db(smpl_no, order_id)
+        _order_detail_lst = OrderDetail.load_from_db(_order.smpl_no, order_id)
         order = _order
+        smpl_no = _order.smpl_no
 
     for order_detail_id, order_detail in _order_detail_lst:
         order_detail_lst.append(order_detail)
+
+    incoming = Incoming.load_smpl_by_smpl_no(smpl_no)
 
     i = 0
     while len(order_detail_lst) > 0:
@@ -946,9 +948,55 @@ def view_order():
 
     return render_template('view_order.html', smpl_no=smpl_no, customer=incoming.customer, thickness=incoming.thickness,
                            width=incoming.width, length=incoming.length, grade=incoming.grade,
-                           weight=incoming.weight, numbers=incoming.numbers, order=order,
+                           weight=incoming.weight, numbers=incoming.numbers, order=order, order_id = order_id,
                            order_detail_lst=zip(order_detail_for_print_lst, operation_lst, ms_lst, proc_wt_lst,
                                                 stage_no_lst))
+
+@app.route('/delete_order', methods=['GET', 'POST'])
+def delete_order():
+    if request.method == 'POST':
+        order_id = request.form['order_id']
+        smpl_no = request.form['smpl_no']
+
+
+    if request.method == 'GET':
+        order_id = request.args.get('order_id')
+        smpl_no = request.args.get('smpl_no')
+
+    # Establish a database connection
+    connection = psycopg2.connect(
+        dbname='smpl_prodn',
+        user='postgres',
+        password='smpl@509',
+        host='localhost',
+        port=5432
+    )
+
+    try:
+        # Begin a transaction
+        connection.autocommit = False
+        cursor = connection.cursor()
+        cursor.execute('delete from order_header where order_id = %s', (order_id,))
+        connection.commit()
+    except (Exception, psycopg2.Error) as error:
+        # Rollback the transaction if an error occurred
+        connection.rollback()
+        # Close the cursor
+        cursor.close()
+
+    except psycopg2.OperationalError as error:
+        # Handle network errors
+        print("Network error occurred:", error)
+        print("Rolling back the transaction...")
+        connection.rollback()
+        return render_template('/main_menu.html', message="Order Not Deleted")
+    finally:
+        # Close the database connection
+        connection.close()
+
+    return render_template('/main_menu.html', message="SMPL No " + smpl_no + " Order deleted.")
+
+
 
 
 # To load orders by machine to chose for processing

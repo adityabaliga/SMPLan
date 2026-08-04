@@ -47,13 +47,15 @@
                 <th>Customer</th>
                 <th>Weight in MT</th>
                 <th>Size</th>
+                <th>Order Date</th>
             </tr>
         {% for order in smpl_lst %}
             <tr>
-                <td><input type = "radio" name = "select_smpl" value = "{{order.smpl_no}}">  {{order.smpl_no}}</input></td>
-                <td></td>
-                <td>{{order.weight}}</td>
-                <td></td>
+                <td><input type = "radio" name = "select_order" id = "select_order" value = "{{order[0]}}">  {{order[1]}}</input></td>
+                <td>{{order[7]}}</td>
+                <td>{{order[4]}}</td>
+                <td>{{order[8]}} x {{order[9]}}</td>
+                <td>{{order[2]}}</td>
             </tr>
         {% endfor %}
     <!--/select-->
