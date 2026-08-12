@@ -1,7 +1,7 @@
 var orderController = (function () {
    var Order = function(id, operation, stage_no, input_width, input_length, fg_wip, output_width, output_length,
    lamination, tolerance, i_dia, processing_wt, wt_per_pkt, numbers, no_of_pkts, no_per_pkt, packing,
-   remarks,op_processing_wt, no_of_parts, length_per_part, outer_dia, half_cut_stop){
+   remarks,op_processing_wt, no_of_parts, length_per_part, outer_dia, half_cut_stop, special_instructions){
         this.id = id;
         this.operation = operation;
         this.stage_no = stage_no;
@@ -25,6 +25,7 @@ var orderController = (function () {
         this.length_per_part  = length_per_part || 0;
         this.outer_dia        = outer_dia || 0;
         this.half_cut_stop = half_cut_stop || 0;
+        this.special_instructions = special_instructions || '';
    };
 
    var operationAbbr = {
@@ -87,7 +88,7 @@ var orderController = (function () {
                 input.fg_wip, input.cut_width, input.cut_length, input.lamination, input.tolerance, input.i_dia,
                 input.processing_wt, input.wt_per_pkt, input.numbers, input.no_of_pkts, input.nos_per_pkt,
                 input.packing, input.remarks, input.op_processing_wt, input.no_of_parts, input.length_per_part,
-                 input.outer_dia);
+                 input.outer_dia, input.special_instructions);
 
                 // Add it to the array based on the operation
                 data.allOrders[input.operation].push(newOrder);
@@ -109,7 +110,7 @@ var orderController = (function () {
                   input.input_length + "," + input.fg_wip + "," +  input.output_width + "," + input.output_length + "," +
                   input.lamination + "," +  input.tolerance + "," + input.i_dia + "," + input.processing_wt + "," +
                   input.wt_per_pkt + "," + input.numbers + "," +  input.no_of_pkts + "," + input.nos_per_pkt + "," +
-                  input.packing + "," +  input.remarks + "^";
+                  input.packing + "," +  input.remarks + "," + input.special_instructions + "^";
               }
           }
           if (data.allOrders['Slitting'].length > 0) {
@@ -357,13 +358,20 @@ var UIController = (function() {
                length_per_part : parseFloat(document.querySelector('.length_per_part').value) || 0,
                outer_dia : parseFloat(document.querySelector('.outer_dia').value) || 0,
                half_cut_stop : parseFloat(document.querySelector('.length_per_part').value) * parseFloat(document.querySelector('.no_of_parts').value) || 0,
+               special_instructions : (function(){
+                var halfCutDiv = document.querySelector('.slitting_half_cut');
+                if(halfCutDiv && halfCutDiv.style.display !== 'none' && halfCutDiv.textContent){
+                    return halfCutDiv.textContent.trim();
+                }
+                return '';
+                })(),
                packing : document.querySelector(DOMStrings.currentFG_WIP).value === "WIP"
-          ? "WIP"
-          : document.querySelector('.packing_covering').value + ' / ' +
-            document.querySelector('.packing_support').value + ' / ' +
-            document.querySelector('.packing_strapping').value,
-               remarks : document.querySelector(DOMStrings.currentRemarks).value
-           };
+              ? "WIP"
+              : document.querySelector('.packing_covering').value + ' / ' +
+                document.querySelector('.packing_support').value + ' / ' +
+                document.querySelector('.packing_strapping').value,
+                   remarks : document.querySelector(DOMStrings.currentRemarks).value
+               };
        },
 
        addListOrder : function(newOrder, operation){
@@ -630,7 +638,9 @@ var UIController = (function() {
 
 var controller = (function(orderCtrl, UICtrl) {
    var setupEventListeners = (function(){
-      var DOM = UICtrl.getDOMstrings();
+        // Guard — only run if we're on the order entry page
+        if(!document.getElementById('order')) return;
+        var DOM = UICtrl.getDOMstrings();
        document.getElementById('expected_date').addEventListener("focusout",checkExpectedDate);
 
        //document.querySelector(DOM.orderForm).addEventListener("load", formOnLoad);
@@ -691,6 +701,13 @@ var controller = (function(orderCtrl, UICtrl) {
             HTMLFormElement.prototype.submit.call(this);;
        });
    });
+
+   var setupReprintListener = function(){
+    var reprintBtn = document.querySelector('.reprint_btn');
+    if(reprintBtn){
+        reprintBtn.addEventListener('click', reprintOrder);
+    }
+};
 
     var formOnLoad = function(){
         var DOM = UICtrl.getDOMstrings();
@@ -1935,8 +1952,191 @@ var controller = (function(orderCtrl, UICtrl) {
         return true;
     };
 
+    var buildAllOrdersFromData = function(data){
+    console.log('order_details from data:', data.order_details);
+    var allOrders = {
+        CTL: [],
+        Slitting: [],
+        Mini_Slitting: [],
+        Narrow_CTL: [],
+        Reshearing: [],
+        Lamination: [],
+        Levelling: []
+    };
 
-    var printAllStages = function(){
+    data.order_details.forEach(function(d, index){
+        if(allOrders[d.operation] !== undefined){
+            allOrders[d.operation].push({
+                id:                  index,
+                operation:           d.operation,
+                stage_no:            d.stage_no,
+                input_width:         d.input_width,
+                input_length:        d.input_length,
+                output_width:        d.output_width,
+                output_length:       d.output_length,
+                fg_wip:              d.fg_wip,
+                processing_wt:       d.processing_wt,
+                numbers:             d.numbers,
+                no_per_pkt:          d.no_per_pkt,
+                no_of_pkts:          d.no_of_pkts,
+                packing:             d.packing,
+                remarks:             d.remarks,
+                tolerance:           d.tolerance,
+                lamination:          d.lamination,
+                wt_per_pkt:          d.wt_per_pkt,
+                i_dia:               d.i_dia,
+                outer_dia:           d.outer_dia,
+                op_processing_wt:    d.processing_wt,
+                length_per_part:     d.length_per_part,
+                no_of_parts:         d.no_of_parts
+            });
+        }
+    });
+
+    // Calculate op_processing_wt per stage per operation
+    var stage_op_wt = {};
+    Object.keys(allOrders).forEach(function(operation){
+        allOrders[operation].forEach(function(order){
+            var key = order.stage_no + '_' + order.operation;
+            stage_op_wt[key] = (stage_op_wt[key] || 0) + parseFloat(order.processing_wt);
+        });
+    });
+
+    // Add op_processing_wt back to each order
+    Object.keys(allOrders).forEach(function(operation){
+        allOrders[operation].forEach(function(order){
+            var key = order.stage_no + '_' + order.operation;
+            order.op_processing_wt = Math.round(stage_op_wt[key] * 1000) / 1000;
+        });
+});
+
+    return allOrders;
+};
+
+
+    var buildStagePairs = function(allOrders){
+    var stagePairs = [];
+    Object.keys(allOrders).forEach(function(operation){
+        allOrders[operation].forEach(function(order){
+            var key = order.stage_no + '_' + operation;
+            if(!stagePairs.find(function(p){ return p.key === key; })){
+                stagePairs.push({ key: key, stage_no: order.stage_no, operation: operation });
+            }
+        });
+    });
+    stagePairs.sort(function(a, b){
+        if(a.stage_no !== b.stage_no) return a.stage_no - b.stage_no;
+        return a.operation.localeCompare(b.operation);
+    });
+    return stagePairs;
+};
+
+    var buildIncomingHTML = function(source){
+    // source can be either a DOM-cloned incoming table (for live print)
+    // or a plain data object from Flask (for reprint)
+    if(source.nodeType){
+        // It's a DOM element — just return outerHTML (existing logic)
+        return source.outerHTML;
+    } else {
+        // It's a data object from Flask — build HTML string from data
+        return '<table style="border-collapse:collapse; width:100%;">' +
+            // Row 1 - SMPL No, Customer, Material Type (bigger font)
+        // Row 1 - SMPL No, Customer, Material Type (bigger font on td)
+        '<tr>' +
+        '<td style="border:1px solid #000; padding:4px; font-size:18px !important; font-weight:bold !important;"><b>SMPL No</b></td>' +
+        '<td style="border:1px solid #000; padding:4px; font-size:18px !important; font-weight:bold !important;"><b>' + source.smpl_no + '</b></td>' +
+        '<td style="border:1px solid #000; padding:4px; font-size:18px !important; font-weight:bold !important;"><b>Customer</b></td>' +
+        '<td style="border:1px solid #000; padding:4px; font-size:18px !important; font-weight:bold !important;"><b>' + source.customer + '</b></td>' +
+        '<td style="border:1px solid #000; padding:4px; font-size:18px !important; font-weight:bold !important;"><b>Material Type</b></td>' +
+        '<td style="border:1px solid #000; padding:4px; font-size:18px !important; font-weight:bold !important;"><b>' + source.material_type + '</b></td>' +
+        '</tr>' +
+
+        // Row 2 - Thickness, Width, Length (bigger font on td)
+        '<tr>' +
+        '<td style="border:1px solid #000; padding:4px; font-size:18px !important; font-weight:bold !important;"><b>Thickness</b></td>' +
+        '<td style="border:1px solid #000; padding:4px; font-size:18px !important; font-weight:bold !important;"><b>' + source.thickness + '</b></td>' +
+        '<td style="border:1px solid #000; padding:4px; font-size:18px !important; font-weight:bold !important;"><b>Width</b></td>' +
+        '<td style="border:1px solid #000; padding:4px; font-size:18px !important; font-weight:bold !important;"><b>' + source.width + '</b></td>' +
+        '<td style="border:1px solid #000; padding:4px; font-size:18px !important; font-weight:bold !important;"><b>Length</b></td>' +
+        '<td style="border:1px solid #000; padding:4px; font-size:18px !important; font-weight:bold !important;"><b>' + source.length + '</b></td>' +
+        '</tr>' +
+
+        // Row 3 - Available Wt, Numbers, Length of Coil
+        '<tr>' +
+        '<td style="border:1px solid #000; padding:4px;">Available Weight in MT</td>' +
+        '<td style="border:1px solid #000; padding:4px;">' + source.available_wt + '</td>' +
+        '<td style="border:1px solid #000; padding:4px;">Numbers</td>' +
+        '<td style="border:1px solid #000; padding:4px;">' + source.numbers + '</td>' +
+        '<td style="border:1px solid #000; padding:4px;">Length of Coil (in m)</td>' +
+        '<td style="border:1px solid #000; padding:4px;">' + (source.length_of_coil || '') + '</td>' +
+        '</tr>' +
+
+        // Row 4 - Grade, Mill, Mill ID
+        '<tr>' +
+        '<td style="border:1px solid #000; padding:4px;">Grade</td>' +
+        '<td style="border:1px solid #000; padding:4px;">' + source.grade + '</td>' +
+        '<td style="border:1px solid #000; padding:4px;">Mill</td>' +
+        '<td style="border:1px solid #000; padding:4px;">' + source.mill + '</td>' +
+        '<td style="border:1px solid #000; padding:4px;">Mill ID</td>' +
+        '<td style="border:1px solid #000; padding:4px;">' + source.mill_id + '</td>' +
+        '</tr>' +
+
+        // Row 5 - Processing Wt, Order Date, Expected Date
+        '<tr>' +
+        '<td style="border:1px solid #000; padding:4px;">Processing Weight in MT</td>' +
+        '<td style="border:1px solid #000; padding:4px;">' + source.processing_wt + '</td>' +
+        '<td style="border:1px solid #000; padding:4px;">Order Date</td>' +
+        '<td style="border:1px solid #000; padding:4px;">' + source.order_date + '</td>' +
+        '<td style="border:1px solid #000; padding:4px;">Expected Date</td>' +
+        '<td style="border:1px solid #000; padding:4px;">' + (source.expected_date || '') + '</td>' +
+        '</tr>' +
+
+        // Row 6 - Incoming Remarks
+        '<tr>' +
+        '<td style="border:1px solid #000; padding:4px;" colspan="2"></td>' +
+        '<td style="border:1px solid #000; padding:4px;">Incoming Remarks</td>' +
+        '<td style="border:1px solid #000; padding:4px;" colspan="3"><b>' + (source.incoming_remarks || '') + '</b></td>' +
+        '</tr>' +
+
+        '</table>';
+    }
+
+};
+
+var openPrintWindow = function(pagesHTML){
+    var printWindow = window.open('', '_blank');
+    printWindow.document.write(`
+        <html>
+        <head>
+            <title>Print Order</title>
+            <style>
+                @page { size: A4 landscape; margin: 10mm; }
+                body { font-family: Arial, sans-serif; margin: 10px; font-size: 11px; }
+                table { border-collapse: collapse; width: 100%; margin-bottom: 10px; }
+                table, th, td { border: 1px solid #000; padding: 4px; font-size: 11px; }
+                h3 { text-align: center; margin: 5px 0; }
+                .stage-page { margin-bottom: 10px; }
+                * {
+                    page-break-after: auto;
+                    page-break-before: auto;
+                }
+            </style>
+        </head>
+        <body>
+            ${pagesHTML}
+        </body>
+        </html>
+    `);
+    printWindow.document.close();
+    printWindow.onload = function(){
+        setTimeout(() => {
+            printWindow.focus();
+            printWindow.print();
+        }, 500);
+    };
+};
+
+var printAllStages = function(){
     var allOrders = orderCtrl.getAllOrders();
     var maxStage = orderCtrl.getMaxStageNo();
 
@@ -2000,7 +2200,63 @@ var controller = (function(orderCtrl, UICtrl) {
         });
     }
 
-    // Build HTML for each stage+operation page
+    // Build short incoming - only first 2 rows
+    var shortIncoming = document.getElementById("incoming_details").cloneNode(true);
+
+    // Handle date inputs - same as incoming
+    document.getElementById("incoming_details").querySelectorAll('input[type="date"]').forEach(function(originalInput){
+        if(originalInput.value){
+            const parts = originalInput.value.split('-');
+            const formatted = parts[2] + '-' + parts[1] + '-' + parts[0];
+            const clonedInput = shortIncoming.querySelector('input[name="' + originalInput.name + '"]')
+                             || shortIncoming.querySelector('input[id="' + originalInput.id + '"]');
+            if(clonedInput){
+                const span = document.createElement('span');
+                span.textContent = formatted;
+                clonedInput.parentNode.replaceChild(span, clonedInput);
+            }
+        }
+    });
+
+    // Replace remaining inputs with spans
+    shortIncoming.querySelectorAll("input, textarea, select").forEach(function(input){
+        var span = document.createElement("span");
+        if(input.tagName.toLowerCase() === "select"){
+            var selected = input.options[input.selectedIndex];
+            span.textContent = selected ? selected.text : "";
+        } else {
+            span.textContent = input.value;
+        }
+        input.parentNode.replaceChild(span, input);
+    });
+
+    // First 2 rows bigger font
+    var shortIncomingRows = Array.from(shortIncoming.querySelectorAll("tr"));
+    for(var i = 0; i < Math.min(2, shortIncomingRows.length); i++){
+        shortIncomingRows[i].querySelectorAll("td, th").forEach(function(cell){
+            cell.setAttribute("style", "font-size: 18px !important; font-weight: bold !important;");
+        });
+    }
+
+    // Remove all rows after first 2
+    shortIncomingRows.slice(2).forEach(function(row){ row.parentNode.removeChild(row); });
+
+    var shortIncomingHTML = shortIncoming.outerHTML;
+
+    var processingWt = parseFloat(document.getElementById('processing_wt').value) || 0;
+
+    var specialInstructions = (function(){
+    var halfCutDiv = document.querySelector('.slitting_half_cut');
+    if(halfCutDiv && halfCutDiv.style.display !== 'none' && halfCutDiv.textContent){
+        return halfCutDiv.textContent.trim();
+    }
+    return '';
+    })();
+
+    printFromData(allOrders, stagePairs, incoming.outerHTML, shortIncomingHTML, extra_details.outerHTML, processingWt, specialInstructions);
+};
+
+    /*// Build HTML for each stage+operation page
     var pagesHTML = '';
 
     stagePairs.forEach(function(pair, index){
@@ -2200,6 +2456,267 @@ var controller = (function(orderCtrl, UICtrl) {
             printWindow.print();
         }, 500);
     };
+};*/
+
+var printFromData = function(allOrders, stagePairs, incomingHTML, shortIncomingHTML, extraDetailsHTML, processingWt, specialInstructions){
+
+
+    var buildTableHTML = function(operation, stage_no, allOrders){
+        var tableId = operation + '_table';
+        var originalTable = document.getElementById(tableId);
+        if(!originalTable) return '';
+
+        var clonedTable = originalTable.cloneNode(true);
+
+        // Remove separator tbodies
+        clonedTable.querySelectorAll('tbody.stage-separator').forEach(function(sep){ sep.remove(); });
+        clonedTable.querySelectorAll('tbody.slitting-op-stage-header').forEach(function(sep){ sep.remove(); });
+        clonedTable.querySelectorAll('tbody.slitting-total-stage').forEach(function(sep){ sep.remove(); });
+        clonedTable.querySelectorAll('tbody.ctl-stage-header').forEach(function(sep){ sep.remove(); });
+
+        // Keep only tbodies matching this stage
+        var allTbodies = Array.from(clonedTable.querySelectorAll('tbody'));
+        var headerTbody = allTbodies[0];
+        allTbodies.slice(1).forEach(function(tbody){
+            var row = tbody.querySelector('tr');
+            if(!row) return;
+            var stageMatch = allOrders[operation].find(function(order){
+                return order.stage_no === stage_no &&
+                       'size-' + operation + '-' + order.id === row.id;
+            });
+            if(!stageMatch) tbody.remove();
+        });
+
+        // Sort WIP first then FG
+        var remainingTbodies = Array.from(clonedTable.querySelectorAll('tbody')).slice(1);
+        var wipTbodies = remainingTbodies.filter(function(tbody){
+            var row = tbody.querySelector('tr');
+            return row && row.cells.length > 1 && row.cells[1].textContent.trim().startsWith('WIP');
+        });
+        var fgTbodies = remainingTbodies.filter(function(tbody){
+            var row = tbody.querySelector('tr');
+            return row && row.cells.length > 1 && row.cells[1].textContent.trim() === 'FG';
+        });
+        var otherTbodies = remainingTbodies.filter(function(tbody){
+            var row = tbody.querySelector('tr');
+            if(!row || row.cells.length <= 1) return false;
+            var val = row.cells[1].textContent.trim();
+            return !val.startsWith('WIP') && val !== 'FG';
+        });
+        [...wipTbodies, ...fgTbodies, ...otherTbodies].forEach(function(tbody){ clonedTable.appendChild(tbody); });
+
+        // Remove Delete/Edit columns
+        Array.from(clonedTable.querySelectorAll('tbody')).slice(1).forEach(function(tbody){
+            var row = tbody.querySelector('tr');
+            if(row && row.cells.length >= 2){
+                row.deleteCell(-1);
+                row.deleteCell(-1);
+            }
+        });
+
+        // Remove Delete/Edit headers
+        var headerRow = headerTbody.querySelector('tr');
+        if(headerRow && headerRow.cells.length >= 2){
+            headerRow.deleteCell(headerRow.cells.length - 1);
+            headerRow.deleteCell(headerRow.cells.length - 1);
+        }
+
+        // Replace inputs with spans
+        clonedTable.querySelectorAll("input, textarea, select").forEach(function(input){
+            var span = document.createElement("span");
+            if(input.tagName.toLowerCase() === "select"){
+                var selected = input.options[input.selectedIndex];
+                span.textContent = selected ? selected.text : "";
+            } else {
+                span.textContent = input.value;
+            }
+            input.parentNode.replaceChild(span, input);
+        });
+
+        return clonedTable.outerHTML;
+    };
+
+    var pagesHTML = '';
+
+    stagePairs.forEach(function(pair, index){
+        var operation = pair.operation;
+        var stage_no = pair.stage_no;
+        var isSlitting = (operation === 'Slitting' || operation === 'Mini_Slitting');
+
+        var stageOrders = allOrders[operation].filter(function(o){ return o.stage_no === stage_no; });
+
+
+        // Build operation table HTML from data
+        var tableHTML = buildTableHTML(operation, stage_no, allOrders);
+        if(!tableHTML) return;
+
+        // Build slitting op HTML
+        var slittingOpHTML = '';
+        if(isSlitting){
+            var firstOrder = stageOrders[0];
+            var halfCutHTML = '';
+            if(firstOrder.op_processing_wt < processingWt && firstOrder.length_per_part > 0 && firstOrder.no_of_parts > 0){
+                var stop_at = (firstOrder.length_per_part * firstOrder.no_of_parts).toFixed(2);
+                halfCutHTML = '<tr><td colspan="5" style="border; padding:6px; font-weight:bold; text-align:center;">HALF CUT — Stop at ' + stop_at + ' m</td></tr>';
+            }
+
+            var totalWidth = stageOrders.reduce(function(sum, o){
+                return sum + (parseFloat(o.output_width) * parseFloat(o.numbers));
+            }, 0);
+
+            slittingOpHTML = '<table style="border-collapse:collapse; width:100%; margin-bottom:10px;">' +
+                '<tr style="background:#f0f0f0;">' +
+                '<td style="border:1px solid #000; padding:6px;"><b>Processing Wt</b><br>' + firstOrder.op_processing_wt + ' MT</td>' +
+                '<td style="border:1px solid #000; padding:6px;"><b>No of Parts</b><br>' + firstOrder.no_of_parts + '</td>' +
+                '<td style="border:1px solid #000; padding:6px;"><b>Length Per Part</b><br>' + firstOrder.length_per_part + ' m</td>' +
+                '<td style="border:1px solid #000; padding:6px;"><b>Internal Dia</b><br>' + firstOrder.i_dia + '</td>' +
+                '<td style="border:1px solid #000; padding:6px;"><b>Outer Dia</b><br>' + firstOrder.outer_dia + '</td>' +
+                '</tr>' +
+                halfCutHTML +
+                '</table>';
+
+            // Add total width row to table
+            var totalRow = '<tr style="background:#e8e8e8;">' +
+                '<td colspan="2" style="text-align:right; border:1px solid #000; padding:6px;"><b>Total Width Used:</b></td>' +
+                '<td style="border:1px solid #000; padding:6px;"><b>' + totalWidth.toFixed(0) + '</b></td>' +
+                '<td colspan="100"></td></tr>';
+            tableHTML = tableHTML.replace('</tbody></table>', totalRow + '</tbody></table>');
+        }
+
+        // Input material
+        var inputMaterialHTML = '';
+        if(operation === 'CTL' || operation === 'Slitting'){
+                var firstStageOrder = allOrders[operation].find(function(o){ return o.stage_no === stage_no; });
+                inputMaterialHTML = '<div style="font-weight:bold; font-size:13px;">' +
+                'Input Material: <span style="font-size:18px;">' + firstStageOrder.input_width + ' x ' + firstStageOrder.input_length + '</span>' +
+                '</div>';
+        }
+
+        // Stage summary
+        var stageSummary = stagePairs.map(function(p, idx2){
+            var isCurrent = (p.stage_no === stage_no && p.operation === operation);
+            return (isCurrent ? '► ' : '') +
+                'Stage ' + (idx2 + 1) + ': ' + p.operation.replace(/_/g, ' ') +
+                (isCurrent ? ' ◄' : '');
+        }).join('  |  ');
+
+        var isLastPage = (index === stagePairs.length - 1);
+        var turnOverMsg = !isLastPage
+            ? '<div style="text-align:center; font-weight:bold; font-size:14px; margin-top:15px; border:2px solid #000; padding:8px;">⟵ PLEASE TURN OVER — Next: Stage ' + (index + 2) + ': ' + stagePairs[index + 1].operation.replace(/_/g, ' ') + ' ⟶</div>'
+            : '<div style="text-align:center; font-weight:bold; font-size:14px; margin-top:15px; border:2px solid #000; padding:8px;">✓ LAST STAGE</div>';
+
+        var currentIncomingHTML = incomingHTML;
+
+         if(index === 0){
+            currentIncomingHTML = incomingHTML;
+         }else{
+              currentIncomingHTML = shortIncomingHTML;
+         }
+        console.log(currentIncomingHTML);
+
+        pagesHTML += `
+            <div class="stage-page">
+                <h3 style="text-align:center; font-size:16px;">
+                    Stage ${index + 1} of ${stagePairs.length} — ${operation.replace(/_/g, ' ')}
+                </h3>
+                ${currentIncomingHTML}
+
+                ${extraDetailsHTML || ''}
+                <h3 style="text-align:center; font-size:22px;">
+                    ${operation}
+                    ${inputMaterialHTML}
+                </h3>
+                ${slittingOpHTML}
+                ${tableHTML}
+                <div style="margin-top:20px; border-top:2px solid #000; padding-top:8px;">
+                    <div style="font-size:16px;">
+                        <b>All Stages:</b> ${stageSummary}
+                    </div>
+                </div>
+                ${turnOverMsg}
+            </div>
+            ${!isLastPage ? '<div style="page-break-after:always;"></div>' : ''}
+        `;
+    });
+
+    openPrintWindow(pagesHTML);
+};
+
+    var reprintOrder = function(){
+    var allOrders = buildAllOrdersFromData(orderData);
+    var stagePairs = buildStagePairs(allOrders);
+
+    // Clone from DOM - same as printAllStages
+    var incoming = document.getElementById("incoming_details").cloneNode(true);
+    var extra_details = document.getElementById("extra_details").cloneNode(true);
+
+    // Date inputs are already formatted as text in view_order.html (rendered by Flask)
+    // so just replace remaining inputs with spans
+    [incoming, extra_details].forEach(function(section){
+        section.querySelectorAll("input, textarea, select").forEach(function(input){
+            var span = document.createElement("span");
+            if(input.tagName.toLowerCase() === "select"){
+                var selected = input.options[input.selectedIndex];
+                span.textContent = selected ? selected.text : "";
+            } else {
+                span.textContent = input.value;
+            }
+            input.parentNode.replaceChild(span, input);
+        });
+    });
+
+    // First 2 rows bigger font
+    var incomingRows = incoming.querySelectorAll("tr");
+    for(var i = 0; i < Math.min(2, incomingRows.length); i++){
+        incomingRows[i].querySelectorAll("td, th").forEach(function(cell){
+            cell.setAttribute("style", "font-size: 18px !important; font-weight: bold !important;");
+        });
+    }
+
+    // Build short incoming - only first 2 rows
+    var shortIncoming = document.getElementById("incoming_details").cloneNode(true);
+
+    // Handle date inputs - same as incoming
+    document.getElementById("incoming_details").querySelectorAll('input[type="date"]').forEach(function(originalInput){
+    if(originalInput.value){
+        const parts = originalInput.value.split('-');
+        const formatted = parts[2] + '-' + parts[1] + '-' + parts[0];
+        const clonedInput = shortIncoming.querySelector('input[name="' + originalInput.name + '"]')
+                         || shortIncoming.querySelector('input[id="' + originalInput.id + '"]');
+        if(clonedInput){
+            const span = document.createElement('span');
+            span.textContent = formatted;
+            clonedInput.parentNode.replaceChild(span, clonedInput);
+        }
+    }
+});
+
+    // Replace remaining inputs with spans
+    shortIncoming.querySelectorAll("input, textarea, select").forEach(function(input){
+        var span = document.createElement("span");
+        if(input.tagName.toLowerCase() === "select"){
+            var selected = input.options[input.selectedIndex];
+            span.textContent = selected ? selected.text : "";
+        } else {
+            span.textContent = input.value;
+        }
+        input.parentNode.replaceChild(span, input);
+    });
+
+    // First 2 rows bigger font
+    var shortIncomingRows = Array.from(shortIncoming.querySelectorAll("tr"));
+    for(var i = 0; i < Math.min(2, shortIncomingRows.length); i++){
+        shortIncomingRows[i].querySelectorAll("td, th").forEach(function(cell){
+            cell.setAttribute("style", "font-size: 18px !important; font-weight: bold !important;");
+        });
+    }
+
+    // Remove all rows after first 2
+    shortIncomingRows.slice(2).forEach(function(row){ row.parentNode.removeChild(row); });
+
+    var shortIncomingHTML = shortIncoming.outerHTML;
+
+    printFromData(allOrders, stagePairs, incoming.outerHTML, shortIncomingHTML, extra_details.outerHTML, orderData.processing_wt, orderData.special_instructions);
 };
 
     var onSubmit = function(){
@@ -2214,6 +2731,13 @@ var controller = (function(orderCtrl, UICtrl) {
         expected_date: document.getElementById('expected_date').value,
         processing_wt: document.getElementById('processing_wt').value,
         remarks: document.querySelector('[name="hdr_remarks"]').value,
+        special_instructions:   (function(){
+        var halfCutDiv = document.querySelector('.slitting_half_cut');
+        if(halfCutDiv && halfCutDiv.style.display !== 'none' && halfCutDiv.textContent){
+            return halfCutDiv.textContent.trim();
+        }
+        return '';
+        })(),
         order_details: []
     };
 
@@ -2251,6 +2775,7 @@ var controller = (function(orderCtrl, UICtrl) {
         init: function() {
 
             setupEventListeners();
+            setupReprintListener();
         }
     };
 })(orderController,UIController);

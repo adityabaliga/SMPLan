@@ -18,6 +18,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 import atexit
 import io
 import json
+import math
 import os
 from io import BytesIO
 from psycopg2.extras import RealDictCursor
@@ -800,16 +801,17 @@ def submit_order():
             expected_date = expected_date if expected_date else None
             processing_wt = order_data.get('processing_wt')
             remarks = order_data.get('remarks')
+            special_instructions = order_data.get('special_instructions', '')
             order_details = order_data.get('order_details', [])
 
             # Insert header
             cursor.execute("""
                     INSERT INTO public.order_header
-                        (smpl_no, order_date, expected_date, processing_wt, status, remarks)
+                        (smpl_no, order_date, expected_date, processing_wt, status, remarks, special_instructions)
                     VALUES
-                        (%s, %s, %s, %s, %s, %s)
+                        (%s, %s, %s, %s, %s, %s, %s)
                     RETURNING order_id
-                """, (smpl_no, order_date, expected_date, processing_wt, 'Open', remarks))
+                """, (smpl_no, order_date, expected_date, processing_wt, 'Open', remarks, special_instructions))
 
             order_id = cursor.fetchone()[0]
 
@@ -908,22 +910,29 @@ def view_order():
     stage_no_lst = []
 
     if request.method == 'POST':
-        order_id = request.form['select_order']
+        order_info = request.form['select_order']
 
     if request.method == 'GET':
-        order_id = request.args.get('select_order')
+        order_info = request.args.get('select_order')
 
-    order_lst = Order.history_load_from_db(order_id)
+    order_id, width, length  = order_info.split("|")
 
-    for order_id, _order in order_lst:
-        _order_detail_lst = OrderDetail.load_from_db(_order.smpl_no, order_id)
-        order = _order
-        smpl_no = _order.smpl_no
+    order = Order.history_load_from_db(order_id)
+
+    _order_detail_lst = OrderDetail.load_from_db(order.smpl_no, order_id)
+    smpl_no = order.smpl_no
 
     for order_detail_id, order_detail in _order_detail_lst:
         order_detail_lst.append(order_detail)
 
     incoming = Incoming.load_smpl_by_smpl_no(smpl_no)
+    cs = CurrentStock.get_cs_by_size(smpl_no, Decimal(width), Decimal(length), 0, "MC")
+
+    half_cut=""
+    if cs:
+        if incoming.weight > cs.weight:
+            half_cut = " HALF CUT"
+
 
     i = 0
     while len(order_detail_lst) > 0:
@@ -946,11 +955,112 @@ def view_order():
             order_detail_lst.remove(order_detail3)
         order_detail_by_stage_and_op_lst = []
 
-    return render_template('view_order.html', smpl_no=smpl_no, customer=incoming.customer, thickness=incoming.thickness,
-                           width=incoming.width, length=incoming.length, grade=incoming.grade,
-                           weight=incoming.weight, numbers=incoming.numbers, order=order, order_id = order_id,
+    # Build order_details list for JSON
+    thickness = incoming.thickness
+    for order_detail in order_detail_for_print_lst:
+        for order_dtl in order_detail:
+            order_detail_lst.append(order_dtl)
+    order_details_for_json = []
+    for order_detail in order_detail_lst:
+        operation = order_detail.operation
+        ms_width = float(order_detail.ms_width)
+        ms_length = float(order_detail.ms_length)
+        cc_width = float(order_detail.cut_width)
+        cc_length = float(order_detail.cut_length)
+        proc_wt = float(order_detail.processing_wt)
+        numbers = int(order_detail.numbers)
+        fg_yes_no = order_detail.fg_yes_no
+        no_per_packet = int(order_detail.no_per_packet) if order_detail.no_per_packet else 0  # length_per_part for slitting
+        no_of_packets = int(order_detail.no_of_packets) if order_detail.no_of_packets else 0  # no_of_parts for slitting
+        packing = order_detail.packing
+        det_remarks = order_detail.remarks
+        stage_no = int(order_detail.stage_no)
+        tolerance = order_detail.tolerance
+        lamination = order_detail.lamination
+        wt_per_pkt = float(order_detail.wt_per_pkt) if order_detail.wt_per_pkt else 0
+        i_dia = float(order_detail.internal_dia) if order_detail.internal_dia else 0
+
+
+        # Calculate outer dia for slitting
+
+        outer_dia = 0
+        length_per_part = no_per_packet
+        if operation in ('Slitting', 'Mini_Slitting') and i_dia > 0 and length_per_part > 0 and thickness > 0:
+            outer_dia = math.sqrt(
+                (i_dia * i_dia) + (4 * length_per_part * float(thickness) * 1000 / math.pi)
+            )
+            outer_dia = round(outer_dia, 2)
+            length_per_part = float(order_detail.no_per_packet) if order_detail.no_per_packet else 0
+            no_of_parts = float(order_detail.no_of_packets) if order_detail.no_of_packets else 0
+        else:
+            length_per_part = 0
+            no_of_parts = 0
+
+        order_details_for_json.append({
+            'operation': operation,
+            'stage_no': stage_no,
+            'input_width': ms_width,
+            'input_length': ms_length,
+            'output_width': cc_width,
+            'output_length': cc_length,
+            'processing_wt': proc_wt,
+            'numbers': numbers,
+            'fg_yes_no': fg_yes_no,
+            'no_per_packet': no_per_packet,  # length_per_part for slitting
+            'no_of_packets': no_of_packets,  # no_of_parts for slitting
+            'packing': packing,
+            'remarks': det_remarks,
+            'stage_no': stage_no,
+            'tolerance': tolerance,
+            'lamination': lamination,
+            'wt_per_pkt': wt_per_pkt,
+            'i_dia': i_dia,
+            'outer_dia': outer_dia,
+            'length_per_part': length_per_part,  # mapped from no_per_packet for slitting
+            'no_of_parts': no_of_parts,  # mapped from no_of_packets for slitting
+
+        })
+
+    # Calculate op_processing_wt per stage per operation
+    # Group by stage_no + operation and sum processing_wt
+    from collections import defaultdict
+    stage_op_wt = defaultdict(float)
+    for d in order_detail_lst:
+        key = str(d.stage_no) + '_' + d.operation
+        stage_op_wt[key] += float(d.processing_wt)
+
+    # Add op_processing_wt to each detail
+    for d in order_detail_lst:
+        key = str(d.stage_no) + '_' + d.operation
+        d.processing_wt = round(stage_op_wt[key], 3)
+
+    # Build full JSON object
+    order_json = json.dumps({
+        'order_id': order_id,
+        'smpl_no': smpl_no,
+        'order_date': order.order_date.strftime('%d-%m-%Y'),
+        'expected_date': order.expected_date.strftime('%d-%m-%Y') if order.expected_date else '',
+        'processing_wt': float(order.processing_wt),
+        'remarks': order.remarks or '',
+        'special_instructions': order.special_instructions or '',
+        'customer': incoming.customer,
+        'thickness': float(incoming.thickness),
+        'width': float(incoming.width),
+        'length': float(incoming.length),
+        'material_type': incoming.material_type,
+        'grade': incoming.grade,
+        'mill': incoming.mill,
+        'mill_id': incoming.mill_id,
+        'incoming_remarks': incoming.remarks or '',
+        'available_wt': 'NA',
+        'numbers': 'NA',
+        'order_details': order_details_for_json
+    })
+
+    return render_template('view_order.html', smpl_no=smpl_no, incoming=incoming, order=order, order_id = order_id,
                            order_detail_lst=zip(order_detail_for_print_lst, operation_lst, ms_lst, proc_wt_lst,
-                                                stage_no_lst))
+                                                stage_no_lst), order_json=order_json,
+                           order_details_json=order_details_for_json, half_cut=half_cut, cs=cs)
 
 @app.route('/delete_order', methods=['GET', 'POST'])
 def delete_order():
@@ -4398,7 +4508,8 @@ def fg_to_wip_submit():
     #CurrentStock.update_status_cls(cs_id, "WIP")
     cs = CurrentStock.load_smpl_by_id(cs_id)
     ProcessingDetail.change_status(cs.smpl_no, cs.width, cs.length, cs.length2, cs.packet_name, 'WIP')
-    status = CurrentStock.change_wt(cs.smpl_no, cs.width, cs.length, cs.weight,cs.numbers, 'plus', 'WIP', cs.length2)
+    status = CurrentStock.change_wt(cs.smpl_no, cs.width, cs.length, cs.weight,cs.numbers, 'plus', 'WIP',
+                                    cs.length2, cs.lami)
 
     if status == 'insert':
         CurrentStock.update_status_cls(cs_id, "WIP")

@@ -26,7 +26,7 @@ class OrderDetail:
         self.stage_no = stage_no
         self.tolerance = tolerance
         self.lamination = lamination
-        self.wt_per_pkt =  wt_per_pkt
+        self.wt_per_pkt = wt_per_pkt
         self.internal_dia = internal_dia
 
     @classmethod

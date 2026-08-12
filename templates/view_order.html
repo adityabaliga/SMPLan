@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>SMPL MRP - Place Order</title>
+    <title>SMPL MRP - View Order</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
     <style>
         hr.style1{
@@ -38,42 +38,88 @@
             <a href="\logout">Logout</a></div></td>
         </table>
     </div>
-    <h2 align="center">Mother Coil Details</h2>
-    <table class = "table table-bordered">
-    <thead>
-        <tr>
-            <th>SMPL No</th>
-            <th>{{smpl_no}}</th>
-            <th>Customer</th>
-            <th>{{customer}}</th>
-        </tr>
-        <tr>
-            <th>Thickness</th>
-            <th>{{thickness}}</th>
-            <th>Grade</th>
-            <th>{{grade}}</th>
-        </tr>
+    <hr class ="style1">
+    <table class = "table table-sm" id="incoming_details">
+    <tr>
 
-    </thead>
+        <td>SMPL No</td>
+        <td><input type="text" name="smpl_no" class = "smpl_no" value = "{{smpl_no}}" readonly></td>
+
+        <td >Customer</td>
+        <td colspan="5"><b>{{incoming.customer}}</b></td>
+        <!--td><input type="text" name="customer" class = "customer" value = "{{incoming.customer}}" readonly></td-->
+
+
+    </tr>
+
+    <tr>
+        <td>Thickness</td>
+        <td><input type="text"  name="thickness" class = "thickness" value = "{{incoming.thickness}}"  readonly></td>
+
+        <td>Width</td>
+        <td><input type="text"  name="width" class = "width" value = "{{incoming.width}}" readonly></td>
+
+        <td>Length</td>
+        <td><input type="text"  name="length" class = "length" id="length" value = "{{incoming.length}}" readonly></td>
+
+        <td>Material Type</td>
+        <td><input type ="text" name="material_type" class="material_type" value="{{incoming.material_type}}" readonly></td>
+    </tr>
+    <tr>
+
+        <td>Available Weight in MT</td>
+        <td><input type="text" name="available_wt" class = "available_wt"  value = "{{cs.weight}}" readonly> <b> {{half_cut}}</b></td>
+
+        <td>Numbers</td>
+        <td><input type="text" name="available_numbers"  class="available_numbers" value = "{{cs.numbers}}" readonly></td>
+
+        <td>Length of Coil (in m) </td>
+        <td><input type="text" name="length_of_coil" class = "length_of_coil" id="length_of_coil" readonly></td>
+
+        <td>Grade</td>
+        <td><input type ="text" name="grade" class="grade" value="{{incoming.grade}}" readonly></td>
+    </tr>
+
+    <tr>
+
+        <td>Mill</td>
+        <td><input type ="text" name="mill" class="mill" value="{{incoming.mill}}" readonly></td>
+        <td>Mill ID</td>
+        <td><input type ="text" name="mill_id" class="mill_id" value="{{incoming.mill_id}}" readonly></td>
+        <td>Incoming Remarks</td>
+        <td colspan="3"><b>{{incoming.remarks}}</b></td>
+    </tr>
+
+
+
+    <tr>
+        <td>Processing Weight in MT</td>
+        <td><input type="number"  name="processing_wt"  id="processing_wt" class = "processing_wt" value = {{order.processing_wt}}></td>
+
+        <td>Order Date</td>
+        <td><input type="date"  id = "order_date" class ="order_date" name="order_date" value = {{order.order_date}}></td>
+
+        <td>Expected Date</td>
+        <td><input type="date"  id = "expected_date" class ="expected_date" name="expected_date" value = {{order.expected_date}}></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td></td>
+
+
+    </tr>
+
     </table>
-    <hr style="border-top: 5px solid #4d0000;">
-    <h2 align="center">Order</h2>
-        <input type="text" name = "order_id" id="order_id" value = "{{order_id}}" hidden>
-        <input type="text" name = "smpl_no" id="smpl_no" value = "{{smpl_no}}" hidden>
-        <table class = "table table-bordered">
-            <tr>
-                <td>Order Date</td>
-                <td>Expected Date</td>
-                <td>Processing Wt(MT)</td>
-                <td>Remarks</td>
-            </tr>
-            <tr>
-                <td>{{order.order_date}}</td>
-                <td>{{order.expected_date}}</td>
-                <td>{{order.processing_wt}}</td>
-                <td>{{order.remarks}}</td>
-            </tr>
-        </table>
+    <table id="extra_details">
+
+
+    <tr>
+
+        <td>Special Instructions</td>
+        <td><input type="text"  name="hdr_remarks" style="width:900px;" value="{{remarks}}"></td>
+    </tr>
+    </table>
+    <hr>
 
     <hr style="border-top: 5px solid #4d0000;">
     {% for order_dtl_lst,operation, ms, proc_wt, stage_no in order_detail_lst %}
@@ -98,8 +144,12 @@
         <tr>
             <th>Output Size</th>
             <th>Numbers x packets</th>
-            <th>Lamination</th>
             <th>Tolerance</th>
+            <th>Lamination</th>
+
+            <th>FG/WIP</th>
+            <th>No.s/pkt</th>
+            <th>No. of pkts</th>
             <th>Packing</th>
             <th>Remarks</th>
         </tr>
@@ -113,8 +163,12 @@
 
             <td>{{order_detail.cut_width}} x {{order_detail.cut_length}}</td>
             <td>{{order_detail.no_per_packet}} x {{order_detail.no_of_packets}}</td>
-            <td>{{order_detail.lamination}}</td>
             <td>{{order_detail.tolerance}}</td>
+            <td>{{order_detail.lamination}}</td>
+            <td>{{order_detail.fg_yes_no}}</td>
+            <td>{{order_detail.no_per_packet}}</td>
+            <td>{{order_detail.no_of_packets}}</td>
+
             <td>{{order_detail.packing}}</td>
             <td>{{order_detail.remarks}}</td>
 
@@ -189,13 +243,355 @@
 
 
     </table>
+    <div style="display:none;">
+
+    <!-- CTL Table -->
+    <table id="CTL_table" class="table table-sm CTL_table">
+        <tbody>
+            <tr>
+                <th hidden>CTL</th>
+                <th>Stage No</th>
+
+                <th>Cut Length</th>
+                <th>Tolerance</th>
+                <th>Lamination</th>
+                <th>FG/WIP</th>
+                <th hidden>I Dia</th>
+                <th>Nos/pkt</th>
+                <th>No. of pkts</th>
+                <th>Packing Type</th>
+                <th>O/p Weight MT</th>
+                <th>Numbers</th>
+                <th>Remarks</th>
+                <th></th>
+                <th></th>
+            </tr>
+        </tbody>
+        {% for d in order_details_json %}
+            {% if d.operation == 'CTL' %}
+            <tbody>
+                <tr id="size-CTL-{{ loop.index0 }}">
+                    <td hidden>CTL</td>
+                    <td>{{ d.stage_no }}</td>
+
+                    <td style="font-size:18px; font-weight:bold;">{{ d.output_length }}</td>
+                    <td>{{ d.tolerance }}</td>
+                    <td>{{ d.lamination }}</td>
+                    <td>{{ d.fg_yes_no }}</td>
+                    <td hidden>{{ d.internal_dia }}</td>
+                    <td>{{ d.no_per_packet }}</td>
+                    <td>{{ d.no_of_packets }}</td>
+                    <td>{{ d.packing }}</td>
+                    <td>{{ d.processing_wt }}</td>
+                    <td>{{ d.numbers }}</td>
+                    <td>{{ d.remarks }}</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </tbody>
+            {% endif %}
+        {% endfor %}
+    </table>
+
+    <!-- Slitting Table -->
+    <table id="Slitting_table" class="table table-sm Slitting_table">
+        <tbody>
+            <tr>
+                <th hidden>Slitting</th>
+                <th>Stage No</th>
+
+                <th>Width x Slits</th>
+                <th>Total Width</th>
+                <th>FG/WIP</th>
+                <th>Tolerance</th>
+                <th>O/p Weight MT</th>
+                <th>Wt/Part</th>
+                <th>Packing Type</th>
+                <th>Remarks</th>
+                <th></th>
+                <th></th>
+            </tr>
+        </tbody>
+        {% for d in order_details_json %}
+            {% if d.operation == 'Slitting' %}
+            <tbody>
+                <tr id="size-Slitting-{{ loop.index0 }}">
+                    <td hidden>Slitting</td>
+                    <td>{{ d.stage_no }}</td>
+
+                    <td style="font-size:18px; font-weight:bold;">{{ d.output_width }} x {{ d.numbers }}</td>
+                    <td>{{ (d.output_width * d.numbers)|int }}</td>
+                    <td>{{ d.fg_yes_no }}</td>
+                    <td>{{ d.tolerance }}</td>
+                    <td>{{ d.processing_wt }}</td>
+                    <td>{{ d.wt_per_pkt }}</td>
+                    <td>{{ d.packing }}</td>
+                    <td>{{ d.remarks }}</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </tbody>
+            {% endif %}
+        {% endfor %}
+    </table>
+
+    <!-- Reshearing Table -->
+    <table id="Reshearing_table" class="table table-sm Reshearing_table">
+        <tbody>
+            <tr>
+                <th hidden>Reshearing</th>
+                <th>Stage No</th>
+                <th>Input Material</th>
+
+                <th>Cut Width</th>
+                <th>Cut Length</th>
+                <th>Tolerance</th>
+                <th>FG/WIP</th>
+                <th hidden>I Dia</th>
+                <th>Nos/pkt</th>
+                <th>No. of pkts</th>
+                <th>Packing Type</th>
+                <th>O/p Weight MT</th>
+                <th>Numbers</th>
+                <th>Remarks</th>
+                <th></th>
+                <th></th>
+            </tr>
+        </tbody>
+        {% for d in order_details_json %}
+            {% if d.operation == 'Reshearing' %}
+            <tbody>
+                <tr id="size-Reshearing-{{ loop.index0 }}">
+                    <td hidden>Reshearing</td>
+                    <td>{{ d.stage_no }}</td>
+                    <td>{{ d.input_width }} x {{ d.input_length }}</td>
+
+                    <td style="font-size:18px; font-weight:bold;">{{ d.output_width }}</td>
+                    <td style="font-size:18px; font-weight:bold;">{{ d.output_length }}</td>
+                    <td>{{ d.tolerance }}</td>
+                    <td>{{ d.fg_yes_no }}</td>
+                    <td hidden>{{ d.internal_dia }}</td>
+                    <td>{{ d.no_per_packet }}</td>
+                    <td>{{ d.no_of_packets }}</td>
+                    <td>{{ d.packing }}</td>
+                    <td>{{ d.processing_wt }}</td>
+                    <td>{{ d.numbers }}</td>
+                    <td>{{ d.remarks }}</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </tbody>
+            {% endif %}
+        {% endfor %}
+    </table>
+
+    <!-- Narrow CTL Table -->
+    <table id="Narrow_CTL_table" class="table table-sm Narrow_CTL_table">
+        <tbody>
+            <tr>
+                <th hidden>Narrow_CTL</th>
+                <th>Stage No</th>
+                <th>Input Material</th>
+                <th>Cut Length</th>
+                <th>Tolerance</th>
+                <th>Lamination</th>
+                <th>FG/WIP</th>
+                <th hidden>I Dia</th>
+                <th>Nos/pkt</th>
+                <th>No. of pkts</th>
+                <th>Packing Type</th>
+                <th>O/p Weight MT</th>
+                <th>Numbers</th>
+                <th>Remarks</th>
+                <th></th>
+                <th></th>
+            </tr>
+        </tbody>
+        {% for d in order_details_json %}
+            {% if d.operation == 'Narrow_CTL' %}
+            <tbody>
+                <tr id="size-Narrow_CTL-{{ loop.index0 }}">
+                    <td hidden>Narrow_CTL</td>
+                    <td>{{ d.stage_no }}</td>
+                    <td>{{ d.input_width }} x {{ d.input_length }}</td>
+
+                    <td style="font-size:18px; font-weight:bold;">{{ d.output_length }}</td>
+                    <td>{{ d.tolerance }}</td>
+                    <td>{{ d.lamination }}</td>
+                    <td>{{ d.fg_yes_no }}</td>
+                    <td hidden>{{ d.internal_dia }}</td>
+                    <td>{{ d.no_per_packet }}</td>
+                    <td>{{ d.no_of_packets }}</td>
+                    <td>{{ d.packing }}</td>
+                    <td>{{ d.processing_wt }}</td>
+                    <td>{{ d.numbers }}</td>
+                    <td>{{ d.remarks }}</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </tbody>
+            {% endif %}
+        {% endfor %}
+    </table>
+
+    <!-- Lamination Table -->
+    <table id="Lamination_table" class="table table-sm Lamination_table">
+        <tbody>
+            <tr>
+                <th hidden>Lamination</th>
+                 <th>Stage No</th>
+
+                <th>Input Material</th>
+                <th>Cut Width</th>
+                <th>Cut Length</th>
+                <th>Lamination</th>
+                <th>FG/WIP</th>
+                <th>Tolerance</th>
+                <td hidden>I dia</td>
+                <th>Processing Weight MT</th>
+                <th>Numbers</th>
+                <th>No.s/pkt</th>
+                <th>No. of pkts</th>
+                <th>Packing Type</th>
+                <th>Remarks</th>
+                <th></th>
+                <th></th>
+            </tr>
+        </tbody>
+        {% for d in order_details_json %}
+            {% if d.operation == 'Lamination' %}
+            <tbody>
+                <tr id="size-Lamination-{{ loop.index0 }}">
+                    <td hidden>Lamination</td>
+                    <td>{{ d.stage_no }}</td>
+                    <td>{{ d.input_width }} x {{ d.input_length }}</td>
+
+                    <td style="font-size:18px; font-weight:bold;">{{ d.output_length }}</td>
+                    <td style="font-size:18px; font-weight:bold;">{{ d.output_width }}</td>
+                    <td>{{ d.tolerance }}</td>
+                    <td>{{ d.lamination }}</td>
+                    <td>{{ d.fg_yes_no }}</td>
+                    <td hidden>{{ d.internal_dia }}</td>
+                    <td>{{ d.no_per_packet }}</td>
+                    <td>{{ d.no_of_packets }}</td>
+                    <td>{{ d.packing }}</td>
+                    <td>{{ d.processing_wt }}</td>
+                    <td>{{ d.numbers }}</td>
+                    <td>{{ d.remarks }}</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </tbody>
+            {% endif %}
+        {% endfor %}
+    </table>
+
+    <!-- Levelling Table -->
+    <table id="Levelling_table" class="table table-sm Levelling_table">
+        <tbody>
+            <tr>
+                <th hidden>Levelling</th>
+                    <th>Stage No</th>
+                    <th>Input Material</th>
+                    <th>Cut Width</th>
+                    <th>Cut Length</th>
+                    <th hidden>Lamination</th>
+                    <th>FG/WIP</th>
+                    <th hidden>Tolerance</th>
+                    <td hidden>I dia</td>
+                    <th>Processing Weight MT</th>
+                    <th>Numbers</th>
+                    <th>No.s/pkt</th>
+                    <th>No. of pkts</th>
+                    <th>Packing Type</th>
+                    <th>Remarks</th>
+                    <th></th>
+                    <th></th>
+            </tr>
+        </tbody>
+        {% for d in order_details_json %}
+            {% if d.operation == 'Levelling' %}
+            <tbody>
+                <tr id="size-Levelling-{{ loop.index0 }}">
+                    <td hidden>Levelling</td>
+                    <td>{{ d.stage_no }}</td>
+                    <td>{{ d.input_width }} x {{ d.input_length }}</td>
+
+                    <td style="font-size:18px; font-weight:bold;">{{ d.output_length }}</td>
+                    <td style="font-size:18px; font-weight:bold;">{{ d.output_width }}</td>
+                    <td hidden>{{ d.lamination }}</td>
+                    <td>{{ d.fg_yes_no }}</td>
+                    <td hidden>{{ d.tolerance }}</td>
+
+                    <td hidden>{{ d.internal_dia }}</td>
+                    <td>{{ d.no_per_packet }}</td>
+                    <td>{{ d.no_of_packets }}</td>
+                    <td>{{ d.packing }}</td>
+                    <td>{{ d.processing_wt }}</td>
+                    <td>{{ d.numbers }}</td>
+                    <td>{{ d.remarks }}</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </tbody>
+            {% endif %}
+        {% endfor %}
+    </table>
+
+    <!-- Mini Slitting Table -->
+    <table id="Mini_Slitting_table" class="table table-sm Mini_Slitting_table">
+        <tbody>
+            <tr>
+                <th hidden>Mini_Slitting</th>
+                <th>Stage No</th>
+                <th hidden>FG/WIP</th>
+                <th>Width x Slits</th>
+                <th>Total Width</th>
+                <th>Tolerance</th>
+                <th>O/p Weight MT</th>
+                <th>Wt/Part</th>
+                <th>Packing Type</th>
+                <th>Remarks</th>
+                <th></th>
+                <th></th>
+            </tr>
+        </tbody>
+        {% for d in order_details_json %}
+            {% if d.operation == 'Mini_Slitting' %}
+            <tbody>
+                <tr id="size-Mini_Slitting-{{ loop.index0 }}">
+                    <td hidden>Mini_Slitting</td>
+                    <td>{{ d.stage_no }}</td>
+                    <td hidden>{{ d.fg_yes_no }}</td>
+                    <td style="font-size:18px; font-weight:bold;">{{ d.output_width }} x {{ d.numbers }}</td>
+                    <td>{{ (d.output_width * d.numbers)|int }}</td>
+                    <td>{{ d.tolerance }}</td>
+                    <td>{{ d.processing_wt }}</td>
+                    <td>{{ d.wt_per_pkt }}</td>
+                    <td>{{ d.packing }}</td>
+                    <td>{{ d.remarks }}</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </tbody>
+            {% endif %}
+        {% endfor %}
+    </table>
+
+</div>
+
     <hr style="border-top: 5px solid #4d0000;">
     <!--p style="page-break-before: always;"-->
     {% endfor %}
 
     <td>
+        <button type="button" class="reprint_btn">Print Order</button>
         <input class="btn btn-default" type="submit" value="Delete Order">
     </td>
-
+    <script src = "{{ url_for('static', filename='js/order.js') }}"></script>
+    <script>
+        var orderData = {{ order_json | safe }};
+    </script>
 </form>
+
 </html>

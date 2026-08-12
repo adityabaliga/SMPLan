@@ -3,13 +3,14 @@ from order_detail import OrderDetail
 
 
 class Order:
-    def __init__(self, smpl_no, order_date, expected_date, processing_wt, status, remarks):
+    def __init__(self, smpl_no, order_date, expected_date, processing_wt, status, remarks, special_instructions = ''):
         self.smpl_no = smpl_no
         self.order_date = order_date
         self.expected_date = expected_date
         self.processing_wt = processing_wt
         self.status = status
         self.remarks = remarks
+        self.special_instructions = special_instructions
 
     @classmethod
     def load_from_db(cls, smpl_no, status):
@@ -20,7 +21,7 @@ class Order:
             order_id_lst = []
             for lst in user_data:
                 order = Order(smpl_no=lst[1], order_date=lst[2], expected_date=lst[3], processing_wt=lst[4],
-                              status=lst[5], remarks=lst[6])
+                              status=lst[5], remarks=lst[6], special_instructions=lst[7])
                 order_lst.append(order)
                 order_id_lst.append(lst[0])
         return zip(order_id_lst, order_lst)
@@ -29,8 +30,8 @@ class Order:
         with CursorFromConnectionFromPool() as cursor:
             cursor.execute(
                 "insert into order_header (smpl_no, order_date, expected_date, processing_wt, status, remarks) values "
-                "( %s, %s, %s, %s, %s, %s)", (self.smpl_no, self.order_date, self.expected_date,
-                                          self.processing_wt, self.status, self.remarks))
+                "( %s, %s, %s, %s, %s, %s,%s)", (self.smpl_no, self.order_date, self.expected_date,
+                                          self.processing_wt, self.status, self.remarks, self.special_instructions))
             # cursor.connection.commit()
             # last_row_id = cursor.lastrowid
             cursor.execute("select order_id from order_header where oid= %s", (cursor.lastrowid,))
@@ -73,12 +74,10 @@ class Order:
             lst = cursor.fetchone()
             if lst:
                 order = Order(smpl_no=lst[1], order_date=lst[2], expected_date=lst[3], processing_wt=lst[4],
-                          status=lst[5], remarks=lst[6])
-
-                order_id = int(lst[0])
-                order_id_lst.append(order_id)
-                order_lst.append(order)
-        return zip(order_id_lst, order_lst)
+                          status=lst[5], remarks=lst[6], special_instructions=lst[7])
+                return order
+            else:
+                return False
 
     @classmethod
     def smpl_list_for_modify_order(cls):
@@ -88,7 +87,7 @@ class Order:
         order_id_lst = []
 
         with CursorFromConnectionFromPool() as cursor:
-            cursor.execute("select o.*, i.customer, i.thickness, i.width from order_header o "
+            cursor.execute("select o.*, i.customer, i.thickness, i.width, i.length from order_header o "
                            "left join incoming i on o.smpl_no = i.smpl_no "
                            "where status= 'Open' order by o.smpl_no asc")
             # cursor.execute("select * from current_stock order by smpl_no asc")

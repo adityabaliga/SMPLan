@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>SMPL MRP - Place Order</title>
+    <title>SMPL MRP - View Order</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
     <style>
         hr.style1{
@@ -45,16 +45,16 @@
             <tr>
                 <th>SMPL no.</th>
                 <th>Customer</th>
-                <th>Weight in MT</th>
+                <th>Processing Weight in MT</th>
                 <th>Size</th>
                 <th>Order Date</th>
             </tr>
         {% for order in smpl_lst %}
             <tr>
-                <td><input type = "radio" name = "select_order" id = "select_order" value = "{{order[0]}}">  {{order[1]}}</input></td>
-                <td>{{order[7]}}</td>
+                <td><input type = "radio" name = "select_order" id = "select_order" value = "{{ order[0] }}|{{ order[10] }}|{{ order[11] }}">  {{order[1]}}</input></td>
+                <td>{{order[8]}}</td>
                 <td>{{order[4]}}</td>
-                <td>{{order[8]}} x {{order[9]}}</td>
+                <td>{{order[9]}} x {{order[10]}} x {{order[11]}}</td>
                 <td>{{order[2]}}</td>
             </tr>
         {% endfor %}
