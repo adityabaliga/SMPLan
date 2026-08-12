@@ -1091,9 +1091,7 @@ def delete_order():
     except (Exception, psycopg2.Error) as error:
         # Rollback the transaction if an error occurred
         connection.rollback()
-        # Close the cursor
-        cursor.close()
-
+        print("Error:", error)
     except psycopg2.OperationalError as error:
         # Handle network errors
         print("Network error occurred:", error)
