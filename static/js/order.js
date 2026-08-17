@@ -735,6 +735,10 @@ var controller = (function(orderCtrl, UICtrl) {
 
             length_of_coil = (parseFloat(document.querySelector(DOM.mc_weight).value))/parseFloat(document.querySelector(DOM.mc_width).value)
             /parseFloat(document.querySelector(DOM.thickness).value)/0.00000785;
+            if (material_type.includes("ALUMINIUM")){
+                length_of_coil = (parseFloat(document.querySelector(DOM.mc_weight).value))/parseFloat(document.querySelector(DOM.mc_width).value)/parseFloat(document.querySelector(DOM.thickness).value)/0.0000027;
+            }
+
             console.log((document.querySelector(DOM.mc_weight).value));
             document.getElementById('length_of_coil').value = Math.round(length_of_coil);
 
@@ -835,6 +839,9 @@ var controller = (function(orderCtrl, UICtrl) {
 
             // Calculate coil_length using op_processing_wt (total for the stage, not per-row)
             var coil_length = (op_processing_wt * 1000) / (thickness * detail.input_width * 0.00000785) / 1000;
+            if (material_type.includes("ALUMINIUM")){
+                coil_length = (op_processing_wt * 1000) / (thickness * detail.input_width * 0.0000027) / 1000;
+            }
             if(no_of_parts > 0){
                 length_per_part = coil_length / no_of_parts;
             }
@@ -848,10 +855,15 @@ var controller = (function(orderCtrl, UICtrl) {
         } else {
             if(detail.cc_length > 0){
                 numbers = Math.round((stageProcWt * 1000) / (thickness * detail.cc_width * detail.cc_length * 0.00000785));
+                if (material_type.includes("ALUMINIUM")){
+                    numbers = Math.round((stageProcWt * 1000) / (thickness * detail.cc_width * detail.cc_length * 0.0000027));
+                }
             }
             if(wt_per_pkt > 0){
                 nos_per_pkt = Math.ceil((wt_per_pkt) / (thickness * detail.cc_width * detail.cc_length * 0.00000785));
-
+                 if (material_type.includes("ALUMINIUM")){
+                    nos_per_pkt = Math.ceil((wt_per_pkt) / (thickness * detail.cc_width * detail.cc_length * 0.0000027;
+                }
                 no_of_pkts = Math.ceil(numbers / (nos_per_pkt));
 
             }
@@ -1295,6 +1307,9 @@ var controller = (function(orderCtrl, UICtrl) {
         input_mtrl = input_mtrl.split(" x ");
         ms_width = parseFloat(input_mtrl[0]);
         ms_length = parseFloat(input_mtrl[1]);
+        var grade = document.querySelector("grade").value;
+        var material_type = document.querySelector("material_type").value;
+
 
 
         if(isNaN(length)){
@@ -1311,11 +1326,17 @@ var controller = (function(orderCtrl, UICtrl) {
         if(flag){
             if (operation != "Reshearing"){
                 numbers = Math.round(processing_wt*1000/thickness/width/length/0.00000785);
+                if (material_type.includes("ALUMINIUM")){
+                    numbers = Math.round(processing_wt*1000/thickness/width/length/0.0000027);
+                }
 
             }
             // This is because for reshearing has to be calculated based on no. of sheets per mother sheet
             else{
                 ms_numbers = Math.round(processing_wt*1000/thickness/ms_width/ms_length/0.00000785);
+                if (material_type.includes("ALUMINIUM")){
+                    ms_numbers = Math.round(processing_wt*1000/thickness/width/length/0.0000027);
+                }
                 numbers_per_ms_sheet = Math.round(ms_width*ms_length/width/length);
                 numbers = ms_numbers * numbers_per_ms_sheet;
             }
@@ -1347,8 +1368,16 @@ var controller = (function(orderCtrl, UICtrl) {
         length_of_slit = wt_of_slit/parseFloat(document.querySelector(DOM.currentWidth).value)
             /parseFloat(document.querySelector(DOM.thickness).value)/0.00000785;
 
+        if (material_type.includes("ALUMINIUM")){
+            length_of_slit = wt_of_slit/parseFloat(document.querySelector(DOM.currentWidth).value)/parseFloat(document.querySelector(DOM.thickness).value)/0.0000027;
+        }
+
         length_per_part = length_of_slit/(parseFloat(document.querySelector(DOM.currentNoOfPkts).value));
         wt_per_part = parseFloat(document.querySelector(DOM.thickness).value) * parseFloat(document.querySelector(DOM.currentWidth).value) * length_per_part * 0.00000785;
+
+        if (material_type.includes("ALUMINIUM")){
+            wt_per_part = parseFloat(document.querySelector(DOM.thickness).value) * parseFloat(document.querySelector(DOM.currentWidth).value) * length_per_part * 0.0000027;
+        }
 
         processing_wt = wt_of_slit * parseFloat(document.querySelector(DOM.currentNumbers).value);
         document.querySelector(DOM.currentProcWt).value = processing_wt.toFixed(3);
@@ -1441,6 +1470,9 @@ var controller = (function(orderCtrl, UICtrl) {
 
     if(thickness > 0 && width > 0 && no_of_parts > 0 && processing_wt > 0){
         var coil_length = (processing_wt * 1000) / (thickness * width * 0.00000785) / 1000;
+        if (material_type.includes("ALUMINIUM")){
+            coil_length = (processing_wt * 1000) / (thickness * width * 0.0000027) / 1000;
+        }
         var length_per_part = coil_length / no_of_parts;
         document.querySelector('.length_per_part').value = length_per_part.toFixed(0);
     } else {
