@@ -638,6 +638,7 @@ var UIController = (function() {
 
 var controller = (function(orderCtrl, UICtrl) {
    var setupEventListeners = (function(){
+        console.log('setupEventListeners start');
         // Guard — only run if we're on the order entry page
         if(!document.getElementById('order')) return;
         var DOM = UICtrl.getDOMstrings();
@@ -648,6 +649,8 @@ var controller = (function(orderCtrl, UICtrl) {
        window.addEventListener("load", formOnLoad);
 
        document.getElementById(DOM.coilProcWtID).addEventListener("change", onChangeCoilProcessingWt);
+
+       document.querySelector('.load_template_btn').addEventListener("click", loadTemplate);
 
        // Commented out for now because the alert box is not going
        //document.getElementById(DOM.coilProcWtID).addEventListener("focusout", onFocusOutCoilProcessingWt);
@@ -700,6 +703,10 @@ var controller = (function(orderCtrl, UICtrl) {
             onSubmit();
             HTMLFormElement.prototype.submit.call(this);;
        });
+
+
+    console.log('setupEventListeners finished');
+
    });
 
    var setupReprintListener = function(){
@@ -732,8 +739,160 @@ var controller = (function(orderCtrl, UICtrl) {
             document.getElementById('length_of_coil').value = Math.round(length_of_coil);
 
         }
-
+        checkForTemplates();
     };
+
+    //Loading Template section
+    var checkForTemplates = function(){
+        var smpl_no = document.querySelector(UICtrl.getDOMstrings().smpl_no).value;
+
+        fetch('/get_matching_templates/' + smpl_no)
+            .then(function(r){ return r.json(); })
+            .then(function(data){
+                if(data.templates && data.templates.length > 0){
+                    populateTemplateDropdown(data.templates);
+                }
+            })
+            .catch(function(err){
+                console.error('Error checking templates:', err);
+            });
+    };
+
+    var populateTemplateDropdown = function(templates){
+        var dropdown = document.querySelector('.template_dropdown');
+        if(!dropdown) return;
+
+        dropdown.innerHTML = '<option value="">-- Select Template --</option>';
+        templates.forEach(function(t){
+        var opt = document.createElement('option');
+        opt.value = t.template_id;
+        opt.textContent = t.template_name;
+        dropdown.appendChild(opt);
+    });
+
+    dropdown.style.display = 'inline-block';
+    document.querySelector('.load_template_btn').style.display = 'inline-block';
+    };
+
+    var loadTemplate = function(){
+    var templateId = document.querySelector('.template_dropdown').value;
+    if(!templateId){
+        alert('Please select a template');
+        return;
+    }
+
+    var processingWt = parseFloat(document.getElementById('processing_wt').value) || 0;
+    if(processingWt <= 0){
+        alert('Please enter Processing Weight first');
+        return;
+    }
+
+    fetch('/get_template_details/' + templateId)
+        .then(function(r){ return r.json(); })
+        .then(function(data){
+            applyTemplate(data.template_details, processingWt);
+        })
+        .catch(function(err){
+            console.error('Error loading template:', err);
+            alert('Error loading template');
+        });
+    };
+
+    var applyTemplate = function(templateDetails, processingWt){
+    templateDetails.sort(function(a, b){ return a.stage_no - b.stage_no; });
+
+    var DOM = UICtrl.getDOMstrings();
+    var mc_width = document.querySelector(DOM.mc_width).value;
+    var mc_length = document.getElementById('length').value;
+    var thickness = parseFloat(document.querySelector(DOM.thickness).value) || 0;
+
+    // Track op_processing_wt per stage+operation for slitting op details row
+    var stageOpWt = {};
+    templateDetails.forEach(function(detail){
+        var key = detail.stage_no + '_' + detail.operation;
+        var stageProcWt = parseFloat((detail.proc_wt_ratio * processingWt).toFixed(3));
+        stageOpWt[key] = (stageOpWt[key] || 0) + stageProcWt;
+    });
+
+    templateDetails.forEach(function(detail){
+        var stageProcWt = parseFloat((detail.proc_wt_ratio * processingWt).toFixed(3));
+        var input_material = detail.input_width + ' x ' + detail.input_length;
+
+        var isSlitting = (detail.operation === 'Slitting' || detail.operation === 'Mini_Slitting');
+        var key = detail.stage_no + '_' + detail.operation;
+        var op_processing_wt = stageOpWt[key];
+
+        var numbers = 0;
+        var length_per_part = 0;
+        var outer_dia = 0;
+        var no_of_parts = detail.no_of_parts || 0;
+        var wt_per_pkt = detail.wt_per_pkt || 0;
+        var no_of_pkts = 0;
+        var nos_per_pkt = 0;
+
+        if(isSlitting){
+            numbers = detail.numbers || 0;  // fixed no of slits, read directly from template
+
+            // Calculate coil_length using op_processing_wt (total for the stage, not per-row)
+            var coil_length = (op_processing_wt * 1000) / (thickness * detail.input_width * 0.00000785) / 1000;
+            if(no_of_parts > 0){
+                length_per_part = coil_length / no_of_parts;
+            }
+            if(detail.internal_dia > 0 && length_per_part > 0 && thickness > 0){
+                outer_dia = Math.sqrt(
+                    (detail.internal_dia * detail.internal_dia) + (4 * length_per_part * thickness * 1000 / Math.PI)
+                );
+                outer_dia = parseFloat(outer_dia.toFixed(2));
+            }
+
+        } else {
+            if(detail.cc_length > 0){
+                numbers = Math.round((stageProcWt * 1000) / (thickness * detail.cc_width * detail.cc_length * 0.00000785));
+            }
+            if(wt_per_pkt > 0){
+                nos_per_pkt = Math.ceil((wt_per_pkt) / (thickness * detail.cc_width * detail.cc_length * 0.00000785));
+
+                no_of_pkts = Math.ceil(numbers / (nos_per_pkt));
+
+            }
+        }
+
+        var input = {
+            operation:        detail.operation,
+            stage_no:         detail.stage_no,
+            input_material:   input_material,
+            fg_wip:           detail.fg_yes_no,
+            cut_width:        detail.cc_width,
+            cut_length:       detail.cc_length,
+            lamination:       detail.lamination,
+            tolerance:        detail.tolerance,
+            i_dia:            detail.internal_dia,
+            processing_wt:    stageProcWt,
+            wt_per_pkt:       wt_per_pkt,
+            numbers:          numbers,
+            no_of_pkts:       no_of_pkts,
+            nos_per_pkt:      nos_per_pkt,
+            packing:          detail.packing_type,
+            remarks:          detail.remarks,
+            op_processing_wt: op_processing_wt,
+            no_of_parts:      no_of_parts,
+            length_per_part:  parseFloat(length_per_part.toFixed(2)),
+            outer_dia:        outer_dia
+        };
+
+        var newOrder = orderCtrl.addOrder(input);
+        UICtrl.addListOrder(newOrder, newOrder.operation);
+        updateWIPLabel(newOrder);
+
+        if(orderCtrl.getMaxStageNo() < detail.stage_no){
+            orderCtrl.incrementMaxStageNo();
+        }
+    });
+
+    onSubmit();
+    alert('Template loaded successfully. Please review before submitting.');
+};
+
 
     var checkExpectedDate = function(){
       // Check if Expected Date > Order Date > Incoming Date
@@ -1246,7 +1405,10 @@ var controller = (function(orderCtrl, UICtrl) {
             }
         }
 
-
+        var loadBtn = document.querySelector('.load_template_btn');
+        if(loadBtn){
+            loadBtn.disabled = (coil_proc_wt <= 0);
+        }
 
     };
 

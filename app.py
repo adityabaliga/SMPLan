@@ -774,6 +774,121 @@ def order():
                            weight=cs_id[1], cs = cs, today_date = today_date, half_cut = half_cut)
 
 
+#Check for matching templates (called when order.html loads)
+@app.route('/get_matching_templates/<smpl_no>', methods=['GET'])
+def get_matching_templates(smpl_no):
+
+    try:
+        connection = psycopg2.connect(
+            dbname='smpl_prodn',
+            user='postgres',
+            password='smpl@509',
+            host='localhost',
+            port=5432
+        )
+        cursor = connection.cursor()
+
+        # Get incoming details for this smpl_no
+        cursor.execute("""
+            SELECT thickness, width, customer, grade, mill, material_type
+            FROM public.incoming
+            WHERE smpl_no = %s
+        """, (smpl_no,))
+        incoming = cursor.fetchone()
+
+        if not incoming:
+            return jsonify({'templates': []})
+
+        thickness, width, customer, grade, mill, material_type = incoming
+
+        cursor.execute("""
+            SELECT 
+                template_id, 
+                template_name,
+                (CASE WHEN grade IS NOT NULL THEN 1 ELSE 0 END +
+                 CASE WHEN mill IS NOT NULL THEN 1 ELSE 0 END +
+                 CASE WHEN material_type IS NOT NULL THEN 1 ELSE 0 END) as specificity
+            FROM public.order_templates
+            WHERE thickness = %s
+              AND width = %s
+              AND customer = %s
+              AND (grade IS NULL OR grade = %s)
+              AND (mill IS NULL OR mill = %s)
+              AND (material_type IS NULL OR material_type = %s)
+            ORDER BY specificity DESC, template_name
+        """, (thickness, width, customer, grade, mill, material_type))
+
+        templates = cursor.fetchall()
+
+        result = [{'template_id': t[0], 'template_name': t[1]} for t in templates]
+
+        return jsonify({'templates': result})
+
+    except Exception as e:
+        raise
+    finally:
+        if cursor: cursor.close()
+        if connection : connection.close()
+
+
+#Fetch full template details (called when user clicks Load Template)
+@app.route('/get_template_details/<int:template_id>', methods=['GET'])
+def get_template_details(template_id):
+    conn = None
+    cur = None
+    try:
+        conn = psycopg2.connect(
+            dbname='smpl_prodn',
+            user='postgres',
+            password='smpl@509',
+            host='localhost',
+            port=5432
+        )
+        cur = conn.cursor()
+
+        cur.execute("""
+            SELECT 
+                operation, stage_no, cc_width, cc_length, fg_yes_no,
+                tolerance, lamination, internal_dia, packing_type, 
+                remarks, proc_wt_ratio, input_width, input_length,
+                no_of_parts, wt_per_pkt, numbers
+            FROM public.order_template_details
+            WHERE template_id = %s
+            ORDER BY stage_no, operation
+        """, (template_id,))
+
+        rows = cur.fetchall()
+
+        details = []
+        for r in rows:
+            details.append({
+                'operation':      r[0],
+                'stage_no':       r[1],
+                'cc_width':       float(r[2]),
+                'cc_length':      float(r[3]),
+                'fg_yes_no':      r[4],
+                'tolerance':      r[5],
+                'lamination':     r[6],
+                'internal_dia':   float(r[7]) if r[7] else 0,
+                'packing_type':   r[8],
+                'remarks':        r[9],
+                'proc_wt_ratio':  float(r[10]),
+                'input_width': float(r[11]),
+                'input_length': float(r[12]),
+                'no_of_parts': float(r[13]) if r[13] else 0,
+                'wt_per_pkt': float(r[14]) if r[14] else 0,
+                'numbers': float(r[15]) if r[15] else 0
+            })
+
+        return jsonify({'template_details': details})
+
+    except Exception as e:
+        raise
+    finally:
+        if cur: cur.close()
+        if conn: conn.close()
+
+
 # from order.html. The details retrieved from the page and loaded to db in to order and order_detail
 @app.route('/submit_order', methods=['GET', 'POST'])
 def submit_order():
