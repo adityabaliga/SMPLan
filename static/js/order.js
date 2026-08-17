@@ -727,6 +727,7 @@ var controller = (function(orderCtrl, UICtrl) {
         // set all fields to default values
         document.querySelector(DOM.currentWidth).value = document.querySelector(DOM.mc_width).value;
         document.querySelector(DOM.currentStageNo).value = orderController.incrementMaxStageNo();
+        var material_type = document.querySelector(".material_type").value;
 
 
         //calculate length of coil
@@ -862,7 +863,7 @@ var controller = (function(orderCtrl, UICtrl) {
             if(wt_per_pkt > 0){
                 nos_per_pkt = Math.ceil((wt_per_pkt) / (thickness * detail.cc_width * detail.cc_length * 0.00000785));
                  if (material_type.includes("ALUMINIUM")){
-                    nos_per_pkt = Math.ceil((wt_per_pkt) / (thickness * detail.cc_width * detail.cc_length * 0.0000027;
+                    nos_per_pkt = Math.ceil((wt_per_pkt) / (thickness * detail.cc_width * detail.cc_length * 0.0000027));
                 }
                 no_of_pkts = Math.ceil(numbers / (nos_per_pkt));
 
@@ -1307,8 +1308,8 @@ var controller = (function(orderCtrl, UICtrl) {
         input_mtrl = input_mtrl.split(" x ");
         ms_width = parseFloat(input_mtrl[0]);
         ms_length = parseFloat(input_mtrl[1]);
-        var grade = document.querySelector("grade").value;
-        var material_type = document.querySelector("material_type").value;
+       // var grade = document.querySelector("grade").value;
+        var material_type = document.querySelector(".material_type").value;
 
 
 
@@ -1362,6 +1363,7 @@ var controller = (function(orderCtrl, UICtrl) {
         input_material = input_material.split(" x ");
         ip_width = parseFloat(input_material[0]);
         currentWidth = parseFloat(document.querySelector(DOM.currentWidth).value);
+        var material_type = document.querySelector(".material_type").value;
 
         //This is wt of each individual slit for full coil
         wt_of_slit = parseFloat(document.querySelector(DOM.currentOpProcWt).value) * parseFloat(document.querySelector(DOM.currentWidth).value) / ip_width ;
@@ -1467,6 +1469,7 @@ var controller = (function(orderCtrl, UICtrl) {
     var thickness = parseFloat(document.querySelector(DOM.thickness).value) || 0;
     var width = parseFloat(document.querySelector(DOM.mc_width).value) || 0;
     var no_of_parts = parseFloat(document.querySelector('.no_of_parts').value) || 0;
+    var material_type = document.querySelector(".material_type").value;
 
     if(thickness > 0 && width > 0 && no_of_parts > 0 && processing_wt > 0){
         var coil_length = (processing_wt * 1000) / (thickness * width * 0.00000785) / 1000;
@@ -2731,11 +2734,13 @@ var printFromData = function(allOrders, stagePairs, incomingHTML, shortIncomingH
     };
 
     var pagesHTML = '';
+    var fgSummaryHTML = '';
 
     stagePairs.forEach(function(pair, index){
         var operation = pair.operation;
         var stage_no = pair.stage_no;
         var isSlitting = (operation === 'Slitting' || operation === 'Mini_Slitting');
+
 
         var stageOrders = allOrders[operation].filter(function(o){ return o.stage_no === stage_no; });
 
@@ -2806,7 +2811,40 @@ var printFromData = function(allOrders, stagePairs, incomingHTML, shortIncomingH
          }else{
               currentIncomingHTML = shortIncomingHTML;
          }
-        console.log(currentIncomingHTML);
+
+        // Build FG Summary if more than 1 stage
+
+        if(stagePairs.length > 1){
+            var fgSummaryMap = {};
+
+            Object.keys(allOrders).forEach(function(operation){
+                allOrders[operation].forEach(function(order){
+                    if(order.fg_wip === 'FG'){
+                        var key = order.output_width + ' x ' + order.output_length;
+                        fgSummaryMap[key] = (fgSummaryMap[key] || 0) + parseFloat(order.processing_wt);
+                    }
+                });
+            });
+
+            var fgRows = Object.keys(fgSummaryMap).map(function(key){
+                return '<tr>' +
+                    '<td style="border:1px solid #000; padding:6px; font-size:14px;">' + key + '</td>' +
+                    '<td style="border:1px solid #000; padding:6px; font-size:14px;">' + fgSummaryMap[key].toFixed(3) + '</td>' +
+                    '</tr>';
+            }).join('');
+
+            fgSummaryHTML = '<div style="margin-top:20px;">' +
+                '<h3 style="text-align:center; font-size:16px;">FG Summary</h3>' +
+                '<table style="border-collapse:collapse; width:60%; margin:0 auto;">' +
+                '<tr style="background:#eee;">' +
+                '<th style="border:1px solid #000; padding:6px;">Width x Length</th>' +
+                '<th style="border:1px solid #000; padding:6px;">Total Processing Wt (MT)</th>' +
+                '</tr>' +
+                fgRows +
+                '</table>' +
+                '</div>';
+        }
+
 
         pagesHTML += `
             <div class="stage-page">
@@ -2831,8 +2869,10 @@ var printFromData = function(allOrders, stagePairs, incomingHTML, shortIncomingH
             </div>
             ${!isLastPage ? '<div style="page-break-after:always;"></div>' : ''}
         `;
+
     });
 
+    pagesHTML += fgSummaryHTML;
     openPrintWindow(pagesHTML);
 };
 
