@@ -810,6 +810,7 @@ var controller = (function(orderCtrl, UICtrl) {
     var mc_width = document.querySelector(DOM.mc_width).value;
     var mc_length = document.getElementById('length').value;
     var thickness = parseFloat(document.querySelector(DOM.thickness).value) || 0;
+    var material_type = document.querySelector(".material_type").value;
 
     // Track op_processing_wt per stage+operation for slitting op details row
     var stageOpWt = {};
