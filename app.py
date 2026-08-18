@@ -1678,7 +1678,7 @@ def submit_processing():
 
 
                                 #This is done so the material's lamination state can be stored in current_stock
-                                if lamination == "No Lamination":
+                                if lamination == "No Lamination" or lamination == "":
                                     if input_lami == '':
                                         lamination = ''
                                     elif "Side" in input_lami:
@@ -2069,7 +2069,7 @@ def submit_slitting_processing():
                             #processing_detail.save_to_db()
 
                             _remarks = ''
-                            if lami == "No Lamination" or lami == '':
+                            if lami == "No Lamination" or lami == "":
                                 if input_lami == '':
                                     lami = ''
                                 elif "Side" in input_lami:
