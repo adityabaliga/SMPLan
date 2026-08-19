@@ -795,6 +795,10 @@ var controller = (function(orderCtrl, UICtrl) {
     fetch('/get_template_details/' + templateId)
         .then(function(r){ return r.json(); })
         .then(function(data){
+            // Populate special instructions field
+            if(data.template_remarks){
+                document.querySelector('[name="hdr_remarks"]').value = data.template_remarks;
+            }
             applyTemplate(data.template_details, processingWt);
         })
         .catch(function(err){
@@ -2361,6 +2365,11 @@ var printAllStages = function(){
     const incoming = document.getElementById("incoming_details").cloneNode(true);
     const extra_details = document.getElementById("extra_details").cloneNode(true);
 
+    var hdrRemarksInput = extra_details.querySelector('[name="hdr_remarks"]');
+    if(hdrRemarksInput){
+        hdrRemarksInput.closest('td').setAttribute('style', 'font-weight:bold !important; font-size:15px !important;');
+    }
+
     // Reformat dates
     document.getElementById("incoming_details").querySelectorAll('input[type="date"]').forEach(originalInput => {
         if(originalInput.value){
@@ -2884,6 +2893,11 @@ var printFromData = function(allOrders, stagePairs, incomingHTML, shortIncomingH
     // Clone from DOM - same as printAllStages
     var incoming = document.getElementById("incoming_details").cloneNode(true);
     var extra_details = document.getElementById("extra_details").cloneNode(true);
+
+    var hdrRemarksInput = extra_details.querySelector('[name="hdr_remarks"]');
+    if(hdrRemarksInput){
+        hdrRemarksInput.closest('td').setAttribute('style', 'font-weight:bold !important; font-size:15px !important;');
+    }
 
     // Date inputs are already formatted as text in view_order.html (rendered by Flask)
     // so just replace remaining inputs with spans

@@ -846,6 +846,13 @@ def get_template_details(template_id):
         )
         cur = conn.cursor()
 
+        # Fetch template-level remarks
+        cur.execute("""
+                    SELECT template_remarks FROM public.order_templates WHERE template_id = %s
+                """, (template_id,))
+        template_header = cur.fetchone()
+        template_remarks = template_header[0] if template_header and template_header[0] else ''
+
         cur.execute("""
             SELECT 
                 operation, stage_no, cc_width, cc_length, fg_yes_no,
@@ -880,7 +887,7 @@ def get_template_details(template_id):
                 'numbers': float(r[15]) if r[15] else 0
             })
 
-        return jsonify({'template_details': details})
+        return jsonify({'template_details': details, 'template_remarks': template_remarks})
 
     except Exception as e:
         raise
