@@ -899,6 +899,7 @@ def get_template_details(template_id):
 # from order.html. The details retrieved from the page and loaded to db in to order and order_detail
 @app.route('/submit_order', methods=['GET', 'POST'])
 def submit_order():
+    smpl_no = ''
     if request.method == 'POST':
         connection = psycopg2.connect(
             dbname='smpl_prodn',
