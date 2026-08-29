@@ -520,7 +520,7 @@ const userPins = {
             Jeevan: "5213",
             Chandu: "1999",
             Aditya: "0509",
-            Chandrashekar: "7973"
+            Chandrashekar: "7973",
             Naveen: "2908"
 };
 
