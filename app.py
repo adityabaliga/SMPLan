@@ -2964,11 +2964,11 @@ def dispatch():
 
         if staging_dispatch_id != '':
             dispatch_detail_lst = DispatchDetail.get_staging_details_by_id(int(staging_dispatch_id), 0)
-            #length = len(dispatch_detail_lst)
-            #if len(dispatch_detail_lst) == 0:
+            length = len(dispatch_detail_lst)
+            if len(dispatch_detail_lst) == 0:
                 #DispatchHeader.delete_staging_data(int(staging_dispatch_id))
-            cursor.execute("delete from staging_dispatch_detail where dispatch_id = %s", (int(staging_dispatch_id),))
-            cursor.execute("delete from staging_dispatch_header where dispatch_id = %s", (int(staging_dispatch_id),))
+                cursor.execute("delete from staging_dispatch_detail where dispatch_id = %s", (int(staging_dispatch_id),))
+                cursor.execute("delete from staging_dispatch_header where dispatch_id = %s", (int(staging_dispatch_id),))
         connection.commit()
     except Exception as error:
         # Handle network errors
