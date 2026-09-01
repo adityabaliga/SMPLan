@@ -324,7 +324,7 @@ function enable_lami_co(table_id, table_row){
 	if(lami_type.includes("Single Side")){
 	    //console.log(last_row.cells[7].firstElementChild[0].innerText);
 	    //last_row.cells[7].disabled = false;
-	    last_row.cells[7].innerHTML ='<select id="lami_co_top" name="lami_co_top"><option value="">Select</option><option value="Futura">Futura</option><option value="SVS">SVS Pack</option><option value="Paragon">Paragon</option><option value="Superbright">Superbright</option><option value="Crystal">Crystal</option><option value="Other">Other</option></select>';
+	    last_row.cells[7].innerHTML ='<select id="lami_co_top" name="lami_co_top"><option value="">Select</option><option value="Futura">Futura</option><option value="SVS">SVS Pack</option><option value="Paragon">Paragon</option><option value="Superbright">Superbright</option><option value="Crystal">Crystal</option><option value="Safepack">Safepack</option><option value="Other">Other</option></select>';
         last_row.cells[8].innerHTML ='<td><select id = "lami_co_top" name= "lami_co_top" ><option value = "No Lami">No Lami</option></select></td>';
         //last_row.cells[7].required = true;
         //last_row.cells[8].required = false;
@@ -332,8 +332,8 @@ function enable_lami_co(table_id, table_row){
 	else if(lami_type.includes("Both Side")){
 	    //console.log(last_row.cells[7].firstElementChild[0].innerText);
 	    //last_row.cells[7].disabled = false;
-	    last_row.cells[7].innerHTML ='<select id="lami_co_top" name="lami_co_top"><option value="">Select</option><option value="Futura">Futura</option><option value="SVS">SVS Pack</option><option value="Paragon">Paragon</option><option value="Superbright">Superbright</option><option value="Crystal">Crystal</option><option value="Other">Other</option></select>';
-	    last_row.cells[8].innerHTML ='<select id="lami_co_top" name="lami_co_top"><option value="">Select</option><option value="Futura">Futura</option><option value="SVS">SVS Pack</option><option value="Paragon">Paragon</option><option value="Superbright">Superbright</option><option value="Crystal">Crystal</option><option value="Other">Other</option></select>';
+	    last_row.cells[7].innerHTML ='<select id="lami_co_top" name="lami_co_top"><option value="">Select</option><option value="Futura">Futura</option><option value="SVS">SVS Pack</option><option value="Paragon">Paragon</option><option value="Superbright">Superbright</option><option value="Crystal">Crystal</option><option value="Safepack">Safepack</option><option value="Other">Other</option></select>';
+	    last_row.cells[8].innerHTML ='<select id="lami_co_top" name="lami_co_top"><option value="">Select</option><option value="Futura">Futura</option><option value="SVS">SVS Pack</option><option value="Paragon">Paragon</option><option value="Superbright">Superbright</option><option value="Crystal">Crystal</option><option value="Safepack">Safepack</option><option value="Other">Other</option></select>';
         //last_row.cells[7].required = true;
         //last_row.cells[8].required = true;
 	}
@@ -361,7 +361,7 @@ function enable_lami_co_slitting(table_id, table_row){
 	if(lami_type.includes("Single Side")){
 	    //console.log(last_row.cells[7].firstElementChild[0].innerText);
 	    //last_row.cells[7].disabled = false;
-	    last_row.cells[3].innerHTML ='<select id="lami_co_top" name="lami_co_top"><option value="">Select</option><option value="Futura">Futura</option><option value="SVS">SVS Pack</option><option value="Paragon">Paragon</option><option value="Superbright">Superbright</option><option value="Crystal">Crystal</option><option value="Other">Other</option></select>';
+	    last_row.cells[3].innerHTML ='<select id="lami_co_top" name="lami_co_top"><option value="">Select</option><option value="Futura">Futura</option><option value="SVS">SVS Pack</option><option value="Paragon">Paragon</option><option value="Superbright">Superbright</option><option value="Crystal">Crystal</option><option value="Safepack">Safepack</option><option value="Other">Other</option></select>';
         last_row.cells[4].innerHTML ='<td><select id = "lami_co_top" name= "lami_co_top" ><option value = "No Lami">No Lami</option></select></td>';
         //last_row.cells[7].required = true;
         //last_row.cells[8].required = false;
@@ -369,8 +369,8 @@ function enable_lami_co_slitting(table_id, table_row){
 	else if(lami_type.includes("Both Side")){
 	    //console.log(last_row.cells[7].firstElementChild[0].innerText);
 	    //last_row.cells[7].disabled = false;
-	    last_row.cells[3].innerHTML ='<select id="lami_co_top" name="lami_co_top"><option value="">Select</option><option value="Futura">Futura</option><option value="SVS">SVS Pack</option><option value="Paragon">Paragon</option><option value="Superbright">Superbright</option><option value="Crystal">Crystal</option><option value="Other">Other</option></select>';
-	    last_row.cells[4].innerHTML ='<select id="lami_co_top" name="lami_co_top"><option value="">Select</option><option value="Futura">Futura</option><option value="SVS">SVS Pack</option><option value="Paragon">Paragon</option><option value="Superbright">Superbright</option><option value="Crystal">Crystal</option><option value="Other">Other</option></select>';
+	    last_row.cells[3].innerHTML ='<select id="lami_co_top" name="lami_co_top"><option value="">Select</option><option value="Futura">Futura</option><option value="SVS">SVS Pack</option><option value="Paragon">Paragon</option><option value="Superbright">Superbright</option><option value="Crystal">Crystal</option><option value="Safepack">Safepack</option><option value="Other">Other</option></select>';
+	    last_row.cells[4].innerHTML ='<select id="lami_co_top" name="lami_co_top"><option value="">Select</option><option value="Futura">Futura</option><option value="SVS">SVS Pack</option><option value="Paragon">Paragon</option><option value="Superbright">Superbright</option><option value="Crystal">Crystal</option><option value="Safepack">Safepack</option><option value="Other">Other</option></select>';
         //last_row.cells[7].required = true;
         //last_row.cells[8].required = true;
 	}
