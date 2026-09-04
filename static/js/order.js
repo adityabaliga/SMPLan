@@ -744,6 +744,20 @@ var controller = (function(orderCtrl, UICtrl) {
             document.getElementById('length_of_coil').value = Math.round(length_of_coil);
 
         }
+
+        // Calculate OD of coil
+        let remarks = document.getElementById('incoming_remarks').textContent.trim();;
+        let match = remarks.match(/COIL ID\s*:\s*(\d+)/);
+        let coil_idia = match ? parseInt(match[1]) : null;
+        let thickness = parseFloat(document.querySelector(DOM.thickness).value);
+
+        outer_dia = Math.sqrt((coil_idia * coil_idia) + (4 * length_of_coil * thickness * 1000 / Math.PI));
+        console.log(outer_dia);
+        outer_dia = Math.round(outer_dia);
+
+        remarks = remarks + " COIL OD: " + outer_dia;
+        document.getElementById('incoming_remarks').querySelector('b').textContent = remarks;
+
         checkForTemplates();
     };
 
