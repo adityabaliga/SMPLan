@@ -4,21 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="43196d60-29a1-4da5-972f-f5ed5d18f5ea" name="Changes" comment="Bug Fix: In smpl_list for order">
+    <list default="true" id="43196d60-29a1-4da5-972f-f5ed5d18f5ea" name="Changes" comment="Lami query updated fro daily and monthly report">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/current_stock.py" beforeDir="false" afterPath="$PROJECT_DIR$/current_stock.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/processing_detail.py" beforeDir="false" afterPath="$PROJECT_DIR$/processing_detail.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/js/processing.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/js/processing.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/hist_view.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/hist_view.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/processing_ctl.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/processing_ctl.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/processing_lamination.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/processing_lamination.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/processing_levelling.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/processing_levelling.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/processing_nctl.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/processing_nctl.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/processing_reshearing.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/processing_reshearing.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/processing_slit.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/processing_slit.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/processing_trap_nctl.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/processing_trap_nctl.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/processing_trap_reshearing.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/processing_trap_reshearing.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -73,25 +61,25 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ASKED_ADD_EXTERNAL_FILES": "true",
-    "DefaultHtmlFileTemplate": "HTML File",
-    "Python.SMPLan.executor": "Run",
-    "Python.advanced_cost_analysis.executor": "Run",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "ignore.virus.scanning.warn.message": "true",
-    "last_opened_file_path": "E:/SMPLan",
-    "run.code.analysis.last.selected.profile": "pProject Default",
-    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
+    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
+    &quot;Python.SMPLan.executor&quot;: &quot;Debug&quot;,
+    &quot;Python.advanced_cost_analysis.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;E:/SMPLan&quot;,
+    &quot;run.code.analysis.last.selected.profile&quot;: &quot;pProject Default&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;
   },
-  "keyToStringList": {
-    "ChangesTree.GroupingKeys": [
-      "directory"
+  &quot;keyToStringList&quot;: {
+    &quot;ChangesTree.GroupingKeys&quot;: [
+      &quot;directory&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="E:\SMPLan\static\js" />
@@ -483,7 +471,7 @@
       <option name="project" value="LOCAL" />
       <updated>1712825420285</updated>
     </task>
-    <option name="localTasksCounter" value="243" />
+    <option name="localTasksCounter" value="259" />
     <servers />
   </component>
   <component name="Vcs.Log.History.Properties">
@@ -632,22 +620,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Removed Scams packet number" />
-    <MESSAGE value="Dispatch reverse implemented" />
-    <MESSAGE value="Added K3CF and K0NH size in Honda WIP/FG report" />
-    <MESSAGE value="Bug fix in loading order. Using cs_id instead of smpl_no to load order" />
-    <MESSAGE value="Improvements in slitting order&#10;Bug fix Tally invoice check" />
-    <MESSAGE value="Lamination report in daily report and monthly report" />
-    <MESSAGE value="Improvements in order for slitting and NCTL" />
-    <MESSAGE value="Bug Fix: Commented out the print ctl and slitting buttons" />
-    <MESSAGE value="Bug Fix: In CTL order" />
-    <MESSAGE value="Reshearing for order done" />
-    <MESSAGE value="Bug Fix in print order for CTL in WIP." />
-    <MESSAGE value="Bug Fix in saving order" />
-    <MESSAGE value="Bug Fix in viewing order" />
-    <MESSAGE value="Sadanand and Chandrashekar added to transfer list" />
-    <MESSAGE value="Minor bug fixes in processing" />
-    <MESSAGE value="Exporting FG for tally stock journal" />
     <MESSAGE value="Improvements in exporting FG for tally stock journal" />
     <MESSAGE value="Dispatch submit entries and deletions changed to app.py. To get better control of commits and rollbacks" />
     <MESSAGE value="Order improvements&#10;Total FG wt of order = processing wt&#10;Width, length, tolerance,etc should be entered" />
@@ -657,7 +629,23 @@
     <MESSAGE value="Improvements in order:&#10;Once ordered coil or weight not available for further orders&#10;Order FG wt &gt; processing wt by 5%" />
     <MESSAGE value="Improvements in order:&#10;Input Material to appear above table for CTL and Slitting" />
     <MESSAGE value="Bug Fix: In smpl_list for order" />
-    <option name="LAST_COMMIT_MESSAGE" value="Bug Fix: In smpl_list for order" />
+    <MESSAGE value="Lamination implemented as separate column. Implemented for NCTL and Mini Slitting also" />
+    <MESSAGE value="Delete Order implemented" />
+    <MESSAGE value="Reprint Order Implemented&#10;Bug Fix: FG to WIP was not working&#10;Bug Fix: CTL Processing to be able to enter decimals" />
+    <MESSAGE value="Bug Fix: Delete order was not working. Fixed it" />
+    <MESSAGE value="Implemented Templates for order" />
+    <MESSAGE value="Bug Fix: Calculating wt_per_pkt, coil_length, etc for Aluminium orders" />
+    <MESSAGE value="Added FG table summary in order print&#10;Bug Fix: Calculating wt_per_pkt, coil_length, etc for Aluminium orders." />
+    <MESSAGE value="Bug Fix in transferring lami condition from mother sheet to FG sheet" />
+    <MESSAGE value="Bug Fix in calculating length for Aluminum material" />
+    <MESSAGE value="Added Special Instructions in Templates" />
+    <MESSAGE value="Added date is stock display" />
+    <MESSAGE value="Theoretical Weight added to PDI" />
+    <MESSAGE value="Bug Fix: In PDI dispatch, all records were getting deleted" />
+    <MESSAGE value="Bug Fix: Syntax issue" />
+    <MESSAGE value="Added Safepack in Lami" />
+    <MESSAGE value="Lami query updated fro daily and monthly report" />
+    <option name="LAST_COMMIT_MESSAGE" value="Lami query updated fro daily and monthly report" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -674,7 +662,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app.py</url>
-          <line>2025</line>
+          <line>2306</line>
           <option name="timeStamp" value="164" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -689,77 +677,72 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app.py</url>
-          <line>4089</line>
+          <line>4374</line>
           <option name="timeStamp" value="196" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app.py</url>
-          <line>1929</line>
+          <line>2210</line>
           <option name="timeStamp" value="202" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app.py</url>
-          <line>1976</line>
+          <line>2257</line>
           <option name="timeStamp" value="205" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app.py</url>
-          <line>3495</line>
+          <line>3777</line>
           <option name="timeStamp" value="218" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app.py</url>
-          <line>2734</line>
-          <option name="timeStamp" value="224" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/app.py</url>
-          <line>3580</line>
+          <line>3862</line>
           <option name="timeStamp" value="225" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app.py</url>
-          <line>2067</line>
+          <line>2348</line>
           <option name="timeStamp" value="250" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app.py</url>
-          <line>3923</line>
+          <line>4205</line>
           <option name="timeStamp" value="251" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app.py</url>
-          <line>3943</line>
+          <line>4225</line>
           <option name="timeStamp" value="252" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app.py</url>
-          <line>3536</line>
+          <line>3818</line>
           <option name="timeStamp" value="258" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app.py</url>
-          <line>3542</line>
+          <line>3824</line>
           <option name="timeStamp" value="259" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app.py</url>
-          <line>490</line>
+          <line>493</line>
           <option name="timeStamp" value="311" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app.py</url>
-          <line>4450</line>
+          <line>4736</line>
           <option name="timeStamp" value="319" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app.py</url>
-          <line>3158</line>
+          <line>3440</line>
           <option name="timeStamp" value="322" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app.py</url>
-          <line>3225</line>
+          <line>3507</line>
           <option name="timeStamp" value="323" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -769,27 +752,22 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app.py</url>
-          <line>4422</line>
+          <line>4708</line>
           <option name="timeStamp" value="331" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app.py</url>
-          <line>4268</line>
+          <line>4553</line>
           <option name="timeStamp" value="334" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app.py</url>
-          <line>889</line>
-          <option name="timeStamp" value="335" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/app.py</url>
-          <line>795</line>
+          <line>921</line>
           <option name="timeStamp" value="336" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app.py</url>
-          <line>1747</line>
+          <line>2028</line>
           <option name="timeStamp" value="341" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -814,38 +792,53 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app.py</url>
-          <line>2642</line>
-          <option name="timeStamp" value="356" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/app.py</url>
-          <line>777</line>
-          <option name="timeStamp" value="360" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/current_stock.py</url>
-          <line>81</line>
-          <option name="timeStamp" value="362" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/app.py</url>
-          <line>1290</line>
+          <line>1571</line>
           <option name="timeStamp" value="365" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app.py</url>
-          <line>1659</line>
+          <line>1940</line>
           <option name="timeStamp" value="373" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app.py</url>
-          <line>1689</line>
+          <line>1970</line>
           <option name="timeStamp" value="374" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app.py</url>
-          <line>1799</line>
-          <option name="timeStamp" value="375" />
+          <line>4369</line>
+          <option name="timeStamp" value="380" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/app.py</url>
+          <line>1190</line>
+          <option name="timeStamp" value="390" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/app.py</url>
+          <line>1688</line>
+          <option name="timeStamp" value="393" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/app.py</url>
+          <line>1645</line>
+          <option name="timeStamp" value="394" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/app.py</url>
+          <line>849</line>
+          <option name="timeStamp" value="395" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/app.py</url>
+          <line>791</line>
+          <option name="timeStamp" value="396" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/app.py</url>
+          <line>2967</line>
+          <option name="timeStamp" value="397" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

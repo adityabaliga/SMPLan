@@ -2964,7 +2964,8 @@ def dispatch():
                 cursor.execute("delete from staging_dispatch_detail where cs_id = %s", (cs_id,))
 
         if staging_dispatch_id != '':
-            dispatch_detail_lst = DispatchDetail.get_staging_details_by_id(int(staging_dispatch_id), 0)
+            cursor.execute("select * from staging_dispatch_detail where dispatch_id = %s", (staging_dispatch_id,))
+            dispatch_detail_lst = cursor.fetchall()
             length = len(dispatch_detail_lst)
             if len(dispatch_detail_lst) == 0:
                 #DispatchHeader.delete_staging_data(int(staging_dispatch_id))
