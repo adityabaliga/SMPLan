@@ -2932,7 +2932,7 @@ var printFromData = function(allOrders, stagePairs, incomingHTML, shortIncomingH
     var incomingRows = incoming.querySelectorAll("tr");
     for(var i = 0; i < Math.min(2, incomingRows.length); i++){
         incomingRows[i].querySelectorAll("td, th").forEach(function(cell){
-            cell.setAttribute("style", "font-size: 18px !important; font-weight: bold !important;");
+            cell.setAttribute("style", "font-family: 'JetBrains Mono', 'Consolas', monospace;font-size: 18px !important; font-weight: bold !important;");
         });
     }
 
