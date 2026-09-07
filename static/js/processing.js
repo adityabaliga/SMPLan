@@ -1120,6 +1120,8 @@ function cust_name_for_label(customer){
             cust_name= "Veer O Metals [JIG]";
         }if(_customer.includes("haro")){
             cust_name= "Veer O Metals [HRL]";
+        }if(_customer.includes("dabaspet")){
+            cust_name= "Veer O Metals [DBS]";
         }
     }
     else if(customer.startsWith("ttp technolgies")){
