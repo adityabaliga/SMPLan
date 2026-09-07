@@ -406,7 +406,7 @@ var UIController = (function() {
                 }
                 // existing CTL html template unchanged
             }
-           if(operation === "Slitting"){
+           if(operation === "Slitting" || operation === "Mini_Slitting"){
                     element = DOMStrings.Slitting_table;
 
                     // Add op details row for this stage if not already present
@@ -449,11 +449,11 @@ var UIController = (function() {
                 // Replace %product% token
                 html = html.replace('%product%', product);
             }
-           if(operation === "Mini_Slitting"){
+           /*if(operation === "Mini_Slitting"){
                element = DOMStrings.Mini_Slitting_table;
                html = '<tr id="size-Mini_Slitting-%id%"><td>%stage_no%</td><td>%fg_wip%</td><td>%input_material%</td><td>%op_width%</td><td hidden>%op_length%</td><td>%tolerance%</td><td>%lamination%</td><td>%i_dia%</td><td>%proc_wt%</td><td>%numbers%</td><td>%nos_per_packet%</td><td>%no_of_pkts%</td><td>%packing%</td><td>%remarks%</td><td><input type="button" class="item__delete--btn" id="del_size" name="del_size" value="Delete"></button></td><td><input type="button" class="item__edit--btn" id="edit_size" name="edit_size" value="Edit"></button></td></tr>';
 
-           }
+           }*/
            if(operation === "Lamination"){
                element = DOMStrings.Lamination_table;
                html = '<tr id="size-Lamination-%id%"><td>%stage_no%</td><td>%fg_wip%</td><td>%input_material%</td><td>%op_width%</td><td>%op_length%</td><td>%lamination%</td><td>%tolerance%</td><td hidden>%i_dia%</td><td>%proc_wt%</td><td>%numbers%</td><td>%nos_per_packet%</td><td>%no_of_pkts%</td><td>%packing%</td><td>%remarks%</td><td><input type="button" class="item__delete--btn" id="del_size" name="del_size" value="Delete"></button></td><td><input type="button" class="item__edit--btn" id="edit_size" name="edit_size" value="Edit"></button></td></tr>';
@@ -2417,7 +2417,7 @@ var printAllStages = function(){
     const incomingRows = incoming.querySelectorAll("tr");
     for(let i = 0; i < Math.min(2, incomingRows.length); i++){
         incomingRows[i].querySelectorAll("td, th").forEach(cell => {
-            cell.setAttribute("style", "font-size: 18px !important; font-weight: bold !important;");
+            cell.setAttribute("style", "font-family: 'JetBrains Mono', 'Consolas', monospace;font-size: 18px !important; font-weight: bold !important;");
         });
     }
 
