@@ -547,7 +547,7 @@ class CurrentStock:
                               length=Decimal(lst[5]),status=lst[6],customer=lst[7], thickness=Decimal(lst[8]),
                               grade=lst[9],unit=lst[10], packet_name = lst [11], length2 = lst[12],
                               date = lst[13], processing_id= lst[14], second_customer= lst[15], net_wt= lst[16],
-                              lami = lst[20])
+                              lami = lst[21])
             cs_lst.append(cs)
             cs_id_lst.append(lst[0])
 
