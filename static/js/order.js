@@ -38,10 +38,11 @@ var orderController = (function () {
     'Levelling'    : 'LEV'
     };
 
-    var Input_size = function(input_size, weight, stage_no){
+    var Input_size = function(input_size, weight, stage_no, numbers){
         this.input_size = input_size;
         this.weight = weight;
         this.stage_no = stage_no;
+        this.numbers = numbers;
     };
 
     var data = {
@@ -209,10 +210,10 @@ var orderController = (function () {
                 }
        },
 
-        newInputSize: function(input_size, wt, mc_stage_no){
+        newInputSize: function(input_size, wt, mc_stage_no, numbers){
             var newInput;
 
-            newInput = new Input_size(input_size, wt, (parseFloat(mc_stage_no) + 1));
+            newInput = new Input_size(input_size, wt, (parseFloat(mc_stage_no) + 1), numbers);
 
             data.input_material.push(newInput);
 
@@ -406,7 +407,7 @@ var UIController = (function() {
                 }
                 // existing CTL html template unchanged
             }
-           if(operation === "Slitting" || operation === "Mini_Slitting"){
+           if(operation === "Slitting"){
                     element = DOMStrings.Slitting_table;
 
                     // Add op details row for this stage if not already present
@@ -449,11 +450,49 @@ var UIController = (function() {
                 // Replace %product% token
                 html = html.replace('%product%', product);
             }
-           /*if(operation === "Mini_Slitting"){
+           if(operation === "Mini_Slitting"){
                element = DOMStrings.Mini_Slitting_table;
-               html = '<tr id="size-Mini_Slitting-%id%"><td>%stage_no%</td><td>%fg_wip%</td><td>%input_material%</td><td>%op_width%</td><td hidden>%op_length%</td><td>%tolerance%</td><td>%lamination%</td><td>%i_dia%</td><td>%proc_wt%</td><td>%numbers%</td><td>%nos_per_packet%</td><td>%no_of_pkts%</td><td>%packing%</td><td>%remarks%</td><td><input type="button" class="item__delete--btn" id="del_size" name="del_size" value="Delete"></button></td><td><input type="button" class="item__edit--btn" id="edit_size" name="edit_size" value="Edit"></button></td></tr>';
 
-           }*/
+                    // Add op details row for this stage if not already present
+                    var existingOpRow = document.querySelector('.mini-slitting-op-details[data-stage="' + newOrder.stage_no + '"]');
+                    if(!existingOpRow){
+                        var opTbody = document.createElement('tbody');
+                    opTbody.className = 'mini-slitting-op-stage-header';
+                    opTbody.innerHTML = '<tr class="mini-slitting-op-details" data-stage="' + newOrder.stage_no + '">' +
+                        '<td colspan="3" style="background:#f0f0f0;"><b>Stage ' + newOrder.stage_no +
+                        '  — Input Material: ' + newOrder.input_width + ' x ' + newOrder.input_length +
+                        ' | Proc Wt: ' + newOrder.op_processing_wt + ' MT' +
+                        ' | No of Parts: ' + newOrder.no_of_parts +
+                        ' | Length/Part: ' + newOrder.length_per_part + ' m' +
+                        ' | I.Dia: ' + newOrder.i_dia +
+                        ' | O.Dia: ' + newOrder.outer_dia + '</b></td>' +
+                        '<td colspan="20"></td></tr>';
+                    document.querySelector(DOMStrings.Mini_Slitting_table).appendChild(opTbody);
+                }
+
+                // Calculate product for the new column
+                var product = (parseFloat(newOrder.output_width) * parseFloat(newOrder.numbers)).toFixed(0);
+
+                html = '<tr id="size-Mini_Slitting-%id%">' +
+                    '<td>%stage_no%</td>' +
+                    '<td hidden>%input_material%</td>' +
+                    '<td style="font-size:18px; font-weight:bold;">%op_width% x %numbers%</td>' +
+                    '<td>%product%</td>' +           // new product column
+                    '<td>%fg_wip%</td>' +
+                    '<td hidden>%op_length%</td>' +
+                    '<td hidden>%lamination%</td>' +
+                    '<td>%tolerance%</td>' +
+                    '<td>%proc_wt%</td>' +
+                    '<td>%wt_per_pkt%</td>' +
+                    '<td>%packing%</td>' +
+                    '<td>%remarks%</td>' +
+                    '<td><input type="button" class="item__delete--btn" value="Delete"></td>' +
+                    '<td><input type="button" class="item__edit--btn" value="Edit"></td>' +
+                    '</tr>';
+
+                // Replace %product% token
+                html = html.replace('%product%', product);
+           }
            if(operation === "Lamination"){
                element = DOMStrings.Lamination_table;
                html = '<tr id="size-Lamination-%id%"><td>%stage_no%</td><td>%fg_wip%</td><td>%input_material%</td><td>%op_width%</td><td>%op_length%</td><td>%lamination%</td><td>%tolerance%</td><td hidden>%i_dia%</td><td>%proc_wt%</td><td>%numbers%</td><td>%nos_per_packet%</td><td>%no_of_pkts%</td><td>%packing%</td><td>%remarks%</td><td><input type="button" class="item__delete--btn" id="del_size" name="del_size" value="Delete"></button></td><td><input type="button" class="item__edit--btn" id="edit_size" name="edit_size" value="Edit"></button></td></tr>';
@@ -522,7 +561,7 @@ var UIController = (function() {
 
 
        // This refreshes the input size drop down in the UI
-       refreshInputSize: function(newInput, mother_size, fromFunction){
+       refreshInputSize: function(newInput, mother_size, fromFunction, numbers){
           var element, html, newHTML,i, firstOption, mother_size_, DOM;
 
            element = document.querySelector(DOMStrings.currentInputMaterial);
@@ -541,11 +580,12 @@ var UIController = (function() {
            for (i=0;i<newInput.length;i++){
 
 
-                html = '<option value="%input_size%" %sel% %disabled%>%input_size%    %wt% MT</option>';
+                html = '<option value="%input_size%" %sel% %disabled%>%input_size%    %wt% MT %nos% Nos</option>';
 
                 newHTML = html.replace('%input_size%', newInput[i].input_size);
                 newHTML = newHTML.replace('%input_size%', newInput[i].input_size);
                 newHTML = newHTML.replace('%wt%', newInput[i].weight);
+                newHTML = newHTML.replace('%nos%', newInput[i].numbers);
 
                //If all the material used then the user should not be able to select it in the input material
                if(newInput[i].weight === "0.000"){
@@ -1378,16 +1418,23 @@ var controller = (function(orderCtrl, UICtrl) {
         var wt_of_slit,length_of_slit, length_per_part, wt_per_part, processing_wt, input_material, ip_width;
         var DOM = UICtrl.getDOMstrings();
 
-        input_material = document.querySelector(DOM.currentInputMaterial).value;
-        input_material = input_material.split(" x ");
-        ip_width = parseFloat(input_material[0]);
+        var input_material_dropdown = document.querySelector(DOM.currentInputMaterial);
+        input_material = input_material_dropdown.options[input_material_dropdown.selectedIndex].text;
+
+        //input_material = document.querySelector(DOM.currentInputMaterial).value;
+        input_material = input_material.match(/^(\d+)\s*x\s*[\d.]+\s+([\d.]+)\s+MT\s+(\d+)\s+Nos/i);
+        ip_width = parseFloat(input_material[1]);
+        const input_wt = Number(input_material[2]);
+        const numbers = Number(input_material[3]);
+        //input_material = input_material.split(" x ");
+        //ip_width = parseFloat(input_material[0]);
         currentWidth = parseFloat(document.querySelector(DOM.currentWidth).value);
         var material_type = document.querySelector(".material_type").value;
 
         //This is wt of each individual slit for full coil
         wt_of_slit = parseFloat(document.querySelector(DOM.currentOpProcWt).value) * parseFloat(document.querySelector(DOM.currentWidth).value) / ip_width ;
         length_of_slit = wt_of_slit/parseFloat(document.querySelector(DOM.currentWidth).value)
-            /parseFloat(document.querySelector(DOM.thickness).value)/0.00000785;
+            /parseFloat(document.querySelector(DOM.thickness).value)/0.00000785/numbers;
 
         if (material_type.includes("ALUMINIUM")){
             length_of_slit = wt_of_slit/parseFloat(document.querySelector(DOM.currentWidth).value)/parseFloat(document.querySelector(DOM.thickness).value)/0.0000027;
@@ -1423,7 +1470,7 @@ var controller = (function(orderCtrl, UICtrl) {
         }else{
             // Add input_size to data
             ip_size = document.querySelector(DOM.mc_width).value + " x " + document.getElementById('length').value;
-            input_size = orderCtrl.newInputSize(ip_size, parseFloat(document.getElementById("processing_wt").value), 0);
+            input_size = orderCtrl.newInputSize(ip_size, parseFloat(document.getElementById("processing_wt").value), 0, parseInt(document.getElementById("available_numbers").value));
 
             //Add input_size to UI
             UICtrl.refreshInputSize(input_size,"","addOperation");
@@ -1484,9 +1531,17 @@ var controller = (function(orderCtrl, UICtrl) {
     var onChangeNoParts = function(){
     var DOM = UICtrl.getDOMstrings();
 
+    var input_material_dropdown = document.querySelector(DOM.currentInputMaterial);
+    var input_material = input_material_dropdown.options[input_material_dropdown.selectedIndex].text;
+
+    input_material = input_material.match(/^(\d+)\s*x\s*[\d.]+\s+([\d.]+)\s+MT\s+(\d+)\s+Nos/i);
+    const width = Number(input_material[1]);
+    const input_wt = Number(input_material[2]);
+    const numbers = Number(input_material[3]);
+
     var processing_wt = parseFloat(document.querySelector('.processing_wt_for_op').value) || 0;
     var thickness = parseFloat(document.querySelector(DOM.thickness).value) || 0;
-    var width = parseFloat(document.querySelector(DOM.mc_width).value) || 0;
+    //var width = parseFloat(document.querySelector(DOM.mc_width).value) || 0;
     var no_of_parts = parseFloat(document.querySelector('.no_of_parts').value) || 0;
     var material_type = document.querySelector(".material_type").value;
 
@@ -1495,7 +1550,7 @@ var controller = (function(orderCtrl, UICtrl) {
         if (material_type.includes("ALUMINIUM")){
             coil_length = (processing_wt * 1000) / (thickness * width * 0.0000027) / 1000;
         }
-        var length_per_part = coil_length / no_of_parts;
+        var length_per_part = coil_length / no_of_parts / numbers;
         document.querySelector('.length_per_part').value = length_per_part.toFixed(0);
     } else {
         document.querySelector('.length_per_part').value = "";
@@ -1506,6 +1561,10 @@ var controller = (function(orderCtrl, UICtrl) {
     var available_wt = parseFloat(document.querySelector(DOM.mc_weight).value) || 0;
     var length_per_part_val = parseFloat(document.querySelector('.length_per_part').value) || 0;
     var halfCutDiv = document.querySelector('.slitting_half_cut');
+    var stage_no = document.querySelector(DOM.currentStageNo).value;
+    if(stage_no > 1){
+        available_wt = input_wt;
+    }
 
     if(processing_wt > 0 && processing_wt < available_wt && no_of_parts > 0 && length_per_part_val > 0){
         var stop_at = (length_per_part_val * no_of_parts).toFixed(2);
@@ -1709,11 +1768,16 @@ var controller = (function(orderCtrl, UICtrl) {
             UICtrl.clearSizeFields();
 
             //update input material when output is FG
-            orderCtrl.updateInputSize(newOrder.input_width, newOrder.input_length, newOrder.processing_wt, "minus");
-
+            orderCtrl.updateInputSize(newOrder.input_width, newOrder.input_length, newOrder.processing_wt, "minus", newOrder.numbers);
+            var numbers = 0;
             if(newOrder.fg_wip === "WIP"){
                 new_input_size = newOrder.output_width + " x " + newOrder.output_length;
-                new_input = orderCtrl.newInputSize(new_input_size, newOrder.processing_wt);
+                if(input.operation =="Slitting" || input.operation == "Mini_Slitting"){
+                    numbers = parseInt(input.no_of_parts)*parseInt(input.numbers);
+                }else{
+                    numbers = input.numbers;
+                }
+                new_input = orderCtrl.newInputSize(new_input_size, newOrder.processing_wt,input.stage_no, numbers);
 
 
             }else{
@@ -1721,7 +1785,7 @@ var controller = (function(orderCtrl, UICtrl) {
             }
 
 
-            UICtrl.refreshInputSize(new_input, input.input_material, "addSize");
+            UICtrl.refreshInputSize(new_input, input.input_material, "addSize", new_input.numbers);
 
 
 
@@ -1731,7 +1795,7 @@ var controller = (function(orderCtrl, UICtrl) {
                 available_width = parseFloat(document.querySelector(DOM.currentAvailableWidth).value);
                 new_width = available_width - width_used;
                 if(new_width>=-15){
-                    document.querySelector(DOM.currentAvailableWidth).value = new_width;
+                    document.querySelector(DOM.currentAvailableWidth).value = new_width.toFixed(2);
                 }else{
                     alert("Please check width");
                     document.querySelector(DOM.currentWidth).focus();
@@ -2455,7 +2519,7 @@ var printAllStages = function(){
     var shortIncomingRows = Array.from(shortIncoming.querySelectorAll("tr"));
     for(var i = 0; i < Math.min(2, shortIncomingRows.length); i++){
         shortIncomingRows[i].querySelectorAll("td, th").forEach(function(cell){
-            cell.setAttribute("style", "font-size: 18px !important; font-weight: bold !important;");
+            cell.setAttribute("style", "font-family: 'JetBrains Mono', 'Consolas', monospace;font-size: 18px !important; font-weight: bold !important;");
         });
     }
 
