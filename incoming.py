@@ -127,9 +127,9 @@ class Incoming:
                 numbers_coll = rm.getElementsByTagName("UDF:_UDF_721427290")
             elif(numbers_coll.length >=1):
                 numbers_list = numbers_coll[0].firstChild.data.split(' ')
-                numbers = Decimal(numbers_list[1])
+                numbers = int(numbers_list[1])
             elif "Nos" in weight_list or "nos" in weight_list or "NOS" in weight_list:
-                numbers = Decimal(weight_list[1])
+                numbers = int(weight_list[1])
             else:
                 numbers = 1
 
