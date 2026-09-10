@@ -377,20 +377,26 @@ var UIController = (function() {
 
        addListOrder : function(newOrder, operation){
            var html, newHTML, element;
+           var thickness = Number(document.querySelector(DOMStrings.thickness).value);
+           var width = Number(newOrder.output_width);
+           var length = Number(newOrder.output_length);
+           var packet_wt = Number(newOrder.processing_wt)/Number(newOrder.no_of_pkts);
+
+          var sheet_wt = thickness*width*length*0.00000785;
 
            if(operation === "CTL"){
                element = DOMStrings.CTL_table;
-               html = '<tr id="size-CTL-%id%"><td>%stage_no%</td><td hidden>%input_material%</td><td hidden>%op_width%</td><td style="font-size:18px; font-weight:bold;">%op_length%</td><td>%tolerance%</td><td>%lamination%</td><td>%fg_wip%</td><td hidden>%i_dia%</td><td>%nos_per_packet%</td><td>%no_of_pkts%</td><td>%packing%</td><td>%proc_wt%</td><td>%numbers%</td><td>%remarks%</td><td><input type="button" class="item__delete--btn" value="Delete"></button></td><td><input type="button" class="item__edit--btn" value="Edit"></button></td></tr>';
+               html = '<tr id="size-CTL-%id%"><td>%stage_no%</td><td hidden>%input_material%</td><td hidden>%op_width%</td><td style="font-size:18px; font-weight:bold;">%op_length%</td><td>%tolerance%</td><td>%lamination%</td><td>%fg_wip%</td><td hidden>%i_dia%</td><td>%nos_per_packet%</td><td>%no_of_pkts%</td><td>%packing%</td><td>%proc_wt%///%packet_wt%///%sheet_wt%</td><td>%numbers%</td><td>%remarks%</td><td><input type="button" class="item__delete--btn" value="Delete"></button></td><td><input type="button" class="item__edit--btn" value="Edit"></button></td></tr>';
 
            }
            if(operation === "Narrow_CTL"){
                element = DOMStrings.Narrow_CTL_table;
-               html = '<tr id="size-Narrow_CTL-%id%"><td>%stage_no%</td><td>%input_material%</td><td hidden>%op_width%</td><td style="font-size:18px; font-weight:bold;">%op_length%</td><td>%tolerance%</td><td>%lamination%</td><td>%fg_wip%</td><td hidden>%i_dia%</td><td>%nos_per_packet%</td><td>%no_of_pkts%</td><td>%packing%</td><td>%proc_wt%</td><td>%numbers%</td><td>%remarks%</td><td><input type="button" class="item__delete--btn" id="del_size" name="del_size" value="Delete"></button></td><td><input type="button" class="item__edit--btn" id="edit_size" name="edit_size" value="Edit"></button></td></tr>';
+               html = '<tr id="size-Narrow_CTL-%id%"><td>%stage_no%</td><td>%input_material%</td><td hidden>%op_width%</td><td style="font-size:18px; font-weight:bold;">%op_length%</td><td>%tolerance%</td><td>%lamination%</td><td>%fg_wip%</td><td hidden>%i_dia%</td><td>%nos_per_packet%</td><td>%no_of_pkts%</td><td>%packing%</td><td>%proc_wt%///%packet_wt%///%sheet_wt%</td><td>%numbers%</td><td>%remarks%</td><td><input type="button" class="item__delete--btn" id="del_size" name="del_size" value="Delete"></button></td><td><input type="button" class="item__edit--btn" id="edit_size" name="edit_size" value="Edit"></button></td></tr>';
 
            }
            if(operation === "Reshearing"){
                element = DOMStrings.Reshearing_table;
-               html = '<tr id="size-Reshearing-%id%"><td>%stage_no%</td><td>%input_material%</td><td style="font-size:18px; font-weight:bold;">%op_width%</td><td style="font-size:18px; font-weight:bold;">%op_length%</td><td hidden>%lamination%</td><td>%tolerance%</td><td>%fg_wip%</td><td hidden>%i_dia%</td><td>%nos_per_packet%</td><td>%no_of_pkts%</td><td>%packing%</td><td>%proc_wt%</td><td>%numbers%</td><td>%remarks%</td><td><input type="button" class="item__delete--btn" id="del_size" name="del_size" value="Delete"></button></td><td><input type="button" class="item__edit--btn" id="edit_size" name="edit_size" value="Edit"></button></td></tr>';
+               html = '<tr id="size-Reshearing-%id%"><td>%stage_no%</td><td>%input_material%</td><td style="font-size:18px; font-weight:bold;">%op_width%</td><td style="font-size:18px; font-weight:bold;">%op_length%</td><td hidden>%lamination%</td><td>%tolerance%</td><td>%fg_wip%</td><td hidden>%i_dia%</td><td>%nos_per_packet%</td><td>%no_of_pkts%</td><td>%packing%</td><td>%proc_wt%///%packet_wt%///%sheet_wt%</td><td>%numbers%</td><td>%remarks%</td><td><input type="button" class="item__delete--btn" id="del_size" name="del_size" value="Delete"></button></td><td><input type="button" class="item__edit--btn" id="edit_size" name="edit_size" value="Edit"></button></td></tr>';
 
            }
            if(operation === 'CTL'){
@@ -520,6 +526,8 @@ var UIController = (function() {
            newHTML = newHTML.replace('%wt_per_pkt%', newOrder.wt_per_pkt);
            newHTML = newHTML.replace('%packing%', newOrder.packing);
            newHTML = newHTML.replace('%remarks%', newOrder.remarks);
+           newHTML = newHTML.replace('%packet_wt%', packet_wt.toFixed(3));
+           newHTML = newHTML.replace('%sheet_wt%', sheet_wt.toFixed(3));
 
            // Insert the HTML into the DOM
             document.querySelector(element).insertAdjacentHTML('beforeend', newHTML);
@@ -3034,7 +3042,7 @@ var printFromData = function(allOrders, stagePairs, incomingHTML, shortIncomingH
     var shortIncomingRows = Array.from(shortIncoming.querySelectorAll("tr"));
     for(var i = 0; i < Math.min(2, shortIncomingRows.length); i++){
         shortIncomingRows[i].querySelectorAll("td, th").forEach(function(cell){
-            cell.setAttribute("style", "font-size: 18px !important; font-weight: bold !important;");
+            cell.setAttribute("style", "font-family: 'JetBrains Mono', 'Consolas', monospace;font-size: 18px !important; font-weight: bold !important;");
         });
     }
 
