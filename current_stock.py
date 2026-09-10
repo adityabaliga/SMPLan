@@ -273,7 +273,7 @@ class CurrentStock:
                                       length=Decimal(lst[5]), status=lst[6], customer=lst[7], thickness=Decimal(lst[8]),
                                       grade=lst[9], unit=lst[10], packet_name = lst [11], length2 = lst[12],
                                       date = lst[13], processing_id= lst[14], second_customer= lst[15], net_wt= lst[16],
-                                      lami= lst[20])
+                                      lami= lst[21])
                     cs_lst.append(cs)
                     cs_id_lst.append(lst[0])
 
@@ -294,7 +294,7 @@ class CurrentStock:
                                       length=Decimal(lst[5]), status=lst[6], customer=lst[7], thickness=Decimal(lst[8]),
                                       grade=lst[9], unit=lst[10], packet_name=lst[11], length2 = lst[12],
                                       date = lst[13], processing_id= lst[14], second_customer= lst[15], net_wt=lst[16],
-                                      lami = lst[20])
+                                      lami = lst[21])
                     cs_lst.append(cs)
                     cs_id_lst.append(lst[0])
 
@@ -445,7 +445,7 @@ class CurrentStock:
                               length=Decimal(lst[5]),status=lst[6],customer=lst[7], thickness=Decimal(lst[8]),
                               grade=lst[9],unit=lst[10], packet_name = lst [11], length2 = lst[12],
                               date = lst[13], processing_id= lst[14], second_customer= lst[15], net_wt= lst[16],
-                              lami = lst[20])
+                              lami = lst[21])
             cs_lst.append(cs)
             cs_id_lst.append(lst[0])
         return zip(cs_id_lst,cs_lst)
@@ -463,7 +463,7 @@ class CurrentStock:
                               length=Decimal(lst[5]), status=lst[6], customer=lst[7], thickness=Decimal(lst[8]),
                               grade=lst[9], unit=lst[10], packet_name = lst [11], length2 = lst[12],
                               date = lst[13], processing_id= lst[14], second_customer= lst[15], net_wt= lst[16],
-                              lami = lst[20])
+                              lami = lst[21])
             cs_lst.append(cs)
             cs_id_lst.append(lst[0])
         return zip(cs_id_lst,cs_lst)
@@ -599,7 +599,7 @@ class CurrentStock:
                                   thickness=Decimal(user_data[8]), grade=user_data[9],
                                   unit=user_data[10], packet_name=user_data[11], length2 = user_data[12],
                                   date = user_data[13], processing_id= user_data[14], second_customer= user_data[15],
-                                  net_wt= user_data[16], lami = user_data[20])
+                                  net_wt= user_data[16], lami = user_data[21])
                 cs_lst.append(cs)
                 cs_id_lst.append(user_data[0])
                 return zip(cs_id_lst, cs_lst)
@@ -620,7 +620,7 @@ class CurrentStock:
                                   customer=user_data[7], thickness=Decimal(user_data[8]), grade=user_data[9],
                                   unit=user_data[10], packet_name = user_data[11], length2 = user_data[12],
                                   date = user_data[13], processing_id= user_data[14], second_customer= user_data[15],
-                                  net_wt= user_data[16], lami = user_data[20])
+                                  net_wt= user_data[16], lami = user_data[21])
 
                 return cs
             else:
@@ -802,7 +802,7 @@ class CurrentStock:
                               customer=user_data[7], thickness=Decimal(user_data[8]), grade=user_data[9],
                               unit=user_data[10], packet_name=user_data[11], length2=user_data[12],
                               date=user_data[13], processing_id=user_data[14], second_customer=user_data[15],
-                              net_wt=user_data[16], lami = user_data[20])
+                              net_wt=user_data[16], lami = user_data[21])
 
             return cs
         else:
