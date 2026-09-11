@@ -19,12 +19,13 @@ var size_pos = 3;
 var numbers_pos = 4;
 var weight_pos = 5;
 var grade_pos = 6;
-var status_pos=7;
-var full_dispatch_pos = 8;
-var dispatch_nos_pos = 9;
-var dispatch_qty_pos = 10;
-var no_of_pkts_pos = 11;
-var defective_pos=9;
+var lami = 7;
+var status_pos=8;
+var full_dispatch_pos = 9;
+var dispatch_nos_pos = 10;
+var dispatch_qty_pos = 11;
+var no_of_pkts_pos = 12;
+var defective_pos=10;
 
 
 //Disable Submit button once submit is pressed
