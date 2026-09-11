@@ -2969,7 +2969,7 @@ def dispatch():
             length = len(dispatch_detail_lst)
             if len(dispatch_detail_lst) == 0:
                 #DispatchHeader.delete_staging_data(int(staging_dispatch_id))
-                cursor.execute("delete from staging_dispatch_detail where dispatch_id = %s", (int(staging_dispatch_id),))
+                #cursor.execute("delete from staging_dispatch_detail where dispatch_id = %s", (int(staging_dispatch_id),))
                 cursor.execute("delete from staging_dispatch_header where dispatch_id = %s", (int(staging_dispatch_id),))
         connection.commit()
     except Exception as error:
