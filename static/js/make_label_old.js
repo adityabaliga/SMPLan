@@ -442,5 +442,22 @@ function print_label_new(){
 
 }
 
+function balanceSize(){
+     const checkbox = document.getElementById('balance_size');
+
+    if (checkbox.checked) {
+        console.log("Checkbox is checked");
+        size = document.getElementById('lbl_size').value;
+        size = size.split('X');
+        thickness = size[0];
+        width = size[1].replaceAll(" ", "");
+        length = size[2];
+
+        new_size = thickness + ' X BAL(' + width + ') X ' + length;
+        document.getElementById('lbl_size').value = new_size;
+
+    }
+}
+
 //This is to call functions in processing.js
 //cust_name_for_label();
