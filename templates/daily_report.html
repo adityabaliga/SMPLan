@@ -374,6 +374,23 @@
         </div>
     </div>
 
+    <h3>Maintenance</h3>
+    <table class="table table-sm">
+        {% for maintenance in maintenance_lst %}
+        <tr>
+            <td>{{maintenance[0]}}</td>
+            <td>{{maintenance[1]}}</td>
+            <td>{{maintenance[2]}}</td>
+            <td>{{maintenance[3]}}</td>
+            <td>{{maintenance[4]}}</td>
+            <td>{{maintenance[5]}}</td>
+            <td>{{maintenance[6]}}</td>
+            <td>{{maintenance[9]}}</td>
+            <td>{{maintenance[10]}}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
     <h3>Entry Not Done</h3>
     <table class="table table-sm">
         {% for sticker in sticker_lst %}

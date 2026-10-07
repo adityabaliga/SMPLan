@@ -126,6 +126,14 @@ class Processing:
 
             return user_data
 
+    @classmethod
+    def get_daily_maintenance(cls, report_date):
+        with CursorFromConnectionFromPool() as cursor:
+            cursor.execute('select * from maintenance_history where repair_start_date = %s', (report_date,))
+
+            user_data = cursor.fetchall()
+        return user_data
+
 
 
     def get_lamination_report(from_date, to_date):

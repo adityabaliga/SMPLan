@@ -4242,6 +4242,8 @@ def get_daily_report():
     sticker_lst = []
     sticker_lst = ProcessingDetail.no_entry_done(report_date)
 
+    maintenance_lst = Processing.get_daily_maintenance(report_date)
+
     lamination_data = Processing.get_lamination_report(report_date,report_date)
     # Calculate totals
     total_lami_metres = sum(item['total_length_metres'] for item in lamination_data if item['total_length_metres'])
@@ -4254,7 +4256,8 @@ def get_daily_report():
                            dispatch_hdr_lst=dispatch_hdr_lst, processing_hdr_detail=processing_hdr_detail,
                            machine_lst = machine_lst, processing_detail_lst = processing_detail_lst,
                            total_dispatch_hdr= total_dispatch_hdr, sticker_lst = sticker_lst,
-                           lamination_data = lamination_data, total_lami_metres = total_lami_metres)
+                           lamination_data = lamination_data, total_lami_metres = total_lami_metres,
+                           maintenance_lst = maintenance_lst)
 
 def daily_report_whatsapp():
     yesterday_date_lst = []
