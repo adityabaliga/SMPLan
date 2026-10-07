@@ -186,10 +186,10 @@
             </td>
 
             <td>
-
+                {% if current_user.user_type == "all" or current_user.user_type == "plan_head" %}
                 <a href="/quality_review">Quality Review</a><br>
                 <a href="/yield_report">Yield Report</a><br>
-
+                {% endif %}
             </td>
 
         </tr>
