@@ -212,7 +212,6 @@
 
     {% endif %}
 
-
      <h3>Processing</h3>
         {% for processing, processing_id in processing_hdr_lst %}
              <h4>Operation : {{processing.operation}}</h4>
@@ -244,11 +243,12 @@
                     <td>Helpers : {{processing.names_of_helpers}}</td>
                 </tr>
             </table>
+
             <hr style="border-top: 3px solid;">
-                {% for _processing_dtl_lst in processing_dtl_lst %}
 
 
-                {% for processing_dtl in _processing_dtl_lst %}
+                {% for processing_dtl_id, processing_dtl in processing_dtl_lst %}
+
                     {% if processing_dtl.processing_id == processing_id %}
                     <table class = "table table-sm">
                         <tr>
@@ -277,15 +277,44 @@
                              <td>{{processing_dtl.status}}</td>
                              <td>{{processing_dtl.lami}}</td>
                              <td>{{processing_dtl.remarks}}</td>
-
-
                          </tr>
-                     </table>
+                        {% set issues = quality_issues_by_detail.get(processing_dtl_id, []) %}
+                    {% if issues %}
+                    <table class="table table-sm table-bordered" style="margin-top:-10px;">
+                        <tr>
+                            <th>Issue</th>
+                            <th>Origin</th>
+                            <th>From</th>
+                            <th>To</th>
+                            <th>Affected Wt</th>
+                            <th>Status</th>
+                            <th>Disposition</th>
+                            <th>Remarks</th>
+                        </tr>
+                        {% for issue in issues %}
+                        <tr>
+                            <td>{{ issue.issue_name }}</td>
+                            <td>{{ issue.origin }}</td>
+                            <td>{{ issue.defect_start }}</td>
+                            <td>{{ issue.defect_end }} {{ issue.position_unit }}</td>
+                            <td>{{ issue.affected_wt }}</td>
+                            <td>{{ issue.status }}</td>
+                            <td>{{ issue.disposition or '-' }}</td>
+                            <td>{{ issue.remarks }}</td>
+                        </tr>
+                        {% endfor %}
+                    </table>
                     {% endif %}
+                    {% endif %}
+                     </table>
+
+
+
+
 
                 {% endfor %}
 
-                {% endfor %}
+
             <hr style="border-top: 3px solid;">
 
         {% endfor %}

@@ -34,6 +34,7 @@ from slitter_usage import SlitterUsage
 from dispatch_header import DispatchHeader
 from dispatch_detail import DispatchDetail
 from slitter_batch import SlitterBatch
+from quality_issues import QualityIssues
 import time
 import psycopg2
 from urllib.parse import unquote
@@ -1406,6 +1407,7 @@ def processing_load():
     incoming = Incoming.load_smpl_by_smpl_no(cs_rm.smpl_no)
 
     processing_detail_lst = ProcessingDetail.load_from_db(cs_rm.smpl_no)
+    issue_types = QualityIssues.get_quality_issue_list()
 
     '''order_return_lst = Order.load_from_db(smpl_no=cs_rm.smpl_no, status="Open")
     order_id_lst = []
@@ -1454,7 +1456,8 @@ def processing_load():
     if operation == "CTL":
         unit = current_user.unit
         return (render_template('processing_ctl.html', incoming=incoming, operation=operation,
-                               processing_details_lst=processing_detail_lst, cs_rm=cs_rm, cs_rm_id=cs_rm_id))
+                               processing_details_lst=processing_detail_lst, cs_rm=cs_rm, cs_rm_id=cs_rm_id,
+                                issue_types = issue_types))
         ''', order=order, order_detail_lst=zip(order_detail_id_lst_by_operation,order_detail_lst_by_operation),
                                _order_detail_lst=zip(order_detail_id_lst_by_operation, order_detail_lst_by_operation),
                                numbers=numbers, order_id=order_id, stage_no=stage_no, total_order_wt = total_order_wt))
@@ -1546,6 +1549,7 @@ def submit_processing():
         output_width_lst = request.form.getlist('output_width')
         output_length_lst = request.form.getlist('output_length')
         output_length2_lst = request.form.getlist('output_length2')
+        quality_issues_json_lst = request.form.getlist("quality_issues_json")
         # order_detail_id_lst = request.form.getlist('order_detail_id')
 
         fg_yes_no_lst = request.form.getlist('fg_yes_no')
@@ -1644,13 +1648,13 @@ def submit_processing():
                     if operation == "CTL" or operation == "CTL 2" or operation == "Reshearing" or operation == "Narrow_CTL" or \
                             operation == "Lamination" or operation == "Levelling" or operation == 'Trap_NCTL' or operation == 'Trap_Reshearing':
                         lamination_lst = request.form.getlist('lamination')
-                        for output_width, output_length, output_length2, actual_no_of_pieces, packet_name, processed_wt, \
-                            lamination, fg_yes_no, remarks, net_wt, second_customer in zip(output_width_lst,
+                        for i,(output_width, output_length, output_length2, actual_no_of_pieces, packet_name, processed_wt, \
+                            lamination, fg_yes_no, remarks, net_wt, second_customer) in enumerate(zip(output_width_lst,
                                                                                            output_length_lst, output_length2_lst,
                                                                   actual_no_of_pieces_lst,
                                                                   packet_name_lst, processed_wt_lst,
                                                                   lamination_lst, fg_yes_no_lst, remarks_lst, net_wt_lst,
-                                                                    second_customer_lst):
+                                                                    second_customer_lst)):
                             ip_size = input_size.split('x')
                             ms_width = ip_size[0]
                             ms_length = ip_size[1]
@@ -1666,8 +1670,9 @@ def submit_processing():
                                 cursor.execute(
                                     "insert into processing_detail (smpl_no, operation, machine, processing_id, input_width,"
                                     "input_length, cut_width, cut_length, processed_numbers, packet_name, processed_wt, "
-                                    "remarks, status, cut_length2, lami) values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s,"
-                                    " %s, %s, %s, %s, %s)",
+                                    "remarks, status, cut_length2, lami) "
+                                    "values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) "
+                                    "returning processing_detail_id",
                                     (processing_detail.smpl_no,
                                      processing_detail.operation,
                                      processing_detail.machine,
@@ -1683,7 +1688,10 @@ def submit_processing():
                                      processing_detail.status,
                                      processing_detail.cut_length2, processing_detail.lami))
                                 #processing_detail.save_to_db()
-
+                                processing_detail_id = cursor.fetchone()[0]
+                                QualityIssues.save_quality_issues(cursor, processing_detail_id, processing_id, smpl_no,
+                                                            quality_issues_json_lst[i],
+                                                            current_user.username)
 
                                 #This is done so the material's lamination state can be stored in current_stock
                                 if lamination == "No Lamination" or lamination == "":
@@ -3878,15 +3886,7 @@ def enter_smpl_no():
     return render_template('/history_enter_smpl_no.html')
 
 
-@app.route('/history_show_details', methods=['GET', 'POST'])
-def history_show_details():
-    smpl_number = ""
-    file_list = ""
-    if request.method == 'POST':
-        smpl_number = request.form['smpl_no']
-    if request.method == 'GET':
-        smpl_number = request.args.get('smpl_no')
-
+def show_history(smpl_no_lst):
     dispatch_hdr_lst = []
     dispatch_dtl_lst, _dispatch_dtl_lst = [], []
     dispatch_id_lst = []
@@ -3894,13 +3894,11 @@ def history_show_details():
     _processing_hdr_lst, processing_hdr_lst, processing_hdr_id_lst = [], [], []
     _order_dtl_lst, order_dtl_lst, order_dtl_id_lst = [], [], []
     order_dtl_lst_by_orderid, order_dtl_id_lst_by_orderid = [], []
-    processing_dtl_lst, processing_dtl_lst_by_order_dtl = [], []
+    processing_dtl_lst, processing_dtl_lst_by_order_dtl, _processing_dtl_lst = [], [], []
+    processing_dtl_id_lst = []
     cs_lst, _cs_lst = [], []
     cost_table = []
-
-    smpl_number = str(smpl_number).upper().replace(" ", "")
-    # smpl_no.replace(" ", "")
-    smpl_no_lst = Incoming.smpl_no_list_for_history(smpl_number)
+    file_list = ""
 
     if smpl_no_lst:
         # the query from incoming returns smpl_nos in ascending order. The original number is always going to be the
@@ -3916,7 +3914,12 @@ def history_show_details():
             for processing_id, processing in _processing:
                 processing_hdr_lst.append(processing)
                 processing_hdr_id_lst.append(processing_id)
-                processing_dtl_lst.append(ProcessingDetail.load_history(processing_id))
+                _processing_dtl_lst=(ProcessingDetail.load_history(processing_id))
+
+                for processsing_dtl_id, processing_dtl in _processing_dtl_lst:
+                    processing_dtl_id_lst.append(processsing_dtl_id)
+                    processing_dtl_lst.append(processing_dtl)
+
 
                 for machine in machine_name_value:
                     if processing.operation == machine[0]:
@@ -3969,6 +3972,8 @@ def history_show_details():
         sticker_lst = []
         sticker_lst = CurrentStock.getStickerList(smpl_no)
 
+        quality_issues_by_detail = QualityIssues.get_quality_issues_by_smplno(smpl_no)
+
         return render_template('/hist_view.html', incoming=incoming, file_list=file_list,
                                smpl_no_lst=smpl_no_lst,
                                order_lst_by_smpl=zip(order_lst, order_id_lst),
@@ -3976,14 +3981,33 @@ def history_show_details():
                                order_dtl_id_lst_by_orderid=order_dtl_id_lst_by_orderid,
                                order_dtl_lst_by_orderid=order_dtl_lst_by_orderid,
                                order_dtl_lst=order_dtl_lst,
-                               processing_dtl_lst=processing_dtl_lst,
+                               processing_dtl_lst= list(zip(processing_dtl_id_lst, processing_dtl_lst)),
                                processing_hdr_lst=zip(processing_hdr_lst, processing_hdr_id_lst),
                                dispatch_hdr_lst=zip(dispatch_lst, dispatch_id_lst),
                                dispatch_dtl_lst=dispatch_dtl_lst,
-                               cs_lst=cs_lst, sticker_lst = sticker_lst, cost_table = cost_table)
+                               cs_lst=cs_lst, sticker_lst=sticker_lst, cost_table=cost_table,
+                               quality_issues_by_detail=quality_issues_by_detail)
 
     else:
         return render_template('/main_menu.html', message=smpl_number + " not found.")
+
+@app.route('/history_show_details', methods=['GET', 'POST'])
+def history_show_details():
+    smpl_number = ""
+    file_list = ""
+    if request.method == 'POST':
+        smpl_number = request.form['smpl_no']
+    if request.method == 'GET':
+        smpl_number = request.args.get('smpl_no')
+
+
+    smpl_number = str(smpl_number).upper().replace(" ", "")
+    # smpl_no.replace(" ", "")
+    smpl_no_lst = Incoming.smpl_no_list_for_history(smpl_number)
+
+    return show_history(smpl_no_lst)
+
+
 
     '''
     dispatch_hdr_lst=zip(dispatch_lst, dispatch_id_lst),
@@ -4079,83 +4103,7 @@ def scams_show_details():
 
     smpl_no_lst = Incoming.get_scams_no(scams_no)
 
-    dispatch_hdr_lst = []
-    dispatch_dtl_lst, _dispatch_dtl_lst = [], []
-    dispatch_id_lst = []
-    order_lst, order_id_lst, _order_lst, order_lst_by_smpl, order_id_lst_by_smpl = [], [], [], [], []
-    _processing_hdr_lst, processing_hdr_lst, processing_hdr_id_lst = [], [], []
-    _order_dtl_lst, order_dtl_lst, order_dtl_id_lst = [], [], []
-    order_dtl_lst_by_orderid, order_dtl_id_lst_by_orderid = [], []
-    processing_dtl_lst, processing_dtl_lst_by_order_dtl = [], []
-    cs_lst, _cs_lst = [], []
-    cost_table = []
-
-    #smpl_number = str(smpl_number).upper().replace(" ", "")
-    # smpl_no.replace(" ", "")
-    #smpl_no_lst = Incoming.smpl_no_list_for_history(smpl_number)
-
-    if smpl_no_lst:
-        # the query from incoming returns smpl_nos in ascending order. The original number is always going to be the
-        # the first element
-        incoming = Incoming.load_smpl_by_smpl_no(smpl_no_lst[0])
-        for smpl_no in smpl_no_lst:
-            _cs_lst = (CurrentStock.load_smpl_for_history(smpl_no))
-            if _cs_lst:
-                for cs in _cs_lst:
-                    cs_lst.append(cs)
-
-            _processing = Processing.load_history(smpl_no)
-
-            for processing_id, processing in _processing:
-                processing_hdr_lst.append(processing)
-                processing_hdr_id_lst.append(processing_id)
-                processing_dtl_lst.append(ProcessingDetail.load_history(processing_id))
-
-                for machine in machine_name_value:
-                    if processing.operation == machine[0]:
-                        machine_rate = machine[1]
-                        total_time = processing.setting_time + processing.processing_time
-                        total_labour = processing.no_of_qc + processing.no_of_helpers
-                        machine_cost = round(machine_rate * (total_time / 60), 2)
-                        labour_cost = round(labour_rate * (total_labour) * (total_time / 60), 2)
-
-                total_cost = round((labour_cost + machine_cost), 2)
-                total_cost_per_mt = round(Decimal(total_cost) / (processing.total_processed_wt), 0)
-                cuts_per_minute = round(Decimal(processing.total_cuts) / (total_time), 2)
-                cost_tuple = (processing.operation, processing.processing_date, processing.total_processed_wt,
-                              processing.processing_time, processing.setting_time, machine_cost, labour_cost,
-                              total_cost, total_cost_per_mt, processing.total_cuts, cuts_per_minute)
-                cost_table.append(cost_tuple)
-
-            _dispatch_dtl_lst.append(DispatchDetail.load_from_db(smpl_no))
-            for dispatch_dtl_sublst in _dispatch_dtl_lst:
-                for dispatch_dtl in dispatch_dtl_sublst:
-                    dispatch_id_lst.append(int(dispatch_dtl.dispatch_id))
-                    dispatch_dtl_lst.append(dispatch_dtl)
-
-        dispatch_id_lst = list(set(dispatch_id_lst))
-        dispatch_lst = []
-        i = 0
-        for dispatch_id in dispatch_id_lst:
-            dispatch_hdr_lst.append(DispatchHeader.load_from_db(dispatch_id))
-            dispatch_lst.append(dispatch_hdr_lst[i][0])
-            i += 1
-
-        return render_template('/hist_view.html', incoming=incoming, file_list=file_list,
-                               smpl_no_lst=smpl_no_lst,
-                               order_lst_by_smpl=zip(order_lst, order_id_lst),
-                               order_id_lst_by_smpl=order_id_lst_by_smpl,
-                               order_dtl_id_lst_by_orderid=order_dtl_id_lst_by_orderid,
-                               order_dtl_lst_by_orderid=order_dtl_lst_by_orderid,
-                               order_dtl_lst=order_dtl_lst,
-                               processing_dtl_lst=processing_dtl_lst,
-                               processing_hdr_lst=zip(processing_hdr_lst, processing_hdr_id_lst),
-                               dispatch_hdr_lst=zip(dispatch_lst, dispatch_id_lst),
-                               dispatch_dtl_lst=dispatch_dtl_lst,
-                               cs_lst=cs_lst, cost_table = cost_table)
-
-    else:
-        return render_template('/main_menu.html', message=scams_no + " not found.")
+    return show_history(smpl_no_lst)
 
 
 
@@ -4181,7 +4129,7 @@ def print_label_smpl_pick():
     processing_lst = Processing.load_history(smpl_number)
     for processing_id, processing in processing_lst:
         _processing_detail_lst = (ProcessingDetail.load_history(processing_id))
-        for processing_detail in _processing_detail_lst:
+        for processing_detail_id, processing_detail in _processing_detail_lst:
             processing_detail_lst.append(processing_detail)
             processing_date_lst.append(processing.processing_date)
             processing_qc_lst.append(processing.names_of_qc)
@@ -4940,6 +4888,173 @@ def tally_stock_delete():
         CurrentStock.delete_record(cs_id)
 
     return render_template('/main_menu.html')
+
+@app.route("/quality_review")
+def quality_review():
+    # Establish a database connection
+    connection = psycopg2.connect(
+        dbname='smpl_prodn',
+        user='postgres',
+        password='smpl@509',
+        host='localhost',
+        port=5432
+    )
+
+    try:
+        # Begin a transaction
+        connection.autocommit = False
+        cur = connection.cursor()
+        cur.execute("SELECT * FROM v_quality_issue_pending")
+        cols = [c.name for c in cur.description]
+        rows = [dict(zip(cols, r)) for r in cur.fetchall()]
+
+        cur.execute("SELECT issue_type_id, issue_name FROM quality_issue_type "
+                    "WHERE active ORDER BY issue_name")
+        issue_types = cur.fetchall()
+    except (Exception, psycopg2.Error) as error:
+        # Rollback the transaction if an error occurred
+        connection.rollback()
+        print("Error inserting data:", error)
+
+        # Close the cursor
+        cur.close()
+
+    except psycopg2.OperationalError as error:
+        # Handle network errors
+        print("Network error occurred:", error)
+        print("Rolling back the transaction...")
+        connection.rollback()
+        return render_template('/main_menu.html', message="Not Deleted")
+    finally:
+        # Close the database connection
+        connection.close()
+
+    return render_template("quality_issue_review.html", issues=rows,
+                            issue_types=issue_types)
+
+
+@app.route("/quality_review_decide", methods=["POST"])
+def quality_review_decide():
+    quality_issue_id = request.form["quality_issue_id"]
+    disposition = request.form["disposition"]  # rejected / salvaged / accepted
+    customer_feedback = request.form.get("customer_feedback", "")
+
+    # Establish a database connection
+    connection = psycopg2.connect(
+        dbname='smpl_prodn',
+        user='postgres',
+        password='smpl@509',
+        host='localhost',
+        port=5432
+    )
+
+    try:
+        # Begin a transaction
+        connection.autocommit = False
+        cur = connection.cursor()
+        cur.execute(
+            """
+            UPDATE quality_issue
+            SET disposition = %s,
+                customer_feedback = %s,
+                status = 'decided',
+                decided_by = %s,
+                decided_at = %s
+            WHERE quality_issue_id = %s
+            """,
+            (disposition, customer_feedback, current_user.username,
+             datetime.now(), quality_issue_id),
+        )
+        connection.commit()
+    except (Exception, psycopg2.Error) as error:
+        # Rollback the transaction if an error occurred
+        connection.rollback()
+        print("Error inserting data:", error)
+
+        # Close the cursor
+        cur.close()
+
+    except psycopg2.OperationalError as error:
+        # Handle network errors
+        print("Network error occurred:", error)
+        print("Rolling back the transaction...")
+        connection.rollback()
+        return render_template('/main_menu.html', message="Entry Not done")
+    finally:
+        # Close the database connection
+        connection.close()
+    return redirect(url_for("quality_review"))
+
+
+# ------------------------------------------------------------------
+# 3. Yield report endpoint (returns JSON; wire to your existing
+#    Excel-export pattern the same way you did for cost analysis)
+# ------------------------------------------------------------------
+@app.route("/yield_report")
+def yield_report():
+    date_from = request.args.get("date_from")
+    date_to = request.args.get("date_to")
+    connection = psycopg2.connect(
+        dbname='smpl_prodn',
+        user='postgres',
+        password='smpl@509',
+        host='localhost',
+        port=5432
+    )
+
+    try:
+        cur = connection.cursor()
+        cur.execute(
+            """
+            SELECT
+                pd.smpl_no,
+                i.customer,
+                i.thickness,
+                i.width,
+                i.length,
+                i.material_type,
+                i.grade,
+                i.weight                                                             AS input_wt,
+                SUM(pd.processed_wt)                                                 AS output_wt,
+                COALESCE(SUM(qi.affected_wt) FILTER (WHERE qi.disposition = 'rejected'), 0) AS rejected_wt,
+                COALESCE(SUM(qi.affected_wt) FILTER (WHERE qi.disposition = 'salvaged'), 0) AS salvaged_wt,
+                COALESCE(SUM(qi.affected_wt) FILTER (WHERE qi.status = 'pending_review'), 0) AS pending_wt,
+                COALESCE(SUM(qi.affected_wt) FILTER (WHERE qi.origin = 'coil_defect'), 0)    AS coil_defect_wt,
+                COALESCE(SUM(qi.affected_wt) FILTER (WHERE qi.origin = 'process_defect'), 0) AS process_defect_wt,
+                ROUND(
+                    (SUM(pd.processed_wt)
+                     - COALESCE(SUM(qi.affected_wt) FILTER (WHERE qi.disposition IN ('rejected', 'salvaged')), 0)
+                    ) / NULLIF(i.weight, 0) * 100
+                , 2) AS net_yield_pct
+            FROM processing p
+            JOIN processing_detail pd ON pd.processing_id = p.processing_id
+            JOIN incoming i ON i.smpl_no = pd.smpl_no
+            LEFT JOIN quality_issue qi ON qi.processing_detail_id = pd.processing_detail_id
+            WHERE p.processing_date BETWEEN %(date_from)s AND %(date_to)s
+            GROUP BY pd.smpl_no, i.customer, i.thickness, i.width, i.length,
+                     i.material_type, i.grade, i.weight
+            ORDER BY pd.smpl_no
+            """,
+            {"date_from": date_from, "date_to": date_to},
+        )
+        cols = [c.name for c in cur.description]
+        rows = [dict(zip(cols, r)) for r in cur.fetchall()]
+
+        connection.close()
+
+
+
+    except psycopg2.OperationalError as error:
+        # Handle network errors
+        print("Network error occurred:", error)
+        print("Rolling back the transaction...")
+        connection.rollback()
+        return render_template('/main_menu.html', message="Not Deleted")
+    finally:
+        # Close the database connection
+        connection.close()
+    return render_template("yield_report.html", rows=rows,
+                           date_from=date_from, date_to=date_to)
 
 @app.errorhandler(Exception)
 def handle_error(e):

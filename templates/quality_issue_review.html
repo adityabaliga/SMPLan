@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SMPL MRP - Quality Review</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+    <style>
+        .mytable>tbody>tr>td, .mytable>tbody>tr>th, .mytable>tfoot>tr>td, .mytable>tfoot>tr>th, .mytable>thead>tr>td, .mytable>thead>tr>th {
+    padding: 6px;
+    }
+    input,select {
+    font-family: "Verdana";
+    }
+    hr.style1{
+	        border-top: 15px solid #4d0000;
+            }
+        .oe{
+            font-family: Mathematica6 Bold, Old English Text MT, Engravers Old English BT, Old English, Collins Old English, New Old English, serif;
+            font-size: 50px;
+            color: #4d0000;
+            text-align:center;
+            }
+        .topnav a:hover {
+            color: #4d0000;
+            text-decoration: none;
+        }
+        .nopad {
+                margin: 0;
+                padding: 0;
+                margin-top: 0em;
+                margin-bottom: 0em;
+            }
+
+
+    </style>
+</head>
+<form action="/quality_review_decide" method="post">
+
+
+    <div class="topnav" id="myTopnav">
+        <br>
+        <table>
+            <td><img src="/static/logo.jpg"  height="70" width="92" align = "left"></td>
+            <td width="1050px"><div align="center" class="nopad"> <a href="\main_menu"  class="oe">SMPL</a></div></td>
+            <td><div align="left" class="nopad">Hi {{current_user.username}}<br>
+            <a href="\change_password_form">Change Password</a><br>
+            <a href="\logout">Logout</a></div></td>
+        </table>
+    </div>
+
+    <hr class ="style1">
+    <div style="margin:20px;">
+    <h2 align="center">Pending Quality Issues</h2>
+
+    <table class="table table-sm table-bordered">
+        <tr>
+            <th>SMPL No</th>
+            <th>Customer</th>
+            <th>Machine</th>
+            <th>Packet</th>
+            <th>Size</th>
+            <th>Issue</th>
+            <th>Origin</th>
+            <th>From - To</th>
+            <th>Affected Qty</th>
+            <th>Affected Wt</th>
+            <th>Reported By / At</th>
+            <th>Remarks</th>
+            <th>Decision</th>
+        </tr>
+
+        {% for issue in issues %}
+        <tr>
+            <td>{{ issue.smpl_no }}</td>
+            <td>{{ issue.customer }}</td>
+            <td>{{ issue.machine }}</td>
+            <td>{{ issue.packet_name }}</td>
+            <td>{{ issue.cut_width }} x {{ issue.cut_length }}</td>
+            <td>{{ issue.issue_name }}</td>
+            <td>{{ issue.origin }}</td>
+            <td>{{ issue.defect_start }} - {{ issue.defect_end }} {{ issue.position_unit }}</td>
+            <td>{{ issue.affected_numbers }}</td>
+            <td>{{ issue.affected_wt }}</td>
+            <td>{{ issue.reported_by }}<br>{{ issue.reported_at }}</td>
+            <td>{{ issue.remarks }}</td>
+            <td>
+                <form action="/quality_review_decide" method="post">
+                    <input type="hidden" name="quality_issue_id" value="{{ issue.quality_issue_id }}">
+
+                    <select name="disposition" class="form-control form-control-sm" required>
+                        <option value="">-- select --</option>
+                        <option value="rejected">Rejected</option>
+                        <option value="salvaged">Salvaged</option>
+                        <option value="accepted">Accepted</option>
+                    </select>
+
+                    <input type="text" name="customer_feedback" placeholder="Customer feedback"
+                           class="form-control form-control-sm" style="margin-top:4px;">
+
+                    <input type="submit" value="Save"
+                           class="btn btn-sm btn-primary" style="margin-top:4px;">
+                </form>
+            </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="12" align="center">No pending issues.</td></tr>
+        {% endfor %}
+    </table>
+    </div>
+
+
+</form>
+</html>

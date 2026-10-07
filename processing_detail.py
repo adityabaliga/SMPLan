@@ -70,6 +70,7 @@ class ProcessingDetail:
             cursor.execute("select * from processing_detail where processing_id = %s ",(processing_id, ))
             user_data = cursor.fetchall()
             processing_dtl_lst = []
+            processing_dtl_id_lst = []
             for lst in user_data:
                 processing_dtl = ProcessingDetail(smpl_no=lst[1], operation=lst[2], machine=lst[3],
                                                   processing_id=int(lst[4]),
@@ -80,7 +81,8 @@ class ProcessingDetail:
                                                   packet_name = lst[12], status = lst[13], cut_length2=lst[14],
                                                   lami = lst[15])
                 processing_dtl_lst.append(processing_dtl)
-            return processing_dtl_lst
+                processing_dtl_id_lst.append(int(lst[0]))
+            return zip(processing_dtl_id_lst, processing_dtl_lst)
 
     @classmethod
     def load_for_report(cls, processing_id):

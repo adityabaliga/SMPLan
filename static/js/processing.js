@@ -2544,3 +2544,129 @@ function check_theory_wt_slit(){
 
 }
 
+var currentQcBtn = null;
+var currentQcHidden = null;
+var currentQcUnit = "sheet";
+
+function openQcModal(btn) {
+    // Work off the actual clicked row, not an id — ids get duplicated
+    // whenever addRow() clones this <tr>, so lookups by id would only
+    // ever find the FIRST row's elements.
+    currentQcBtn = btn;
+    currentQcHidden = btn.closest("tr").querySelector(".quality_issues_json");
+    document.getElementById("qcModal").style.display = "block";
+
+    // operation is already selected elsewhere on this page (CTL/Shearing/
+    // Slitting/Narrow CTL) — reuse it to decide sheet vs. metre, matching
+    // how position_unit is interpreted server-side.
+    var operation = document.getElementById("operation").value; // adjust to your actual field id
+    var isLengthBased = (operation === "Slitting" || operation === "Narrow CTL");
+    document.getElementById("qc_position_label").innerText =
+        isLengthBased ? "Start (Metres)" : "Start (Sheet #)";
+    currentQcUnit = isLengthBased ? "metre" : "sheet";
+
+    renderQcList();
+}
+
+function closeQcModal() {
+    document.getElementById("qcModal").style.display = "none";
+}
+
+function saveQcIssue() {
+    var start = parseFloat(document.getElementById("qc_defect_start").value);
+    var end = parseFloat(document.getElementById("qc_defect_end").value);
+
+    if (isNaN(start) || isNaN(end) || end < start) {
+        alert("Enter a valid start and end (end must be >= start).");
+        return;
+    }
+
+    var issues = JSON.parse(currentQcHidden.value || "[]");
+
+    issues.push({
+        issue_type_id: parseInt(document.getElementById("qc_issue_type").value),
+        origin: document.getElementById("qc_origin").value,
+        position_unit: currentQcUnit,
+        defect_start: start,
+        defect_end: end,
+        remarks: document.getElementById("qc_remarks").value
+    });
+
+    currentQcHidden.value = JSON.stringify(issues);
+
+    // flip the row's own button so it's visually obvious this packet has an issue
+    currentQcBtn.value = "QC: " + issues.length + " issue(s)";
+
+    renderQcList();
+    refreshQcSummaryTable();
+
+
+    // clear inputs for the next entry
+    document.getElementById("qc_defect_start").value = "";
+    document.getElementById("qc_defect_end").value = "";
+    document.getElementById("qc_remarks").value = "";
+}
+
+function renderQcList() {
+    var issues = JSON.parse(currentQcHidden.value || "[]");
+    var html = "";
+    issues.forEach(function (iss, idx) {
+        html += (idx + 1) + ". type " + iss.issue_type_id + " / " + iss.origin +
+                " / " + iss.position_unit + " " + iss.defect_start + "-" + iss.defect_end + "<br>";
+    });
+    document.getElementById("qc_issue_list_display").innerHTML = html;
+}
+
+//var qcIssueTypeNames = {{% for issue_type_id, issue_name in issue_types %}{{ issue_type_id }}: "{{ issue_name }}"{% if not loop.last %},{% endif %}{% endfor %}};
+
+
+function refreshQcSummaryTable() {
+        var table = document.getElementById("qc_summary_table");
+    while (table.rows.length > 1) {        // keep the header row, clear the rest
+        table.deleteRow(1);
+    }
+
+    document.querySelectorAll("#numbers_pkts tr").forEach(function (tr) {
+        var hidden = tr.querySelector(".quality_issues_json");
+        if (!hidden) return;               // header row has no hidden field
+
+        var issues;
+        try {
+            issues = JSON.parse(hidden.value || "[]");
+        } catch (e) {
+            console.error("Bad quality_issues_json value:", hidden.value, e);
+            return;                        // skip this row, keep going for the rest
+        }
+
+        var packetNameInput = tr.querySelector("[name='packet_name']");
+        var packetName = packetNameInput ? packetNameInput.value : "";
+
+        issues.forEach(function (iss, idx) {
+            try {
+                var row = table.insertRow(-1);
+                row.insertCell(0).innerText = packetName;
+                row.insertCell(1).innerText = qcIssueTypeNames[iss.issue_type_id] || iss.issue_type_id;
+                row.insertCell(2).innerText = iss.origin;
+                row.insertCell(3).innerText = iss.defect_start;
+                row.insertCell(4).innerText = iss.defect_end;
+                row.insertCell(5).innerText = iss.remarks || "";
+
+                var removeBtn = document.createElement("input");
+                removeBtn.type = "button";
+                removeBtn.value = "Remove";
+                removeBtn.className = "btn btn-sm btn-outline-danger";
+                removeBtn.onclick = function () {
+                    issues.splice(idx, 1);
+                    hidden.value = JSON.stringify(issues);
+                    refreshQcSummaryTable();   // rebuild so remaining indices stay correct
+                };
+                row.insertCell(6).appendChild(removeBtn);
+            } catch (e) {
+                console.error("Failed to render quality issue row:", iss, e);
+            }
+        });
+    });
+
+}
+
+

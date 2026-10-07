@@ -272,6 +272,13 @@
 
             </select>
             </td>
+            <td>
+                <input type="button" class="btn btn-default btn-sm qc_btn"
+                       value="QC Issue"
+                       onclick="openQcModal(this)">
+                <input type="text" name="quality_issues_json" class="quality_issues_json"
+                       value="[]" hidden>
+            </td>
             <td><input type = "text" name ="remarks" value="" style="width:150px;" id = "remarks"></td>
             <td><input type = "button" value="Make Label" onclick="make_label_new(this)"></td>
             <td><input type="button" name="add_size" id="add_size" value="Add Size" onclick="addRow('numbers_pkts')"></td>
@@ -523,9 +530,68 @@
     <script src = "{{ url_for('static', filename='js/processing.js') }}"></script>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
     <script src="jquery-3.6.0.min.js"></script>
+    <script>
+    var qcIssueTypeNames = {
+        {% for issue_type_id, issue_name in issue_types %}
+        {{ issue_type_id }}: "{{ issue_name }}"{% if not loop.last %},{% endif %}
+        {% endfor %}
+    };
+    </script>
+    <div id="qcModal" style="display:none; position:fixed; top:15%; left:35%;
+     width:400px; background:#fff; border:2px solid #4d0000; padding:15px;
+     z-index:1000;">
+    <h5>Quality Issue</h5>
 
 
 
+
+   <label>Issue Type</label>
+    <select id="qc_issue_type" class="form-control">
+        {% for issue_type_id, issue_name in issue_types %}
+        <option value="{{ issue_type_id }}">{{ issue_name }}</option>
+        {% endfor %}
+    </select>
+
+    <label>Origin</label>
+    <select id="qc_origin" class="form-control">
+        <option value="coil_defect">From Coil</option>
+        <option value="process_defect">During Processing</option>
+    </select>
+
+    <!-- label flips based on operation: "Sheet #" for CTL/Shearing, "Metres" for Slitting/Narrow CTL -->
+    <label id="qc_position_label">Start (Sheet #)</label>
+    <div style="display:flex; gap:8px;">
+        <input type="number" id="qc_defect_start" class="form-control" placeholder="Start">
+        <input type="number" id="qc_defect_end" class="form-control" placeholder="End">
+    </div>
+    <small class="text-muted">
+        Sheet: numbers within this packet (e.g. 12 to 15).<br>
+        Slitting: running metres from the start of the coil (e.g. 210 to 260).
+    </small>
+
+    <label>Remarks</label>
+    <input type="text" id="qc_remarks" class="form-control">
+
+    <br>
+    <input type="button" class="btn btn-danger btn-sm" value="Add Issue" onclick="saveQcIssue()">
+    <input type="button" class="btn btn-secondary btn-sm" value="Close" onclick="closeQcModal()">
+
+    <hr>
+    <div id="qc_issue_list_display" style="font-size:0.85em;"></div>
+    </div>
+
+    <h4 align="center">Quality Issues Entered</h4>
+    <table class="table table-sm table-bordered" id="qc_summary_table">
+    <tr>
+        <th>Packet Name</th>
+        <th>Issue</th>
+        <th>Origin</th>
+        <th>From</th>
+        <th>To</th>
+        <th>Remarks</th>
+        <th></th>
+    </tr>
+    </table>
 
 
 </form>
