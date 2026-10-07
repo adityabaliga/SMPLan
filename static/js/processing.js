@@ -329,7 +329,7 @@ function enable_lami_co(table_id, table_row){
         //last_row.cells[7].required = true;
         //last_row.cells[8].required = false;
 	}
-	else if(lami_type.includes("Both Side")){
+	else if(lami_type.includes("Double Side")){
 	    //console.log(last_row.cells[7].firstElementChild[0].innerText);
 	    //last_row.cells[7].disabled = false;
 	    last_row.cells[7].innerHTML ='<select id="lami_co_top" name="lami_co_top"><option value="">Select</option><option value="Futura">Futura</option><option value="SVS">SVS Pack</option><option value="Superbright">Superbright</option><option value="Crystal">Crystal</option><option value="Packguard">Packguard</option><option value="Laser Lami VOM">Laser Lami VOM</option><option value="Other">Other</option></select>';
@@ -366,7 +366,7 @@ function enable_lami_co_slitting(table_id, table_row){
         //last_row.cells[7].required = true;
         //last_row.cells[8].required = false;
 	}
-	else if(lami_type.includes("Both Side")){
+	else if(lami_type.includes("Double Side")){
 	    //console.log(last_row.cells[7].firstElementChild[0].innerText);
 	    //last_row.cells[7].disabled = false;
 	    last_row.cells[3].innerHTML ='<select id="lami_co_top" name="lami_co_top"><option value="">Select</option><option value="Futura">Futura</option><option value="SVS">SVS Pack</option><option value="Paragon">Paragon</option><option value="Superbright">Superbright</option><option value="Crystal">Crystal</option><option value="Packguard">Packguard</option><option value="Other">Other</option></select>';
@@ -1389,7 +1389,7 @@ function make_label_new_slit(th){
                 remarks = remarks + "|TOPLAMI:" + top_lami_co + "|";
             }
         }
-        if(lami_type.includes('BOTH SIDE')){
+        if(lami_type.includes('DOUBLE SIDE')){
             if(top_lami_co == 'Select' || bottom_lami_co == 'Select'){
                 window.alert("Please Enter Lami Company");
                 return;
@@ -1857,7 +1857,7 @@ function make_label_new(th){
                 remarks = remarks + "|TOPLAMI:" + top_lami_co + "|";
             }
         }
-        if(lami_type.includes('BOTH SIDE')){
+        if(lami_type.includes('DOUBLE SIDE')){
             if(top_lami_co == 'Select' || bottom_lami_co == 'Select'){
                 window.alert("Please Enter Lami Company");
                 return;
