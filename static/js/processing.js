@@ -1836,7 +1836,7 @@ function make_label_new(th){
 
     var lami_type;
 
-    var remarks = numbers_table.rows[rowId].cells[9].lastChild.value;
+    var remarks = numbers_table.rows[rowId].cells[10].lastChild.value;
     var input_lami = document.getElementById('input_lami').value;
 
 
@@ -1871,7 +1871,7 @@ function make_label_new(th){
           lamination = input_lami;
     }
 
-    numbers_table.rows[rowId].cells[9].lastChild.value = remarks;
+    numbers_table.rows[rowId].cells[10].lastChild.value = remarks;
 
     //Row 4
     var grade_field = document.getElementById("grade").value;
