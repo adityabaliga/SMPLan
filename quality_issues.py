@@ -106,7 +106,7 @@ class QualityIssues:
             cursor.execute("""
                     SELECT qi.processing_detail_id, qit.issue_name, qi.origin, qi.position_unit,
                            qi.defect_start, qi.defect_end, qi.affected_wt,
-                           qi.status, qi.disposition, qi.remarks
+                           qi.status, qi.disposition, qi.remarks, qi.customer_feedback
                     FROM quality_issue qi
                     JOIN quality_issue_type qit ON qit.issue_type_id = qi.issue_type_id
                     WHERE qi.smpl_no = %s
