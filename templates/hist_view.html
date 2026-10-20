@@ -290,6 +290,7 @@
                             <th>Status</th>
                             <th>Disposition</th>
                             <th>Remarks</th>
+                            <th>Customer Remarks</th>
                         </tr>
                         {% for issue in issues %}
                         <tr>
@@ -301,6 +302,7 @@
                             <td>{{ issue.status }}</td>
                             <td>{{ issue.disposition or '-' }}</td>
                             <td>{{ issue.remarks }}</td>
+                            <td>{{ issue.customer_feedback }}</td>
                         </tr>
                         {% endfor %}
                     </table>
