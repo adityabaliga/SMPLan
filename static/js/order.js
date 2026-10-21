@@ -1,7 +1,8 @@
 var orderController = (function () {
    var Order = function(id, operation, stage_no, input_width, input_length, fg_wip, output_width, output_length,
    lamination, tolerance, i_dia, processing_wt, wt_per_pkt, numbers, no_of_pkts, no_per_pkt, packing,
-   remarks,op_processing_wt, no_of_parts, length_per_part, outer_dia, half_cut_stop, special_instructions){
+   remarks,op_processing_wt, no_of_parts, length_per_part, outer_dia, half_cut_stop, special_instructions,
+   pieces_per_sheet, balance_size, balance_wt, balance_numbers){
         this.id = id;
         this.operation = operation;
         this.stage_no = stage_no;
@@ -26,6 +27,10 @@ var orderController = (function () {
         this.outer_dia        = outer_dia || 0;
         this.half_cut_stop = half_cut_stop || 0;
         this.special_instructions = special_instructions || '';
+        this.pieces_per_sheet = pieces_per_sheet || 0;
+        this.balance_size     = balance_size || "";
+        this.balance_wt       = balance_wt || 0;
+        this.balance_numbers  = balance_numbers || 0;
    };
 
    var operationAbbr = {
@@ -89,7 +94,8 @@ var orderController = (function () {
                 input.fg_wip, input.cut_width, input.cut_length, input.lamination, input.tolerance, input.i_dia,
                 input.processing_wt, input.wt_per_pkt, input.numbers, input.no_of_pkts, input.nos_per_pkt,
                 input.packing, input.remarks, input.op_processing_wt, input.no_of_parts, input.length_per_part,
-                 input.outer_dia, input.special_instructions);
+                 input.outer_dia, input.half_cut_stop, input.special_instructions,
+                input.pieces_per_sheet, input.balance_size, input.balance_wt, input.balance_numbers)
 
                 // Add it to the array based on the operation
                 data.allOrders[input.operation].push(newOrder);
@@ -220,6 +226,36 @@ var orderController = (function () {
             return data.input_material;
 
             },
+
+        newBalanceInput: function(size, wt, stage_no, numbers){
+            var i, e;
+            for(i=0;i<data.input_material.length;i++){
+                e = data.input_material[i];
+                if(e.is_balance && e.input_size === size){
+                    e.weight = (parseFloat(e.weight) + wt).toFixed(3);
+                    e.numbers = parseInt(e.numbers) + numbers;
+                    return data.input_material;
+                }
+            }
+            e = new Input_size(size, wt.toFixed(3), stage_no, numbers);
+            e.is_balance = true;
+            data.input_material.push(e);
+            return data.input_material;
+        },
+
+        removeBalanceInput: function(size, wt, numbers){
+            var i, e;
+            for(i=0;i<data.input_material.length;i++){
+                e = data.input_material[i];
+                if(e.is_balance && e.input_size === size){
+                    if(parseFloat(e.weight) + 0.0005 < wt) return false;
+                    e.weight = (parseFloat(e.weight) - wt).toFixed(3);
+                    e.numbers = Math.max(0, parseInt(e.numbers) - numbers);
+                    return true;
+                }
+            }
+            return true;
+        },
 
         // This updates the array input size. The input width and length are searched for in the array
         // and the wt of the input is updated accordingly.
@@ -396,7 +432,7 @@ var UIController = (function() {
            }
            if(operation === "Reshearing"){
                element = DOMStrings.Reshearing_table;
-               html = '<tr id="size-Reshearing-%id%"><td>%stage_no%</td><td>%input_material%</td><td style="font-size:18px; font-weight:bold;">%op_width%</td><td style="font-size:18px; font-weight:bold;">%op_length%</td><td hidden>%lamination%</td><td>%tolerance%</td><td>%fg_wip%</td><td hidden>%i_dia%</td><td>%nos_per_packet%</td><td>%no_of_pkts%</td><td>%packing%</td><td>%proc_wt%///%packet_wt%///%sheet_wt%</td><td>%numbers%</td><td>%remarks%</td><td><input type="button" class="item__delete--btn" id="del_size" name="del_size" value="Delete"></button></td><td><input type="button" class="item__edit--btn" id="edit_size" name="edit_size" value="Edit"></button></td></tr>';
+               html = '<tr id="size-Reshearing-%id%"><td>%stage_no%</td><td>%input_material%<br></td><td style="font-size:18px; font-weight:bold;">%op_width%</td><td style="font-size:18px; font-weight:bold;">%op_length%</td><td>%per_sheet%</td><td hidden>%lamination%</td><td>%tolerance%</td><td>%fg_wip%</td><td>%balance%</td><td hidden>%i_dia%</td><td>%nos_per_packet%</td><td>%no_of_pkts%</td><td>%packing%</td><td>%proc_wt%///%packet_wt%///%sheet_wt%</td><td>%numbers%</td><td>%remarks%</td><td><input type="button" class="item__delete--btn" id="del_size" name="del_size" value="Delete"></button></td><td><input type="button" class="item__edit--btn" id="edit_size" name="edit_size" value="Edit"></button></td></tr>';
 
            }
            if(operation === 'CTL'){
@@ -514,6 +550,14 @@ var UIController = (function() {
            newHTML = newHTML.replace('%id%', newOrder.id);
            newHTML = newHTML.replace('%fg_wip%', newOrder.fg_wip);
            newHTML = newHTML.replace('%input_material%', newOrder.input_width + " x " +  newOrder.input_length);
+           var perSheet = "";
+           var balance = "";
+            if(newOrder.operation === "Reshearing" && newOrder.pieces_per_sheet > 0){
+                perSheet =  newOrder.pieces_per_sheet + " nos ";
+                balance = (newOrder.balance_wt > 0 ? newOrder.balance_size : "0");
+            }
+            newHTML = newHTML.replace('%per_sheet%', perSheet);
+            newHTML = newHTML.replace('%balance%', balance);
            newHTML = newHTML.replace('%op_width%', newOrder.output_width);
            newHTML = newHTML.replace('%op_length%', newOrder.output_length);
            newHTML = newHTML.replace('%lamination%', newOrder.lamination);
@@ -563,6 +607,8 @@ var UIController = (function() {
            document.querySelector('.packing_support').hidden = false;
            document.querySelector('.packing_strapping').hidden = false;
            document.querySelector('.outer_dia').hidden = false;
+           document.querySelector(".pieces_per_sheet").value = "";
+            document.querySelector(".balance_info").textContent = ""
            var halfCutDiv = document.querySelector('.slitting_half_cut');
             if(halfCutDiv) halfCutDiv.style.display = 'none';
        },
@@ -588,12 +634,13 @@ var UIController = (function() {
            for (i=0;i<newInput.length;i++){
 
 
-                html = '<option value="%input_size%" %sel% %disabled%>%input_size%    %wt% MT %nos% Nos</option>';
+                html = '<option value="%input_size%" %sel% %disabled%>%input_size%    %wt% MT %nos% Nos%tag%</option>';
 
                 newHTML = html.replace('%input_size%', newInput[i].input_size);
                 newHTML = newHTML.replace('%input_size%', newInput[i].input_size);
                 newHTML = newHTML.replace('%wt%', newInput[i].weight);
                 newHTML = newHTML.replace('%nos%', newInput[i].numbers);
+                newHTML = newHTML.replace('%tag%', newInput[i].is_balance ? '  (balance)' : '');
 
                //If all the material used then the user should not be able to select it in the input material
                if(newInput[i].weight === "0.000"){
@@ -744,6 +791,11 @@ var controller = (function(orderCtrl, UICtrl) {
        //document.querySelector(DOM.printSlitBtn).addEventListener('click', printSlit);
 
        document.querySelector('.print_all_btn').addEventListener('click', printAllStages);
+
+       document.querySelector(DOM.currentWidth).addEventListener("change", function(){ updateReshearingBalance(true); });
+        document.querySelector(DOM.currentLength).addEventListener("change", function(){ updateReshearingBalance(true); });
+        document.querySelector(DOM.currentInputMaterial).addEventListener("change", function(){ updateReshearingBalance(true); });
+        document.querySelector(".pieces_per_sheet").addEventListener("change", function(){ updateReshearingBalance(false); });
 
        document.getElementById('order').addEventListener('submit', function(event){
            event.preventDefault();
@@ -1028,6 +1080,9 @@ var controller = (function(orderCtrl, UICtrl) {
                 }else{
                     input_material[i].disabled = false;
                 }
+                if(document.querySelector(DOM.currentOperation).value === "Reshearing"){
+                    document.querySelector(".pieces_per_sheet_curr_size").hidden = false;
+                }
             }
         }
 
@@ -1181,8 +1236,10 @@ var controller = (function(orderCtrl, UICtrl) {
             parent.insertBefore(no_of_slits,no_per_pakt);
             var no_of_pakts = document.querySelector('.no_of_pkts_curr_size');
             var packing = document.querySelector('.packing_curr_size');
-            parent.insertBefore(no_of_pakts,packing);
+            //parent.insertBefore(no_of_pakts,packing);
         }
+        document.querySelector(".pieces_per_sheet_curr_size").hidden =
+                                                (document.querySelector(DOM.currentOperation).value !== "Reshearing");
 
         //For Lamination and Levelling, the size should not change
         if(document.querySelector(DOM.currentOperation).value === "Lamination" || document.querySelector(DOM.currentOperation).value === "Levelling"){
@@ -1358,6 +1415,60 @@ var controller = (function(orderCtrl, UICtrl) {
         }
     };
 
+    var getReshearingBalance = function(){
+    var DOM = UICtrl.getDOMstrings();
+    var ip = document.querySelector(DOM.currentInputMaterial).value.split(" x ");
+    var P = parseFloat(ip[0]), Q = parseFloat(ip[1]);
+    var W = parseFloat(document.querySelector(DOM.currentWidth).value);
+    var L = parseFloat(document.querySelector(DOM.currentLength).value);
+    if(!(P > 0 && Q > 0 && W > 0 && L > 0)) return null;
+
+    //This is to decide which side is being sheared
+    var keepIsFirst;
+    if(L === P){ keepIsFirst = true; }
+    else if(L === Q){ keepIsFirst = false; }
+    else { return null; }
+    var keep = keepIsFirst ? P : Q;
+    var divide = keepIsFirst ? Q : P;
+
+    var max = Math.floor(divide / W + 1e-9);
+    if(max < 1) return null;
+
+    var pps = parseInt(document.querySelector(".pieces_per_sheet").value);
+    if(!(pps >= 1) || pps > max) pps = max;
+
+    var bal = Math.round((divide - pps * W) * 100) / 100;
+    if(bal < 0.005) bal = 0;
+
+    return {
+        P: P, Q: Q, W: W, L: L, divide: divide, max: max, pieces: pps, balance: bal,
+        balance_size: keepIsFirst ? (keep + " x " + bal) : (bal + " x " + keep)
+    };
+    };
+
+    var updateReshearingBalance = function(resetToMax){
+        var DOM = UICtrl.getDOMstrings();
+        if(document.querySelector(DOM.currentOperation).value !== "Reshearing") return;
+
+        var ppsEl = document.querySelector(".pieces_per_sheet");
+        var info = document.querySelector(".balance_info");
+        if(resetToMax) ppsEl.value = "";
+
+        var rb = getReshearingBalance();
+        if(!rb){ info.textContent = ""; return; }
+
+        if(ppsEl.value === "" || parseInt(ppsEl.value) > rb.max){
+            ppsEl.value = rb.max;
+            rb = getReshearingBalance();
+        }
+        info.textContent = "Max " + rb.max + " per sheet. " +
+            (rb.balance > 0 ? "Balance: " + rb.balance_size : "No balance");
+
+        if(document.querySelector(DOM.currentWtPerPkt).value !== "" &&
+           document.querySelector(DOM.currentProcWt).value !== ""){
+            onChangeWtPerPkt();
+        }
+    };
 
     var onChangeWtPerPkt = function(){
       //calculate numbers, number of packets, numbers per packet for CTL, NCTl and Reshearing
@@ -1391,6 +1502,8 @@ var controller = (function(orderCtrl, UICtrl) {
             flag = false;
         }
 
+        var out_wt = processing_wt;
+
         if(flag){
             if (operation != "Reshearing"){
                 numbers = Math.round(processing_wt*1000/thickness/width/length/0.00000785);
@@ -1405,11 +1518,14 @@ var controller = (function(orderCtrl, UICtrl) {
                 if (material_type.includes("ALUMINIUM")){
                     ms_numbers = Math.round(processing_wt*1000/thickness/width/length/0.0000027);
                 }
-                numbers_per_ms_sheet = Math.round(ms_width*ms_length/width/length);
+                var rb = getReshearingBalance();
+                numbers_per_ms_sheet = rb ? rb.pieces : Math.round(ms_width*ms_length/width/length);
                 numbers = ms_numbers * numbers_per_ms_sheet;
+                if(rb){ out_wt = processing_wt * rb.pieces * rb.W / rb.divide; }
+
             }
 
-            number_of_pkts = Math.round(processing_wt/wt_per_pkt);
+            number_of_pkts = Math.round(out_wt/wt_per_pkt);
             numbers_per_pkt = Math.round(numbers/number_of_pkts);
 
             document.querySelector(DOM.currentNumbers).value = numbers;
@@ -1707,8 +1823,10 @@ var controller = (function(orderCtrl, UICtrl) {
                         var rowId = 'size-' + operation + '-' + order.id;
                         var row = document.getElementById(rowId);
                         if(row){
-                            if(operation == "CTL"){
+                            if(operation == "CTL" ){
                                 row.cells[6].textContent = 'WIP-' + abbr;
+                            }if(operation == "Reshearing"){
+                                row.cells[7].textContent = 'WIP-' + abbr;
                             }else{
                             row.cells[4].textContent = 'WIP-' + abbr;
                             }
@@ -1759,6 +1877,21 @@ var controller = (function(orderCtrl, UICtrl) {
         if(checkValidInputs(input)){
 
             console.log('stage_no being used:', orderCtrl.getMaxStageNo());
+
+            var consumed_wt = parseFloat(input.processing_wt);
+            var rb = (input.operation === "Reshearing") ? getReshearingBalance() : null;
+            if(rb){
+                var out_wt = Math.round(consumed_wt * rb.pieces * rb.W / rb.divide * 1000) / 1000;
+                input.processing_wt = out_wt;
+                input.pieces_per_sheet = rb.pieces;
+                if(rb.balance > 0){
+                    var dens = document.querySelector(".material_type").value.includes("ALUMINIUM") ? 0.0000027 : 0.00000785;
+                    input.balance_size = rb.balance_size;
+                    input.balance_wt = Math.round((consumed_wt - out_wt) * 1000) / 1000;
+                    input.balance_numbers = Math.round(consumed_wt*1000/parseFloat(document.querySelector(DOM.thickness).value)/rb.P/rb.Q/dens);
+                }
+            }
+
             //Add item to order Controller
             newOrder = orderCtrl.addOrder(input);
 
@@ -1776,7 +1909,7 @@ var controller = (function(orderCtrl, UICtrl) {
             UICtrl.clearSizeFields();
 
             //update input material when output is FG
-            orderCtrl.updateInputSize(newOrder.input_width, newOrder.input_length, newOrder.processing_wt, "minus", newOrder.numbers);
+            orderCtrl.updateInputSize(newOrder.input_width, newOrder.input_length, consumed_wt, "minus", newOrder.numbers);
             var numbers = 0;
             if(newOrder.fg_wip === "WIP"){
                 new_input_size = newOrder.output_width + " x " + newOrder.output_length;
@@ -1792,6 +1925,10 @@ var controller = (function(orderCtrl, UICtrl) {
                 new_input = orderCtrl.returnInputSize();
             }
 
+            if(newOrder.balance_wt > 0){
+                orderCtrl.newBalanceInput(newOrder.balance_size, newOrder.balance_wt, input.stage_no, newOrder.balance_numbers);
+                new_input = orderCtrl.returnInputSize();
+            }
 
             UICtrl.refreshInputSize(new_input, input.input_material, "addSize", new_input.numbers);
 
@@ -1877,6 +2014,14 @@ var controller = (function(orderCtrl, UICtrl) {
             }
 
             size_details = orderCtrl.getSize(operation,ID);
+
+            if(size_details.balance_wt > 0){
+            if(!orderCtrl.removeBalanceInput(size_details.balance_size, size_details.balance_wt, size_details.balance_numbers)){
+                alert("The balance from this size has already been used. Delete the size that used it first.");
+                return;
+                }
+            }
+            var restore_wt = parseFloat(size_details.processing_wt) + parseFloat(size_details.balance_wt || 0);
 
             if(to_do === "item__delete--btn"){
 
@@ -2207,10 +2352,14 @@ var controller = (function(orderCtrl, UICtrl) {
 
         // Calculate total FG weight across all operations
         var totalFGWt = 0;
+        var totalFGScrapWt = 0;
         Object.keys(allOrders).forEach(function(operation){
             allOrders[operation].forEach(function(order){
-                if(order.fg_wip === 'FG'){
+                if(order.fg_wip === 'FG' || order.fg_wip === 'Scrap'){
+                    if(order.fg_wip === 'FG'){
                     totalFGWt += parseFloat(order.processing_wt) || 0;
+                    }
+                    totalFGScrapWt += parseFloat(order.processing_wt) || 0;
                 }
             });
         });
@@ -2224,7 +2373,7 @@ var controller = (function(orderCtrl, UICtrl) {
         }
 
         // FG must be at least 95% of processing weight
-        if(totalFGWt < (0.95 * processingWt)){
+        if(totalFGScrapWt < (0.95 * processingWt)){
             alert('Total FG weight (' + totalFGWt + ' MT) is less than 95% of processing weight (' + processingWt + ' MT). Please check.');
             return false;
         }

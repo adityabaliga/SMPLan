@@ -223,7 +223,11 @@
             <span class="cut_length_hdr" style= "padding-left:110px;padding-right:20px;"><b>Length</b></span>
             <input type="number" class="cut_length" step="0.1" style= "width:200px;" value="">
         </span>
-
+        <span class="pieces_per_sheet_curr_size" hidden>
+            <span style="padding-right:10px;"><b>Pieces/sheet</b></span>
+            <input type="number" class="pieces_per_sheet" step="1" min="1" style="width:70px;">
+            <span class="balance_info" style="padding-left:10px; font-weight:bold;"></span>
+        </span>
 
         <br><br>
         <span class="tol_curr_size" style="width:200px;">
@@ -439,10 +443,12 @@
                     <th>Input Material</th>
                     <th>Cut Width</th>
                     <th>Cut Length</th>
+                    <th>Per Sheet</th>
                     <th hidden>Lamination</th>
                     <th>Tolerance</th>
                     <td hidden>I dia</td>
                     <th>FG/WIP</th>
+                    <th>Scrap</th>
 
 
                     <th>No.s/pkt</th>
