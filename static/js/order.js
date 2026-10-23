@@ -1825,7 +1825,7 @@ var controller = (function(orderCtrl, UICtrl) {
                         if(row){
                             if(operation == "CTL" ){
                                 row.cells[6].textContent = 'WIP-' + abbr;
-                            }if(operation == "Reshearing"){
+                            }else if(operation == "Reshearing"){
                                 row.cells[7].textContent = 'WIP-' + abbr;
                             }else{
                             row.cells[4].textContent = 'WIP-' + abbr;
