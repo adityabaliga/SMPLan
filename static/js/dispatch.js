@@ -568,3 +568,243 @@ const userPins = {
             return true;
         }
 
+
+// --------------------------------------------------
+// QR DISPATCH SCANNER
+// --------------------------------------------------
+
+let qrScanner = null;
+let scannerRunning = false;
+let lastScannedText = "";
+let lastScannedTime = 0;
+
+
+// Convert numeric values to a consistent format
+function qrNumber(value) {
+    const n = Number(String(value).trim());
+
+    if (!Number.isFinite(n)) {
+        return null;
+    }
+
+    return Math.round(n * 1000) / 1000;
+}
+
+
+// Parse the existing QR format:
+//
+// SMPL,Packet,Thickness X Width X Length,
+// Numbers,Net Weight,Gross Weight,Status
+
+function parseDispatchQR(qrText) {
+
+    const fields = qrText.split(",");
+
+    if (fields.length !== 7) {
+        throw new Error("Invalid QR format. Expected 7 fields.");
+    }
+
+    const dimensions = fields[2].split(/\s*[xX]\s*/);
+
+    if (dimensions.length !== 3) {
+        throw new Error("Invalid dimensions in QR code.");
+    }
+
+    const qr = {
+        smpl_no: fields[0].trim(),
+        packet_name: fields[1].trim(),
+        thickness: qrNumber(dimensions[0]),
+        width: qrNumber(dimensions[1]),
+        length: qrNumber(dimensions[2]),
+        numbers: qrNumber(fields[3]),
+        net_weight: fields[4].trim(),
+        gross_weight: fields[5].trim(),
+        status: fields[6].trim()
+    };
+
+    if (!qr.smpl_no || !qr.packet_name ||
+        qr.thickness === null ||
+        qr.width === null ||
+        qr.length === null ||
+        qr.numbers === null ||
+        !qr.status) {
+
+        throw new Error("One or more required QR fields are missing.");
+    }
+
+    return qr;
+}
+
+
+// Find the corresponding packet in the dispatch table
+
+function findDispatchPacket(qr) {
+
+    const rows = document.querySelectorAll(
+        "#dispatch_list tr.packet-list"
+    );
+
+    for (const row of rows) {
+
+        const match =
+            row.dataset.smpl_no.trim() === qr.smpl_no &&
+            row.dataset.packet_name.trim() === qr.packet_name &&
+            qrNumber(row.dataset.thickness) === qr.thickness &&
+            qrNumber(row.dataset.width) === qr.width &&
+            qrNumber(row.dataset.length) === qr.length &&
+            qrNumber(row.dataset.numbers) === qr.numbers &&
+            row.dataset.status.trim() === qr.status;
+
+        if (match) {
+            return row;
+        }
+    }
+
+    return null;
+}
+
+
+// Process a successfully scanned QR code
+
+function processDispatchQR(qrText) {
+
+    const now = Date.now();
+
+    // Avoid processing the same QR repeatedly
+    // while it remains in front of the camera
+    if (qrText === lastScannedText &&
+        now - lastScannedTime < 2500) {
+        return;
+    }
+
+    lastScannedText = qrText;
+    lastScannedTime = now;
+
+    const message = document.getElementById("qrScanMessage");
+
+    try {
+
+        const qr = parseDispatchQR(qrText);
+
+        const row = findDispatchPacket(qr);
+
+        if (!row) {
+            message.style.color = "red";
+            message.textContent =
+                "Packet not found in the dispatch list: " +
+                qr.smpl_no + " / " + qr.packet_name;
+            return;
+        }
+
+        const checkbox = row.querySelector(".select_smpl");
+
+        if (checkbox.checked) {
+            message.style.color = "orange";
+            message.textContent =
+                "Already selected: " + qr.smpl_no +
+                " / " + qr.packet_name;
+            return;
+        }
+
+        // Select the packet using existing dispatch logic
+        checkbox.checked = true;
+
+        enable_dispatch(checkbox, "dispatch_list");
+
+        // Highlight the selected row
+        row.scrollIntoView({
+            behavior: "smooth",
+            block: "center"
+        });
+
+        message.style.color = "green";
+        message.textContent =
+            "Selected: " + qr.smpl_no +
+            " / " + qr.packet_name;
+
+    }
+    catch (error) {
+
+        message.style.color = "red";
+        message.textContent = error.message;
+
+    }
+}
+
+
+// Start camera scanner
+
+async function startDispatchScanner() {
+
+    if (scannerRunning) {
+        return;
+    }
+
+    const message = document.getElementById("qrScanMessage");
+
+    try {
+
+        if (!qrScanner) {
+            qrScanner = new Html5Qrcode("qr-reader");
+        }
+
+        await qrScanner.start(
+            { facingMode: "environment" },
+            {
+                fps: 10,
+                qrbox: { width: 250, height: 150 }
+            },
+            processDispatchQR
+        );
+
+        scannerRunning = true;
+
+        message.style.color = "green";
+        message.textContent = "Scanner started.";
+
+    }
+    catch (error) {
+
+        message.style.color = "red";
+        message.textContent =
+            "Unable to start camera: " + error;
+
+    }
+}
+
+
+// Stop camera scanner
+
+async function stopDispatchScanner() {
+
+    if (!qrScanner || !scannerRunning) {
+        return;
+    }
+
+    try {
+
+        await qrScanner.stop();
+        scannerRunning = false;
+
+        document.getElementById("qrScanMessage").textContent =
+            "Scanner stopped.";
+
+    }
+    catch (error) {
+
+        console.error(error);
+    }
+}
+
+
+// Connect scanner buttons
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    document.getElementById("startScanner")
+        .addEventListener("click", startDispatchScanner);
+
+    document.getElementById("stopScanner")
+        .addEventListener("click", stopDispatchScanner);
+
+});

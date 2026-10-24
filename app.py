@@ -2901,6 +2901,7 @@ def dispatch_list():
 def dispatch():
     if request.method == 'POST':
         dispatch_lst = request.form.getlist('select_smpl')
+        defectives = request.form.getlist('defectives')
         vehicle_no = request.form['vehicle_no']
         customer = request.form['customer']
         dispatch_date = request.form['dispatch_date']
