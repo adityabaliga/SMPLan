@@ -549,6 +549,7 @@ function time_taken(){
     document.getElementById("start_time").focus();
    }
     validate();
+    validateLami();
 }
 
 function time_taken_setting(){
@@ -700,6 +701,14 @@ function addRow(tableID)
 			var operation = document.getElementById("operation").value;
 
 			var rowCount = table.rows.length;
+			if (tableID == "numbers_pkts") {
+                var row_check = document.getElementById(tableID).rows[rowCount-1];
+                if (!getLamiState(row_check)){
+                alert("Please enter lami company");
+                return;
+                }
+            }
+
 			var row = table.insertRow(rowCount);
             if(tableID == "part_tbl" || tableID == "numbers_pkts"){
                 console.log("Before:", row.id, "rowCount =", rowCount);
@@ -708,48 +717,52 @@ function addRow(tableID)
             }
 			var last_row = document.getElementById(tableID).rows[rowCount-1];
 
+
 			var colCount = table.rows[1].cells.length;
 
 			for(var i=0; i<colCount; i++) {
 
-				var newcell	= row.insertCell(i);
+                    var newcell	= row.insertCell(i);
 
-				newcell.innerHTML = table.rows[1].cells[i].innerHTML;
-				newcell.hidden = table.rows[1].cells[i].hidden;
+                    newcell.innerHTML = table.rows[1].cells[i].innerHTML;
+                    newcell.hidden = table.rows[1].cells[i].hidden;
 
-                if(tableID == "numbers_pkts"){
-                    if(newcell.lastElementChild.id == 'output_width' || newcell.lastElementChild.id == 'output_length'){
-				        newcell.lastElementChild.value = last_row.cells[i].lastElementChild.value;
+                    if(tableID == "numbers_pkts"){
+
+                        if(newcell.lastElementChild.id == 'output_width' || newcell.lastElementChild.id == 'output_length'){
+                            newcell.lastElementChild.value = last_row.cells[i].lastElementChild.value;
                     }
 
-                if(newcell.lastElementChild.id == 'packet_name'){
-                    var str = last_row.cells[i].lastElementChild.value;
-                    var index = str.length - 1;
+                    if(newcell.lastElementChild.id == 'packet_name'){
+                        var str = last_row.cells[i].lastElementChild.value;
+                        var index = str.length - 1;
 
-                      while (index >= 0) {
-                        if (/[a-zA-Z]/.test(str[index])) {
-                          break;
+                          while (index >= 0) {
+                            if (/[a-zA-Z]/.test(str[index])) {
+                              break;
+                            }
+                            index--;
+                          }
+
+                        var secondPart = parseInt(str.substring(index+1)) +1;
+                        var firstPart;
+                        if (secondPart > 9){
+                            firstPart = str.substring(0, index+1);
+                        }else{
+                            firstPart = str.substring(0, index+2);
                         }
-                        index--;
-                      }
-
-                    var secondPart = parseInt(str.substring(index+1)) +1;
-                    var firstPart;
-                    if (secondPart > 9){
-                        firstPart = str.substring(0, index+1);
-                    }else{
-                        firstPart = str.substring(0, index+2);
-                    }
 
 
 
-                    console.log(firstPart);
-                    console.log(secondPart);
-                    newcell.lastElementChild.value = firstPart + secondPart.toString();
-                    //return [firstPart, secondPart];
+                        console.log(firstPart);
+                        console.log(secondPart);
+                        newcell.lastElementChild.value = firstPart + secondPart.toString();
+                        //return [firstPart, secondPart];
+                        }
+
+
+
                 }
-
-				}
 
 			}
     }
@@ -2491,10 +2504,6 @@ function check_slitter_numbers(tableID){
 }
 
 function validateForm(){
-// 1. If slitting check if all slitter numbers < 50
-// 2. Processed weight cannot be empty
-
-
 // First step check for all the nulls and empty fields
 
     var total_processed_wt = document.getElementById('total_processed_wt').value;
@@ -2502,10 +2511,11 @@ function validateForm(){
         alert('Processed weight is empty. Please check!');
         return false;
     }
-    var check_slitters = check_slitter_numbers('slitting_cutters');
-    if(check_slitters == false){
-        return false;
-    }
+
+
+    if(!validateLami()) return false;
+
+    return true;
 
 }
 
@@ -2668,5 +2678,79 @@ function refreshQcSummaryTable() {
     });
 
 }
+
+function getLamiState(last_row) {
+  const lami_type = last_row.cells[2].lastElementChild.selectedOptions[0].innerHTML; // 'None' | 'Single Side' | 'Double Side'
+  var top_lami_co = last_row.cells[7].lastElementChild.selectedOptions[0].innerHTML;
+    var bottom_lami_co = last_row.cells[8].lastElementChild.selectedOptions[0].innerHTML;
+
+  var valid = true;
+  if (lami_type.includes('Single Side') && (top_lami_co == "Select")) valid = false;
+  else if (lami_type.includes('Double Side') && ((top_lami_co == "Select") || (bottom_lami_co == "Select"))) valid = false;
+
+  return valid;
+}
+
+function buildLamiTag() {
+  const lami_type = document.getElementById('lamination').value;
+  const top = document.getElementById('lami_co_top').value;
+  const bot = document.getElementById('lami_co_bot').value;
+
+  var remarks = '';
+  if (lami_type.includes('Single Side') && top) remarks =  `|TOPLAMI:${top}|`;
+  if (lami_type.includes('Double Side') && top && bot) remarks = `|TOPLAMI:${top}|BOTMLAMI:${bot}|`;
+
+
+  // strip any old tag, then add the current one
+
+  const base = remarksInput.value.replace(/\|(TOPLAMI|BOTMLAMI):[^|]*/g, '').replace(/^\|+|\|+$/g, '').trim();
+  remarksInput.value = base + buildLamiTag();
+}
+
+function validateLami() {
+  const rows = [...document.querySelectorAll('#numbers_pkts tr')]
+    .filter(row => row.querySelector('#lamination'));   // skips header/footer rows
+
+  const updates = [];
+
+  // Pass 1: validate every row, change nothing yet
+  for (let i = 0; i < rows.length; i++) {
+    const row       = rows[i];
+    const lamiType  = row.cells[2].lastElementChild.value;
+    const topSel    = row.cells[7].lastElementChild;
+    const botSel    = row.cells[8].lastElementChild;
+    const remarksEl = row.cells[10].lastElementChild;
+
+    const topName = topSel.value ? topSel.selectedOptions[0].textContent.trim() : '';
+    const botName = botSel.value ? botSel.selectedOptions[0].textContent.trim() : '';
+
+    let tag = '';
+    if (lamiType.includes('Single Side')) {
+      if (!topName) {
+        alert(`Line ${i + 1}: please select the lamination company`);
+        topSel.focus();
+        return false;
+      }
+      tag = `|TOPLAMI:${topName}|`;
+    } else if (lamiType.includes('Double Side')) {
+      if (!topName || !botName) {
+        alert(`Line ${i + 1}: please select both lamination companies`);
+        (topName ? botSel : topSel).focus();
+        return false;
+      }
+      tag = `|TOPLAMI:${topName}|BOTMLAMI:${botName}|`;
+    }
+    updates.push([remarksEl, tag]);
+  }
+
+  // Pass 2: all rows are valid, so write the tags (replacing any old ones)
+  updates.forEach(([el, tag]) => {
+    el.value = el.value.replace(/\|?(?:TOPLAMI|BOTMLAMI):[^|]*\|?/g, '').trim() + tag;
+  });
+
+  return true;
+}
+
+
 
 
