@@ -704,7 +704,7 @@ function addRow(tableID)
 			if (tableID == "numbers_pkts") {
                 var row_check = document.getElementById(tableID).rows[rowCount-1];
                 if (!getLamiState(row_check)){
-                alert("Please enter lami company");
+                    alert("Please enter lami company");
                 return;
                 }
             }
@@ -2680,6 +2680,8 @@ function refreshQcSummaryTable() {
 }
 
 function getLamiState(last_row) {
+  if (!last_row.querySelector('#lami_co_top')) return true;
+
   const lami_type = last_row.cells[2].lastElementChild.selectedOptions[0].innerHTML; // 'None' | 'Single Side' | 'Double Side'
   var top_lami_co = last_row.cells[7].lastElementChild.selectedOptions[0].innerHTML;
     var bottom_lami_co = last_row.cells[8].lastElementChild.selectedOptions[0].innerHTML;
