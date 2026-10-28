@@ -1419,16 +1419,18 @@ var controller = (function(orderCtrl, UICtrl) {
     var DOM = UICtrl.getDOMstrings();
     var ip = document.querySelector(DOM.currentInputMaterial).value.split(" x ");
     var P = parseFloat(ip[0]), Q = parseFloat(ip[1]);
-    var W = parseFloat(document.querySelector(DOM.currentWidth).value);
-    var L = parseFloat(document.querySelector(DOM.currentLength).value);
-    if(!(P > 0 && Q > 0 && W > 0 && L > 0)) return null;
+    var cutW = parseFloat(document.querySelector(DOM.currentWidth).value);
+    var cutL = parseFloat(document.querySelector(DOM.currentLength).value);
+    if(!(P > 0 && Q > 0 && cutW > 0 && cutL > 0)) return null;
 
-    //This is to decide which side is being sheared
-    var keepIsFirst;
-    if(L === P){ keepIsFirst = true; }
-    else if(L === Q){ keepIsFirst = false; }
+    // keep = the cut dimension that equals one side of the sheet (that side stays whole)
+    // W    = the other cut dimension, taken along the side being divided
+    var keep, W;
+    if(cutL === P || cutL === Q){ keep = cutL; W = cutW; }        // divide by width
+    else if(cutW === P || cutW === Q){ keep = cutW; W = cutL; }   // divide by length
     else { return null; }
-    var keep = keepIsFirst ? P : Q;
+
+    var keepIsFirst = (keep === P);
     var divide = keepIsFirst ? Q : P;
 
     var max = Math.floor(divide / W + 1e-9);
@@ -1441,10 +1443,10 @@ var controller = (function(orderCtrl, UICtrl) {
     if(bal < 0.005) bal = 0;
 
     return {
-        P: P, Q: Q, W: W, L: L, divide: divide, max: max, pieces: pps, balance: bal,
+        P: P, Q: Q, W: W, L: cutL, divide: divide, max: max, pieces: pps, balance: bal,
         balance_size: keepIsFirst ? (keep + " x " + bal) : (bal + " x " + keep)
     };
-    };
+};
 
     var updateReshearingBalance = function(resetToMax){
         var DOM = UICtrl.getDOMstrings();
