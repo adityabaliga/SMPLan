@@ -175,7 +175,7 @@ class Processing:
                     ROUND((pd.cut_length::numeric * pd.processed_numbers) / 1000, 2)
                 FROM processing p
                 JOIN processing_detail pd ON p.processing_id = pd.processing_id
-                WHERE pd.lami LIKE '%%Both Side - White%%'
+                WHERE pd.lami LIKE '%%Double Side - White%%'
                     AND p.processing_date >= %s
                     AND p.processing_date <= %s
         
@@ -188,7 +188,7 @@ class Processing:
                     ROUND((pd.cut_length::numeric * pd.processed_numbers) / 1000, 2)
                 FROM processing p
                 JOIN processing_detail pd ON p.processing_id = pd.processing_id
-                WHERE pd.lami LIKE '%%Both Side - Blue%%'
+                WHERE pd.lami LIKE '%%Double Side - Blue%%'
                     AND p.processing_date >= %s
                     AND p.processing_date <= %s
         
@@ -201,7 +201,7 @@ class Processing:
                     ROUND((pd.cut_length::numeric * pd.processed_numbers) / 1000, 2)
                 FROM processing p
                 JOIN processing_detail pd ON p.processing_id = pd.processing_id
-                WHERE pd.lami LIKE '%%Top Blue Bottom White%%'
+                WHERE pd.lami LIKE '%%Top Blue Lower White%%'
                     AND p.processing_date >= %s
                     AND p.processing_date <= %s
         
@@ -214,7 +214,7 @@ class Processing:
                     ROUND((pd.cut_length::numeric * pd.processed_numbers) / 1000, 2)
                 FROM processing p
                 JOIN processing_detail pd ON p.processing_id = pd.processing_id
-                WHERE pd.lami LIKE '%%Top Blue Bottom White%%'
+                WHERE pd.lami LIKE '%%Top Blue Lower White%%'
                     AND p.processing_date >= %s
                     AND p.processing_date <= %s
         
@@ -227,7 +227,7 @@ class Processing:
                     ROUND((pd.cut_length::numeric * pd.processed_numbers) / 1000, 2)
                 FROM processing p
                 JOIN processing_detail pd ON p.processing_id = pd.processing_id
-                WHERE pd.lami LIKE '%%Top White Bottom Blue%%'
+                WHERE pd.lami LIKE '%%Top White Lower Blue%%'
                     AND p.processing_date >= %s
                     AND p.processing_date <= %s
         
@@ -240,7 +240,7 @@ class Processing:
                     ROUND((pd.cut_length::numeric * pd.processed_numbers) / 1000, 2)
                 FROM processing p
                 JOIN processing_detail pd ON p.processing_id = pd.processing_id
-                WHERE pd.lami LIKE '%%Top White Bottom Blue%%'
+                WHERE pd.lami LIKE '%%Top White Lower Blue%%'
                     AND p.processing_date >= %s
                     AND p.processing_date <= %s
             )
