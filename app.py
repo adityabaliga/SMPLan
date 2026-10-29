@@ -4156,6 +4156,12 @@ def print_old_label_format():
     packet_wt = smpl_no[7]
     _packet_wt = 0
 
+    lami = smpl_no[9].split('-')
+    if len(lami) > 2:
+        lamination = lami[0] + ',' + lami[1]
+    else:
+        lamination = ''
+
     # Since size contains length1 and length2. Coil is represented as 0-0
     if size[1] == '0-0':
         _packet_wt = packet_wt
@@ -4176,7 +4182,7 @@ def print_old_label_format():
     incoming = Incoming.load_smpl_by_smpl_no(smpl_no[0])
 
     return render_template('/make_label.html', incoming = incoming, _packet_wt=_packet_wt,
-                           second_customer = second_customer, net_wt = net_wt)
+                           second_customer = second_customer, net_wt = net_wt, lamination = lamination)
 
 @app.route('/daily_report_pick_date', methods=['GET', 'POST'])
 def daily_report_pick_date():

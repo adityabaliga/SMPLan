@@ -1,7 +1,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>SMPL MRP- Processing</title>
+    <title>SMPL MRP- Print Old Label</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
     <style>
         .mytable>tbody>tr>td, .mytable>tbody>tr>th, .mytable>tfoot>tr>td, .mytable>tfoot>tr>th, .mytable>thead>tr>td, .mytable>thead>tr>th {
@@ -72,7 +72,7 @@
             <td>Packet Name</td>
             <td><input type="text" name="lbl_packet_name" id="lbl_packet_name"></td>
             <td>Lamination</td>
-            <td><input type="text" name="lbl_lamination" id="lbl_lamination" ></td>
+            <td><input type="text" name="lbl_lamination" id="lbl_lamination" value = "{{lamination}}"></td>
             <td>Incoming Date</td>
             <td><input type="text" name="incoming_date" id="incoming_date" value = "{{incoming.incoming_date}}" readonly></td>
         </tr>
