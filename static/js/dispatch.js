@@ -229,6 +229,7 @@ function total_dispatch_wt(tableID){
 
         document.getElementById("total_disp_wt").value = total_disp_wt.toFixed(3);
         document.getElementById("total_packets").value = total_packets;
+        updateScannedPacketsList();
 }
 
 function display_honda_pkts(){
@@ -671,7 +672,6 @@ function processDispatchQR(qrText) {
     const now = Date.now();
 
     // Avoid processing the same QR repeatedly
-    // while it remains in front of the camera
     if (qrText === lastScannedText &&
         now - lastScannedTime < 2500) {
         return;
@@ -685,42 +685,41 @@ function processDispatchQR(qrText) {
     try {
 
         const qr = parseDispatchQR(qrText);
-
         const row = findDispatchPacket(qr);
 
         if (!row) {
+
             message.style.color = "red";
             message.textContent =
-                "Packet not found in the dispatch list: " +
+                "Packet not found in dispatch list: " +
                 qr.smpl_no + " / " + qr.packet_name;
+
             return;
         }
 
         const checkbox = row.querySelector(".select_smpl");
 
         if (checkbox.checked) {
+
             message.style.color = "orange";
             message.textContent =
-                "Already selected: " + qr.smpl_no +
-                " / " + qr.packet_name;
+                "Already selected: " +
+                qr.smpl_no + " / " + qr.packet_name;
+
             return;
         }
 
-        // Select the packet using existing dispatch logic
+        // Select packet
         checkbox.checked = true;
 
+        // Call existing function.
+        // This also updates totals and scanned-packet summary.
         enable_dispatch(checkbox, "dispatch_list");
-
-        // Highlight the selected row
-        row.scrollIntoView({
-            behavior: "smooth",
-            block: "center"
-        });
 
         message.style.color = "green";
         message.textContent =
-            "Selected: " + qr.smpl_no +
-            " / " + qr.packet_name;
+            "Successfully selected: " +
+            qr.smpl_no + " / " + qr.packet_name;
 
     }
     catch (error) {
@@ -808,3 +807,74 @@ document.addEventListener("DOMContentLoaded", function () {
         .addEventListener("click", stopDispatchScanner);
 
 });
+
+function updateScannedPacketsList() {
+
+    const selectedCheckboxes =
+        document.querySelectorAll("#dispatch_list .select_smpl:checked");
+
+    const tbody = document.getElementById("scannedPacketsBody");
+    const count = document.getElementById("scannedPacketCount");
+    const emptyMessage = document.getElementById("noScannedPackets");
+
+    if (!tbody) return;
+
+    // Rebuild the list from the actual checked checkboxes
+    tbody.innerHTML = "";
+
+    selectedCheckboxes.forEach(checkbox => {
+
+        const row = checkbox.closest("tr");
+
+        const smplNo = row.dataset.smpl_no;
+        const packetName = row.dataset.packet_name;
+        const thickness = row.dataset.thickness;
+        const width = row.dataset.width;
+        const length = row.dataset.length;
+        const length2 = row.dataset.length2;
+        const numbers = row.dataset.numbers;
+
+        const weight = row.querySelector(".dispatch_wt").value;
+
+        const newRow = tbody.insertRow();
+
+        newRow.insertCell(0).textContent = smplNo;
+        newRow.insertCell(1).textContent = packetName;
+
+        let size = thickness + " x " + width + " x " + length;
+
+        if (Number(length2) !== 0) {
+            size += " - " + length2;
+        }
+
+        newRow.insertCell(2).textContent = size;
+        newRow.insertCell(3).textContent = numbers;
+        newRow.insertCell(4).textContent = Number(weight).toFixed(3);
+
+        // Remove button
+        const actionCell = newRow.insertCell(5);
+
+        const removeButton = document.createElement("button");
+
+        removeButton.type = "button";
+        removeButton.textContent = "Remove";
+        removeButton.className = "btn btn-sm btn-danger";
+
+        removeButton.addEventListener("click", function () {
+
+            checkbox.checked = false;
+
+            // Reuse existing dispatch selection logic
+            enable_dispatch(checkbox, "dispatch_list");
+
+        });
+
+        actionCell.appendChild(removeButton);
+
+    });
+
+    count.textContent = selectedCheckboxes.length;
+
+    emptyMessage.style.display =
+        selectedCheckboxes.length === 0 ? "block" : "none";
+}

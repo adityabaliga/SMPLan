@@ -56,21 +56,7 @@
                     {% endfor %}
 
     </select>
-    <div style="margin:15px 0; padding:15px; border:1px solid #ccc;">
-    <h4>QR Dispatch Scanner</h4>
 
-        <button type="button" id="startScanner" class="btn btn-primary">
-            Start Scanner
-        </button>
-
-        <button type="button" id="stopScanner" class="btn btn-secondary">
-            Stop Scanner
-        </button>
-
-        <div id="qr-reader" style="width:350px; max-width:100%; margin-top:15px;"></div>
-
-        <p id="qrScanMessage" style="margin-top:10px;"></p>
-    </div>
     <table class = "table table-sm" id = 'dispatch_list'>
             <tr>
 
@@ -124,6 +110,56 @@
         {% endfor %}
 
         </table>
+
+        <!-- QR Dispatch Scanner -->
+    <div style="margin:20px 0; padding:15px; border:1px solid #ccc; border-radius:5px;">
+
+        <h4>QR Dispatch Scanner</h4>
+
+        <button type="button" id="startScanner" class="btn btn-primary">
+            Start Scanner
+        </button>
+
+        <button type="button" id="stopScanner" class="btn btn-secondary">
+            Stop Scanner
+        </button>
+
+        <div id="qr-reader"
+             style="width:350px; max-width:100%; margin-top:15px;">
+        </div>
+
+        <p id="qrScanMessage" style="margin-top:10px;"></p>
+
+        <hr>
+
+        <h5>Selected Packets (<span id="scannedPacketCount">0</span>)</h5>
+
+        <div style="overflow-x:auto;">
+            <table class="table table-sm table-bordered"
+                   id="scannedPacketsTable">
+
+                <thead>
+                    <tr>
+                        <th>SMPL No.</th>
+                        <th>Packet</th>
+                        <th>Size</th>
+                        <th>Numbers</th>
+                        <th>Weight (MT)</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+
+                <tbody id="scannedPacketsBody">
+                </tbody>
+
+            </table>
+        </div>
+
+        <p id="noScannedPackets">
+            No packets selected yet.
+        </p>
+
+    </div>
 
         <p>Total Dispatch Wt (in MT) <input type = "number" step = "3" id = "total_disp_wt" value = "0.0" readonly> </p>
         <p>Total Packets <input type = "number" step = "0" id = "total_packets" value = "0" readonly> </p>
