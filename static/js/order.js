@@ -2,7 +2,7 @@ var orderController = (function () {
    var Order = function(id, operation, stage_no, input_width, input_length, fg_wip, output_width, output_length,
    lamination, tolerance, i_dia, processing_wt, wt_per_pkt, numbers, no_of_pkts, no_per_pkt, packing,
    remarks,op_processing_wt, no_of_parts, length_per_part, outer_dia, half_cut_stop, special_instructions,
-   pieces_per_sheet, balance_size, balance_wt, balance_numbers){
+   pieces_per_sheet, balance_size, balance_wt, balance_numbers, input_id){
         this.id = id;
         this.operation = operation;
         this.stage_no = stage_no;
@@ -31,6 +31,7 @@ var orderController = (function () {
         this.balance_size     = balance_size || "";
         this.balance_wt       = balance_wt || 0;
         this.balance_numbers  = balance_numbers || 0;
+        this.input_id = input_id;
    };
 
    var operationAbbr = {
@@ -43,7 +44,10 @@ var orderController = (function () {
     'Levelling'    : 'LEV'
     };
 
+    var inputIdSeq = 0;
+
     var Input_size = function(input_size, weight, stage_no, numbers){
+        this.id = ++inputIdSeq;
         this.input_size = input_size;
         this.weight = weight;
         this.stage_no = stage_no;
@@ -95,7 +99,7 @@ var orderController = (function () {
                 input.processing_wt, input.wt_per_pkt, input.numbers, input.no_of_pkts, input.nos_per_pkt,
                 input.packing, input.remarks, input.op_processing_wt, input.no_of_parts, input.length_per_part,
                  input.outer_dia, input.half_cut_stop, input.special_instructions,
-                input.pieces_per_sheet, input.balance_size, input.balance_wt, input.balance_numbers)
+                input.pieces_per_sheet, input.balance_size, input.balance_wt, input.balance_numbers, input.input_id)
 
                 // Add it to the array based on the operation
                 data.allOrders[input.operation].push(newOrder);
@@ -257,28 +261,32 @@ var orderController = (function () {
             return true;
         },
 
+        getInputEntry: function(id){
+            var i;
+            for(i=0;i<data.input_material.length;i++){
+                if(String(data.input_material[i].id) === String(id)) return data.input_material[i];
+            }
+            return null;
+        },
+
+
         // This updates the array input size. The input width and length are searched for in the array
         // and the wt of the input is updated accordingly.
-        updateInputSize : function(input_width, input_length, processing_wt, sign){
+        updateInputSize : function(id, wt, sign){
 
-            var ip_size, currentInputMaterial, input_size,i,weight;
-
-            ip_size = input_width + " x " + input_length;
-
+            var i, entry = null, w;
             for(i=0;i<data.input_material.length;i++){
-                    if(data.input_material[i].input_size === ip_size){
-                        if(sign === "minus"){
-                            weight =data.input_material[i].weight-processing_wt;
-                            data.input_material[i].weight = weight.toFixed(3);
-                        }if(sign === "plus"){
-                            weight = parseFloat(data.input_material[i].weight) + parseFloat(processing_wt);
-                            data.input_material[i].weight = weight.toFixed(3);
-                        }
-                    }
-                }
+                if(String(data.input_material[i].id) === String(id)){ entry = data.input_material[i]; break; }
+            }
+            if(!entry) return;
 
+            w = parseFloat(entry.weight);
+            if(sign === "minus"){ w = w - parseFloat(wt); }
+            if(sign === "plus"){  w = w + parseFloat(wt); }
+            if(Math.abs(w) < 0.0005) w = 0;      // avoids "-0.000", which the dropdown wouldn't treat as used up
+            entry.weight = w.toFixed(3);
 
-            },
+        },
 
         returnInputSize: function(){
             return data.input_material;
@@ -615,7 +623,7 @@ var UIController = (function() {
 
 
        // This refreshes the input size drop down in the UI
-       refreshInputSize: function(newInput, mother_size, fromFunction, numbers){
+       refreshInputSize: function(newInput, mother_size, fromFunction, numbers, selected_id){
           var element, html, newHTML,i, firstOption, mother_size_, DOM;
 
            element = document.querySelector(DOMStrings.currentInputMaterial);
@@ -634,16 +642,17 @@ var UIController = (function() {
            for (i=0;i<newInput.length;i++){
 
 
-                html = '<option value="%input_size%" %sel% %disabled%>%input_size%    %wt% MT %nos% Nos%tag%</option>';
+                html = '<option value="%input_size%" data-id="%id%" %sel% %disabled%>%input_size%    %wt% MT %nos% Nos%tag%</option>';
 
                 newHTML = html.replace('%input_size%', newInput[i].input_size);
+                newHTML = newHTML.replace('%id%', newInput[i].id);
                 newHTML = newHTML.replace('%input_size%', newInput[i].input_size);
-                newHTML = newHTML.replace('%wt%', newInput[i].weight);
+                newHTML = newHTML.replace('%wt%', Math.max(0, parseFloat(newInput[i].weight)).toFixed(3));
                 newHTML = newHTML.replace('%nos%', newInput[i].numbers);
                 newHTML = newHTML.replace('%tag%', newInput[i].is_balance ? '  (balance)' : '');
 
                //If all the material used then the user should not be able to select it in the input material
-               if(newInput[i].weight === "0.000"){
+               if(parseFloat(newInput[i].weight) < 0.0005){
                    newHTML = newHTML.replace('%disabled%', 'disabled');
                }else{
                    newHTML = newHTML.replace('%disabled%', '');
@@ -651,7 +660,10 @@ var UIController = (function() {
                  // If the mother size is the input size, it should be automatically selected.
                 if(mother_size == newInput[i].input_size){
                    if(fromFunction !== "addOperation"){
-                     newHTML = newHTML.replace('%sel%', 'selected');
+                     if(selected_id === undefined || String(newInput[i].id) === String(selected_id)){
+                        newHTML = newHTML.replace('%sel%', 'selected');
+                    }
+
                  }
 
                    // Width of CTL size is set only on change of input material. When we add size, the user does not change input material,
@@ -663,7 +675,7 @@ var UIController = (function() {
                }else{
                    newHTML = newHTML.replace('%sel%', "");
                }
-
+                newHTML = newHTML.replace('%sel%', '');
                 document.querySelector(DOMStrings.currentInputMaterial).insertAdjacentHTML('beforeend', newHTML);
             }
 
@@ -1744,8 +1756,9 @@ var controller = (function(orderCtrl, UICtrl) {
 
         ip_mtrl_selected = ip_mtrl_selected.split(' ');
         ip_mtrl_wt = parseFloat(ip_mtrl_selected[3]);
-        if(ip_mtrl_wt * 1.05 < input.processing_wt){
-            alert('Processing Wt is greater than input material weight');
+        var entry = orderCtrl.getInputEntry(input.input_id);
+        if(entry && parseFloat(input.processing_wt) > parseFloat(entry.weight) * 1.05){
+            alert('Processing Wt (' + input.processing_wt + ' MT) is more than the ' + entry.weight + ' MT available in the selected input material');
             return false;
         }
 
@@ -1856,6 +1869,9 @@ var controller = (function(orderCtrl, UICtrl) {
         // Get field input data
         input = UICtrl.getInput();
 
+        var ipSel = document.querySelector(DOM.currentInputMaterial);
+        input.input_id = ipSel.options[ipSel.selectedIndex].getAttribute("data-id");
+
         console.log('op_processing_wt:', input.op_processing_wt, 'no_of_parts:', input.no_of_parts, 'outer_dia:', input.outer_dia);
 
        if(document.querySelector(DOM.currentFG_WIP).value === "FG"){
@@ -1911,7 +1927,7 @@ var controller = (function(orderCtrl, UICtrl) {
             UICtrl.clearSizeFields();
 
             //update input material when output is FG
-            orderCtrl.updateInputSize(newOrder.input_width, newOrder.input_length, consumed_wt, "minus", newOrder.numbers);
+            orderCtrl.updateInputSize(newOrder.input_id, consumed_wt, "minus", newOrder.numbers);
             var numbers = 0;
             if(newOrder.fg_wip === "WIP"){
                 new_input_size = newOrder.output_width + " x " + newOrder.output_length;
@@ -1932,7 +1948,7 @@ var controller = (function(orderCtrl, UICtrl) {
                 new_input = orderCtrl.returnInputSize();
             }
 
-            UICtrl.refreshInputSize(new_input, input.input_material, "addSize", new_input.numbers);
+            UICtrl.refreshInputSize(new_input, input.input_material, "addSize", new_input.numbers, input.input_id);
 
 
 
@@ -2056,10 +2072,10 @@ var controller = (function(orderCtrl, UICtrl) {
                 onChangeOperation();
 
                 // update input size
-                orderCtrl.updateInputSize(size_details.input_width, size_details.input_length, size_details.processing_wt, "plus");
+                orderCtrl.updateInputSize(size_details.input_id, restore_wt, "plus");
                 newInput = orderCtrl.returnInputSize();
                 mother_size = size_details.input_width + " x " + size_details.input_length;
-                UICtrl.refreshInputSize(newInput, mother_size, "addSize");
+                UICtrl.refreshInputSize(newInput, mother_size, "addSize", undefined, size_details.input_id);
 
 
             }
