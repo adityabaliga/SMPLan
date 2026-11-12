@@ -8,6 +8,7 @@ import json
 from flask import jsonify
 from pathlib import Path
 import io
+from xml.sax.saxutils import escape
 
 
 class CurrentStock:
@@ -808,6 +809,28 @@ class CurrentStock:
         else:
             return None
 
+
+    def get_incoming_coil_size(cursor, smpl_no):
+        """Return input coil size string like '4.0 x 1250' from incoming"""
+
+        cursor.execute("""
+            SELECT thickness, width, length
+            FROM incoming
+            WHERE smpl_no = %s
+        """, (smpl_no,))
+        row = cursor.fetchone()
+        if not row:
+            return ''
+        thickness, width, length = row
+        try:
+            has_length = length is not None and float(length) != 0
+        except (ValueError, TypeError):
+            has_length = False
+
+        if has_length:
+            return f"{thickness} X {width} X {length}"
+        return f"{thickness} X {width}"
+
     @classmethod
     def get_unexported_fg_by_size(cls, smpl_no=None):
         """
@@ -928,6 +951,8 @@ class CurrentStock:
                     date_str = datetime.now().strftime('%d%m%Y')
                     xml_filename = f"{smpl_no}_{fg_size_clean}_{date_str}.xml"
 
+                incoming_size = cls.get_incoming_coil_size(cursor, smpl_no)
+                coil_customer = packets[0][8] if packets and packets[0][8] else ''
 
                 # Generate XML for Tally
                 xml_content = cls.generate_tally_stock_journal_xml(
@@ -939,7 +964,10 @@ class CurrentStock:
                     total_quantity=total_quantity,
                     total_weight=total_weight,
                     packets=packets,
-                    batch_id=batch_id
+                    batch_id=batch_id,
+                    customer=coil_customer,
+                    input_coil_size=incoming_size
+
                 )
 
                 # Log the export
@@ -1014,48 +1042,47 @@ class CurrentStock:
 
     @classmethod
     def generate_tally_stock_journal_xml(cls, smpl_no, fg_size, thickness, width, length,
-                                         total_quantity, total_weight, packets, batch_id):
+                                         total_quantity, total_weight, packets, batch_id, customer='',
+                                         input_coil_size=''):
         """
         Generate Tally XML for Stock Journal entry
         """
         try:
-            # Format FG size: if length is 0, replace with "Coils"
-            if length == 0 or length == '0':
-                fg_size_formatted = f"{thickness} x {width} x Coils"
+            try:
+                is_coil = float(length) == 0
+            except (ValueError, TypeError):
+                is_coil = False
+
+            if is_coil:
+                fg_size_formatted = f"{thickness} X {width} X Coils"
             else:
                 fg_size_formatted = fg_size
 
-            # Add space after coil prefixes
             smpl_no_formatted = cls.format_coil_number(smpl_no)
 
-
             xml = f"""<?xml version="1.0" encoding="utf-8"?>
-            <TALLY>
-              <STOCKJOURNAL>
-                <GUID>{uuid.uuid4().hex.upper()}</GUID>
-                <DATE>{datetime.now().strftime('%Y-%m-%d')}</DATE>
-                <REFERENCE>SJ-{batch_id}</REFERENCE>
-                <NOTES>Auto-generated from Production System - FG: {fg_size}</NOTES>
-                <LINEITEM>
-                  <ITEM>{fg_size}</ITEM>
-                  <QUANTITY>{total_quantity}</QUANTITY>
-                  <BASEUNITS>{total_weight}</BASEUNITS>
-                  <UNIT>MT</UNIT>
-                  <COIL_NUMBER>{smpl_no_formatted}</COIL_NUMBER>
-                  <THICKNESS>{thickness}</THICKNESS>
-                  <WIDTH>{width}</WIDTH>
-                  <LENGTH>{length}</LENGTH>
-                  <PACKET_DETAILS>
-            """
+        <TALLY>
+          <STOCKJOURNAL>
+            <GUID>{uuid.uuid4().hex.upper()}</GUID>
+            <DATE>{datetime.now().strftime('%Y-%m-%d')}</DATE>
+            <REFERENCE>SJ-{batch_id}</REFERENCE>
+            <NOTES>Auto-generated from Production System - FG: {escape(fg_size_formatted)}</NOTES>
+            <LINEITEM>
+              <ITEM>{escape(fg_size_formatted)}</ITEM>
+              <QUANTITY>{total_quantity}</QUANTITY>
+              <BASEUNITS>{total_weight}</BASEUNITS>
+              <UNIT>MT</UNIT>
+              <COIL_NUMBER>{smpl_no_formatted}</COIL_NUMBER>
+              <CUSTOMER>{escape(str(customer))}</CUSTOMER>
+              <INPUT_COIL_SIZE>{escape(str(input_coil_size))}</INPUT_COIL_SIZE>
+              <THICKNESS>{thickness}</THICKNESS>
+              <WIDTH>{width}</WIDTH>
+              <LENGTH>{'Coils' if is_coil else length}</LENGTH>
+              <PACKET_DETAILS>
+        """
 
-            # Add details of each packet
-            print(f"Adding {len(packets)} packets to XML...")
             for i, packet in enumerate(packets):
                 cs_id = packet[0]
-                coil = packet[1]
-                thick = packet[2]
-                w = packet[3]
-                l = packet[4]
                 weight = packet[5]
                 qty = packet[6]
                 pkt_name = packet[7] if packet[7] else "Unknown"
@@ -1063,25 +1090,22 @@ class CurrentStock:
                 grade = packet[9] if packet[9] else "N/A"
                 prod_date = packet[10] if packet[10] else datetime.now().date()
 
-
                 xml += f"""        <PACKET>
-                      <PACKET_ID>{cs_id}</PACKET_ID>
-                      <PACKET_NAME>{pkt_name}</PACKET_NAME>
-                      <COIL_NUMBER>{smpl_no_formatted}</COIL_NUMBER>
-                      <QUANTITY>{qty}</QUANTITY>
-                      <WEIGHT>{weight}</WEIGHT>
-                      <CUSTOMER>{cust}</CUSTOMER>
-                      <GRADE>{grade}</GRADE>
-                      <PRODUCTION_DATE>{prod_date}</PRODUCTION_DATE>
-                    </PACKET>
-            """
-                print(f"  Packet {i + 1}: {pkt_name} - {qty} qty, {weight} kg")
+                  <PACKET_ID>{cs_id}</PACKET_ID>
+                  <PACKET_NAME>{escape(str(pkt_name))}</PACKET_NAME>
+                  <COIL_NUMBER>{smpl_no_formatted}</COIL_NUMBER>
+                  <QUANTITY>{qty}</QUANTITY>
+                  <WEIGHT>{weight}</WEIGHT>
+                  <CUSTOMER>{escape(str(cust))}</CUSTOMER>
+                  <GRADE>{escape(str(grade))}</GRADE>
+                  <PRODUCTION_DATE>{prod_date}</PRODUCTION_DATE>
+                </PACKET>
+        """
 
             xml += """      </PACKET_DETAILS>
-                </LINEITEM>
-              </STOCKJOURNAL>
-            </TALLY>"""
-
+            </LINEITEM>
+          </STOCKJOURNAL>
+        </TALLY>"""
             return xml
 
         except Exception as e:
