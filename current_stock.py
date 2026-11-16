@@ -1059,11 +1059,12 @@ class CurrentStock:
                 fg_size_formatted = fg_size
 
             smpl_no_formatted = cls.format_coil_number(smpl_no)
+            guid = uuid.uuid5(uuid.NAMESPACE_URL, batch_id).hex.upper()
 
             xml = f"""<?xml version="1.0" encoding="utf-8"?>
         <TALLY>
           <STOCKJOURNAL>
-            <GUID>{uuid.uuid4().hex.upper()}</GUID>
+            <GUID>{guid}</GUID>
             <DATE>{datetime.now().strftime('%Y-%m-%d')}</DATE>
             <REFERENCE>SJ-{batch_id}</REFERENCE>
             <NOTES>Auto-generated from Production System - FG: {escape(fg_size_formatted)}</NOTES>
