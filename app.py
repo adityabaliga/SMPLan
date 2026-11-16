@@ -2868,11 +2868,11 @@ def dispatch_list():
     if request.method == 'POST':
         customer = request.form['select_customer']
         display_type = request.form['FG/RM']
-        dispatch_type = request.form['dispatch_type']
+
     if request.method == 'GET':
         customer = request.args.get('select_customer')
         display_type = request.args.get('FG/RM')
-        dispatch_type = request.args.get('dispatch_type')
+
 
     cs_lst = CurrentStock.get_stock_by_customer(customer, display_type)
     smpl_no_lst = []
@@ -2890,10 +2890,8 @@ def dispatch_list():
     unique_smpl_no_lst = list(set(smpl_no_lst))
     unique_smpl_no_lst.sort()
 
-    if dispatch_type == 'qr':
-        return render_template('qr_dispatch.html', customer=customer)
-    else:
-        return render_template('dispatch_list.html', cs_lst=zip(_cs_id_lst, _cs_lst), customer=customer,
+
+    return render_template('dispatch_list.html', cs_lst=zip(_cs_id_lst, _cs_lst), customer=customer,
                                unique_smpl_no_lst = unique_smpl_no_lst)
 
 
@@ -2994,98 +2992,6 @@ def dispatch():
 
     return render_template('/main_menu.html', message = "Dispatch complete")
 
-
-@app.route('/qr_dispatch', methods=['GET', 'POST'])
-def qr_dispatch():
-    return render_template('qr_dispatch.html')
-
-@app.route('/qr_dispatch_submit', methods=['GET', 'POST'])
-def qr_dispatch_submit():
-    cs_lst = []
-    _cs_lst = []
-    cs_id_lst = []
-    cs_qr_lst = []
-    dispatch_lst = []
-    dispatch_numbers_lst = []
-    dispatch_wt_lst = []
-    packet_name_lst = []
-    if request.method == 'POST':
-        dispatch_lst = request.form.getlist['qr_dispatch']
-        customer = request.form['customer']
-
-    if request.method == 'GET':
-        dispatch_lst = request.args.getlist('qr_dispatch')
-        customer = request.args.get('customer')
-
-    dispatch_string_lst = dispatch_lst[0].split('\n')
-    #dispatch_record = dispatch_string_lst.split(',')
-
-
-    for dispatch_string in dispatch_string_lst:
-        if dispatch_string:
-            dispatch_string = dispatch_string.split(',')
-            smpl_no = dispatch_string[0]
-            packet_name = dispatch_string[1]
-            numbers = dispatch_string[3]
-            size = dispatch_string[2].upper().split('X')
-            if len(size) == 3:
-                thickness = size[0]
-                width = size[1]
-                length = size[2]
-                if '-' in length:
-                    _length = length.split(' - ')
-                    length = _length[0]
-                    length2 = _length[1]
-                else:
-                    length2 = 0
-                dispatch_weight = ''
-                if 'COIL' in length:
-                    length = '0'
-            # This is for trap sizes
-            if len(size) == 4:
-                thickness = size[0]
-                width = round(((Decimal(size[1]) + Decimal(size[2]))/2), 0)
-                length = size[3]
-                dispatch_weight = ''
-                if 'COIL' in length:
-                    length = '0'
-            status = dispatch_string[6].replace('\r', '')
-
-            # Currently FG wise separate packets is only mentioned for unit 2, so picking the unit based on user
-            # to query for packet wise details or else no
-            user = current_user
-            if user.unit == 1:
-                unit = '1'
-
-            if user.unit == 2:
-                unit = '2'
-
-            unmatched_lst = []
-
-
-            cs_qr_lst = CurrentStock.get_cs_for_qr_dispath(smpl_no, packet_name, width, length, status, customer, length2, unit, numbers)
-
-            if cs_qr_lst:
-                for cs_id, cs in cs_qr_lst:
-                    cs_id_lst.append(cs_id)
-                    cs_lst.append(cs)
-                    # if coil then numbers =1, else take numbers from sticker
-                    if cs.length == 0:
-                        dispatch_numbers_lst.append(1)
-                    else:
-                        dispatch_numbers_lst.append(dispatch_string[3])
-                    if dispatch_string[4]:
-                        dispatch_weight = Decimal(dispatch_string[4])/1000
-                    else:
-                        dispatch_weight = '0'
-                    dispatch_wt_lst.append(dispatch_weight)
-                    packet_name_lst.append(dispatch_string[1])
-            else:
-                unmatched_lst.append(dispatch_string)
-
-    _cs_lst = zip(cs_id_lst, cs_lst, dispatch_numbers_lst, dispatch_wt_lst, packet_name_lst)
-    return render_template('qr_dispatch_list.html', _cs_lst = _cs_lst, customer = customer,
-                            unmatched_lst = unmatched_lst)
 
 @app.route('/generate_pdi_list', methods=['GET', 'POST'])
 def generate_pdi_list():

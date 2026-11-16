@@ -636,6 +636,14 @@ function parseDispatchQR(qrText) {
     return qr;
 }
 
+function getMainNumber(value) {
+
+    const match = String(value).match(/^\s*(\d+)/);
+
+    return match ? parseInt(match[1], 10) : null;
+
+}
+
 
 // Find the corresponding packet in the dispatch table
 
@@ -653,7 +661,7 @@ function findDispatchPacket(qr) {
             qrNumber(row.dataset.thickness) === qr.thickness &&
             qrNumber(row.dataset.width) === qr.width &&
             qrNumber(row.dataset.length) === qr.length &&
-            qrNumber(row.dataset.numbers) === qr.numbers &&
+            getMainNumber(row.dataset.numbers) === getMainNumber(qr.numbers) &&
             row.dataset.status.trim() === qr.status;
 
         if (match) {
