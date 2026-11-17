@@ -611,12 +611,13 @@ function parseDispatchQR(qrText) {
         throw new Error("Invalid dimensions in QR code.");
     }
 
+    var _length = dimensions[2].trim().toLowerCase() === "coil" ? 0 : Number(dimensions[2])
     const qr = {
         smpl_no: fields[0].trim(),
         packet_name: fields[1].trim(),
         thickness: qrNumber(dimensions[0]),
         width: qrNumber(dimensions[1]),
-        length = qrSize[2].trim().toLowerCase() === "coil" ? 0 : Number(qrSize[2]),
+        length: qrNumber(_length),
         numbers: qrNumber(fields[3]),
         net_weight: fields[4].trim(),
         gross_weight: fields[5].trim(),
@@ -661,7 +662,7 @@ function findDispatchPacket(qr) {
             qrNumber(row.dataset.thickness) === qr.thickness &&
             qrNumber(row.dataset.width) === qr.width &&
             qrNumber(row.dataset.length) === qr.length &&
-            getMainNumber(row.dataset.numbers) === getMainNumber(qr.numbers) &&
+            (qr.length === 0 || getMainNumber(row.dataset.numbers) === getMainNumber(qr.numbers)) &&
             row.dataset.status.trim() === qr.status;
 
         if (match) {
@@ -700,7 +701,10 @@ function processDispatchQR(qrText) {
             message.style.color = "red";
             message.textContent =
                 "Packet not found in dispatch list: " +
-                qr.smpl_no + " / " + qr.packet_name;
+                qr.smpl_no + " / " + qr.packet_name  + qr.smpl_no + qr.packet_name  + qr.thickness  + qr.width +
+                 qr.length +  getMainNumber(qr.numbers)  + qr.status;
+            /*+'row' + + row.dataset.smpl_no.trim() + row.dataset.packet_name.trim() + qrNumber(row.dataset.thickness)
+            + qrNumber(row.dataset.width) + qrNumber(row.dataset.length) + getMainNumber(row.dataset.numbers) + + row.dataset.status.trim() ;*/
 
             return;
         }
