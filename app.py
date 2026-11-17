@@ -497,7 +497,7 @@ def transfer_submit():
         else:
             cs_new = CurrentStock(smpl_no, cs.customer, Decimal(transfer_qty), transfer_nos, cs.thickness, cs.width,
                                   cs.length, cs.status, cs.grade, unit, cs.packet_name, cs.length2, cs.date,
-                                  cs.processing_id, '', 0)
+                                  cs.processing_id, '', 0, cs.lami)
             cs.change_wt(smpl_no, cs.width, cs.length, transfer_qty, transfer_nos, 'minus', cs.status, cs.length2)
             if cs_new.check_if_size_exists():
                 cs_new.change_wt(cs_new.smpl_no, cs_new.width, cs_new.length, transfer_qty, transfer_nos,
