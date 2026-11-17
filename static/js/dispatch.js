@@ -616,7 +616,7 @@ function parseDispatchQR(qrText) {
         packet_name: fields[1].trim(),
         thickness: qrNumber(dimensions[0]),
         width: qrNumber(dimensions[1]),
-        length: qrNumber(dimensions[2]),
+        length = qrSize[2].trim().toLowerCase() === "coil" ? 0 : Number(qrSize[2]),
         numbers: qrNumber(fields[3]),
         net_weight: fields[4].trim(),
         gross_weight: fields[5].trim(),
