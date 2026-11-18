@@ -3267,9 +3267,10 @@ def generate_honda_disp_list():
     for cs in cs_lst_sorted:
         incoming = Incoming.load_smpl_by_smpl_no(cs.smpl_no)
         incoming_lst.append(incoming)
-        import_invoice_number = incoming.remarks.split('IIN :')
-        if len(import_invoice_number) > 1:
-            import_invoice_number_lst.append(import_invoice_number[1])
+        invoice_number = incoming.remarks.split('IIN :')
+        if len(invoice_number) > 1:
+            import_invoice_number = invoice_number[1].split('.')
+            import_invoice_number_lst.append(import_invoice_number[0])
         else:
             import_invoice_number_lst.append('')
 
