@@ -1930,6 +1930,24 @@ def submit_processing():
         return render_template('/main_menu.html', message="Processing for " + smpl_no + " entered.")
 
 
+PACK_METHODS = ('Machine', 'Manual', 'No Packing')
+EYE_OPTIONS = ('Eye Vertical + Pallet', 'Eye Vertical + Pallet + Separator',
+               'Eye Horizontal', 'Eye Horizontal + Pallet')
+MAX_MERGE_COILS = 8
+
+def build_coil_packing(method, style, eye):
+    """'HDPE|Machine|Single|Eye Vertical + Pallet'. Material is None when there is no packing."""
+    if method not in PACK_METHODS:
+        raise ValueError("Unknown pack method: " + repr(method))
+    if eye not in EYE_OPTIONS:
+        raise ValueError("Unknown eye option: " + repr(eye))
+    if method == 'No Packing':
+        return 'None|No Packing|NA|' + eye
+    if style not in ('Single', 'Multiple'):
+        raise ValueError("Unknown pack style: " + repr(style))
+    return 'HDPE|' + method + '|' + style + '|' + eye
+    # to read it back: material, method, style, eye = packing.split('|')
+
 @app.route("/submit_slitting_processing", methods=['GET', 'POST'])
 def submit_slitting_processing():
     if request.method == 'POST':
@@ -1977,6 +1995,7 @@ def submit_slitting_processing():
         no_of_helpers = request.form['no_of_helpers']
         fg_id = request.form['fg_id']
         names_of_qc = request.form['names_of_qc']
+        packed_by = request.form.get('packed_by', '').strip() or None
         # names_of_helpers = request.form['names_of_helpers']
         # name_of_packer = request.form['name_of_packer']
         # names_of_qc = ''
@@ -1992,6 +2011,44 @@ def submit_slitting_processing():
         total_length = int(request.form['total_length'])
         rm_wt = Decimal(request.form['input_weight'])
         cs_rm_id = request.form['cs_rm_id']
+
+        fg_pack_method_lst = request.form.getlist('lbl_pack_method')
+        fg_pack_style_lst = request.form.getlist('lbl_pack_style')
+        fg_eye_lst = request.form.getlist('lbl_eye')
+        fg_merge_group_lst = request.form.getlist('lbl_merge_group')
+
+        m_group_lst = request.form.getlist('m_group')
+        m_name_lst = request.form.getlist('m_packet_name')
+        m_net_wt_lst = request.form.getlist('m_net_wt')
+        m_method_lst = request.form.getlist('m_pack_method')
+        m_style_lst = request.form.getlist('m_pack_style')
+        m_eye_lst = request.form.getlist('m_eye')
+
+        _n = len(fg_packet_name_lst)
+        if any(len(l) != _n for l in (fg_pack_method_lst, fg_pack_style_lst, fg_eye_lst,
+                                      fg_merge_group_lst, fg_net_wt_lst)) \
+                or any(len(l) != len(m_group_lst) for l in (m_name_lst, m_net_wt_lst, m_method_lst,
+                                                            m_style_lst, m_eye_lst)):
+            return render_template('/main_menu.html',
+                                   message="Processing Entry not completed. Packing fields out of sync. Reload the page and try again.")
+
+        try:
+            # packet_name -> (packing string, merge group)
+            packing_by_packet = {
+                n: (build_coil_packing(me, st, ey), g)
+                for n, me, st, ey, g in zip(fg_packet_name_lst, fg_pack_method_lst, fg_pack_style_lst,
+                                            fg_eye_lst, fg_merge_group_lst)
+            }
+            merged_packets = {
+                g: {'name': nm, 'net_wt': Decimal(nw or 0), 'packing': build_coil_packing(me, st, ey)}
+                for g, nm, nw, me, st, ey in zip(m_group_lst, m_name_lst, m_net_wt_lst,
+                                                 m_method_lst, m_style_lst, m_eye_lst)
+            }
+        except ValueError as error:
+            return render_template('/main_menu.html', message=f"Processing Entry not completed. {error}")
+        net_by_packet = {n: Decimal(w or 0) for n, w in zip(fg_packet_name_lst, fg_net_wt_lst)}
+
+
         # Establish a database connection
         connection = psycopg2.connect(
             dbname='smpl_prodn',
@@ -2022,15 +2079,16 @@ def submit_slitting_processing():
                     cursor.execute("insert into processing (smpl_no, operation, processing_date, start_time, "
                                    "end_time, setting_start_time, setting_end_time, production_time, setting_time, no_of_qc, "
                                    "no_of_helpers, names_of_qc,setting_date, total_processed_wt,"
-                                   "total_cuts, previous_processing_id) values (%s, %s,%s, %s, "
-                                   "%s, %s, %s, %s, %s, %s,%s, %s, %s, %s, %s, %s) "
+                                   "total_cuts, previous_processing_id, packed_by) values (%s, %s,%s, %s, "
+                                   "%s, %s, %s, %s, %s, %s,%s, %s, %s, %s, %s, %s, %s) "
                                    "returning processing_id",
                                    (processing.smpl_no, processing.operation, processing.processing_date,
                                     processing.start_time, processing.end_time, processing.setting_start_time,
                                     processing.setting_end_time, processing.processing_time, processing.setting_time,
                                     processing.no_of_qc, processing.no_of_helpers, processing.names_of_qc,
                                     processing.setting_date,
-                                    processing.total_processed_wt, processing.total_cuts, processing.previous_processing_id))
+                                    processing.total_processed_wt, processing.total_cuts,
+                                    processing.previous_processing_id, packed_by))
 
                     # cursor.execute("select processing_id from processing where oid= %s", (cursor.lastrowid,))
                     processing_id = cursor.fetchone()[0]
@@ -2311,6 +2369,63 @@ def submit_slitting_processing():
                                 # CurrentStock.delete_record(cs_id)
 
                                 cursor.execute("delete from current_stock where cs_id = %s", (cs_rm_id,))
+
+                    # ---- packing + merged packets ------------------------------------------
+                    member_names = {}  # group -> [packet names in table order]
+                    for pname, (_pk, grp) in packing_by_packet.items():
+                        if grp:
+                            member_names.setdefault(grp, []).append(pname)
+
+                    for pname, (pk, grp) in packing_by_packet.items():
+                        merged_name = None
+                        if grp:
+                            if grp not in merged_packets:
+                                raise ValueError("Merge group " + grp + " has no merged packet")
+                            if pk != merged_packets[grp]['packing']:
+                                raise ValueError("Packing of " + pname + " differs from its merged packet")
+                            merged_name = '+'.join(member_names[grp])
+                        cursor.execute(
+                            "update processing_detail set packing = %s, merged_packet_name = %s "
+                            "where processing_id = %s and packet_name = %s",
+                            (pk, merged_name, processing_id, pname))
+                        if not grp:  # individual FG coils: packing goes on their stock row too
+                            cursor.execute(
+                                "update current_stock set packing = %s "
+                                "where processing_id = %s and packet_name = %s and status = 'FG'",
+                                (pk, processing_id, pname))
+
+                    for grp, m in merged_packets.items():
+                        members = member_names.get(grp, [])
+                        merged_name = '+'.join(members)
+                        if len(members) < 2 or len(members) > MAX_MERGE_COILS:
+                            raise ValueError("Merge " + merged_name + ": needs 2 to " + str(MAX_MERGE_COILS) + " coils")
+                        if m['name'] != merged_name:
+                            raise ValueError("Merged packet name mismatch: " + m['name'] + " vs " + merged_name)
+
+                        cursor.execute(
+                            "select cs_id, weight, numbers, width, length, length2, lami, second_customer, customer, "
+                            "thickness, grade, unit, date, status from current_stock "
+                            "where processing_id = %s and packet_name = any(%s) and status = 'FG' for update",
+                            (processing_id, members))
+                        rows = cursor.fetchall()
+                        if len(rows) != len(members):
+                            raise ValueError("Merge " + merged_name + ": expected " + str(len(members)) +
+                                             " stock rows, found " + str(len(rows)))
+                        if len({(r[3], r[6] or '', (r[7] or '').strip().upper()) for r in rows}) != 1:
+                            raise ValueError("Merge " + merged_name + ": width, lamination or 2nd customer differ")
+                        if abs(sum(net_by_packet[n] for n in members) - m['net_wt']) > Decimal('0.001'):
+                            raise ValueError("Merge " + merged_name + ": net weight does not match the coils")
+
+                        tot_wt = round(sum(Decimal(r[1]) for r in rows), 3)
+                        tot_nos = sum(Decimal(r[2]) for r in rows)
+                        f = rows[0]
+                        cursor.execute("delete from current_stock where cs_id = any(%s)", ([r[0] for r in rows],))
+                        cursor.execute(
+                            "insert into current_stock (smpl_no, weight, numbers, width, length, status, customer, thickness, "
+                            "grade, unit, packet_name, length2, date, processing_id, second_customer, net_wt, lami, packing) "
+                            "values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+                            (smpl_no, tot_wt, tot_nos, f[3], f[4], f[13], f[8], f[9], f[10], f[11], merged_name,
+                             f[5], f[12], processing_id, f[7], m['net_wt'], f[6], m['packing']))
 
                     connection.commit()
                     print("Data inserted successfully!")

@@ -853,8 +853,7 @@ function print_label_slit_new(){
     var top_comment_pos = 8;
     var comment_pos = 9;
     var status_pos = 10;
-    var label_size_pos = 11;
-    var label_format_pos = 12;
+    var label_format_pos = 11;
 
     var fg_table = document.getElementById('fg_table');
 
@@ -881,7 +880,7 @@ function print_label_slit_new(){
     data += fg_table.rows[rowId].cells[net_wt_pos].lastChild.value + '&';
     data += fg_table.rows[rowId].cells[gross_wt_pos].lastChild.value + '&';
     data += fg_table.rows[rowId].cells[top_comment_pos].lastChild.value + '&';
-    data += fg_table.rows[rowId].cells[label_size_pos].lastChild.value + '&';
+    data += SLIT_LABEL_SIZE + '&';
     data += fg_table.rows[rowId].cells[status_pos].lastChild.value + '&';
     data += document.getElementById('lbl_qc_name').value;
 
@@ -1432,12 +1431,15 @@ function make_label_new_slit(th){
             '<td><input type="text" style="width:130px;"  id="lbl_comment" name="lbl_comment"></td>' +
             '<td><input type="text" style="width:50px;"  id="lbl_mat_status" name="lbl_mat_status" value="%status%"></td>' +
 
-            '<td><select name ="lbl_format_size" id="lbl_format_size">' +
-            '<option value ="big">BIG</option><option value ="small">SMALL</option></select></td>' +
             '<td><select name ="lbl_format" id="lbl_format"><option value ="SMPL">SMPL</option>' +
             '<option value ="TTS">TTS</option><option value ="HONDA">HONDA</option>' +
             '<option value ="TSL">TSL</option></select></td>' +
             '<td><input type = "button" class="btn btn-default" value="Print" onclick="print_label_slit_new()"></td>' +
+                        '<td><input type="checkbox" class="merge_chk" title="Select to merge"></td>' +
+            '<td><select name="lbl_pack_method" id="lbl_pack_method" onchange="sync_pack_from_coil(this)"><option value="">Select</option><option value="Machine">Machine</option><option value="Manual">Manual</option><option value="No Packing">No Packing</option></select></td>' +
+            '<td><input type="text" style="width:90px;border:0px none;" name="lbl_pack_style" id="lbl_pack_style" value="Single" readonly></td>' +
+            '<td><select name="lbl_eye" id="lbl_eye" onchange="sync_pack_from_coil(this)"><option value="">Select</option><option value="Eye Vertical + Pallet">Eye Vertical + Pallet</option><option value="Eye Vertical + Pallet + Separator">Eye Vertical + Pallet + Separator</option><option value="Eye Horizontal">Eye Horizontal</option><option value="Eye Horizontal + Pallet">Eye Horizontal + Pallet</option></select></td>' +
+            '<td><input type="text" style="width:50px;border:0px none;" name="lbl_merge_group" id="lbl_merge_group" value="" readonly></td>' +
             '<td><input type="text" name="lbl_theory_wt" id="lbl_theory_wt" value="%theory_wt%"></td></tr>';
 
     var part_length = parts_table.rows[rowId].cells[0].lastChild.value;
@@ -1470,6 +1472,7 @@ function make_label_new_slit(th){
         theory_wt = parseFloat(thickness)*parseFloat(width)*parseFloat(part_length)*parseFloat(0.00000785);
         width_part_name = part_name + width_name;
 
+        existingRow = null;   //reset for every width so one match cannot leak into the next width
         const rows = fg_table.querySelectorAll('tr');
         for (let i = 1; i < rows.length; i++) {
         const packetNameCell = rows[i].cells[2].lastChild.value;
@@ -1489,12 +1492,14 @@ function make_label_new_slit(th){
 
         document.getElementById('fg_table').insertAdjacentHTML('beforeend', newNEWHTML);
         id = id +1;
+        }else if(existingRow.cells[FG.group] && existingRow.cells[FG.group].lastChild.value){
+            window.alert('Packet ' + width_part_name + ' is already merged (' + existingRow.cells[FG.group].lastChild.value + '). Unmerge it first if you need to change it.');
         }else{
 
             existingRow.cells[0].lastChild.value = size;
             existingRow.cells[1].lastChild.value = part_length;
             existingRow.cells[10].lastChild.value = width_status;
-            existingRow.cells[14].lastChild.value = theory_wt.toFixed(3);
+            existingRow.cells[FG.theory].lastChild.value = theory_wt.toFixed(3);
 
 
             }
@@ -2515,6 +2520,10 @@ function validateForm(){
 
     if(!validateLami()) return false;
 
+    if(!validatePackedBy()) return false;
+
+    if(!validatePacking()) return false;
+
     return true;
 
 }
@@ -2756,3 +2765,320 @@ function validateLami() {
 
 
 
+
+
+/* =====================================================================
+   MERGED PACKETS + PACKING TYPE  (slitting)
+   ---------------------------------------------------------------------
+   fg_table keeps ONE row per coil (these go to processing_detail as before).
+   Extra columns on each coil row:
+     15 merge checkbox (not posted) | 16 lbl_pack_method | 17 lbl_pack_style
+     18 lbl_eye | 19 lbl_merge_group (M1, M2.. or blank)
+   merged_table holds ONE row per merged packet (m_* fields) -> current_stock.
+   ===================================================================== */
+var SLIT_LABEL_SIZE = 'big';   //label size field was removed from the page; change to 'small' if you print the small layout
+var FG = {size:0, len:1, name:2, cust2:3, net:4, gross:5, lami:6, batch:7, topc:8, comm:9,
+          status:10, lblfmt:11, print:12,
+          chk:13, method:14, style:15, eye:16, group:17, theory:18};
+var MG = {group:0, size:1, len:2, name:3, nos:4, cust2:5, net:6, gross:7, lami:8, batch:9, topc:10,
+          comm:11, status:12, lblfmt:13, method:14, style:15, eye:16, print:17, unmerge:18, theory:19};
+var merge_counter = 0;
+var MAX_MERGE_COILS = 8;   //longer merged names make the sticker QR too dense to scan (QR holds the full packet name)
+
+function fg_coil_rows(){
+    return Array.prototype.slice.call(document.getElementById('fg_table').rows, 1);
+}
+function fg_val(row, pos){ return row.cells[pos].lastChild.value; }
+function norm(s){ return (s || '').toString().trim().toUpperCase().replace(/\s+/g, ' '); }
+function round3(n){ return Math.round(n * 1000) / 1000; }
+function uniq_join(arr, sep){
+    var out = [];
+    arr.forEach(function(v){ v = (v || '').toString().trim(); if(v && out.indexOf(v) === -1) out.push(v); });
+    return out.join(sep);
+}
+//"1.2 X 30 X Coil" -> {thk:'1.2', width:'30'}
+function parse_fg_size(sz){
+    var p = (sz || '').split(/\s*[xX]\s*/);
+    return {thk: (p[0] || '').trim(), width: (p[1] || '').trim()};
+}
+function merged_row_by_group(g){
+    var t = document.getElementById('merged_table');
+    for(var i = 1; i < t.rows.length; i++){
+        if(t.rows[i].cells[MG.group].lastChild.value === g) return t.rows[i];
+    }
+    return null;
+}
+function coils_in_group(g){
+    return fg_coil_rows().filter(function(r){ return fg_val(r, FG.group) === g; });
+}
+
+function merge_selected_coils(){
+    var rows = fg_coil_rows().filter(function(r){
+        return r.cells[FG.chk] && r.cells[FG.chk].firstChild.checked;
+    });
+    if(rows.length < 2){
+        alert('Tick at least two coils to merge.');
+        return;
+    }
+    if(rows.length > MAX_MERGE_COILS){
+        alert('A merged packet can have at most ' + MAX_MERGE_COILS + ' coils (you ticked ' + rows.length + '). Merge them in smaller packets.');
+        return;
+    }
+    var errors = [];
+    rows.forEach(function(r){
+        if(fg_val(r, FG.group)) errors.push(fg_val(r, FG.name) + ' is already in ' + fg_val(r, FG.group) + '.');
+    });
+    if(errors.length){ alert(errors.join('\n')); return; }
+
+    //Compatibility: thickness, width, 2nd customer, lamination, FG/WIP status must all match.
+    //(Customer is the same by definition: all coils on this page come from one mother coil.)
+    var first = rows[0];
+    var f_size = parse_fg_size(fg_val(first, FG.size));
+    rows.slice(1).forEach(function(r){
+        var s = parse_fg_size(fg_val(r, FG.size));
+        var nm = fg_val(r, FG.name);
+        if(s.thk !== f_size.thk) errors.push(nm + ': thickness ' + s.thk + ' differs from ' + f_size.thk);
+        if(s.width !== f_size.width) errors.push(nm + ': width ' + s.width + ' differs from ' + f_size.width);
+        if(norm(fg_val(r, FG.cust2)) !== norm(fg_val(first, FG.cust2))) errors.push(nm + ': 2nd customer differs');
+        if(norm(fg_val(r, FG.lami)) !== norm(fg_val(first, FG.lami))) errors.push(nm + ': lamination differs');
+        if(norm(fg_val(r, FG.status)) !== norm(fg_val(first, FG.status))) errors.push(nm + ': FG/WIP status differs');
+    });
+    if(f_size.width === 'BAL') errors.push('Balance width coils cannot be merged until the width is known.');
+    rows.forEach(function(r){ if(norm(fg_val(r, FG.status)) === 'WIP') errors.push(fg_val(r, FG.name) + ': WIP coils cannot be merged (only FG).'); });
+
+    //Weights must be entered on every coil so that the totals are right
+    var net = 0, gross = 0, theory = 0, gross_filled = 0, net_filled = 0;
+    rows.forEach(function(r){
+        var n = parseFloat(fg_val(r, FG.net));
+        if(!isNaN(n) && n > 0){ net += n; net_filled++; }
+        var g = parseFloat(fg_val(r, FG.gross));
+        if(!isNaN(g) && g > 0){ gross += g; gross_filled++; }
+        var t = parseFloat(r.cells[FG.theory].lastChild.value);
+        if(!isNaN(t)) theory += t;
+    });
+    if(net_filled > 0 && net_filled < rows.length) errors.push('Net Wt is entered for some coils but not all. Fill all or none.');
+    if(gross_filled > 0 && gross_filled < rows.length) errors.push('Gross Wt is entered for some coils but not all. Fill all or none.');
+    if(errors.length){ alert('Cannot merge:\n\n' + errors.join('\n')); return; }
+
+    merge_counter++;
+    var group = 'M' + merge_counter;
+    while(merged_row_by_group(group)){ merge_counter++; group = 'M' + merge_counter; }
+
+    var names = rows.map(function(r){ return fg_val(r, FG.name); });
+    var lens  = uniq_join(rows.map(function(r){ return fg_val(r, FG.len); }), '/');
+    var methods = uniq_join(rows.map(function(r){ return fg_val(r, FG.method); }), '|');
+    var eyes    = uniq_join(rows.map(function(r){ return fg_val(r, FG.eye); }), '|');
+    if(methods.indexOf('|') !== -1) methods = '';   //members disagree -> user must pick
+    if(eyes.indexOf('|') !== -1) eyes = '';
+    var mstyle = '';
+    if(methods === 'No Packing') mstyle = 'NA';   //no HDPE -> pack style does not apply
+    var topc = uniq_join(rows.map(function(r){ return fg_val(r, FG.topc); }), ' | ');
+
+    var html = '<tr>' +
+        '<td><input type="text" style="width:45px;border:0px none;" name="m_group" value="' + group + '" readonly></td>' +
+        '<td><input type="text" style="width:130px;border:0px none;" name="m_size" value="' + fg_val(first, FG.size) + '" readonly></td>' +
+        '<td><input type="text" style="width:80px;border:0px none;" name="m_coil_length" value="' + lens + '" readonly></td>' +
+        '<td><input type="text" style="width:260px;" name="m_packet_name" value="' + names.join('+') + '" readonly></td>' +
+        '<td><input type="number" style="width:60px;" name="m_numbers" value="' + rows.length + '" readonly></td>' +
+        '<td><input type="text" style="width:130px;" name="m_second_customer" value="' + fg_val(first, FG.cust2).replace(/"/g, '&quot;') + '" readonly></td>' +
+        '<td><input type="number" step="any" style="width:100px;" name="m_net_wt" value="' + (net_filled ? round3(net) : '') + '" readonly></td>' +
+        '<td><input type="text" style="width:100px;" name="m_gross_wt" value="' + (gross_filled ? round3(gross) : '') + '" readonly></td>' +
+        '<td><input type="text" style="width:130px;" name="m_lamination" value="' + fg_val(first, FG.lami).replace(/"/g, '&quot;') + '"></td>' +
+        '<td><input type="text" style="width:130px;" name="m_batch_no" value="' + uniq_join(rows.map(function(r){ return fg_val(r, FG.batch); }), '/').replace(/"/g, '&quot;') + '"></td>' +
+        '<td><input type="text" style="width:130px;" name="m_top_comment" value="' + topc.replace(/"/g, '&quot;') + '"></td>' +
+        '<td><input type="text" style="width:130px;" name="m_comment" value="' + uniq_join(rows.map(function(r){ return fg_val(r, FG.comm); }), ', ').replace(/"/g, '&quot;') + '"></td>' +
+        '<td><input type="text" style="width:50px;" name="m_mat_status" value="' + fg_val(first, FG.status) + '"></td>' +
+        '<td><select name="m_format"><option value="SMPL">SMPL</option><option value="TTS">TTS</option><option value="HONDA">HONDA</option><option value="TSL">TSL</option></select></td>' +
+        '<td><select name="m_pack_method" onchange="sync_pack_from_merged(this)"><option value="">Select</option><option value="Machine">Machine</option><option value="Manual">Manual</option><option value="No Packing">No Packing</option></select></td>' +
+        '<td><select name="m_pack_style" title="Multiple = coils wrapped together, Single = each coil wrapped separately" onchange="sync_pack_from_merged(this)"><option value="">Select</option><option value="Multiple">Multiple</option><option value="Single">Single</option><option value="NA">N/A</option></select></td>' +
+        '<td><select name="m_eye" onchange="sync_pack_from_merged(this)"><option value="">Select</option><option value="Eye Vertical + Pallet">Eye Vertical + Pallet</option><option value="Eye Vertical + Pallet + Separator">Eye Vertical + Pallet + Separator</option><option value="Eye Horizontal">Eye Horizontal</option><option value="Eye Horizontal + Pallet">Eye Horizontal + Pallet</option></select></td>' +
+        '<td><input type="button" class="btn btn-default" value="Print" onclick="print_label_merged(this)"></td>' +
+        '<td><input type="button" class="btn btn-default" value="Unmerge" onclick="unmerge_packet(this)"></td>' +
+        '<td><input type="text" name="m_theory_wt" value="' + theory.toFixed(3) + '" style="width:70px;" readonly></td></tr>';
+
+    var mt = document.getElementById('merged_table');
+    mt.insertAdjacentHTML('beforeend', html);
+    var mrow = mt.rows[mt.rows.length - 1];
+    mrow.cells[MG.method].lastChild.value = methods;
+    mrow.cells[MG.eye].lastChild.value = eyes;
+    mrow.cells[MG.style].lastChild.value = mstyle;
+    document.getElementById('merged_section').style.display = '';
+
+    //Lock the member coils: they keep their own row (-> processing_detail) but belong to the group
+    rows.forEach(function(r){
+        r.cells[FG.group].lastChild.value = group;
+        r.cells[FG.style].lastChild.value = mstyle;   //otherwise set from the merged packet's Pack Style
+        r.cells[FG.net].lastChild.readOnly = true;
+        r.cells[FG.gross].lastChild.readOnly = true;
+        r.cells[FG.print].lastChild.disabled = true;     //only the merged sticker is printed
+        r.cells[FG.chk].firstChild.checked = false;
+        r.cells[FG.chk].firstChild.disabled = true;
+        r.cells[FG.method].lastChild.value = methods;
+        r.cells[FG.eye].lastChild.value = eyes;
+        r.style.backgroundColor = '#e6f2ff';
+    });
+}
+
+function unmerge_packet(btn){
+    var mrow = btn.parentNode.parentNode;
+    var group = mrow.cells[MG.group].lastChild.value;
+    coils_in_group(group).forEach(function(r){
+        r.cells[FG.group].lastChild.value = '';
+        r.cells[FG.style].lastChild.value = (fg_val(r, FG.method) === 'No Packing') ? 'NA' : 'Single';
+        r.cells[FG.net].lastChild.readOnly = false;
+        r.cells[FG.gross].lastChild.readOnly = false;
+        r.cells[FG.print].lastChild.disabled = false;
+        r.cells[FG.chk].firstChild.disabled = false;
+        r.style.backgroundColor = '';
+    });
+    mrow.parentNode.removeChild(mrow);
+    var mt = document.getElementById('merged_table');
+    if(mt.rows.length < 2) document.getElementById('merged_section').style.display = 'none';
+}
+
+//"No Packing" means no HDPE on the coil, so Pack Style does not apply (stored as NA).
+//The eye / pallet choice still applies. Choosing any other method clears the NA so the operator has to pick.
+function apply_no_packing_rules_coil(row, in_group){
+    var style_el = row.cells[FG.style].lastChild;
+    if(fg_val(row, FG.method) === 'No Packing'){
+        style_el.value = 'NA';
+    }else if(style_el.value === 'NA'){
+        style_el.value = in_group ? '' : 'Single';
+    }
+}
+
+//Packing changed on a coil row. If the coil is part of a merge, keep the whole packet consistent.
+function sync_pack_from_coil(sel){
+    var row = sel.parentNode.parentNode;
+    var group = fg_val(row, FG.group);
+    if(sel.name === 'lbl_pack_method') apply_no_packing_rules_coil(row, !!group);
+    if(!group) return;
+    var method = fg_val(row, FG.method), eye = fg_val(row, FG.eye), style = fg_val(row, FG.style);
+    coils_in_group(group).forEach(function(r){
+        r.cells[FG.method].lastChild.value = method;
+        r.cells[FG.eye].lastChild.value = eye;
+        r.cells[FG.style].lastChild.value = style;
+    });
+    var mrow = merged_row_by_group(group);
+    if(mrow){
+        mrow.cells[MG.method].lastChild.value = method;
+        mrow.cells[MG.eye].lastChild.value = eye;
+        mrow.cells[MG.style].lastChild.value = style;
+    }
+}
+
+//Packing changed on the merged packet row -> copy to every coil in the packet
+function sync_pack_from_merged(sel){
+    var mrow = sel.parentNode.parentNode;
+    var group = mrow.cells[MG.group].lastChild.value;
+    var style_el = mrow.cells[MG.style].lastChild;
+    if(sel.name === 'm_pack_method'){
+        if(sel.value === 'No Packing') style_el.value = 'NA';
+        else if(style_el.value === 'NA') style_el.value = '';
+    }
+    var method = mrow.cells[MG.method].lastChild.value, eye = mrow.cells[MG.eye].lastChild.value, style = style_el.value;
+    coils_in_group(group).forEach(function(r){
+        r.cells[FG.method].lastChild.value = method;
+        r.cells[FG.eye].lastChild.value = eye;
+        r.cells[FG.style].lastChild.value = style;
+    });
+}
+
+//Same sticker payload as print_label_slit_new(), but fed from the merged packet row
+function print_label_merged(btn){
+    var mrow = btn.parentNode.parentNode;
+    var v = function(pos){ return mrow.cells[pos].lastChild.value; };
+
+    var data = "";
+    data += document.getElementById('lbl_smpl_no').value + '&';
+    data += document.getElementById('lbl_prod_date').value + '&';
+    data += document.getElementById('lbl_customer').value + '&';
+    data += document.getElementById('lbl_machine').value + '&';
+    data += v(MG.size) + '&';
+    data += '&';                           //coil length intentionally blank on merged sticker
+    data += v(MG.name) + '&';
+    data += v(MG.lami) + '&';
+    data += document.getElementById('lbl_mill_id').value + '&';
+    data += document.getElementById('lbl_grade').value + '&';
+    data += document.getElementById('lbl_mill').value + '&';
+    data += v(MG.comm) + '&';
+    data += v(MG.cust2) + '&';
+    data += document.getElementById('lbl_mat_type').value + '&';
+    data += document.getElementById('lbl_scams_no').value + '&';
+    data += '&' + '&';                     //coating, part_no
+    data += v(MG.batch) + '&';
+    data += v(MG.net) + '&';
+    data += v(MG.gross) + '&';
+    data += v(MG.topc) + '&';
+    data += SLIT_LABEL_SIZE + '&';
+    data += v(MG.status) + '&';
+    data += document.getElementById('lbl_qc_name').value + '&';
+    data += v(MG.nos);                     //24th field: number of coils, shown in the size line
+
+    var sticker_text = data.replaceAll('&', ';;');
+    if(v(MG.lblfmt) == "TSL"){
+        window.open('print_label_tsl?' + data);
+    }else{
+        window.open('print_label?' + data);
+    }
+
+    fetch('/process_data', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({fieldName: sticker_text})
+    })
+    .then(function(response){ return response.json(); })
+    .then(function(d){ console.log('Success:', d); })
+    .catch(function(error){ console.error('Error:', error); });
+
+    //List the individual coil names (not the combined name) so a packet name cannot be reused
+    coils_in_group(v(MG.group)).forEach(function(r){
+        document.getElementById('net_wt_table').insertAdjacentHTML('beforeend',
+            '<tr><td>' + fg_val(r, FG.name) + '</td><td>' + fg_val(r, FG.net) + '</td><td>' + fg_val(r, FG.cust2) + '</td></tr>');
+    });
+}
+
+//Method and eye option must be chosen. For a merged packet the style (Single / Multiple) must be too,
+//unless the method is No Packing (no HDPE, so style does not apply).
+function packing_ok(method, eye, style, need_style){
+    if(!method || !eye) return false;
+    if(need_style && method !== 'No Packing' && (!style || style === 'NA')) return false;
+    return true;
+}
+
+function validatePacking(){
+    var rows = fg_coil_rows();
+    for(var i = 0; i < rows.length; i++){
+        if(!packing_ok(fg_val(rows[i], FG.method), fg_val(rows[i], FG.eye), '', false)){
+            alert('Select Pack Method and Eye Vertical option for packet ' + fg_val(rows[i], FG.name) + '.');
+            return false;
+        }
+        var g = fg_val(rows[i], FG.group);
+        if(g){
+            if(!merged_row_by_group(g) || coils_in_group(g).length < 2){
+                alert('Merge group ' + g + ' is incomplete. Unmerge and merge again.');
+                return false;
+            }
+        }
+    }
+    var mt = document.getElementById('merged_table');
+    for(var j = 1; j < mt.rows.length; j++){
+        var mr = mt.rows[j];
+        if(!packing_ok(mr.cells[MG.method].lastChild.value, mr.cells[MG.eye].lastChild.value, mr.cells[MG.style].lastChild.value, true)){
+            alert('Select Pack Method, Pack Style (Single / Multiple) and Eye Vertical option for merged packet ' + mr.cells[MG.name].lastChild.value + '.');
+            return false;
+        }
+    }
+    return true;
+}
+
+//"Packed By" may be left empty while printing stickers, but must be filled before the page is submitted
+function validatePackedBy(){
+    var el = document.getElementById('packed_by');
+    if(el && el.value.trim() === ''){
+        alert('Enter who packed the coils (Packed By) before submitting.');
+        el.focus();
+        return false;
+    }
+    return true;
+}

@@ -386,6 +386,10 @@
             <td><input type = "number" name = "no_of_helpers" id = "no_of_helpers" required></td>
             <td>Names of fitters</td>
             <td><input type = "text" name = "names_of_qc" id = "names_of_qc"></td>
+            <td>Packed By</td>
+            <td><input type = "text" name = "packed_by" id = "packed_by" required></td>
+        </tr>
+        <tr>
             <td>FG ID</td>
             <td>
                 <select name="fg_id" id="fg_id" required>
@@ -507,8 +511,14 @@
             <th>Top Comment</th>
             <th>Comments</th>
             <th>Status</th>
-            <th>Label size</th>
             <th>Label Format</th>
+            <th></th>
+            <th>Merge</th>
+            <th>Pack Method</th>
+            <th>Pack Style</th>
+            <th>Eye Vertical</th>
+            <th>Merge Grp</th>
+            <th>Theory Wt</th>
 
 
 
@@ -537,6 +547,38 @@
 
     </table>
 
+    <input type="button" class="btn btn-default" value="Merge Selected Coils" onclick="merge_selected_coils()">
+    <small>Tick the coils packed together (same width, 2nd customer and lamination), then click Merge.</small>
+
+    <div id="merged_section" style="display:none;">
+    <h3 align = "center">Merged Packets</h3>
+    <table class="table table-sm" id="merged_table">
+        <tr>
+            <th>Grp</th>
+            <th>Size</th>
+            <th>Coil Length</th>
+            <th>Packet Name</th>
+            <th>Numbers</th>
+            <th>2nd Customer</th>
+            <th>Net Wt (kgs)</th>
+            <th>Gross Wt (kgs)</th>
+            <th>Lamination</th>
+            <th>Batch No</th>
+            <th>Top Comment</th>
+            <th>Comments</th>
+            <th>Status</th>
+            <th>Label Format</th>
+            <th>Pack Method</th>
+            <th>Pack Style</th>
+            <th>Eye Vertical</th>
+            <th></th>
+            <th></th>
+            <th>Theory Wt</th>
+        </tr>
+    </table>
+    </div>
+
+    <br><br>
 
     <p>
         <!--button type ="button" class="btn btn-default">Start</button-->

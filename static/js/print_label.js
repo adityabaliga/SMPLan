@@ -22,6 +22,7 @@ var lbl_top_comment_pos = 20;
 var lbl_format_size = 21;
 var lbl_mat_status = 22;
 var lbl_qc_name = 23;
+var lbl_coil_count_pos = 24;   //only sent by merged-packet stickers
 
 //function to reduce the font size when length of text is long
 //https://stackoverflow.com/questions/18229230/dynamically-change-the-size-of-the-font-size-based-on-text-length
@@ -68,7 +69,12 @@ function get_param_new(){
         document.getElementById("customer").innerHTML = queries[lbl_customer_pos];
     }
 
-    document.getElementById("smpl_no").innerHTML = queries[lbl_smpl_no_pos] + " - " + queries[lbl_packet_name_pos] + " (" +queries[lbl_mat_type_pos] + ")";
+    //Merged packets have names like P1W1+P1W2+P2W1. Short ones stay in the header; long ones are
+    //replaced by "MERGED (n COILS)" and the full list is printed in the comments area instead.
+    var merged_names = queries[lbl_packet_name_pos].split('+');
+    var is_merged_long = (merged_names.length > 1 && queries[lbl_packet_name_pos].length > 18);
+    var header_name = is_merged_long ? ("MERGED (" + merged_names.length + " COILS)") : queries[lbl_packet_name_pos];
+    document.getElementById("smpl_no").innerHTML = queries[lbl_smpl_no_pos] + " - " + header_name + " (" +queries[lbl_mat_type_pos] + ")";
     document.getElementById("size").innerHTML = queries[lbl_size_pos];
 
     document.getElementById("qc_name").innerHTML = queries[lbl_qc_name];
@@ -77,13 +83,18 @@ function get_param_new(){
      if(url.includes('print_label_tsl')){
       document.getElementById("numbers").innerHTML = "NUMBERS: " + queries[lbl_numbers_pos];
       if(queries[lbl_size_pos].includes("coil") || queries[lbl_size_pos].includes("Coil")){
-        document.getElementById("numbers").innerHTML = "LENGTH: " + queries[lbl_numbers_pos] + " metres";
+        var _cc = (queries[lbl_coil_count_pos] || "");
+        document.getElementById("numbers").innerHTML = (queries[lbl_numbers_pos] != "") ? "LENGTH: " + queries[lbl_numbers_pos] + " metres" : (_cc != "" ? _cc + " COILS" : "");
       }
       //document.getElementById("packet_name").innerHTML = queries[lbl_packet_name_pos];
       //document.getElementById("smpl_no").innerHTML = queries[lbl_smpl_no_pos];
      }else{
         if(queries[lbl_size_pos].includes("coil") || queries[lbl_size_pos].includes("Coil")){
-            document.getElementById("size").innerHTML +=  " - " + queries[lbl_numbers_pos] + " metres";
+            if(queries[lbl_numbers_pos] != ""){
+                document.getElementById("size").innerHTML +=  " - " + queries[lbl_numbers_pos] + " metres";
+            }else if((queries[lbl_coil_count_pos] || "") != ""){
+                document.getElementById("size").innerHTML +=  " - " + queries[lbl_coil_count_pos] + " coils";
+            }
         }else{
         document.getElementById("size").innerHTML +=  " - " + queries[lbl_numbers_pos] + " Nos";
         }
@@ -126,8 +137,12 @@ function get_param_new(){
         myobj.remove();
     }
 
-    if(queries[lbl_comment_pos] != ""){
-        document.getElementById("comments").innerHTML = queries[lbl_comment_pos];
+    var comment_text = queries[lbl_comment_pos];
+    if(is_merged_long){
+        comment_text = "COILS: " + merged_names.join(", ") + (comment_text != "" ? " | " + comment_text : "");
+    }
+    if(comment_text != ""){
+        document.getElementById("comments").innerHTML = comment_text;
         line_count+=1;
         }else{
         myobj = document.getElementById("comments");
@@ -250,13 +265,41 @@ function get_param_new(){
     qr_string = queries[lbl_smpl_no_pos] + ',' + queries[lbl_packet_name_pos] + ',' + queries[lbl_size_pos] + ',' + queries[lbl_numbers_pos] + ',';
     qr_string+= queries[lbl_net_wt_pos] + ',' + queries[lbl_gross_wt_pos] + ',' + queries[lbl_mat_status];
 
+    //Long merged names make a dense QR. At 90px a code with more than ~45 modules per side drops
+    //below 2px per module and stops scanning. So: strongest error correction that still fits
+    //version 7 (45 modules); if even level L does not fit, make the code bigger instead.
+    var qr_len = unescape(encodeURIComponent(qr_string)).length;     //bytes (UTF-8)
+    var qr_size = 90;
+    var qr_level = QRCode.CorrectLevel.H;
+    if(qr_len > 154){
+        qr_level = QRCode.CorrectLevel.L;
+        var l_caps = [[192,49],[230,53],[271,57],[321,61],[367,65],[425,69]];   //[byte capacity, modules]
+        var modules = 73;
+        for(var q = 0; q < l_caps.length; q++){
+            if(qr_len <= l_caps[q][0]){ modules = l_caps[q][1]; break; }
+        }
+        qr_size = modules * 2;
+    }else if(qr_len > 122){
+        qr_level = QRCode.CorrectLevel.L;
+    }else if(qr_len > 86){
+        qr_level = QRCode.CorrectLevel.M;
+    }else if(qr_len > 64){
+        qr_level = QRCode.CorrectLevel.Q;
+    }
+
+    if(is_merged_long && document.getElementById("comments")){
+        //4 coils: 20px, 5-6 coils: 18px, 7-8 coils: 16px
+        document.getElementById("comments").style.fontSize = (merged_names.length <= 4) ? "20px" : ((merged_names.length <= 6) ? "18px" : "16px");
+        document.getElementById("comments").style.wordBreak = "break-word";
+    }
+
     var qrcode = new QRCode(document.getElementById("qr_code_block"),{
     text: qr_string,
-    width: 90,
-    height: 90,
+    width: qr_size,
+    height: qr_size,
     colorDark : "#000000",
     colorLight : "#ffffff",
-    correctLevel : QRCode.CorrectLevel.H
+    correctLevel : qr_level
         });
 
 
