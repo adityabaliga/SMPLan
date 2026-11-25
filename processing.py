@@ -106,7 +106,7 @@ class Processing:
             user_data = [list(row) for row in cursor.fetchall()]
 
             for processing in user_data:
-                processing[18] = cust_name_for_label(processing[18])
+                processing[19] = cust_name_for_label(processing[19])
 
 
         return user_data
