@@ -232,7 +232,7 @@ function check_packet_name(table_id, table_row){
     //In case of Honda 810 x 1010, the CTL and reshearing sizes are the same and the packet names are also the same
     //So, in case of reshearing I am adding operation to the packet_key
 
-    if(operation == "Reshearing" or operation == "Levelling"){
+    if(operation == "Reshearing" || operation == "Levelling"){
         packet_key = packet_key + '+' + operation;
     }
 
