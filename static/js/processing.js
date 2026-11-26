@@ -232,7 +232,7 @@ function check_packet_name(table_id, table_row){
     //In case of Honda 810 x 1010, the CTL and reshearing sizes are the same and the packet names are also the same
     //So, in case of reshearing I am adding operation to the packet_key
 
-    if(operation == "Reshearing" || operation == "Levelling"){
+    if(operation == "Reshearing"){
         packet_key = packet_key + '+' + operation;
     }
 
@@ -928,9 +928,7 @@ function print_label_slit_new(){
 
     document.getElementById('stickers').value = '';
 
-    var newHTML = '<tr><td>' + fg_table.rows[rowId].cells[packet_name_pos].lastChild.value + '</td><td>' + fg_table.rows[rowId].cells[net_wt_pos].lastChild.value + '</td><td>' + fg_table.rows[rowId].cells[second_customer_pos].lastChild.value + '</td></tr>'
-
-    document.getElementById('net_wt_table').insertAdjacentHTML('beforeend', newHTML);
+    add_net_wt_row(fg_table.rows[rowId].cells[packet_name_pos].lastChild.value, fg_table.rows[rowId].cells[net_wt_pos].lastChild.value, fg_table.rows[rowId].cells[second_customer_pos].lastChild.value);
 
 }
 
@@ -1429,7 +1427,7 @@ function make_label_new_slit(th){
             '<td><input type="text" style="width:130px;"  id="lbl_batch_no" name="lbl_batch_no"></td>' +
             '<td><input type="text" style="width:130px;"  id="lbl_top_comment" name="lbl_top_comment"></td>' +
             '<td><input type="text" style="width:130px;"  id="lbl_comment" name="lbl_comment"></td>' +
-            '<td><input type="text" style="width:50px;"  id="lbl_mat_status" name="lbl_mat_status" value="%status%"></td>' +
+            '<td><input type="text" style="width:50px;"  id="lbl_mat_status" name="lbl_mat_status" value="%status%" readonly></td>' +
 
             '<td><select name ="lbl_format" id="lbl_format"><option value ="SMPL">SMPL</option>' +
             '<option value ="TTS">TTS</option><option value ="HONDA">HONDA</option>' +
@@ -1491,6 +1489,7 @@ function make_label_new_slit(th){
         newNEWHTML = newNEWHTML.replace('%lamination%', lamination);
 
         document.getElementById('fg_table').insertAdjacentHTML('beforeend', newNEWHTML);
+        apply_wip_lock(document.getElementById('fg_table').rows[document.getElementById('fg_table').rows.length - 1]);
         id = id +1;
         }else if(existingRow.cells[FG.group] && existingRow.cells[FG.group].lastChild.value){
             window.alert('Packet ' + width_part_name + ' is already merged (' + existingRow.cells[FG.group].lastChild.value + '). Unmerge it first if you need to change it.');
@@ -1500,6 +1499,7 @@ function make_label_new_slit(th){
             existingRow.cells[1].lastChild.value = part_length;
             existingRow.cells[10].lastChild.value = width_status;
             existingRow.cells[FG.theory].lastChild.value = theory_wt.toFixed(3);
+            apply_wip_lock(existingRow);
 
 
             }
@@ -2910,7 +2910,6 @@ function merge_selected_coils(){
         r.cells[FG.style].lastChild.value = mstyle;   //otherwise set from the merged packet's Pack Style
         r.cells[FG.net].lastChild.readOnly = true;
         r.cells[FG.gross].lastChild.readOnly = true;
-        r.cells[FG.print].lastChild.disabled = true;     //only the merged sticker is printed
         r.cells[FG.chk].firstChild.checked = false;
         r.cells[FG.chk].firstChild.disabled = true;
         r.cells[FG.method].lastChild.value = methods;
@@ -2927,7 +2926,6 @@ function unmerge_packet(btn){
         r.cells[FG.style].lastChild.value = (fg_val(r, FG.method) === 'No Packing') ? 'NA' : 'Single';
         r.cells[FG.net].lastChild.readOnly = false;
         r.cells[FG.gross].lastChild.readOnly = false;
-        r.cells[FG.print].lastChild.disabled = false;
         r.cells[FG.chk].firstChild.disabled = false;
         r.style.backgroundColor = '';
     });
@@ -3033,8 +3031,7 @@ function print_label_merged(btn){
 
     //List the individual coil names (not the combined name) so a packet name cannot be reused
     coils_in_group(v(MG.group)).forEach(function(r){
-        document.getElementById('net_wt_table').insertAdjacentHTML('beforeend',
-            '<tr><td>' + fg_val(r, FG.name) + '</td><td>' + fg_val(r, FG.net) + '</td><td>' + fg_val(r, FG.cust2) + '</td></tr>');
+        add_net_wt_row(fg_val(r, FG.name), fg_val(r, FG.net), fg_val(r, FG.cust2));
     });
 }
 
@@ -3049,6 +3046,7 @@ function packing_ok(method, eye, style, need_style){
 function validatePacking(){
     var rows = fg_coil_rows();
     for(var i = 0; i < rows.length; i++){
+        if(is_wip_row(rows[i])) continue;      //WIP coils are not packed
         if(!packing_ok(fg_val(rows[i], FG.method), fg_val(rows[i], FG.eye), '', false)){
             alert('Select Pack Method and Eye Vertical option for packet ' + fg_val(rows[i], FG.name) + '.');
             return false;
@@ -3081,4 +3079,50 @@ function validatePackedBy(){
         return false;
     }
     return true;
+}
+
+function is_wip_row(row){
+    return fg_val(row, FG.status).trim().toUpperCase() === 'WIP';
+}
+
+//WIP coils are not packed and get no sticker, so the whole row is locked. Inputs are made read-only (not
+//disabled) and selects are made unclickable, because disabled fields are not posted and the per-row
+//lists the server reads would go out of step.
+function apply_wip_lock(row){
+    var wip = is_wip_row(row);
+    var locked = row.dataset.wipLocked === '1';
+    if(wip === locked) return;
+    var inputs = row.querySelectorAll('input[type=text], input[type=number]');
+    var selects = row.querySelectorAll('select');
+    var chk = row.cells[FG.chk].firstChild, btn = row.cells[FG.print].lastChild;
+    if(wip){
+        Array.prototype.forEach.call(inputs, function(el){ el.dataset.prevRo = el.readOnly ? '1' : '0'; el.readOnly = true; });
+        Array.prototype.forEach.call(selects, function(el){ el.style.pointerEvents = 'none'; el.tabIndex = -1; });
+        row.cells[FG.method].lastChild.value = '';
+        row.cells[FG.eye].lastChild.value = '';
+        row.cells[FG.style].lastChild.value = '';
+        chk.checked = false; chk.disabled = true; btn.disabled = true;
+        row.style.backgroundColor = '#eeeeee'; row.style.color = '#888888';
+        row.dataset.wipLocked = '1';
+    }else{
+        Array.prototype.forEach.call(inputs, function(el){ el.readOnly = (el.dataset.prevRo === '1'); });
+        Array.prototype.forEach.call(selects, function(el){ el.style.pointerEvents = ''; el.tabIndex = 0; });
+        row.cells[FG.style].lastChild.value = 'Single';
+        chk.disabled = false; btn.disabled = false;
+        row.style.backgroundColor = ''; row.style.color = '';
+        row.dataset.wipLocked = '0';
+    }
+}
+
+//Packet-name list under the label table: one row per packet (a reprint updates the row instead of adding another)
+function add_net_wt_row(name, net, cust2){
+    var t = document.getElementById('net_wt_table');
+    for(var i = 0; i < t.rows.length; i++){
+        if(t.rows[i].cells.length && t.rows[i].cells[0].textContent === name){
+            t.rows[i].cells[1].textContent = net;
+            t.rows[i].cells[2].textContent = cust2;
+            return;
+        }
+    }
+    t.insertAdjacentHTML('beforeend', '<tr><td>' + name + '</td><td>' + net + '</td><td>' + cust2 + '</td></tr>');
 }
