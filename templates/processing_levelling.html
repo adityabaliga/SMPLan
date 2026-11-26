@@ -256,6 +256,13 @@
                 <option value = "WIP">WIP</option>
             </select>
             </td>
+            <td>
+                <input type="button" class="btn btn-default btn-sm qc_btn"
+                       value="QC Issue"
+                       onclick="openQcModal(this)">
+                <input type="text" name="quality_issues_json" class="quality_issues_json"
+                       value="[]" hidden>
+            </td>
             <td><input type = "text" name ="remarks" style="width:150px;" id = "remarks"></td>
             <td><input type = "button" value="Make Label" onclick="make_label_new(this)"></td>
             <td><input type="button" name="add_size" id="add_size" value="Add Size" onclick="addRow('numbers_pkts')"></td>
