@@ -2034,10 +2034,16 @@ def submit_slitting_processing():
 
         try:
             # packet_name -> (packing string, merge group)
+            # packets that are WIP (decided per width): no packing, no sticker
+            wip_names = {part_name + width_name
+                         for width_name, fg_yes_no in zip(width_name_lst, fg_yes_no_lst) if fg_yes_no != 'FG'
+                         for part_name in part_name_lst}
+
             packing_by_packet = {
                 n: (build_coil_packing(me, st, ey), g)
                 for n, me, st, ey, g in zip(fg_packet_name_lst, fg_pack_method_lst, fg_pack_style_lst,
                                             fg_eye_lst, fg_merge_group_lst)
+                if n not in wip_names
             }
             merged_packets = {
                 g: {'name': nm, 'net_wt': Decimal(nw or 0), 'packing': build_coil_packing(me, st, ey)}
@@ -3014,7 +3020,7 @@ def dispatch_list():
 def dispatch():
     if request.method == 'POST':
         dispatch_lst = request.form.getlist('select_smpl')
-        defectives = request.form.getlist('defectives')
+        defectives = request.form.getlist('defective')
         vehicle_no = request.form['vehicle_no']
         customer = request.form['customer']
         dispatch_date = request.form['dispatch_date']
